@@ -127,7 +127,9 @@ export class PantoneToolAction extends WeaveAction {
       const tr = selectionPlugin.getTransformer();
       tr.show();
       const node = stage.findOne(`#${this.pantoneId}`);
-      node && selectionPlugin.setSelectedNodes([node]);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
     }
 
     this.pantoneId = null;

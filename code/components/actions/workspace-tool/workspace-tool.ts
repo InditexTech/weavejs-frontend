@@ -132,7 +132,9 @@ export class WorkspaceToolAction extends WeaveAction {
       const tr = selectionPlugin.getTransformer();
       tr.show();
       const node = stage.findOne(`#${this.workspaceId}`);
-      node && selectionPlugin.setSelectedNodes([node]);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
     }
 
     this.workspaceId = null;
