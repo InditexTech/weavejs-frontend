@@ -1,0 +1,25 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import React from "react";
+
+type ToolbarProps = {
+  children: React.ReactNode;
+  orientation?: "horizontal" | "vertical";
+};
+
+export const Toolbar = ({ children, orientation = "vertical" }: Readonly<ToolbarProps>) => {
+  return (
+    <div
+      className={cn(
+        "gap-[1px] shadow-md rounded-lg px-1 py-1 bg-light-background-1 border border-light-border-3 pointer-events-auto",
+        {
+          ["flex"]: orientation === "horizontal",
+          ["flex flex-col"]: orientation === "vertical",
+        },
+      )}
+    >
+      {children}
+    </div>
+  );
+};

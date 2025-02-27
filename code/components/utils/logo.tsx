@@ -1,0 +1,26 @@
+import React from "react";
+import Image from "next/image";
+import logoSrc from "@/assets/images/logo.png";
+import { cn } from "@/lib/utils";
+
+type LogoProps = {
+  kind?: "large" | "small"
+};
+
+export function Logo({ kind = "large" }: Readonly<LogoProps>) {
+  return (
+    <div className="p-0 bg-transparent flex justify-start items-center gap-2">
+      <Image
+        src={logoSrc}
+        width={kind === "large" ? 64 : 24}
+        height={kind === "large" ? 64 : 24}
+        className={cn(`object-cover`, {
+          ["w-11 h-11"]: kind === "large",
+          ["w-6 h-6"]: kind === "small",
+        })}
+        alt="Weave.js logo"
+      />
+      <div className="font-noto-sans-mono text-zinc !normal-case">Weave.js</div>
+    </div>
+  );
+}
