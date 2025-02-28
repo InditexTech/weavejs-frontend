@@ -27,6 +27,8 @@ import {
   WeaveUser,
   WeaveSelection,
 } from "@weavejs/sdk";
+import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@weavejs/store-websockets";
+// import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@weavejs/store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
 import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
@@ -34,7 +36,7 @@ import { WorkspaceToolAction } from "@/components/actions/workspace-tool/workspa
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { Logo } from "@/components/utils/logo";
-import { WeaveProvider } from "@weavejs/react";
+import { useWeave, WeaveProvider } from "@weavejs/react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 
@@ -43,6 +45,8 @@ export const Room = () => {
   const [loadedParams, setLoadedParams] = React.useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
 
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
@@ -81,6 +85,22 @@ export const Room = () => {
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
   }, [user]);
+
+  const onConnectionStatusChangeHandler = React.useCallback(
+    (status: WeaveStoreWebsocketsConnectionStatus) => {
+      setConnectionStatus(status);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  // const onConnectionStatusChangeHandler = React.useCallback(
+  //   (status: WeaveStoreAzureWebPubsubConnectionStatus) => {
+  //     setConnectionStatus(status);
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [],
+  // );
 
   const handleEnter = React.useCallback(() => {
     router.push("/collaboration");
@@ -132,8 +152,17 @@ export const Room = () => {
     <WeaveProvider
       containerId="weave"
       getUser={getUser}
-      roomId={room}
-      connection={{ serverUrl: "ws://localhost:1234" }}
+      store={
+        new WeaveStoreWebsockets({
+          roomId: room,
+          wsOptions: {
+            serverUrl: "ws://localhost:1234",
+          },
+          callbacks: {
+            onConnectionStatusChange: onConnectionStatusChangeHandler,
+          },
+        })
+      }
       fonts={[
         {
           id: "NotoSansMono",
