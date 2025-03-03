@@ -4,7 +4,7 @@ import React from "react";
 import { useWeave } from "@weavejs/react";
 import { Pin, PinOff } from "lucide-react";
 import type { WeaveStateElement } from "@weavejs/sdk";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,

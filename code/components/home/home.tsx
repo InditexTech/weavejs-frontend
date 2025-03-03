@@ -6,17 +6,6 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2, Users } from "lucide-react"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useCollaborationRoom } from "@/store/store";
 import { Logo } from "@/components/utils/logo";
 import { HomeShowCaseAnimation } from "../home-components/home-showcase-animation";
@@ -34,30 +23,6 @@ const formSchema = z.object({
 });
 
 export const Home = () => {
-  const router = useRouter();
-
-  const setRoom = useCollaborationRoom((state) => state.setRoom);
-  const setUser = useCollaborationRoom((state) => state.setUser);
-  const [loading, setLoading] = React.useState(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      roomId: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    setRoom(values.roomId);
-    setUser({
-      name: values.username,
-      email: `${values.username}@weavejs.com`,
-    });
-    router.push(`/room/${values.roomId}?userName=${values.username}`);
-  }
-
   return (
     <main className="w-full h-full grid grid-cols-[1fr_1fr]">
       <motion.section
