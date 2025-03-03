@@ -2,25 +2,9 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useCollaborationRoom } from "@/store/store";
 import { Logo } from "@/components/utils/logo";
 import { HomeShowCaseAnimation } from "../home-components/home-showcase-animation";
 import LoginForm from "../home-components/login-form";
-
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(2, { message: "The username must contain at least 2 characters" })
-    .max(50, { message: "The username must contain as maximum 50 characters" }),
-  roomId: z
-    .string()
-    .min(5, { message: "The room id must contain at least 5 characters" })
-    .max(50, { message: "The room id must contain as maximum 50 characters" }),
-});
 
 export const Home = () => {
   return (
