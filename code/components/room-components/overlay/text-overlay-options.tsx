@@ -51,6 +51,7 @@ function TextOverlayOptions({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <motion.div
+              {...motionProps}
               className="grid grid-cols-1 gap-3 w-full"
             >
               <InputText
