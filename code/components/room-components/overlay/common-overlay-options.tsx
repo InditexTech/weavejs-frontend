@@ -257,7 +257,6 @@ function CommonOverlayOptions({ instance, node }: {
                   label="Corner Radius"
                   value={node.props.cornerRadius ?? 0}
                   onChange={(value) => {
-                    //TODO GH-{issue-number} This is not working
                     const updatedNode = {
                       ...node,
                       props: {

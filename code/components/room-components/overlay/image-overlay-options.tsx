@@ -18,7 +18,7 @@ function ImageOverlayOptions({
         label="W"
         value={node.props.imageInfo.width}
         onChange={(value) => {
-          //TODO this is not working
+          //TODO this is not working - https://github.com/InditexTech/weavejs-frontend/issues/3
           const updatedNode = {
             ...node,
             props: {
@@ -33,7 +33,7 @@ function ImageOverlayOptions({
         label="H"
         value={node.props.imageInfo.height}
         onChange={(value) => {
-          //TODO this is not working
+          //TODO this is not working - https://github.com/InditexTech/weavejs-frontend/issues/3
           const updatedNode = {
             ...node,
             props: {
