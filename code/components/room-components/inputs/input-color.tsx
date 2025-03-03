@@ -47,7 +47,7 @@ export const InputColor = ({
       {label && (
         <label
           htmlFor="color-input"
-          className="text-sm font-medium whitespace-nowrap"
+          className="text-xs font-medium whitespace-nowrap"
         >
           {label}
         </label>
@@ -55,7 +55,7 @@ export const InputColor = ({
       <input
         id="color-input"
         type="text"
-        className="w-full text-sm font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
         value={actualValue}
         onChange={handleInputChange}
         onMouseEnter={() => setInputState("hover")}

@@ -28,7 +28,7 @@ export const InputText = ({ label, value, onChange }: Readonly<InputTextProps>) 
       <div className="font-detail-m-light text-light-content-3 whitespace-nowrap">{label}</div>
       <input
         type="text"
-        className="w-full text-right focus:border-light-border-3"
+        className="w-full text-xs font-normal text-gray-700 text-right focus:border-light-border-3"
         value={actualValue}
         onChange={(e) => {
           setActualValue(e.target.value);

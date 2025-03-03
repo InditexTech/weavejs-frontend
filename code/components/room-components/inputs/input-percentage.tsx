@@ -45,11 +45,11 @@ export const InputPercentage = ({
       )}
     >
       {label && (
-        <div className="text-sm font-medium whitespace-nowrap">{label}</div>
+        <div className="text-xs font-medium whitespace-nowrap">{label}</div>
       )}
       <input
         type="text"
-        className="w-full text-sm font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
         value={Number(actualValue * 100).toFixed(2)}
         onChange={(e) => {
           if (Number(e.target.value) <= max) {
