@@ -15,7 +15,7 @@ interface RequiredProps {
   types?: string[];
 }
 
-function withInstanceNode<P extends {}>(
+function withInstanceNode<P extends object>(
   WrappedComponent: React.ComponentType<P & InjectedProps>
 ): React.FC<Omit<P, keyof InjectedProps> & RequiredProps> {
   const ComponentWithInstanceNode: React.FC<Omit<P, keyof InjectedProps> & RequiredProps> = (props) => {
