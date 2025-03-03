@@ -1,24 +1,16 @@
 
-import { useWeave } from "@weavejs/react";
 import OverlayOptionsSection from "./overlay-options-section";
 import { InputNumber } from "../inputs/input-number";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function ImageOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["image"].includes(node.type)) {
-    return null;
-  }
-
+function ImageOverlayOptions({
+  instance,
+  node,
+}: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <OverlayOptionsSection sectionTitle="Image size">
     <div className="grid grid-cols-2 gap-3 w-full">
@@ -57,4 +49,8 @@ function ImageOverlayOptions() {
   );
 }
 
-export default ImageOverlayOptions;
+
+const ImageOverlayOptionsWithInstance = withInstanceNode(ImageOverlayOptions);
+ImageOverlayOptionsWithInstance.displayName = "ImageOverlayOptions";
+
+export default ImageOverlayOptionsWithInstance;

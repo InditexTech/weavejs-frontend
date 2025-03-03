@@ -1,26 +1,15 @@
 import { InputColor } from "./../inputs/input-color";
 import { cn } from "@/lib/utils";
 
-import { useWeave } from "@weavejs/react";
 import { ToggleIconButton } from "./../toggle-icon-button";
 import { Eye, EyeOff } from "lucide-react";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function RectangleOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["rectangle"].includes(node.type)) {
-    return null;
-  }
-
+function RectangleOverlayOptions({ instance, node }: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <div className="w-full font-body-m-light p-4 pb-2">
       <div
@@ -69,5 +58,7 @@ function RectangleOverlayOptions() {
     </div>
   );
 }
+const RectangleOverlayOptionsWithInstance = withInstanceNode(RectangleOverlayOptions);
+RectangleOverlayOptionsWithInstance.displayName = " RectangleOverlayOptions";
 
-export default RectangleOverlayOptions;
+export default RectangleOverlayOptionsWithInstance;

@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { useWeave } from "@weavejs/react";
 import { Pin, PinOff } from "lucide-react";
-import type { WeaveStateElement } from "@weavejs/sdk";
+import type { Weave, WeaveStateElement } from "@weavejs/sdk";
 import { motion } from "framer-motion";
 import {
   Accordion,
@@ -14,6 +13,7 @@ import {
 import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { InputPercentage } from "../inputs/input-percentage";
+import withInstanceNode from "../with-instance-node";
 
 const motionProps = {
   initial: { opacity: 0, height: 0 },
@@ -22,14 +22,10 @@ const motionProps = {
   transition: { duration: 0.8, ease: "easeInOut" },
 };
 
-function CommonOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance || !node) {
-    return null;
-  }
-
+function CommonOverlayOptions({ instance, node }: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   const onRotationChange = React.useCallback(
     (value: number) => {
       function degToRad(angle: number) {
@@ -281,4 +277,7 @@ function CommonOverlayOptions() {
   );
 }
 
-export default CommonOverlayOptions;
+const CommonOverlayWithInstance = withInstanceNode(CommonOverlayOptions);
+CommonOverlayWithInstance.displayName = "CommonOverlayOptions";
+
+export default CommonOverlayWithInstance;

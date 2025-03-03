@@ -1,5 +1,3 @@
-import { useWeave } from "@weavejs/react";
-
 import { InputColor } from "../inputs/input-color";
 import { cn } from "@/lib/utils";
 import { ToggleIconButton } from "../toggle-icon-button";
@@ -14,23 +12,13 @@ import {
   Tally3,
 } from "lucide-react";
 import { InputNumber } from "../inputs/input-number";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function StrokeOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!node) {
-    return null;
-  }
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!["rectangle", "line", "image"].includes(node.type)) {
-    return null;
-  }
-
+function StrokeOverlayOptions({ instance, node }: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <div className="w-full font-body-m-light p-4 pb-2">
       <div
@@ -267,4 +255,7 @@ function StrokeOverlayOptions() {
   );
 }
 
-export default StrokeOverlayOptions;
+const StrokeOverlayOptionsWithInstance = withInstanceNode(StrokeOverlayOptions);
+StrokeOverlayOptionsWithInstance.displayName = "StrokeOverlayOptions";
+
+export default StrokeOverlayOptionsWithInstance;

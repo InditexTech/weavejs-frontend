@@ -1,20 +1,16 @@
 
-import { useWeave } from "@weavejs/react";
 import OverlayOptionsSection from "./overlay-options-section";
 import { InputColor } from "../inputs/input-color";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function PantoneOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["pantone"].includes(node.type)) {
-    return null;
-  }
-
+function PantoneOverlayOptions({
+  instance,
+  node,
+}: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <OverlayOptionsSection sectionTitle="Pantone properties">
       <div className="grid grid-cols-1 gap-3 w-full">
@@ -40,4 +36,7 @@ function PantoneOverlayOptions() {
   );
 }
 
-export default PantoneOverlayOptions;
+const PantoneOverlayOptionsWithInstance = withInstanceNode(PantoneOverlayOptions);
+PantoneOverlayOptionsWithInstance.displayName = "PantoneOverlayOptions";
+
+export default PantoneOverlayOptionsWithInstance;

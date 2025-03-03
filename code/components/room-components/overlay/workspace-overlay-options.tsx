@@ -1,24 +1,16 @@
 import { InputText } from "../inputs/input-text";
 
-import { useWeave } from "@weavejs/react";
 import OverlayOptionsSection from "./overlay-options-section";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function WorkspaceOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["workspace"].includes(node.type)) {
-    return null;
-  }
-
+function WorkspaceOverlayOptions({
+  instance,
+  node,
+}: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <OverlayOptionsSection sectionTitle="Workspace properties">
       <div className="grid grid-cols-1 gap-3 w-full">
@@ -41,4 +33,7 @@ function WorkspaceOverlayOptions() {
   );
 }
 
-export default WorkspaceOverlayOptions;
+const WorkspaceOverlayOptionsWithInstance = withInstanceNode(WorkspaceOverlayOptions);
+WorkspaceOverlayOptionsWithInstance.displayName = "WorkspaceOverlayOptions";
+
+export default WorkspaceOverlayOptionsWithInstance;

@@ -1,25 +1,14 @@
 import { InputNumber } from "../inputs/input-number";
 
-import { useWeave } from "@weavejs/react";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { Crop } from "lucide-react";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function ExtraImageOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["image"].includes(node.type)) {
-    return null;
-  }
-
+function ExtraImageOverlayOptions({ instance, node }: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <div className="w-full font-body-m-light p-4 pb-2">
       <div className="flex justify-between items-center">
@@ -124,4 +113,7 @@ function ExtraImageOverlayOptions() {
   );
 }
 
-export default ExtraImageOverlayOptions;
+const ExtraImageOverlayOptionsWithInstance = withInstanceNode(ExtraImageOverlayOptions);
+ExtraImageOverlayOptionsWithInstance.displayName = "ExtraImageOverlayOptions";
+
+export default ExtraImageOverlayOptionsWithInstance;

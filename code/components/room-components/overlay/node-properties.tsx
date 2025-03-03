@@ -8,12 +8,11 @@ import WorkspaceOverlayOptions from "./workspace-overlay-options";
 import ImageOverlayOptions from "./image-overlay-options";
 import TextOverlayOptions from "./text-overlay-options";
 import RectangleOverlayOptions from "./rectangle-overlay-options";
+import CommonOverlayOptions from "./common-overlay-options";
 import StrokeOverlayOptions from "./stroke-overlay-options";
 import ExtraImageOverlayOptions from "./extra-image-overlay-options";
-import CommonOverlayOptions from "./common-overlay-options";
 
 export const NodeProperties = () => {
-  const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
   const nodePropertiesVisible = useCollaborationRoom(
     (state) => state.nodeProperties.visible
@@ -32,21 +31,13 @@ export const NodeProperties = () => {
       case "image":
         return "Image";
       case "pantone":
-        return "Pantone";
+        return "Pantone color";
       case "workspace":
         return "Workspace";
       default:
         return "Unknown";
     }
   }, [node]);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
 
   if (!nodePropertiesVisible) {
     return null;
@@ -58,14 +49,14 @@ export const NodeProperties = () => {
         <h2 className="text-sm font-medium">{nodeType}</h2>
       </div>
       <div className="flex-1">
-        <PantoneOverlayOptions />
-        <WorkspaceOverlayOptions />
-        <ImageOverlayOptions />
-        <CommonOverlayOptions />
-        <TextOverlayOptions />
-        <RectangleOverlayOptions />
-        <StrokeOverlayOptions />
-        <ExtraImageOverlayOptions />
+        <PantoneOverlayOptions types={["pantone"]}/>
+        <WorkspaceOverlayOptions types={["workspace"]}/>
+        <ImageOverlayOptions types={["image"]}/>
+        <CommonOverlayOptions/>
+        <TextOverlayOptions types={["text"]}/>
+        <RectangleOverlayOptions types={["rectangle"]}/>
+        <StrokeOverlayOptions types={["rectangle", "line", "image"]}/>
+        <ExtraImageOverlayOptions types={["image"]}/>
       </div>
     </div>
   );

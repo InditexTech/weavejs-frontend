@@ -1,6 +1,5 @@
 import { InputNumber } from "../inputs/input-number";
 
-import { useWeave } from "@weavejs/react";
 import { InputText } from "../inputs/input-text";
 import {
   AlignCenter,
@@ -19,23 +18,13 @@ import {
 } from "lucide-react";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { InputColor } from "../inputs/input-color";
+import withInstanceNode from "../with-instance-node";
+import { Weave, WeaveStateElement } from "@weavejs/sdk";
 
-function TextOverlayOptions() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-
-  if (!instance) {
-    return null;
-  }
-
-  if (!node) {
-    return null;
-  }
-
-  if (!["text"].includes(node.type)) {
-    return null;
-  }
-
+function TextOverlayOptions({ instance, node }: {
+  instance: Weave;
+  node: WeaveStateElement;
+}) {
   return (
     <div className="w-full text-sm font-medium p-4 pb-2">
       <div className="text-sm font-medium mb-3">Typography</div>
@@ -376,4 +365,7 @@ function TextOverlayOptions() {
   );
 }
 
-export default TextOverlayOptions;
+const TextOverlayOptionsWithInstance = withInstanceNode(TextOverlayOptions);
+TextOverlayOptionsWithInstance.displayName = "TextOverlayOptions";
+
+export default TextOverlayOptionsWithInstance;
