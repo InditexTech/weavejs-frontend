@@ -20,9 +20,9 @@ export function ToolbarButton({ icon, label = "tool", onClick, disabled = false,
         <TooltipTrigger asChild>
         <button
             className={cn(
-              "pointer-events-auto cursor-pointer rounded bg-light-background-1 hover:bg-light-background-2 disabled:cursor-default disabled:bg-light-background-disabled disabled:text-light-content-disabled px-3 py-3 flex justify-center items-center",
+              "pointer-events-auto cursor-pointer rounded border border-gray-50 hover:bg-gray-100 disabled:cursor-default disabled:bg-light-background-disabled disabled:text-light-content-disabled px-3 py-3 flex justify-center items-center",
               {
-                ["bg-light-background-active"]: active,
+                ["bg-gray-100 border border-gray-200"]: active,
               },
             )}
             disabled={disabled}

@@ -93,14 +93,12 @@ function CommonOverlayOptions({ instance, node }: {
   );
 
   return (
-    <div className="w-full font-body-m-light">
+    <div className="w-full">
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="position">
           <div className="flex justify-between items-center p-2">
             <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-2">
-              <div className="flex items-center">
-                <span className="text-sm font-medium">Position</span>
-              </div>
+              <span className="text-sm font-medium">Position</span>
             </AccordionTrigger>
             <ToggleIconButton
               kind="toggle"
@@ -164,10 +162,8 @@ function CommonOverlayOptions({ instance, node }: {
         </AccordionItem>
 
         <AccordionItem value="size">
-          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-2">
-            <div className="flex justify-between items-center p-2">
-              <span className="text-sm font-medium">Size</span>
-            </div>
+          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-4">
+            <span className="text-sm font-medium">Size</span>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <motion.div
@@ -226,10 +222,8 @@ function CommonOverlayOptions({ instance, node }: {
         </AccordionItem>
 
         <AccordionItem value="appearance">
-          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-2">
-            <div className="flex justify-between items-center p-2">
-              <span className="text-sm font-medium">Appearance</span>
-            </div>
+          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-4">
+            <span className="text-sm font-medium">Appearance</span>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <motion.div

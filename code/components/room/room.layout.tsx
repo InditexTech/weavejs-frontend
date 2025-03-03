@@ -23,7 +23,7 @@ export const RoomLayout = () => {
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
 
   return (
-    <div className="relative w-full h-full relative flex">
+    <div className="w-full h-full relative flex">
       <div id="weave" className="w-full h-full"></div>
       {started && (
         <>

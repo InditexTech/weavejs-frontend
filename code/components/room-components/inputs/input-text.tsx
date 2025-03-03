@@ -9,9 +9,16 @@ type InputTextProps = {
   onChange: (value: string) => void;
 };
 
-export const InputText = ({ label, value, onChange }: Readonly<InputTextProps>) => {
-  const [focused, setFocused] = React.useState<boolean>(false);
+export const InputText = ({
+  label,
+  value,
+  onChange,
+}: Readonly<InputTextProps>) => {
   const [actualValue, setActualValue] = React.useState<string>(`${value}`);
+
+  const [inputState, setInputState] = React.useState<
+    "idle" | "hover" | "focus"
+  >("idle");
 
   React.useEffect(() => {
     setActualValue(`${value}`);
@@ -20,15 +27,19 @@ export const InputText = ({ label, value, onChange }: Readonly<InputTextProps>) 
   return (
     <div
       tabIndex={0}
-      className={cn("pointer-events-auto w-full flex gap-1 justify-between items-center border rounded px-2 py-1", {
-        ["border-light-border-3"]: !focused,
-        ["border-light-semantic-highlight-2"]: focused,
-      })}
+      className={cn(
+        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded transition-all duration-200",
+        {
+          "border border-gray-200": inputState === "idle",
+          "border border-gray-400": inputState === "hover",
+          "border border-gray-800": inputState === "focus",
+        }
+      )}
     >
-      <div className="font-detail-m-light text-light-content-3 whitespace-nowrap">{label}</div>
+      <div className="text-xs font-medium whitespace-nowrap">{label}</div>
       <input
         type="text"
-        className="w-full text-xs font-normal text-gray-700 text-right focus:border-light-border-3"
+        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
         value={actualValue}
         onChange={(e) => {
           setActualValue(e.target.value);
@@ -41,11 +52,15 @@ export const InputText = ({ label, value, onChange }: Readonly<InputTextProps>) 
             input.blur();
           }
         }}
-        onFocus={() => {
-          setFocused(true);
-        }}
+        onMouseEnter={() => setInputState("hover")}
+        onMouseLeave={() =>
+          setInputState((prevState) =>
+            prevState === "focus" ? "focus" : "idle"
+          )
+        }
+        onFocus={() => setInputState("focus")}
         onBlur={() => {
-          setFocused(false);
+          setInputState("idle");
           onChange(actualValue);
         }}
       />
