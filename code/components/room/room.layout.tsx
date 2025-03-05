@@ -4,12 +4,13 @@ import { Hourglass } from "lucide-react";
 import React from "react";
 import { ContextMenu } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
-import { RoomInformationOverlay } from "@/components/room-components/room-information-overlay";
-import { RoomStatusOverlay } from "@/components/room-components/room-status-overlay";
-import { ToolsOverlay } from "@/components/room-components/tools-overlay";
-import { MultiuseOverlay } from "@/components/room-components/multiuse-overlay";
-import { OperationsOverlay } from "@/components/room-components/operations-overlay";
+import { RoomInformationOverlay } from "@/components/room-components/overlay/room-information-overlay";
+import { RoomStatusOverlay } from "@/components/room-components/overlay/room-status-overlay";
+import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
+import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
+import { OperationsOverlay } from "@/components/room-components/overlay/operations-overlay";
 import { useWeave } from "@weavejs/react";
+import { RoomLoader } from "../room-components/room-loader";
 
 export const RoomLayout = () => {
   const started = useWeave((state) => state.started);
@@ -22,7 +23,7 @@ export const RoomLayout = () => {
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
 
   return (
-    <div className="relative w-full h-full relative flex">
+    <div className="w-full h-full relative flex">
       <div id="weave" className="w-full h-full"></div>
       {started && (
         <>
@@ -59,7 +60,7 @@ export const RoomLayout = () => {
       )}
       {!started && (
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-white flex justify-center items-center">
-          LOADING ROOM...
+          <RoomLoader />
         </div>
       )}
     </div>

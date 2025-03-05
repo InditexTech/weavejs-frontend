@@ -4,10 +4,11 @@ import logoSrc from "@/assets/images/logo.png";
 import { cn } from "@/lib/utils";
 
 type LogoProps = {
-  kind?: "large" | "small"
+  kind?: "large" | "small",
+  variant?: "no-text" | "text",
 };
 
-export function Logo({ kind = "large" }: Readonly<LogoProps>) {
+export function Logo({ kind = "large", variant = "text" }: Readonly<LogoProps>) {
   return (
     <div className="p-0 bg-transparent flex justify-start items-center gap-2">
       <Image
@@ -20,7 +21,7 @@ export function Logo({ kind = "large" }: Readonly<LogoProps>) {
         })}
         alt="Weave.js logo"
       />
-      <div className="font-noto-sans-mono text-zinc !normal-case">Weave.js</div>
+      { variant === "text" && <div className="font-noto-sans-mono text-zinc !normal-case">Weave.js</div>}
     </div>
   );
 }

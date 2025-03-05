@@ -3,10 +3,10 @@
 import React from "react";
 import { useWeave } from "@weavejs/react";
 import { ImagesLibrary } from "./images-library";
-import { SelectionInformation } from "./selection-information";
+import { SelectionInformation } from "./../selection-information";
 import { NodeProperties } from "./node-properties";
 import { useCollaborationRoom } from "@/store/store";
-import { WorkspacesLibrary } from "./workspaces-library/workspaces-library";
+import { WorkspacesLibrary } from "../workspaces-library/workspaces-library";
 
 export function MultiuseOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -52,8 +52,8 @@ export function MultiuseOverlay() {
         "pointer-events-none absolute top-[216px] right-[20px] bottom-[20px] flex flex-col gap-5 justify-center items-center"
       }
     >
-      <div className="w-[320px] p-0 h-full bg-light-background-1 rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3 overflow-hidden">
-        <div className="w-full shrink-0 h-full overflow-scroll">
+      <div className="w-[320px] p-0 h-full bg-white rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3 overflow-hidden">
+        <div className="pointer-events-auto w-full shrink-0 h-full overflow-auto custom-scrollbar scrollbar-gutter">
           <ImagesLibrary />
           <WorkspacesLibrary />
           <SelectionInformation />

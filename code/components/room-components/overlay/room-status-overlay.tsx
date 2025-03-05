@@ -2,10 +2,10 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { ToolbarButton } from "./toolbar-button";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Braces, Images, Presentation, LogOut } from "lucide-react";
-import { ConnectedUsers } from "./connected-users";
-import { ConnectionStatus } from "./connection-status";
+import { ConnectedUsers } from "./../connected-users";
+import { ConnectionStatus } from "./../connection-status";
 import { useWeave } from "@weavejs/react";
 import { useCollaborationRoom } from "@/store/store";
 import { ZoomHandlerOverlay } from "./zoom-handler-overlay";
@@ -27,7 +27,7 @@ export function RoomStatusOverlay() {
 
   return (
     <div className="pointer-events-none absolute top-[20px] right-[20px] flex flex-col gap-5 justify-center items-center">
-      <div className="w-[320px] p-1 bg-light-background-1 rounded-lg border border-light-border-3 shadow-md flex flex-col justify-start items-center">
+      <div className="w-[320px] p-1 bg-white rounded-lg border border-light-border-3 shadow-md flex flex-col justify-start items-center">
         <div className="w-full p-3 flex justify-between items-center gap-4">
           <ConnectedUsers connectedUsers={connectedUsers} />
           <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
@@ -42,6 +42,8 @@ export function RoomStatusOverlay() {
                 setWorkspacesLibraryVisible(false);
                 setImagesLibraryVisible(!imagesLibraryVisible);
               }}
+              label="Images Library"
+              tooltipSide="top"
             />
             <ToolbarButton
               icon={<Presentation />}
@@ -50,6 +52,8 @@ export function RoomStatusOverlay() {
                 setImagesLibraryVisible(false);
                 setWorkspacesLibraryVisible(!workspacesLibraryVisible);
               }}
+              label="Presentation mode"
+              tooltipSide="top"
             />
             <ToolbarButton
               icon={<Braces />}
@@ -60,6 +64,8 @@ export function RoomStatusOverlay() {
                   console.log({ appState: JSON.parse(JSON.stringify(instance.getStore().getState())) });
                 }
               }}
+              label="Debug state"
+              tooltipSide="top"
             />
           </div>
           <div className="w-full flex justify-end items-center">
@@ -68,6 +74,8 @@ export function RoomStatusOverlay() {
               onClick={() => {
                 router.push("/");
               }}
+              label="Leave room"
+              tooltipSide="top"
             />
           </div>
         </div>

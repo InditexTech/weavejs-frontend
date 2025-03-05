@@ -35,10 +35,10 @@ import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
 import { WorkspaceToolAction } from "@/components/actions/workspace-tool/workspace-tool";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
-import { Logo } from "@/components/utils/logo";
 import { useWeave, WeaveProvider } from "@weavejs/react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
+import { RoomLoader } from "../room-components/room-loader";
 
 export const Room = () => {
   const params = useParams<{ roomId: string }>();
@@ -102,50 +102,17 @@ export const Room = () => {
   //   [],
   // );
 
-  const handleEnter = React.useCallback(() => {
-    router.push("/collaboration");
-  }, [router]);
-
   if (!loadedParams) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        LOADING PARAMETERS...
+        <RoomLoader />
       </div>
     );
   }
 
   if (!room || !user) {
-    return (
-      <div className="w-full h-full grid grid-cols-1">
-        <div className="relative w-full h-full flex flex-col justify-center items-center">
-          <div className="absolute top-[20px] left-[20px] flex flex-col gap-5 justify-start items-center">
-            <div className="p-0 bg-light-background-1 flex flex-col justify-start items-start">
-              <div className="font-title-l text-light-content-1">
-                COLLABORATION TOOL
-              </div>
-              <div className="font-title-s text-light-content-3">SHOWCASE</div>
-            </div>
-          </div>
-          <div className="w-[320px] flex flex-col border-0 border-light-border-3 p-5 gap-5">
-            <div className="font-title-xs !normal-case text-center ">
-              No <b>room</b> or <b>username defined</b>, go back to the home to
-              enter a room.
-            </div>
-            <div className="flex justify-center items-center">
-              <button
-                className="font-title-xs !text-[20px] px-4 py-3 bg-light-background-inverse text-light-content-inverse hover:bg-light-background-3 hover:text-light-content-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-light-background-inverse disabled:hover:text-light-content-inverse"
-                onClick={handleEnter}
-              >
-                BACK TO HOME
-              </button>
-            </div>
-          </div>
-          <div className="absolute bottom-[20px] left-[20px] flex flex-col gap-5 justify-center items-center">
-            <Logo />
-          </div>
-        </div>
-      </div>
-    );
+    router.push("/error?errorCode=missing-required-parameters");
+    return <></>;
   }
 
   return (

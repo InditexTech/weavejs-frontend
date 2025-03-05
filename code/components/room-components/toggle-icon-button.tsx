@@ -38,11 +38,13 @@ export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
   return (
     <button
       className={cn(
-        "pointer-events-auto cursor-pointer bg-light-background-1 hover:text-light-content-3 disabled:cursor-default disabled:text-light-content-disabled flex justify-center items-center",
+        "flex items-center justify-center cursor-pointer",
+        "transition-all duration-200 ease-in-out",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         {
-          ["p-[3px] rounded"]: kind === "switch",
-          ["bg-light-background-1"]: (kind === "switch" && !isPressed) || kind === "toggle",
-          ["bg-light-background-3"]: kind === "switch" && isPressed,
+          ["p-[3px] rounded border border-gray-50"]: kind === "switch",
+          ["bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border hover:border-gray-900"]: (kind === "switch" && !isPressed) || kind === "toggle",
+          ["bg-gray-200 border border-gray-500 hover:bg-gray-300"]: kind === "switch" && isPressed,
         },
       )}
       disabled={disabled}

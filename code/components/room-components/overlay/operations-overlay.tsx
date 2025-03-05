@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { ToolbarButton } from "./toolbar-button";
 import { Clipboard, Copy, Trash2, Redo2, Undo2, Group, Ungroup, MonitorDown, ImageDown } from "lucide-react";
 import { useWeave } from "@weavejs/react";
 import { WeaveCopyPasteNodesPlugin, WeaveExportNodeActionParams, WeaveExportStageActionParams } from "@weavejs/sdk";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export function OperationsOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -21,7 +21,7 @@ export function OperationsOverlay() {
 
   return (
     <div className="pointer-events-none absolute bottom-[20px] left-[20px] right-[20px] flex gap-5 justify-center items-center">
-      <div className="p-1 bg-light-background-1 rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3">
+      <div className="p-1 bg-white rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3">
         <div className="flex justify-start items-center">
           <ToolbarButton
             icon={<Group />}
@@ -31,6 +31,8 @@ export function OperationsOverlay() {
                 instance.group(selectedNodes.map((n) => n.node));
               }
             }}
+            label="Group selected shapes"
+            tooltipSide="top"
           />
           <ToolbarButton
             icon={<Ungroup />}
@@ -40,6 +42,8 @@ export function OperationsOverlay() {
                 instance.unGroup(node);
               }
             }}
+            label="Ungroup selected shapes"
+            tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
             <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
@@ -55,6 +59,8 @@ export function OperationsOverlay() {
                 }
               }
             }}
+            tooltipSide="top"
+            label="Copy"
           />
           <ToolbarButton
             icon={<Clipboard />}
@@ -67,6 +73,8 @@ export function OperationsOverlay() {
                 }
               }
             }}
+            label="Paste"
+            tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
             <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
@@ -80,6 +88,8 @@ export function OperationsOverlay() {
                 actualStore.undoStateStep();
               }
             }}
+            label="Undo"
+            tooltipSide="top"
           />
           <ToolbarButton
             icon={<Redo2 />}
@@ -90,6 +100,8 @@ export function OperationsOverlay() {
                 actualStore.redoStateStep();
               }
             }}
+            label="Redo"
+            tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
             <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
@@ -108,6 +120,8 @@ export function OperationsOverlay() {
                 });
               }
             }}
+            tooltipSide="top"
+            label="Export selected nodes as image"
           />
           <ToolbarButton
             icon={<MonitorDown />}
@@ -121,6 +135,8 @@ export function OperationsOverlay() {
                 });
               }
             }}
+            tooltipSide="top"
+            label="Export canvas as image"
           />
           <div className="w-full flex justify-center items-center">
             <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
@@ -135,6 +151,8 @@ export function OperationsOverlay() {
                 }
               }
             }}
+            tooltipSide="top"
+            label="Delete selected shapes"
           />
         </div>
       </div>

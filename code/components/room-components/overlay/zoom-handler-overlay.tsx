@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ToolbarButton } from "./toolbar-button";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
 import { useWeave } from "@weavejs/react";
 
@@ -25,6 +25,8 @@ export function ZoomHandlerOverlay() {
                 instance.triggerAction("zoomInTool");
               }
             }}
+            label="Zoom in"
+            tooltipSide="top"
           />
           <ToolbarButton
             icon={<ZoomOut />}
@@ -34,6 +36,8 @@ export function ZoomHandlerOverlay() {
                 instance.triggerAction("zoomOutTool");
               }
             }}
+            label="Zoom out"
+            tooltipSide="top"
           />
           <ToolbarButton
             icon={<Maximize />}
@@ -42,6 +46,8 @@ export function ZoomHandlerOverlay() {
                 instance.triggerAction("fitToScreenTool");
               }
             }}
+            label="Fit to screen"
+            tooltipSide="top"
           />
           <ToolbarButton
             icon={<Fullscreen />}
@@ -51,6 +57,8 @@ export function ZoomHandlerOverlay() {
                 instance.triggerAction("fitToSelectionTool");
               }
             }}
+            label="Fit to selection"
+            tooltipSide="top"
           />
         </div>
         <div className="w-full px-4 font-mono flex justify-end items-center bg-light-background-1">

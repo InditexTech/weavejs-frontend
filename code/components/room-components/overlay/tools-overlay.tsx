@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { ToolbarButton } from "./toolbar-button";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Brush, ImagePlus, PenTool, Presentation, Square, SwatchBook, Type } from "lucide-react";
 import { useWeave } from "@weavejs/react";
-import { Toolbar } from "./toolbar";
+import { Toolbar } from "../toolbar/toolbar";
 
 export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -83,30 +83,35 @@ export function ToolsOverlay() {
           active={actualAction === "rectangleTool"}
           disabled={isActionActive && actualAction !== "rectangleTool"}
           onClick={triggerRectangleTool}
+          label="Draw a Rectangle"
         />
         <ToolbarButton
           icon={<PenTool />}
           active={actualAction === "penTool"}
           disabled={isActionActive && actualAction !== "penTool"}
           onClick={triggerPenTool}
+          label="Draw a Line"
         />
         <ToolbarButton
           icon={<Brush />}
           active={actualAction === "brushTool"}
           disabled={isActionActive && actualAction !== "brushTool"}
           onClick={triggerBrushTool}
+          label="Free draw"
         />
         <ToolbarButton
           icon={<Type />}
           active={actualAction === "textTool"}
           disabled={isActionActive && actualAction !== "textTool"}
           onClick={triggerTextTool}
+          label="Text tool"
         />
         <ToolbarButton
           icon={<ImagePlus />}
           active={actualAction === "imageTool"}
           disabled={isActionActive && actualAction !== "imageTool"}
           onClick={triggerImageTool}
+          label="Add an image"
         />
         <div className="w-full flex justify-center items-center">
           <div className="w-[30px] h-[1px] bg-light-background-3 my-1"></div>
@@ -116,12 +121,14 @@ export function ToolsOverlay() {
           active={actualAction === "pantoneTool"}
           disabled={isActionActive && actualAction !== "pantoneTool"}
           onClick={triggerPantoneTool}
+          label="Add a Pantone color"
         />
         <ToolbarButton
           icon={<Presentation />}
           active={actualAction === "workspaceTool"}
           disabled={isActionActive && actualAction !== "workspaceTool"}
           onClick={triggerWorkspaceTool}
+          label="Create a workspace"
         />
       </Toolbar>
     </div>
