@@ -27,8 +27,8 @@ import {
   WeaveUser,
   WeaveSelection,
 } from "@weavejs/sdk";
-import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@weavejs/store-websockets";
-// import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@weavejs/store-azure-web-pubsub";
+// import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@weavejs/store-websockets";
+import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@weavejs/store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
 import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
@@ -52,6 +52,8 @@ export const Room = () => {
   const user = useCollaborationRoom((state) => state.user);
   const setRoom = useCollaborationRoom((state) => state.setRoom);
   const setUser = useCollaborationRoom((state) => state.setUser);
+  const setFetchConnectionUrlLoading = useCollaborationRoom((state) => state.setFetchConnectionUrlLoading);
+  const setFetchConnectionUrlError = useCollaborationRoom((state) => state.setFetchConnectionUrlError);
 
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
@@ -86,8 +88,17 @@ export const Room = () => {
     return user as WeaveUser;
   }, [user]);
 
+  const onFetchConnectionUrlHandler = React.useCallback(
+    ({ loading, error }: { loading: boolean; error: Error | null }) => {
+      setFetchConnectionUrlLoading(loading);
+      setFetchConnectionUrlError(error);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   const onConnectionStatusChangeHandler = React.useCallback(
-    (status: WeaveStoreWebsocketsConnectionStatus) => {
+    (status: WeaveStoreAzureWebPubsubConnectionStatus) => {
       setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,7 +106,7 @@ export const Room = () => {
   );
 
   // const onConnectionStatusChangeHandler = React.useCallback(
-  //   (status: WeaveStoreAzureWebPubsubConnectionStatus) => {
+  //   (status: WeaveStoreWebsocketsConnectionStatus) => {
   //     setConnectionStatus(status);
   //   },
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,7 +116,7 @@ export const Room = () => {
   if (!loadedParams) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <RoomLoader />
+        <RoomLoader content="loadingParams" />
       </div>
     );
   }
@@ -120,12 +131,20 @@ export const Room = () => {
       containerId="weave"
       getUser={getUser}
       store={
-        new WeaveStoreWebsockets({
+        // new WeaveStoreWebsockets({
+        //   roomId: room,
+        //   wsOptions: {
+        //     serverUrl: "ws://localhost:1234",
+        //   },
+        //   callbacks: {
+        //     onConnectionStatusChange: onConnectionStatusChangeHandler,
+        //   },
+        // })
+        new WeaveStoreAzureWebPubsub({
           roomId: room,
-          wsOptions: {
-            serverUrl: "ws://localhost:1234",
-          },
+          url: `http://localhost:3001/api/v1/weavejs/rooms/${room}/connect`,
           callbacks: {
+            onFetchConnectionUrl: onFetchConnectionUrlHandler,
             onConnectionStatusChange: onConnectionStatusChangeHandler,
           },
         })

@@ -8,6 +8,10 @@ type ShowcaseUser = {
 };
 
 interface CollaborationRoomState {
+  fetchConnectionUrl: {
+    loading: boolean;
+    error: Error | null;
+  };
   user: ShowcaseUser | undefined;
   room: string | undefined;
   contextMenu: {
@@ -30,6 +34,8 @@ interface CollaborationRoomState {
       visible: boolean;
     };
   };
+  setFetchConnectionUrlLoading: (newLoading: boolean) => void;
+  setFetchConnectionUrlError: (newFetchConnectionUrlError: Error | null) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
@@ -43,6 +49,10 @@ interface CollaborationRoomState {
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
+  fetchConnectionUrl: {
+    loading: false,
+    error: null,
+  },
   user: undefined,
   room: undefined,
   contextMenu: {
@@ -65,6 +75,16 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       visible: false,
     },
   },
+  setFetchConnectionUrlLoading: (newLoading) =>
+    set((state) => ({
+      ...state,
+      fetchConnectionUrl: { ...state.fetchConnectionUrl, loading: newLoading },
+    })),
+  setFetchConnectionUrlError: (newFetchConnectionUrlError) =>
+    set((state) => ({
+      ...state,
+      fetchConnectionUrl: { ...state.fetchConnectionUrl, error: newFetchConnectionUrlError },
+    })),
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
   setContextMenuShow: (newContextMenuShow) =>
