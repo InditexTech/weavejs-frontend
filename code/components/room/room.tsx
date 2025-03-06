@@ -27,8 +27,8 @@ import {
   WeaveUser,
   WeaveSelection,
 } from "@inditextech/weavejs-sdk";
-// import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@weavejs/store-websockets";
-import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@weavejs/store-azure-web-pubsub";
+// import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@@inditextech/weavejs-store-websockets";
+import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@@inditextech/weavejs-store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
 import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
