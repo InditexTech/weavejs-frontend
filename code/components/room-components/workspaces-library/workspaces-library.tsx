@@ -1,5 +1,5 @@
 import { PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@weavejs/sdk";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import React from "react";
 import Konva from "konva";
 import { useCollaborationRoom } from "@/store/store";

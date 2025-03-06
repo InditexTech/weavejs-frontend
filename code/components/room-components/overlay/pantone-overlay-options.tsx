@@ -2,7 +2,7 @@
 import OverlayOptionsSection from "./overlay-options-section";
 import { InputColor } from "../inputs/input-color";
 import withInstanceNode from "../with-instance-node";
-import { Weave, WeaveStateElement } from "@weavejs/sdk";
+import { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 
 function PantoneOverlayOptions({
   instance,

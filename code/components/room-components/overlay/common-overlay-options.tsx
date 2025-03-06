@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Pin, PinOff } from "lucide-react";
-import type { Weave, WeaveStateElement } from "@weavejs/sdk";
+import type { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import { motion } from "framer-motion";
 import {
   Accordion,

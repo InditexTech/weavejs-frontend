@@ -26,7 +26,7 @@ import {
   WeaveImageNode,
   WeaveUser,
   WeaveSelection,
-} from "@weavejs/sdk";
+} from "@inditextech/weavejs-sdk";
 // import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@weavejs/store-websockets";
 import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@weavejs/store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";

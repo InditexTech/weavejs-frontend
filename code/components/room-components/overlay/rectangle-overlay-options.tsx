@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ToggleIconButton } from "./../toggle-icon-button";
 import { Eye, EyeOff } from "lucide-react";
 import withInstanceNode from "../with-instance-node";
-import { Weave, WeaveStateElement } from "@weavejs/sdk";
+import { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 
 function RectangleOverlayOptions({ instance, node }: {
   instance: Weave;

@@ -1,4 +1,4 @@
-import { WeaveElementAttributes, WeaveElementInstance, WeaveNode } from "@weavejs/sdk";
+import { WeaveElementAttributes, WeaveElementInstance, WeaveNode } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 import { getNearestPantone } from "pantone-tcx";
 
