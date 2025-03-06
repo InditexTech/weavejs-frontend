@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ImagePlus } from "lucide-react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
 
 export const ImagesLibrary = () => {

@@ -9,7 +9,7 @@ import { RoomStatusOverlay } from "@/components/room-components/overlay/room-sta
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
 import { OperationsOverlay } from "@/components/room-components/overlay/operations-overlay";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { RoomLoader } from "../room-components/room-loader";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { RoomError } from "../room-components/room-error";

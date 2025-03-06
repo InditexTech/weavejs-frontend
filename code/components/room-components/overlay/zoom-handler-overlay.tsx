@@ -3,7 +3,7 @@
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 
 export function ZoomHandlerOverlay() {
   const instance = useWeave((state) => state.instance);

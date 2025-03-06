@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { ImagesLibrary } from "./images-library";
 import { SelectionInformation } from "./../selection-information";
 import { NodeProperties } from "./node-properties";

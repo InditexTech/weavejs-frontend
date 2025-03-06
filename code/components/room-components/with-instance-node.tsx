@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { Weave, WeaveStateElement } from '@inditextech/weavejs-sdk';
 
 interface InjectedProps {

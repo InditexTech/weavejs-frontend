@@ -3,7 +3,7 @@ import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import React from "react";
 import Konva from "konva";
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { AlignStartHorizontal, Download } from "lucide-react";
 import { toImageAsync } from "./utils";
 import { WorkspaceImage } from "./workspaces-library.image";

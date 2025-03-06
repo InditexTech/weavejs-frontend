@@ -6,7 +6,7 @@ import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Braces, Images, Presentation, LogOut } from "lucide-react";
 import { ConnectedUsers } from "./../connected-users";
 import { ConnectionStatus } from "./../connection-status";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ZoomHandlerOverlay } from "./zoom-handler-overlay";
 

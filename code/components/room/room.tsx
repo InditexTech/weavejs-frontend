@@ -35,7 +35,7 @@ import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
 import { WorkspaceToolAction } from "@/components/actions/workspace-tool/workspace-tool";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave, WeaveProvider } from "@weavejs/react";
+import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { RoomLoader } from "../room-components/room-loader";

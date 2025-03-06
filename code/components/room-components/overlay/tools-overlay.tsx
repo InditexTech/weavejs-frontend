@@ -3,7 +3,7 @@
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Brush, ImagePlus, PenTool, Presentation, Square, SwatchBook, Type } from "lucide-react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
 
 export function ToolsOverlay() {
