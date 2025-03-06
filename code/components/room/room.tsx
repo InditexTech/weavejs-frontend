@@ -116,7 +116,7 @@ export const Room = () => {
   if (!loadedParams) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <RoomLoader content="loadingParams" />
+        <RoomLoader roomId="" content="loadingParams" />
       </div>
     );
   }
