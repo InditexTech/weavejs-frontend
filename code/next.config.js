@@ -1,10 +1,19 @@
 const nextConfig = {
+  output: "standalone",
   reactStrictMode: false,
   webpack: (
     config,
   ) => {
     config.externals = [...config.externals, { canvas: "canvas" }];  // required to make Konva work
     return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/weavebff/:path*',
+        destination: 'http://localhost:3001/:path*' // Proxy to Backend
+      }
+    ]
   },
   images: {
     localPatterns: [

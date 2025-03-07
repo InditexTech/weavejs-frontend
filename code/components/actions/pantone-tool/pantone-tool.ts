@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import { WeavePantoneToolActionState } from "./types";
 import { PANTONE_TOOL_STATE } from "./constants";
-import { WeaveAction, WeaveNodesSelectionPlugin } from "@weavejs/sdk";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export class PantoneToolAction extends WeaveAction {

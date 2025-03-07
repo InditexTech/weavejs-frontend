@@ -1,4 +1,4 @@
-import { WeaveElementAttributes, WeaveElementInstance, WeaveNode, WeaveStateElement } from "@weavejs/sdk";
+import { WeaveElementAttributes, WeaveElementInstance, WeaveNode, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export const WORKSPACE_NODE_TYPE = "workspace";

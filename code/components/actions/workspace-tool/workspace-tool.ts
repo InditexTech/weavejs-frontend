@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import { WeaveWorkspaceToolActionState } from "./types";
 import { WORKSPACE_TOOL_STATE } from "./constants";
-import { WEAVE_NODE_LAYER_ID, WeaveAction, WeaveNodesSelectionPlugin } from "@weavejs/sdk";
+import { WEAVE_NODE_LAYER_ID, WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export class WorkspaceToolAction extends WeaveAction {

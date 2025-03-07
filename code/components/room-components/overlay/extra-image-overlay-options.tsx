@@ -3,7 +3,7 @@ import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { Crop } from "lucide-react";
 import withInstanceNode from "../with-instance-node";
-import { Weave, WeaveStateElement } from "@weavejs/sdk";
+import { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 
 function ExtraImageOverlayOptions({ instance, node }: {
   instance: Weave;

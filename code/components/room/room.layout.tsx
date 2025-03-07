@@ -9,12 +9,25 @@ import { RoomStatusOverlay } from "@/components/room-components/overlay/room-sta
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
 import { OperationsOverlay } from "@/components/room-components/overlay/operations-overlay";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { RoomLoader } from "../room-components/room-loader";
+import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
+import { RoomError } from "../room-components/room-error";
+
+const statusMap = {
+  ["idle"]: "Idle",
+  ["starting"]: "Starting Weave...",
+  ["loadingFonts"]: "Loading custom fonts...",
+  ["running"]: "Running",
+}
 
 export const RoomLayout = () => {
-  const started = useWeave((state) => state.started);
+  const status = useWeave((state) => state.status);
+  const roomLoaded = useWeave((state) => state.room.loaded);
 
+  const roomId = useCollaborationRoom((state) => state.room);
+  const errorFetchConnectionUrl = useCollaborationRoom((state) => state.fetchConnectionUrl.error);
+  const loadingFetchConnectionUrl = useCollaborationRoom((state) => state.fetchConnectionUrl.loading);
   const contextMenuShow = useCollaborationRoom((state) => state.contextMenu.show);
   const contextMenuPosition = useCollaborationRoom((state) => state.contextMenu.position);
   const contextMenuOptions = useCollaborationRoom((state) => state.contextMenu.options);
@@ -22,10 +35,36 @@ export const RoomLayout = () => {
   const uploadingImage = useCollaborationRoom((state) => state.images.uploading);
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
 
+  if (loadingFetchConnectionUrl) {
+    return (
+      <div className="absolute top-0 left-0 right-0 bottom-0 bg-light-background-1 flex justify-center items-center">
+        <RoomLoader roomId={roomId ?? "undefined"} content="Loading fetch URL" />
+      </div>
+    );
+  }
+
+  if (errorFetchConnectionUrl) {
+    return (
+      <div className="absolute top-0 left-0 right-0 bottom-0 bg-light-background-1 flex justify-center items-center">
+        <RoomError content={`Failed to fetch client connection URL for room ${roomId}`} />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full relative flex">
       <div id="weave" className="w-full h-full"></div>
-      {started && (
+      {status !== WEAVE_INSTANCE_STATUS.RUNNING && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-light-background-1 flex justify-center items-center">
+          <RoomLoader roomId={roomId ?? "undefined"} content={statusMap[status]} />
+        </div>
+      )}
+      {status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-light-background-1 flex justify-center items-center">
+          <RoomLoader roomId={roomId ?? "undefined"} content="Loading room content..." />
+        </div>
+      )}
+      {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
         <>
           <RoomInformationOverlay />
           <RoomStatusOverlay />
@@ -57,11 +96,6 @@ export const RoomLayout = () => {
             </div>
           )}
         </>
-      )}
-      {!started && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-white flex justify-center items-center">
-          <RoomLoader />
-        </div>
       )}
     </div>
   );

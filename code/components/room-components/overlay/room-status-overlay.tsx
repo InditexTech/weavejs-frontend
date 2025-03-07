@@ -6,7 +6,7 @@ import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Braces, Images, Presentation, LogOut } from "lucide-react";
 import { ConnectedUsers } from "./../connected-users";
 import { ConnectionStatus } from "./../connection-status";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ZoomHandlerOverlay } from "./zoom-handler-overlay";
 
@@ -42,7 +42,7 @@ export function RoomStatusOverlay() {
                 setWorkspacesLibraryVisible(false);
                 setImagesLibraryVisible(!imagesLibraryVisible);
               }}
-              label="Images Library"
+              label="Images"
               tooltipSide="top"
             />
             <ToolbarButton
@@ -52,7 +52,7 @@ export function RoomStatusOverlay() {
                 setImagesLibraryVisible(false);
                 setWorkspacesLibraryVisible(!workspacesLibraryVisible);
               }}
-              label="Presentation mode"
+              label="Workspaces"
               tooltipSide="top"
             />
             <ToolbarButton

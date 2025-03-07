@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
 import PantoneOverlayOptions from "./pantone-overlay-options";
 import WorkspaceOverlayOptions from "./workspace-overlay-options";

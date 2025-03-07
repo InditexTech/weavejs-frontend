@@ -19,7 +19,7 @@ import {
 import { ToggleIconButton } from "../toggle-icon-button";
 import { InputColor } from "../inputs/input-color";
 import withInstanceNode from "../with-instance-node";
-import { Weave, WeaveStateElement } from "@weavejs/sdk";
+import { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import {
   Accordion,
   AccordionContent,

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { WeaveConnectedUsersChanged } from "@weavejs/sdk";
+import { WeaveConnectedUsersChanged } from "@inditextech/weavejs-sdk";
 
 type ConnectionStatusProps = {
   connectedUsers: WeaveConnectedUsersChanged;

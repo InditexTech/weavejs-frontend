@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 
 export const SelectionInformation = () => {
   const instance = useWeave((state) => state.instance);

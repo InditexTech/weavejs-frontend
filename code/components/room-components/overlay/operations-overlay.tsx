@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Clipboard, Copy, Trash2, Redo2, Undo2, Group, Ungroup, MonitorDown, ImageDown } from "lucide-react";
-import { useWeave } from "@weavejs/react";
-import { WeaveCopyPasteNodesPlugin, WeaveExportNodeActionParams, WeaveExportStageActionParams } from "@weavejs/sdk";
+import { useWeave } from "@inditextech/weavejs-react";
+import { WeaveCopyPasteNodesPlugin, WeaveExportNodeActionParams, WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export function OperationsOverlay() {

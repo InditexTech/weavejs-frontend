@@ -1,9 +1,9 @@
 import { PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@weavejs/sdk";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-sdk";
 import React from "react";
 import Konva from "konva";
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@weavejs/react";
+import { useWeave } from "@inditextech/weavejs-react";
 import { AlignStartHorizontal, Download } from "lucide-react";
 import { toImageAsync } from "./utils";
 import { WorkspaceImage } from "./workspaces-library.image";
@@ -115,9 +115,9 @@ export const WorkspacesLibrary = () => {
 
   return (
     <div className="pointer-events-auto w-full h-full">
-      <div className="w-full font-title-xs p-4 border-b border-light-border-3 bg-light-background-2 flex justify-between items-center">
-        <div className="flex justify-between items-center">Workspaces</div>
-        <div className="flex">
+      <div className="w-full font-title-xs p-4 py-3 border-b border-light-border-3 bg-light-background-2 flex justify-between items-center">
+        <div className="flex justify-between items-center text-sm">Workspaces</div>
+        <div className="flex justify-end items-center gap-1">
           <button
             className="cursor-pointer bg-transparent hover:text-light-content-3"
             disabled={selectedNodes.length <= 1 || !selectedNodesAllWorkspace}
@@ -135,7 +135,10 @@ export const WorkspacesLibrary = () => {
       </div>
       <div className="flex flex-col gap-2 w-full h-[calc(100%-53px)] p-4 overflow-scroll">
         {workspacesAvailable.length === 0 && (
-          <div className="w-full h-full font-title-xs flex justify-center items-center">No workspaces available</div>
+          <div className="col-span-2 w-full flex flex-col justify-center items-center text-sm py-5 text-center">
+            <b>No workspaces available</b>
+            <span className="text-xs">Add a workspace to the room</span>
+          </div>
         )}
         {workspacesAvailable.map((node) => {
           const attrs = node.getAttrs();
