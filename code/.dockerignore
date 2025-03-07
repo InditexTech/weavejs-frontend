@@ -1,0 +1,9 @@
+.husky/
+.next/
+coverage/
+node_modules/
+
+.eslintrc.json
+vitest.config.mts
+commitlint.config.ts
+README.md

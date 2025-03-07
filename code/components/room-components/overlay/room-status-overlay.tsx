@@ -42,7 +42,7 @@ export function RoomStatusOverlay() {
                 setWorkspacesLibraryVisible(false);
                 setImagesLibraryVisible(!imagesLibraryVisible);
               }}
-              label="Images Library"
+              label="Images"
               tooltipSide="top"
             />
             <ToolbarButton
@@ -52,7 +52,7 @@ export function RoomStatusOverlay() {
                 setImagesLibraryVisible(false);
                 setWorkspacesLibraryVisible(!workspacesLibraryVisible);
               }}
-              label="Presentation mode"
+              label="Workspaces"
               tooltipSide="top"
             />
             <ToolbarButton
