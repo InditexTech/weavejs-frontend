@@ -1,7 +1,3 @@
-ARG BACKEND_ENDPOINT
-ARG NEXT_PUBLIC_API_ENDPOINT_HUB_NAME
-ARG NEXT_PUBLIC_API_ENDPOINT
-
 FROM node:20-alpine as base
 
 # Install dependencies step
@@ -19,13 +15,12 @@ RUN npm ci
 # Build step
 FROM base AS builder
 
-ENV NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=$NEXT_PUBLIC_API_ENDPOINT_HUB_NAME
-ENV NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT
-ENV BACKEND_ENDPOINT=$BACKEND_ENDPOINT
+ARG PROD_ENV=""
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN printf "$PROD_ENV" >> .env.production
 RUN npm run build
 
 # Runtime image

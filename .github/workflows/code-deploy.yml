@@ -70,6 +70,14 @@ jobs:
           username: ${{ env.AZURE_ACR_USERNAME }}
           password: ${{ env.AZURE_ACR_PASSWORD }}
 
+      - name: Define production environment variables
+        working-directory: code
+        run: |
+          touch .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
+          echo BACKEND_ENDPOINT=${{ secrets.BACKEND_ENDPOINT }} >> .env.production
+
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
         with:
@@ -79,9 +87,7 @@ jobs:
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
           file: code/Dockerfile
           build-args: |
-            NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-            NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }}
-            BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}
+            PROD_ENV="NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}\nNEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }}\nBACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}"
 
       - name: Azure Login
         uses: azure/login@v2
@@ -105,5 +111,5 @@ jobs:
               --registry-server $AZURE_ACR_NAME.azurecr.io \
               --user-assigned "$AZURE_IDENTITY_ID" \
               --registry-identity "$AZURE_IDENTITY_ID" \
-              --env-vars "BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}"
+              --env-vars "BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}" \
               --query properties.configuration.ingress.fqdn
