@@ -2,6 +2,10 @@
 name: code-deploy
 
 on:
+  pull_request:
+    types: [closed]
+    branches: ["main", "main-*"]
+    paths: ["code/**", ".github/workflows/code**"]
   workflow_dispatch:
     inputs:
       BASELINE:
