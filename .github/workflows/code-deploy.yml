@@ -23,6 +23,7 @@ env:
   AZURE_RESOURCE_GROUP: "weavejs-test"
   AZURE_CONTAINER_ENVIRONMENT_NAME: "managedEnvironment-weavejstest-aad6"
   AZURE_CONTAINER_NAME: "weavejs-frontend"
+  AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
   NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
@@ -57,8 +58,8 @@ jobs:
           azcliversion: latest
           inlineScript: |
             BACKEND_INGRESS_FQDN=$(az containerapp show \
-              --resource-group <RESOURCE_GROUP_NAME> \
-              --name <CONTAINER_APP_NAME> \
+              --resource-group $AZURE_RESOURCE_GROUP \
+              --name $AZURE_CONTAINER_NAME_BACKEND \
               --query properties.configuration.ingress.fqdn)
             echo "endpoint=http://$BACKEND_INGRESS_FQDN:8081" >> $GITHUB_OUTPUT
 
