@@ -49,14 +49,16 @@ jobs:
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
-        env:
-          BACKEND_ENDPOINT: ${{ env.BACKEND_ENDPOINT }}
         with:
           push: true
           platforms: linux/amd64
           context: code
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
           file: code/Dockerfile
+          build-args: |
+            NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+            NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }}
+            BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}
 
       - name: Azure Login
         uses: azure/login@v2
