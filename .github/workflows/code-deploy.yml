@@ -24,7 +24,6 @@ env:
   AZURE_CONTAINER_ENVIRONMENT_NAME: "managedEnvironment-weavejstest-aad6"
   AZURE_CONTAINER_NAME: "weavejs-frontend"
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
-  BACKEND_ENDPOINT: ${{ secrets.BACKEND_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
 
@@ -43,6 +42,24 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Query the backend Ingress FQDN
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            BACKEND_INGRESS_FQDN=$(az containerapp show \
+              --resource-group <RESOURCE_GROUP_NAME> \
+              --name <CONTAINER_APP_NAME> \
+              --query properties.configuration.ingress.fqdn)
+            echo "BACKEND_ENDPOINT=http://$BACKEND_INGRESS_FQDN:8081" >> $GITHUB_OUTPUT
 
       - name: ACR Login
         uses: docker/login-action@v3
@@ -86,7 +103,5 @@ jobs:
               --registry-server $AZURE_ACR_NAME.azurecr.io \
               --user-assigned "$AZURE_IDENTITY_ID" \
               --registry-identity "$AZURE_IDENTITY_ID" \
-              --env-vars "BACKEND_ENDPOINT=$BACKEND_ENDPOINT" \
-                         "NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT" \
-                         "NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=$NEXT_PUBLIC_API_ENDPOINT_HUB_NAME" \
+              --env-vars "BACKEND_ENDPOINT=$BACKEND_ENDPOINT"
               --query properties.configuration.ingress.fqdn
