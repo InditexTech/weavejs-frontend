@@ -15,12 +15,9 @@ RUN npm ci
 # Build step
 FROM base AS builder
 
-ARG PROD_ENV=""
-
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN printf "$PROD_ENV" >> .env.production
 RUN npm run build
 
 # Runtime image
@@ -38,6 +35,7 @@ RUN mkdir .next
 RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs .env.production ./
 USER nextjs
 EXPOSE 8080
 ENV PORT 8080

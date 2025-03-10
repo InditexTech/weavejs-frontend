@@ -86,8 +86,6 @@ jobs:
           context: code
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
           file: code/Dockerfile
-          build-args: |
-            PROD_ENV="NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}\nNEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }}\nBACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }}"
 
       - name: Azure Login
         uses: azure/login@v2
