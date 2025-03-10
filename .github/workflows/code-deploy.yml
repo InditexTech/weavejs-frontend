@@ -92,4 +92,9 @@ jobs:
               --registry-server $AZURE_ACR_NAME.azurecr.io \
               --user-assigned "$AZURE_IDENTITY_ID" \
               --registry-identity "$AZURE_IDENTITY_ID" \
+              --min-replicas 1 \
+              --max-replicas 2 \
+              --scale-rule-name http-rule \
+              --scale-rule-type http \
+              --scale-rule-http-concurrency 10
               --query properties.configuration.ingress.fqdn
