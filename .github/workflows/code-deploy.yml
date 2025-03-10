@@ -66,6 +66,7 @@ jobs:
           echo NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
           echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
           echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
+          cat .env.production
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
