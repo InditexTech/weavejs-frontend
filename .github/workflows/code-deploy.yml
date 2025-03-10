@@ -61,7 +61,7 @@ jobs:
               --resource-group $AZURE_RESOURCE_GROUP \
               --name $AZURE_CONTAINER_NAME_BACKEND \
               --query properties.configuration.ingress.fqdn)
-            echo "BACKEND_ENDPOINT=http://$(echo $BACKEND_INGRESS_FQDN):8081" >> $GITHUB_ENV
+            echo "BACKEND_ENDPOINT=http://$(echo $BACKEND_INGRESS_FQDN)" >> $GITHUB_ENV
 
       - name: ACR Login
         uses: docker/login-action@v3
