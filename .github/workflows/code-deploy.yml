@@ -45,13 +45,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-
       - name: ACR Login
         uses: docker/login-action@v3
         with:
