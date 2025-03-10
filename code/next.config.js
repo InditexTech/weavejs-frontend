@@ -8,12 +8,14 @@ const nextConfig = {
     return config;
   },
   async rewrites() {
-    return [
-      {
-        source: '/weavebff1/:path*',
-        destination: `${process.env.BACKEND_ENDPOINT}/:path*` // Proxy to Backend
-      }
-    ]
+    return {
+      beforeFiles: [
+        {
+          source: '/weavebff/:path*',
+          destination: `${process.env.BACKEND_ENDPOINT}/:path*` // Proxy to Backend
+        }
+      ]
+    };
   },
   images: {
     localPatterns: [
