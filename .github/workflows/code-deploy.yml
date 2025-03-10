@@ -96,5 +96,5 @@ jobs:
               --max-replicas 2 \
               --scale-rule-name http-rule \
               --scale-rule-type http \
-              --scale-rule-http-concurrency 10
+              --scale-rule-http-concurrency 10 \
               --query properties.configuration.ingress.fqdn
