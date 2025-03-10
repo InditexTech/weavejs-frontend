@@ -49,6 +49,8 @@ jobs:
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
+        env:
+          BACKEND_ENDPOINT: ${{ env.BACKEND_ENDPOINT }}
         with:
           push: true
           platforms: linux/amd64
