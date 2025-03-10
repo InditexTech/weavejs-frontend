@@ -8,9 +8,13 @@ concurrency:
 on:
   pull_request:
     paths:
-      - 'code/**'
-      - '.github/workflows/code*'
+      - "code/**"
+      - ".github/workflows/code*"
 
+env:
+  NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+  BACKEND_ENDPOINT: "http://weavejs-backend"
 
 jobs:
   unit-tests:
@@ -60,6 +64,15 @@ jobs:
         run: |
           mkdir -p "$HOME"/.npm
           mkdir -p "$HOME"/.asdf/data
+
+      - name: Create .env.production file
+        working-directory: code
+        run: |
+          touch .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
+          echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
+            cat .env.production
 
       - name: NPM / Verify
         working-directory: code
