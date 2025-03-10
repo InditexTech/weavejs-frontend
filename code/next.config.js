@@ -11,7 +11,7 @@ const nextConfig = {
     return [
       {
         source: '/weavebff/:path*',
-        destination: 'http://localhost:3001/:path*' // Proxy to Backend
+        destination: `${process.env.BACKEND_ENDPOINT}/:path*` // Proxy to Backend
       }
     ]
   },

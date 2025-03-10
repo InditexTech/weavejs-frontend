@@ -10,17 +10,29 @@ on:
         default: "main"
 
 env:
-  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+  AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
+  AZURE_ACR_NAME: "weavejs"
   AZURE_RESOURCE_GROUP: "weavejs-test"
   AZURE_CONTAINER_ENVIRONMENT_NAME: "managedEnvironment-weavejstest-aad6"
-  AZURE_CONTAINER_NAME: "showcase-frontend"
-  AZURE_REGISTRY_NAME: "weavejs"
+  AZURE_CONTAINER_NAME: "weavejs-frontend"
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
+  BACKEND_ENDPOINT: ${{ secrets.BACKEND_ENDPOINT }}
+  NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
+  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
+    environment: production
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
@@ -28,23 +40,28 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: ACR Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.AZURE_ACR_NAME }}.azurecr.io
+          username: ${{ env.AZURE_ACR_USERNAME }}
+          password: ${{ env.AZURE_ACR_PASSWORD }}
+
+      - name: Build image and push it to ACR
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          platforms: linux/amd64
+          context: code
+          tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
+          file: code/Dockerfile
+
       - name: Azure Login
         uses: azure/login@v2
         with:
-          creds: ${{ env.AZURE_CREDENTIALS }}
-
-      - name: Build
-        working-directory: code
-        run: |
-          docker build --platform=linux/amd64 --tag $AZURE_REGISTRY_NAME.azurecr.io/$AZURE_CONTAINER_NAME:${{ github.sha }} .
-
-      - name: Push Image to Registry
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az acr login --name $AZURE_REGISTRY_NAME
-            docker push $AZURE_REGISTRY_NAME.azurecr.io/$AZURE_CONTAINER_NAME:${{ github.sha }}
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy
         uses: azure/cli@v2
@@ -55,10 +72,13 @@ jobs:
               --name $AZURE_CONTAINER_NAME \
               --resource-group $AZURE_RESOURCE_GROUP \
               --environment $AZURE_CONTAINER_ENVIRONMENT_NAME \
-              --image $AZURE_REGISTRY_NAME.azurecr.io/$AZURE_CONTAINER_NAME:${{ github.sha }} \
+              --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:${{ github.sha }} \
               --target-port 8080 \
               --ingress external \
-              --registry-server $AZURE_REGISTRY_NAME.azurecr.io \
+              --registry-server $AZURE_ACR_NAME.azurecr.io \
               --user-assigned "$AZURE_IDENTITY_ID" \
               --registry-identity "$AZURE_IDENTITY_ID" \
+              --env-vars "BACKEND_ENDPOINT=$BACKEND_ENDPOINT" \
+                         "NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT" \
+                         "NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=$NEXT_PUBLIC_API_ENDPOINT_HUB_NAME" \
               --query properties.configuration.ingress.fqdn
