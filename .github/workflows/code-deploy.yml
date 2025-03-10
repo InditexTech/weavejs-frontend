@@ -27,6 +27,7 @@ env:
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
   NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+  BACKEND_ENDPOINT: "http://weavejs-backend"
 
 permissions:
   id-token: write
@@ -50,18 +51,6 @@ jobs:
           client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Query the backend Ingress FQDN
-        id: backend-api
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            BACKEND_INGRESS_FQDN=$(az containerapp show \
-              --resource-group $AZURE_RESOURCE_GROUP \
-              --name $AZURE_CONTAINER_NAME_BACKEND \
-              --query properties.configuration.ingress.fqdn)
-            echo "BACKEND_ENDPOINT=http://$(echo $BACKEND_INGRESS_FQDN)" | tr -d '"' >> $GITHUB_ENV
 
       - name: ACR Login
         uses: docker/login-action@v3
