@@ -10,7 +10,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/weavebff/:path*',
+        source: '/weavebff1/:path*',
         destination: `${process.env.BACKEND_ENDPOINT}/:path*` // Proxy to Backend
       }
     ]

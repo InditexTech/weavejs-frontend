@@ -25,8 +25,8 @@ env:
   AZURE_CONTAINER_NAME: "weavejs-frontend"
   AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
-  NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
-  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+  NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
   BACKEND_ENDPOINT: "http://weavejs-backend"
 
 permissions:
@@ -63,9 +63,9 @@ jobs:
         working-directory: code
         run: |
           touch .env.production
-          echo NEXT_PUBLIC_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
-          echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ secrets.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
-          echo BACKEND_ENDPOINT=${{ secrets.BACKEND_ENDPOINT }} >> .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
+          echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
+          echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
