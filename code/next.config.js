@@ -8,9 +8,6 @@ const nextConfig = {
     return config;
   },
   async rewrites() {
-    console.log("Rewrites called");
-    console.log("Source", "/weavebff/:path*");
-    console.log("Destination", `${process.env.BACKEND_ENDPOINT}/:path*`);
     return [
       {
         source: '/weavebff/:path*',
