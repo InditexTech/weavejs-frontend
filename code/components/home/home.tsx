@@ -22,8 +22,8 @@ export const Home = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col items-start justify-start bg-background"
           >
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">COLLABORATION TOOL</h1>
-            <h2 className="text-xl text-muted-foreground">SHOWCASE</h2>
+            <h1 className="text-4xl font-noto-sans-mono font-extralight text-foreground uppercase">Whiteboard</h1>
+            <h2 className="text-2xl font-noto-sans-mono font-extralight text-muted-foreground uppercase">Join a Room</h2>
           </motion.div>
         </div>
        <LoginForm />

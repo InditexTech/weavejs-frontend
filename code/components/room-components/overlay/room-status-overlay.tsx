@@ -26,15 +26,19 @@ export function RoomStatusOverlay() {
   const setImagesLibraryVisible = useCollaborationRoom((state) => state.setImagesLibraryVisible);
 
   return (
-    <div className="pointer-events-none absolute top-[20px] right-[20px] flex flex-col gap-5 justify-center items-center">
-      <div className="w-[320px] p-1 bg-white rounded-lg border border-light-border-3 shadow-md flex flex-col justify-start items-center">
-        <div className="w-full p-3 flex justify-between items-center gap-4">
+    <div className="absolute top-2 right-2 flex flex-col gap-1 justify-center items-center">
+      <div className="w-[320px] p-2 bg-white border border-zinc-200 shadow-xs flex flex-col justify-start items-center">
+        <div className="w-full flex justify-between items-center gap-4">
           <ConnectedUsers connectedUsers={connectedUsers} />
           <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
         </div>
+      </div>
+      <div className="w-[320px] p-1 bg-white border border-zinc-200 shadow-xs flex flex-col justify-start items-center">
         <ZoomHandlerOverlay />
-        <div className="w-full pt-1 flex justify-between items-center border-t border-light-border-3">
-          <div className="flex justify-start items-center">
+      </div>
+      <div className="w-[320px] p-1 bg-white border border-zinc-200 shadow-xs flex flex-col justify-start items-center">
+        <div className="w-full flex justify-between items-center">
+          <div className="flex justify-start items-center gap-1">
             <ToolbarButton
               icon={<Images />}
               active={imagesLibraryVisible}

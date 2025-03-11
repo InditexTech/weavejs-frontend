@@ -21,7 +21,7 @@ export function Logo({ kind = "large", variant = "text" }: Readonly<LogoProps>) 
         })}
         alt="Weave.js logo"
       />
-      { variant === "text" && <div className="font-noto-sans-mono text-zinc !normal-case">Weave.js</div>}
+      { variant === "text" && <div className="font-noto-sans-mono text-muted-foreground !normal-case">Weave.js</div>}
     </div>
   );
 }

@@ -49,10 +49,10 @@ export function MultiuseOverlay() {
   return (
     <div
       className={
-        "pointer-events-none absolute top-[216px] right-[20px] bottom-[20px] flex flex-col gap-5 justify-center items-center"
+        "pointer-events-none absolute top-[calc(150px+8px+8px+4px)] right-2 bottom-2 flex flex-col gap-5 justify-center items-center"
       }
     >
-      <div className="w-[320px] p-0 h-full bg-white rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3 overflow-hidden">
+      <div className="w-[320px] p-0 h-full bg-white border border-light-border-3 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
         <div className="pointer-events-auto w-full h-full overflow-auto custom-scrollbar !px-0">
           <ImagesLibrary />
           <WorkspacesLibrary />

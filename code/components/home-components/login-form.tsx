@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2, Users } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -22,20 +21,21 @@ import { useCollaborationRoom } from "@/store/store";
 const formSchema = z.object({
   username: z
     .string()
-    .min(2, { message: "The username must contain at least 2 characters" })
-    .max(50, { message: "The username must contain as maximum 50 characters" }),
+    .trim()
+    .min(1, { message: "The username is required" })
+    .max(50, { message: "The username must be maximum 50 characters long" }),
   roomId: z
     .string()
-    .min(5, { message: "The room id must contain at least 5 characters" })
-    .max(50, { message: "The room id must contain as maximum 50 characters" }),
-});
+    .trim()
+    .min(1, { message: "The room name is required" })
+    .max(50, { message: "The room name must be maximum 50 characters long" }),
+}).required();
 
 function LoginForm() {
   const router = useRouter();
 
   const setRoom = useCollaborationRoom((state) => state.setRoom);
   const setUser = useCollaborationRoom((state) => state.setUser);
-  const [loading, setLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +46,6 @@ function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
     setRoom(values.roomId);
     setUser({
       name: values.username,
@@ -60,14 +59,8 @@ function LoginForm() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="w-full max-w-md space-y-8 rounded-lg border bg-card p-6 shadow-lg"
+      className="w-full max-w-md"
     >
-      <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">Join a Room</h2>
-        <p className="text-sm text-muted-foreground">
-          Enter your details to start collaborating
-        </p>
-      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -78,9 +71,9 @@ function LoginForm() {
             name="roomId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Room ID</FormLabel>
+                <FormLabel className="font-noto-sans-mono">ROOM NAME</FormLabel>
                 <FormControl>
-                  <Input placeholder="i.e.: test-room" {...field} />
+                  <Input placeholder="the room name to join" className="font-noto-sans-mono" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -91,26 +84,16 @@ function LoginForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel className="font-noto-sans-mono">USERNAME</FormLabel>
                 <FormControl>
-                  <Input placeholder="i.e.: myname" {...field} />
+                  <Input placeholder="your username" className="font-noto-sans-mono" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Joining...
-              </>
-            ) : (
-              <>
-                <Users className="mr-2 h-4 w-4" />
-                Join
-              </>
-            )}
+          <Button type="submit" className="w-full cursor-pointer font-mono">
+            JOIN
           </Button>
         </form>
       </Form>
