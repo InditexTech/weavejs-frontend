@@ -14,12 +14,24 @@ export function MultiuseOverlay() {
 
   const isActionActive = useWeave((state) => state.actions.active);
 
-  const nodePropertiesVisible = useCollaborationRoom((state) => state.nodeProperties.visible);
-  const setNodePropertiesVisible = useCollaborationRoom((state) => state.setNodePropertiesVisible);
-  const imagesLibraryVisible = useCollaborationRoom((state) => state.images.library.visible);
-  const setWorkspacesLibraryVisible = useCollaborationRoom((state) => state.setWorkspacesLibraryVisible);
-  const workspacesLibraryVisible = useCollaborationRoom((state) => state.workspaces.library.visible);
-  const setImagesLibraryVisible = useCollaborationRoom((state) => state.setImagesLibraryVisible);
+  const nodePropertiesVisible = useCollaborationRoom(
+    (state) => state.nodeProperties.visible
+  );
+  const setNodePropertiesVisible = useCollaborationRoom(
+    (state) => state.setNodePropertiesVisible
+  );
+  const imagesLibraryVisible = useCollaborationRoom(
+    (state) => state.images.library.visible
+  );
+  const setWorkspacesLibraryVisible = useCollaborationRoom(
+    (state) => state.setWorkspacesLibraryVisible
+  );
+  const workspacesLibraryVisible = useCollaborationRoom(
+    (state) => state.workspaces.library.visible
+  );
+  const setImagesLibraryVisible = useCollaborationRoom(
+    (state) => state.setImagesLibraryVisible
+  );
 
   React.useEffect(() => {
     if (selectedNodes.length !== 1) {
@@ -42,14 +54,18 @@ export function MultiuseOverlay() {
     return null;
   }
 
-  if (!nodePropertiesVisible && !workspacesLibraryVisible && !imagesLibraryVisible) {
+  if (
+    !nodePropertiesVisible &&
+    !workspacesLibraryVisible &&
+    !imagesLibraryVisible
+  ) {
     return null;
   }
 
   return (
     <div
       className={
-        "pointer-events-none absolute top-[calc(150px+8px+8px+4px)] right-2 bottom-2 flex flex-col gap-5 justify-center items-center"
+        "pointer-events-none absolute top-[calc(100px+8px+4px+4px)] right-2 bottom-[calc(50px+8px+4px)] flex flex-col gap-5 justify-center items-center"
       }
     >
       <div className="w-[320px] p-0 h-full bg-white border border-light-border-3 shadow-xs flex justify-start items-center gap-3 overflow-hidden">

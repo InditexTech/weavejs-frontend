@@ -13,6 +13,7 @@ import { useWeave } from "@inditextech/weavejs-react";
 import { RoomLoader } from "../room-components/room-loader";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { RoomError } from "../room-components/room-error";
+import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -94,6 +95,7 @@ export const RoomLayout = () => {
           <RoomInformationOverlay />
           <RoomStatusOverlay />
           <ToolsOverlay />
+          <ZoomHandlerOverlay />
           {/* <OperationsOverlay /> */}
           <MultiuseOverlay />
           <ContextMenu
