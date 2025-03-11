@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ToolbarButton } from "../toolbar/toolbar-button";
-import { Braces, Images, Presentation, LogOut } from "lucide-react";
+import { Braces, Images, LogOut, Frame } from "lucide-react";
 import { ConnectedUsers } from "./../connected-users";
 import { ConnectionStatus } from "./../connection-status";
 import { useWeave } from "@inditextech/weavejs-react";
@@ -54,13 +54,13 @@ export function RoomStatusOverlay() {
               tooltipSide="top"
             />
             <ToolbarButton
-              icon={<Presentation />}
+              icon={<Frame />}
               active={workspacesLibraryVisible}
               onClick={() => {
                 setImagesLibraryVisible(false);
                 setWorkspacesLibraryVisible(!workspacesLibraryVisible);
               }}
-              label="Workspaces"
+              label="Frames"
               tooltipSide="top"
             />
             <ToolbarButton
