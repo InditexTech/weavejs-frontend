@@ -1,9 +1,21 @@
 "use client";
 
 import React from "react";
-import { Clipboard, Copy, Trash2, Redo2, Undo2, Group, Ungroup, MonitorDown, ImageDown } from "lucide-react";
+import {
+  Clipboard,
+  Copy,
+  Trash2,
+  Group,
+  Ungroup,
+  MonitorDown,
+  ImageDown,
+} from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
-import { WeaveCopyPasteNodesPlugin, WeaveExportNodeActionParams, WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
+import {
+  WeaveCopyPasteNodesPlugin,
+  WeaveExportNodeActionParams,
+  WeaveExportStageActionParams,
+} from "@inditextech/weavejs-sdk";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export function OperationsOverlay() {
@@ -15,9 +27,6 @@ export function OperationsOverlay() {
 
   const canCopy = useWeave((state) => state.copyPaste.canCopy);
   const canPaste = useWeave((state) => state.copyPaste.canPaste);
-
-  const canUndo = useWeave((state) => state.undoRedo.canUndo);
-  const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
   return (
     <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex gap-5 justify-center items-center">
@@ -46,14 +55,17 @@ export function OperationsOverlay() {
             tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
+            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
           </div>
           <ToolbarButton
             icon={<Copy />}
             disabled={isActionActive || !canCopy}
             onClick={() => {
               if (instance) {
-                const weaveCopyPasteNodesPlugin = instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+                const weaveCopyPasteNodesPlugin =
+                  instance.getPlugin<WeaveCopyPasteNodesPlugin>(
+                    "copyPasteNodes"
+                  );
                 if (weaveCopyPasteNodesPlugin) {
                   return weaveCopyPasteNodesPlugin.copy();
                 }
@@ -67,7 +79,10 @@ export function OperationsOverlay() {
             disabled={isActionActive || !canPaste}
             onClick={() => {
               if (instance) {
-                const weaveCopyPasteNodesPlugin = instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+                const weaveCopyPasteNodesPlugin =
+                  instance.getPlugin<WeaveCopyPasteNodesPlugin>(
+                    "copyPasteNodes"
+                  );
                 if (weaveCopyPasteNodesPlugin) {
                   return weaveCopyPasteNodesPlugin.paste();
                 }
@@ -77,47 +92,23 @@ export function OperationsOverlay() {
             tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
-          </div>
-          <ToolbarButton
-            icon={<Undo2 />}
-            disabled={isActionActive || !canUndo}
-            onClick={() => {
-              if (instance) {
-                const actualStore = instance.getStore();
-                actualStore.undoStateStep();
-              }
-            }}
-            label="Undo"
-            tooltipSide="top"
-          />
-          <ToolbarButton
-            icon={<Redo2 />}
-            disabled={isActionActive || !canRedo}
-            onClick={() => {
-              if (instance) {
-                const actualStore = instance.getStore();
-                actualStore.redoStateStep();
-              }
-            }}
-            label="Redo"
-            tooltipSide="top"
-          />
-          <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
+            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
           </div>
           <ToolbarButton
             icon={<ImageDown />}
             disabled={selectedNodes.length !== 1}
             onClick={() => {
               if (instance && selectedNodes.length === 1) {
-                instance.triggerAction<WeaveExportNodeActionParams>("exportNodeTool", {
-                  node: selectedNodes[0].instance,
-                  options: {
-                    padding: 20,
-                    pixelRatio: 2,
-                  },
-                });
+                instance.triggerAction<WeaveExportNodeActionParams>(
+                  "exportNodeTool",
+                  {
+                    node: selectedNodes[0].instance,
+                    options: {
+                      padding: 20,
+                      pixelRatio: 2,
+                    },
+                  }
+                );
               }
             }}
             tooltipSide="top"
@@ -127,19 +118,22 @@ export function OperationsOverlay() {
             icon={<MonitorDown />}
             onClick={() => {
               if (instance) {
-                instance.triggerAction<WeaveExportStageActionParams>("exportStageTool", {
-                  options: {
-                    padding: 20,
-                    pixelRatio: 2,
-                  },
-                });
+                instance.triggerAction<WeaveExportStageActionParams>(
+                  "exportStageTool",
+                  {
+                    options: {
+                      padding: 20,
+                      pixelRatio: 2,
+                    },
+                  }
+                );
               }
             }}
             tooltipSide="top"
             label="Export canvas as image"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-[30px] bg-light-background-3 mx-1"></div>
+            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
           </div>
           <ToolbarButton
             icon={<Trash2 />}

@@ -2,7 +2,17 @@
 
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
-import { Brush, ImagePlus, PenTool, Presentation, Square, SwatchBook, Type } from "lucide-react";
+import {
+  Brush,
+  ImagePlus,
+  PenTool,
+  Presentation,
+  Square,
+  SwatchBook,
+  Type,
+  Redo2,
+  Undo2,
+} from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
 
@@ -11,6 +21,9 @@ export function ToolsOverlay() {
 
   const isActionActive = useWeave((state) => state.actions.active);
   const actualAction = useWeave((state) => state.actions.actual);
+
+  const canUndo = useWeave((state) => state.undoRedo.canUndo);
+  const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
   const triggerRectangleTool = React.useCallback(() => {
     if (instance && actualAction !== "rectangleTool") {
@@ -76,7 +89,7 @@ export function ToolsOverlay() {
   }, [instance, actualAction]);
 
   return (
-    <div className="absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-5 justify-center items-center">
+    <div className="absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-1 justify-center items-center">
       <Toolbar>
         <ToolbarButton
           icon={<Square />}
@@ -113,9 +126,8 @@ export function ToolsOverlay() {
           onClick={triggerImageTool}
           label="Add an image"
         />
-        <div className="w-full flex justify-center items-center">
-          <div className="w-[30px] h-[1px] bg-light-background-3 my-1"></div>
-        </div>
+      </Toolbar>
+      <Toolbar>
         <ToolbarButton
           icon={<SwatchBook />}
           active={actualAction === "pantoneTool"}
@@ -129,6 +141,32 @@ export function ToolsOverlay() {
           disabled={isActionActive && actualAction !== "workspaceTool"}
           onClick={triggerWorkspaceTool}
           label="Create a workspace"
+        />
+      </Toolbar>
+      <Toolbar>
+        <ToolbarButton
+          icon={<Undo2 />}
+          disabled={isActionActive || !canUndo}
+          onClick={() => {
+            if (instance) {
+              const actualStore = instance.getStore();
+              actualStore.undoStateStep();
+            }
+          }}
+          label="Undo"
+          tooltipSide="top"
+        />
+        <ToolbarButton
+          icon={<Redo2 />}
+          disabled={isActionActive || !canRedo}
+          onClick={() => {
+            if (instance) {
+              const actualStore = instance.getStore();
+              actualStore.redoStateStep();
+            }
+          }}
+          label="Redo"
+          tooltipSide="top"
         />
       </Toolbar>
     </div>
