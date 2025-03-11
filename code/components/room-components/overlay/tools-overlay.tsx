@@ -6,12 +6,12 @@ import {
   Brush,
   ImagePlus,
   PenTool,
-  Presentation,
   Square,
   SwatchBook,
   Type,
   Redo2,
   Undo2,
+  Frame,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -126,6 +126,13 @@ export function ToolsOverlay() {
           onClick={triggerImageTool}
           label="Add an image"
         />
+        <ToolbarButton
+          icon={<Frame />}
+          active={actualAction === "workspaceTool"}
+          disabled={isActionActive && actualAction !== "workspaceTool"}
+          onClick={triggerWorkspaceTool}
+          label="Create a frame"
+        />
       </Toolbar>
       <Toolbar>
         <ToolbarButton
@@ -134,13 +141,6 @@ export function ToolsOverlay() {
           disabled={isActionActive && actualAction !== "pantoneTool"}
           onClick={triggerPantoneTool}
           label="Add a Pantone color"
-        />
-        <ToolbarButton
-          icon={<Presentation />}
-          active={actualAction === "workspaceTool"}
-          disabled={isActionActive && actualAction !== "workspaceTool"}
-          onClick={triggerWorkspaceTool}
-          label="Create a workspace"
         />
       </Toolbar>
       <Toolbar>
