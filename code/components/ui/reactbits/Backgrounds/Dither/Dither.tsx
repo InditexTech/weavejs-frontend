@@ -318,6 +318,7 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1,
 }: DitherProps) {
+  const [devicePixelRatio, setDevicePixelRatio] = useState(1);
   const [isMac, setIsMac] = useState(false);
 
   React.useEffect(() => {
@@ -327,6 +328,7 @@ export default function Dither({
         (navigator as any).userAgentData.platform.toLowerCase() === "macos"
       : /macintosh|mac os x/i.test(navigator.userAgent);
     setIsMac(isOnMac);
+    setDevicePixelRatio(window.devicePixelRatio);
   }, []);
 
   return (
@@ -334,7 +336,7 @@ export default function Dither({
       className="w-full h-full relative"
       style={{ padding: isMac ? "1px" : "2px" }}
       camera={{ position: [0, 0, 6] }}
-      dpr={window.devicePixelRatio}
+      dpr={devicePixelRatio}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
     >
       <DitheredWaves
