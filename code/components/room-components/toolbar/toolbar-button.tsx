@@ -32,9 +32,9 @@ export function ToolbarButton({
         <TooltipTrigger asChild>
           <button
             className={cn(
-              "pointer-events-auto cursor-pointer hover:bg-zinc-200 px-2 py-2 flex justify-center items-center",
+              "pointer-events-auto cursor-pointer hover:bg-accent px-2 py-2 flex justify-center items-center",
               {
-                ["bg-zinc-200"]: active,
+                ["bg-accent"]: active,
                 ["pointer-events-none cursor-default opacity-50"]: disabled,
               }
             )}
