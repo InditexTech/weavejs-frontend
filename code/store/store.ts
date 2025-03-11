@@ -35,7 +35,9 @@ interface CollaborationRoomState {
     };
   };
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
-  setFetchConnectionUrlError: (newFetchConnectionUrlError: Error | null) => void;
+  setFetchConnectionUrlError: (
+    newFetchConnectionUrlError: Error | null
+  ) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
@@ -83,36 +85,63 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   setFetchConnectionUrlError: (newFetchConnectionUrlError) =>
     set((state) => ({
       ...state,
-      fetchConnectionUrl: { ...state.fetchConnectionUrl, error: newFetchConnectionUrlError },
+      fetchConnectionUrl: {
+        ...state.fetchConnectionUrl,
+        error: newFetchConnectionUrlError,
+      },
     })),
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
   setContextMenuShow: (newContextMenuShow) =>
-    set((state) => ({ ...state, contextMenu: { ...state.contextMenu, show: newContextMenuShow } })),
+    set((state) => ({
+      ...state,
+      contextMenu: { ...state.contextMenu, show: newContextMenuShow },
+    })),
   setContextMenuPosition: (newContextMenuPosition) =>
-    set((state) => ({ ...state, contextMenu: { ...state.contextMenu, position: newContextMenuPosition } })),
+    set((state) => ({
+      ...state,
+      contextMenu: { ...state.contextMenu, position: newContextMenuPosition },
+    })),
   setContextMenuOptions: (newContextMenuOptions) =>
-    set((state) => ({ ...state, contextMenu: { ...state.contextMenu, options: newContextMenuOptions } })),
+    set((state) => ({
+      ...state,
+      contextMenu: { ...state.contextMenu, options: newContextMenuOptions },
+    })),
   setUploadingImage: (newUploadingImage) =>
-    set((state) => ({ ...state, images: { ...state.images, uploading: newUploadingImage } })),
+    set((state) => ({
+      ...state,
+      images: { ...state.images, uploading: newUploadingImage },
+    })),
   setLoadingImage: (newLoadingImage) =>
-    set((state) => ({ ...state, images: { ...state.images, loading: newLoadingImage } })),
+    set((state) => ({
+      ...state,
+      images: { ...state.images, loading: newLoadingImage },
+    })),
   setNodePropertiesVisible: (newNodePropertiesVisible) =>
     set((state) => ({
       ...state,
-      nodeProperties: { ...state.nodeProperties, visible: newNodePropertiesVisible },
+      nodeProperties: {
+        ...state.nodeProperties,
+        visible: newNodePropertiesVisible,
+      },
     })),
   setImagesLibraryVisible: (newImagesLibraryVisible) =>
     set((state) => ({
       ...state,
-      images: { ...state.images, library: { ...state.images.library, visible: newImagesLibraryVisible } },
+      images: {
+        ...state.images,
+        library: { ...state.images.library, visible: newImagesLibraryVisible },
+      },
     })),
   setWorkspacesLibraryVisible: (newWorkspacesLibraryVisible) =>
     set((state) => ({
       ...state,
       workspaces: {
         ...state.workspaces,
-        library: { ...state.workspaces.library, visible: newWorkspacesLibraryVisible },
+        library: {
+          ...state.workspaces.library,
+          visible: newWorkspacesLibraryVisible,
+        },
       },
     })),
 }));

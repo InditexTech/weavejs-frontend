@@ -28,7 +28,10 @@ import {
   WeaveSelection,
 } from "@inditextech/weavejs-sdk";
 // import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets";
-import { WeaveStoreAzureWebPubsubConnectionStatus, WeaveStoreAzureWebPubsub } from "@inditextech/weavejs-store-azure-web-pubsub";
+import {
+  WeaveStoreAzureWebPubsubConnectionStatus,
+  WeaveStoreAzureWebPubsub,
+} from "@inditextech/weavejs-store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
 import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
@@ -39,6 +42,17 @@ import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { RoomLoader } from "../room-components/room-loader";
+import {
+  Copy,
+  Clipboard,
+  Group,
+  Ungroup,
+  Trash,
+  SendToBack,
+  BringToFront,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 
 export const Room = () => {
   const params = useParams<{ roomId: string }>();
@@ -52,8 +66,12 @@ export const Room = () => {
   const user = useCollaborationRoom((state) => state.user);
   const setRoom = useCollaborationRoom((state) => state.setRoom);
   const setUser = useCollaborationRoom((state) => state.setUser);
-  const setFetchConnectionUrlLoading = useCollaborationRoom((state) => state.setFetchConnectionUrlLoading);
-  const setFetchConnectionUrlError = useCollaborationRoom((state) => state.setFetchConnectionUrlError);
+  const setFetchConnectionUrlLoading = useCollaborationRoom(
+    (state) => state.setFetchConnectionUrlLoading
+  );
+  const setFetchConnectionUrlError = useCollaborationRoom(
+    (state) => state.setFetchConnectionUrlError
+  );
 
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
@@ -94,7 +112,7 @@ export const Room = () => {
       setFetchConnectionUrlError(error);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onConnectionStatusChangeHandler = React.useCallback(
@@ -102,7 +120,7 @@ export const Room = () => {
       setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   // const onConnectionStatusChangeHandler = React.useCallback(
@@ -235,6 +253,7 @@ export const Room = () => {
                   id: "copy",
                   type: "button",
                   label: "Copy",
+                  icon: <Copy size={16} />,
                   disabled: actIsActionActive || !actCanCopy,
                   onClick: () => {
                     const weaveCopyPasteNodesPlugin =
@@ -250,6 +269,7 @@ export const Room = () => {
                   id: "paste",
                   type: "button",
                   label: "Paste",
+                  icon: <Clipboard size={16} />,
                   disabled: actIsActionActive || !actCanPaste,
                   onClick: () => {
                     const weaveCopyPasteNodesPlugin =
@@ -269,6 +289,7 @@ export const Room = () => {
                   id: "bring-to-front",
                   type: "button",
                   label: "Bring to front",
+                  icon: <BringToFront size={16} />,
                   disabled: nodes.length !== 1,
                   onClick: () => {
                     actInstance.bringToFront(nodes[0].instance);
@@ -278,6 +299,7 @@ export const Room = () => {
                   id: "move-up",
                   type: "button",
                   label: "Move up",
+                  icon: <ArrowUp size={16} />,
                   disabled: nodes.length !== 1,
                   onClick: () => {
                     actInstance.moveUp(nodes[0].instance);
@@ -287,6 +309,7 @@ export const Room = () => {
                   id: "move-down",
                   type: "button",
                   label: "Move down",
+                  icon: <ArrowDown size={16} />,
                   disabled: nodes.length !== 1,
                   onClick: () => {
                     actInstance.moveDown(nodes[0].instance);
@@ -296,6 +319,7 @@ export const Room = () => {
                   id: "send-to-back",
                   type: "button",
                   label: "Send to back",
+                  icon: <SendToBack size={16} />,
                   disabled: nodes.length !== 1,
                   onClick: () => {
                     actInstance.sendToBack(nodes[0].instance);
@@ -309,6 +333,7 @@ export const Room = () => {
                   id: "group",
                   type: "button",
                   label: "Group",
+                  icon: <Group size={16} />,
                   disabled: !canGroup,
                   onClick: () => {
                     actInstance.group(nodes.map((n) => n.node));
@@ -318,6 +343,7 @@ export const Room = () => {
                   id: "ungroup",
                   type: "button",
                   label: "Ungroup",
+                  icon: <Ungroup size={16} />,
                   disabled: !canUnGroup,
                   onClick: () => {
                     actInstance.unGroup(nodes[0].node);
@@ -331,6 +357,7 @@ export const Room = () => {
                   id: "delete",
                   type: "button",
                   label: "Delete",
+                  icon: <Trash size={16} />,
                   onClick: () => {
                     for (const node of nodes) {
                       actInstance.removeNode(node.node);
