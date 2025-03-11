@@ -127,23 +127,23 @@ export const WorkspacesLibrary = () => {
 
   return (
     <div className="pointer-events-auto w-full h-full">
-      <div className="w-full font-title-xs p-2 py-2 border-b border-light-border-3 bg-light-background-2 flex justify-between items-center">
-        <div className="flex justify-between items-center text-sm pl-1">
+      <div className="w-full font-title-xs p-1 border-b border-zinc-200 bg-white flex justify-between items-center">
+        <div className="flex justify-between font-noto-sans font-light items-center text-md pl-2">
           Frames
         </div>
         <div className="flex justify-end items-center gap-1">
           <button
-            className="cursor-pointer bg-transparent hover:bg-zinc-200 p-1"
+            className="cursor-pointer bg-transparent hover:bg-zinc-200 p-2"
             disabled={selectedNodes.length <= 1 || !selectedNodesAllWorkspace}
             onClick={alignItemsHandler}
           >
-            <AlignStartHorizontal size={16} />
+            <AlignStartHorizontal />
           </button>
           <button
-            className="cursor-pointer bg-transparent  hover:bg-zinc-200 p-1"
+            className="cursor-pointer bg-transparent  hover:bg-zinc-200 p-2"
             onClick={exportWorkspacesHandler}
           >
-            <Download size={16} />
+            <Download />
           </button>
         </div>
       </div>

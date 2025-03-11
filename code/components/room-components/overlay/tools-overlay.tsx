@@ -11,10 +11,9 @@ import {
   Square,
   SwatchBook,
   Type,
-  Redo2,
-  Undo2,
+  Redo,
+  Undo,
   Frame,
-  Presentation,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -169,7 +168,7 @@ export function ToolsOverlay() {
           label="Images"
         />
         <ToolbarButton
-          icon={<Presentation />}
+          icon={<Frame />}
           active={workspacesLibraryVisible}
           onClick={() => {
             setImagesLibraryVisible(false);
@@ -180,7 +179,7 @@ export function ToolsOverlay() {
       </Toolbar>
       <Toolbar>
         <ToolbarButton
-          icon={<Undo2 />}
+          icon={<Undo />}
           disabled={isActionActive || !canUndo}
           onClick={() => {
             if (instance) {
@@ -191,7 +190,7 @@ export function ToolsOverlay() {
           label="Undo"
         />
         <ToolbarButton
-          icon={<Redo2 />}
+          icon={<Redo />}
           disabled={isActionActive || !canRedo}
           onClick={() => {
             if (instance) {
