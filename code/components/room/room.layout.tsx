@@ -2,13 +2,12 @@
 
 import { Hourglass } from "lucide-react";
 import React from "react";
-import { ContextMenu } from "@/components/room-components/context-menu";
+import { ContextMenuRender } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { RoomInformationOverlay } from "@/components/room-components/overlay/room-information-overlay";
 import { RoomStatusOverlay } from "@/components/room-components/overlay/room-status-overlay";
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
-// import { OperationsOverlay } from "@/components/room-components/overlay/operations-overlay";
 import { useWeave } from "@inditextech/weavejs-react";
 import { RoomLoader } from "../room-components/room-loader";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
@@ -92,13 +91,7 @@ export const RoomLayout = () => {
       )}
       {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
         <>
-          <RoomInformationOverlay />
-          <RoomStatusOverlay />
-          <ToolsOverlay />
-          <ZoomHandlerOverlay />
-          {/* <OperationsOverlay /> */}
-          <MultiuseOverlay />
-          <ContextMenu
+          <ContextMenuRender
             show={contextMenuShow}
             onChanged={(show: boolean) => {
               setContextMenuShow(show);
@@ -106,6 +99,11 @@ export const RoomLayout = () => {
             position={contextMenuPosition}
             options={contextMenuOptions}
           />
+          <RoomInformationOverlay />
+          <RoomStatusOverlay />
+          <ToolsOverlay />
+          <ZoomHandlerOverlay />
+          <MultiuseOverlay />
           {uploadingImage && (
             <div className="w-full h-full bg-light-background-inverse/25 flex justify-center items-center absolute top-0 left-0">
               <div className="flex flex-col gap-2 bg-light-background-1 p-8 justify-center items-center">

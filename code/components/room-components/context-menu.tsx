@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 type ContextMenuButtonProps = {
   label: React.ReactNode;
+  icon?: React.ReactNode;
   disabled?: boolean;
   onClick: () => void;
 };
@@ -16,6 +17,7 @@ export type ContextMenuOption = {
   | {
       type: "button";
       label: string;
+      icon?: React.ReactNode;
       disabled?: boolean;
       onClick: () => void;
     }
@@ -31,22 +33,35 @@ type ContextMenuProps = {
   options: ContextMenuOption[];
 };
 
-function ContextMenuButton({ label, disabled, onClick }: Readonly<ContextMenuButtonProps>) {
+function ContextMenuButton({
+  label,
+  icon,
+  disabled,
+  onClick,
+}: Readonly<ContextMenuButtonProps>) {
   return (
     <button
-      className={cn("!cursor-pointer font-body-m-light w-full bg-transparent text-left px-3 py-2", {
-        ["hover:bg-light-background-hover"]: !disabled,
-        ["!cursor-default"]: disabled,
-      })}
+      className={cn(
+        "!cursor-pointer w-[calc(100%-8px)] flex justify-start items-center gap-2 font-noto-sans-mono text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
+        {
+          ["hover:bg-accent"]: !disabled,
+          ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
+        }
+      )}
       disabled={disabled}
       onClick={onClick}
     >
-      {label}
+      {icon} {label}
     </button>
   );
 }
 
-export const ContextMenu = ({ show, onChanged, position, options }: Readonly<ContextMenuProps>) => {
+export const ContextMenuRender = ({
+  show,
+  onChanged,
+  position,
+  options,
+}: Readonly<ContextMenuProps>) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -68,7 +83,7 @@ export const ContextMenu = ({ show, onChanged, position, options }: Readonly<Con
   return (
     <div
       ref={ref}
-      className="fixed w-[200px] bg-light-background-1 flex flex-col border border-light-border-1"
+      className="fixed w-[200px] bg-white flex flex-col border border-zinc-200 shadow-xs"
       style={{
         display: show ? "block" : "none",
         top: `${position.y}px`,
@@ -81,13 +96,16 @@ export const ContextMenu = ({ show, onChanged, position, options }: Readonly<Con
             <ContextMenuButton
               key={option.id}
               label={option.label}
+              icon={option.icon}
               disabled={option.disabled ?? false}
               onClick={option.onClick}
             />
           );
         }
         if (option.type === "divider") {
-          return <div key={option.id} className="w-full h-[1px] bg-light-background-3"></div>;
+          return (
+            <div key={option.id} className="w-full h-[1px] bg-zinc-200"></div>
+          );
         }
       })}
     </div>
