@@ -318,11 +318,16 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1,
 }: DitherProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isMac = (navigator as any).userAgentData
-    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigator as any).userAgentData.platform.toLowerCase() === "macos"
-    : /macintosh|mac os x/i.test(navigator.userAgent);
+  const [isMac, setIsMac] = useState(false);
+
+  React.useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isOnMac = (navigator as any).userAgentData
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (navigator as any).userAgentData.platform.toLowerCase() === "macos"
+      : /macintosh|mac os x/i.test(navigator.userAgent);
+    setIsMac(isOnMac);
+  }, []);
 
   return (
     <Canvas
