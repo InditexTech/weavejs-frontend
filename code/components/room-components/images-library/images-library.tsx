@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { ImagePlus, Trash } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
@@ -58,8 +59,8 @@ export const ImagesLibrary = () => {
 
   return (
     <div className="pointer-events-auto w-full h-full">
-      <div className="w-full font-title-xs p-2 py-2 border-b border-light-border-3 bg-light-background-2 flex justify-between items-center">
-        <div className="flex justify-between items-center text-sm pl-1">
+      <div className="w-full font-title-xs p-1 border-b border-zinc-200 bg-white flex justify-between items-center">
+        <div className="flex justify-between font-noto-sans font-light items-center text-md pl-2">
           Images
         </div>
         <div className="flex justify-end items-center gap-1">
@@ -81,7 +82,7 @@ export const ImagesLibrary = () => {
             }}
           />
           <button
-            className="cursor-pointer bg-transparent hover:bg-zinc-200 p-1"
+            className="cursor-pointer bg-transparent hover:bg-zinc-200 p-2"
             onClick={() => {
               if (inputFileRef.current) {
                 inputFileRef.current.click();
@@ -89,7 +90,7 @@ export const ImagesLibrary = () => {
               }
             }}
           >
-            <ImagePlus size={16} />
+            <ImagePlus />
           </button>
         </div>
       </div>
@@ -117,10 +118,13 @@ export const ImagesLibrary = () => {
                   key={image}
                   className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border border-zinc-300 relative"
                 >
-                  <img
+                  <Image
                     className="w-full h-full object-cover"
                     draggable="true"
                     src={imageUrl}
+                    width={139}
+                    height={100}
+                    alt="An image"
                   />
                   <button
                     className="absolute bottom-[8px] right-[8px] bg-white p-2 border border-zinc-300 rounded hidden group-hover:block cursor-pointer"

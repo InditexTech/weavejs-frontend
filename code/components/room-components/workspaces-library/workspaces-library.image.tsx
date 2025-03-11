@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Konva from "konva";
 import { toImageAsync } from "./utils";
 
@@ -20,7 +21,15 @@ export const WorkspaceImage = ({ node }: Readonly<WorkspaceImageProps>) => {
         }
         const boxBg = workspaceBg.getClientRect();
         const img = await toImageAsync(node, boxBg);
-        setImage(<img src={img.src} className="object-fit w-full h-full" />);
+        setImage(
+          <Image
+            src={img.src}
+            width={284}
+            height={201}
+            alt="A workspace image"
+            className="object-fit w-full h-full"
+          />
+        );
       } catch (ex) {
         console.error(ex);
       }
@@ -28,5 +37,9 @@ export const WorkspaceImage = ({ node }: Readonly<WorkspaceImageProps>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div className="w-full aspect-video border border-light-border-1">{image}</div>;
+  return (
+    <div className="w-full aspect-video border border-light-border-1">
+      {image}
+    </div>
+  );
 };
