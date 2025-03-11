@@ -26,6 +26,7 @@ import {
   WeaveImageNode,
   WeaveUser,
   WeaveSelection,
+  WEAVE_INSTANCE_STATUS,
 } from "@inditextech/weavejs-sdk";
 // import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets";
 import {
@@ -54,20 +55,35 @@ import {
   ArrowDown,
 } from "lucide-react";
 
+const statusMap = {
+  ["idle"]: "Idle",
+  ["starting"]: "Starting Weave...",
+  ["loadingFonts"]: "Fetching custom fonts...",
+  ["running"]: "Running",
+};
+
 export const Room = () => {
   const params = useParams<{ roomId: string }>();
   const [loadedParams, setLoadedParams] = React.useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const status = useWeave((state) => state.status);
+  const roomLoaded = useWeave((state) => state.room.loaded);
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
 
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const setRoom = useCollaborationRoom((state) => state.setRoom);
   const setUser = useCollaborationRoom((state) => state.setUser);
+  const loadingFetchConnectionUrl = useCollaborationRoom(
+    (state) => state.fetchConnectionUrl.loading
+  );
   const setFetchConnectionUrlLoading = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlLoading
+  );
+  const errorFetchConnectionUrl = useCollaborationRoom(
+    (state) => state.fetchConnectionUrl.error
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
@@ -90,16 +106,23 @@ export const Room = () => {
   );
 
   React.useEffect(() => {
-    const roomId = params.roomId;
-    const userName = searchParams.get("userName");
-    if (roomId && userName) {
-      setRoom(roomId);
-      setUser({
-        name: userName,
-        email: `${userName}@weave.js`,
-      });
-    }
-    setLoadedParams(true);
+    setFetchConnectionUrlError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      const roomId = params.roomId;
+      const userName = searchParams.get("userName");
+      if (roomId && userName) {
+        setRoom(roomId);
+        setUser({
+          name: userName,
+          email: `${userName}@weave.js`,
+        });
+      }
+      setLoadedParams(true);
+    }, 1000);
   }, [params.roomId, searchParams, setRoom, setUser]);
 
   const getUser = React.useCallback(() => {
@@ -131,248 +154,278 @@ export const Room = () => {
   //   [],
   // );
 
-  if (!loadedParams) {
-    return (
-      <div className="w-full h-full flex justify-center items-center">
-        <RoomLoader roomId="" content="loadingParams" />
-      </div>
-    );
+  const loadingDescription = React.useMemo(() => {
+    if (!loadedParams) {
+      return "Fetching room parameters...";
+    }
+    if (loadingFetchConnectionUrl) {
+      return "Connecting to the room...";
+    }
+    if (status !== WEAVE_INSTANCE_STATUS.RUNNING) {
+      return statusMap[status];
+    }
+    if (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded) {
+      return "Fetching room content...";
+    }
+
+    return "";
+  }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
+
+  if ((!room || !user) && loadedParams) {
+    router.push("/error?errorCode=room-required-parameters");
+    return null;
   }
 
-  if (!room || !user) {
-    router.push("/error?errorCode=missing-required-parameters");
-    return <></>;
+  if (errorFetchConnectionUrl) {
+    router.push("/error?errorCode=room-failed-connection");
+    return null;
   }
 
   return (
-    <WeaveProvider
-      containerId="weave"
-      getUser={getUser}
-      store={
-        // new WeaveStoreWebsockets({
-        //   roomId: room,
-        //   wsOptions: {
-        //     serverUrl: "ws://localhost:1234",
-        //   },
-        //   callbacks: {
-        //     onConnectionStatusChange: onConnectionStatusChangeHandler,
-        //   },
-        // })
-        new WeaveStoreAzureWebPubsub({
-          roomId: room,
-          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
-          callbacks: {
-            onFetchConnectionUrl: onFetchConnectionUrlHandler,
-            onConnectionStatusChange: onConnectionStatusChangeHandler,
-          },
-        })
-      }
-      fonts={[
-        {
-          id: "NotoSansMono",
-          name: "Noto Sans Mono",
-        },
-        {
-          id: "NeueHelveticaZara",
-          name: "Neue Helvetica Zara",
-        },
-      ]}
-      nodes={[
-        new WeaveStageNode(),
-        new WeaveLayerNode(),
-        new WeaveGroupNode(),
-        new WeaveRectangleNode(),
-        new WeaveLineNode(),
-        new WeaveTextNode(),
-        new WeaveImageNode(),
-        new PantoneNode(),
-        new WorkspaceNode(),
-      ]}
-      actions={[
-        new WeaveRectangleToolAction(),
-        new WeavePenToolAction(),
-        new WeaveBrushToolAction(),
-        new WeaveTextToolAction(),
-        new WeaveImageToolAction({
-          onUploadImage: async (finished: (imageURL: string) => void) => {
-            setUploadingImage(true);
-            setTimeout(() => {
-              setUploadingImage(false);
-              finished(
-                "https://lostintokyo.co.uk/content/uploads/sites/3/2017/02/test-image-7MB.jpg"
-              );
-            }, 1000);
-          },
-          onImageLoadStart: () => {
-            setLoadingImage(true);
-          },
-          onImageLoadEnd: () => {
-            setLoadingImage(false);
-          },
-        }),
-        new WeaveZoomOutToolAction(),
-        new WeaveZoomInToolAction(),
-        new WeaveFitToScreenToolAction(),
-        new WeaveFitToSelectionToolAction(),
-        new PantoneToolAction(),
-        new WorkspaceToolAction(),
-        new AlignElementsToolAction(),
-        new WeaveExportNodeToolAction(),
-        new WeaveExportStageToolAction(),
-      ]}
-      customPlugins={[
-        new WeaveContextMenuPlugin(
-          {
-            xOffset: 10,
-            yOffset: 10,
-          },
-          {
-            onNodeMenu: (
-              actInstance: Weave,
-              nodes: WeaveSelection[],
-              point: { x: number; y: number }
-            ) => {
-              const canGroup = nodes.length > 1;
-              const canUnGroup =
-                nodes.length === 1 && nodes[0].node.type === "group";
-
-              const weaveCopyPasteNodesPlugin =
-                actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                  "copyPasteNodes"
-                );
-
-              const actIsActionActive =
-                typeof actInstance.getActiveAction() !== "undefined";
-              const actCanCopy = weaveCopyPasteNodesPlugin.canCopy();
-              const actCanPaste = weaveCopyPasteNodesPlugin.canPaste();
-
-              setContextMenuShow(true);
-              setContextMenuPosition(point);
-              const contextMenu: ContextMenuOption[] = [
-                {
-                  id: "copy",
-                  type: "button",
-                  label: "Copy",
-                  icon: <Copy size={16} />,
-                  disabled: actIsActionActive || !actCanCopy,
-                  onClick: () => {
-                    const weaveCopyPasteNodesPlugin =
-                      actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                        "copyPasteNodes"
-                      );
-                    if (weaveCopyPasteNodesPlugin) {
-                      return weaveCopyPasteNodesPlugin.copy();
-                    }
-                  },
-                },
-                {
-                  id: "paste",
-                  type: "button",
-                  label: "Paste",
-                  icon: <Clipboard size={16} />,
-                  disabled: actIsActionActive || !actCanPaste,
-                  onClick: () => {
-                    const weaveCopyPasteNodesPlugin =
-                      actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                        "copyPasteNodes"
-                      );
-                    if (weaveCopyPasteNodesPlugin) {
-                      return weaveCopyPasteNodesPlugin.paste();
-                    }
-                  },
-                },
-                {
-                  id: "div-1",
-                  type: "divider",
-                },
-                {
-                  id: "bring-to-front",
-                  type: "button",
-                  label: "Bring to front",
-                  icon: <BringToFront size={16} />,
-                  disabled: nodes.length !== 1,
-                  onClick: () => {
-                    actInstance.bringToFront(nodes[0].instance);
-                  },
-                },
-                {
-                  id: "move-up",
-                  type: "button",
-                  label: "Move up",
-                  icon: <ArrowUp size={16} />,
-                  disabled: nodes.length !== 1,
-                  onClick: () => {
-                    actInstance.moveUp(nodes[0].instance);
-                  },
-                },
-                {
-                  id: "move-down",
-                  type: "button",
-                  label: "Move down",
-                  icon: <ArrowDown size={16} />,
-                  disabled: nodes.length !== 1,
-                  onClick: () => {
-                    actInstance.moveDown(nodes[0].instance);
-                  },
-                },
-                {
-                  id: "send-to-back",
-                  type: "button",
-                  label: "Send to back",
-                  icon: <SendToBack size={16} />,
-                  disabled: nodes.length !== 1,
-                  onClick: () => {
-                    actInstance.sendToBack(nodes[0].instance);
-                  },
-                },
-                {
-                  id: "div-2",
-                  type: "divider",
-                },
-                {
-                  id: "group",
-                  type: "button",
-                  label: "Group",
-                  icon: <Group size={16} />,
-                  disabled: !canGroup,
-                  onClick: () => {
-                    actInstance.group(nodes.map((n) => n.node));
-                  },
-                },
-                {
-                  id: "ungroup",
-                  type: "button",
-                  label: "Ungroup",
-                  icon: <Ungroup size={16} />,
-                  disabled: !canUnGroup,
-                  onClick: () => {
-                    actInstance.unGroup(nodes[0].node);
-                  },
-                },
-                {
-                  id: "div-3",
-                  type: "divider",
-                },
-                {
-                  id: "delete",
-                  type: "button",
-                  label: "Delete",
-                  icon: <Trash size={16} />,
-                  onClick: () => {
-                    for (const node of nodes) {
-                      actInstance.removeNode(node.node);
-                    }
-                  },
-                },
-              ];
-
-              setContextMenuOptions(contextMenu);
-            },
+    <>
+      {(!loadedParams ||
+        loadingFetchConnectionUrl ||
+        status !== WEAVE_INSTANCE_STATUS.RUNNING ||
+        (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
+        <div className="w-full h-full flex justify-center items-center">
+          <RoomLoader
+            roomId={room ? room : "-"}
+            content="LOADING ROOM"
+            description={loadingDescription}
+          />
+        </div>
+      )}
+      {loadedParams && room && (
+        <WeaveProvider
+          containerId="weave"
+          getUser={getUser}
+          store={
+            // new WeaveStoreWebsockets({
+            //   roomId: room,
+            //   wsOptions: {
+            //     serverUrl: "ws://localhost:1234",
+            //   },
+            //   callbacks: {
+            //     onConnectionStatusChange: onConnectionStatusChangeHandler,
+            //   },
+            // })
+            new WeaveStoreAzureWebPubsub({
+              roomId: room,
+              url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
+              callbacks: {
+                onFetchConnectionUrl: onFetchConnectionUrlHandler,
+                onConnectionStatusChange: onConnectionStatusChangeHandler,
+              },
+            })
           }
-        ),
-      ]}
-    >
-      <RoomLayout />
-    </WeaveProvider>
+          fonts={[
+            {
+              id: "NotoSansMono",
+              name: "Noto Sans Mono",
+            },
+            {
+              id: "NeueHelveticaZara",
+              name: "Neue Helvetica Zara",
+            },
+          ]}
+          nodes={[
+            new WeaveStageNode(),
+            new WeaveLayerNode(),
+            new WeaveGroupNode(),
+            new WeaveRectangleNode(),
+            new WeaveLineNode(),
+            new WeaveTextNode(),
+            new WeaveImageNode(),
+            new PantoneNode(),
+            new WorkspaceNode(),
+          ]}
+          actions={[
+            new WeaveRectangleToolAction(),
+            new WeavePenToolAction(),
+            new WeaveBrushToolAction(),
+            new WeaveTextToolAction(),
+            new WeaveImageToolAction({
+              onUploadImage: async (finished: (imageURL: string) => void) => {
+                setUploadingImage(true);
+                setTimeout(() => {
+                  setUploadingImage(false);
+                  finished(
+                    "https://lostintokyo.co.uk/content/uploads/sites/3/2017/02/test-image-7MB.jpg"
+                  );
+                }, 1000);
+              },
+              onImageLoadStart: () => {
+                setLoadingImage(true);
+              },
+              onImageLoadEnd: () => {
+                setLoadingImage(false);
+              },
+            }),
+            new WeaveZoomOutToolAction(),
+            new WeaveZoomInToolAction(),
+            new WeaveFitToScreenToolAction(),
+            new WeaveFitToSelectionToolAction(),
+            new PantoneToolAction(),
+            new WorkspaceToolAction(),
+            new AlignElementsToolAction(),
+            new WeaveExportNodeToolAction(),
+            new WeaveExportStageToolAction(),
+          ]}
+          customPlugins={[
+            new WeaveContextMenuPlugin(
+              {
+                xOffset: 10,
+                yOffset: 10,
+              },
+              {
+                onNodeMenu: (
+                  actInstance: Weave,
+                  nodes: WeaveSelection[],
+                  point: { x: number; y: number }
+                ) => {
+                  const canGroup = nodes.length > 1;
+                  const canUnGroup =
+                    nodes.length === 1 && nodes[0].node.type === "group";
+
+                  const weaveCopyPasteNodesPlugin =
+                    actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
+                      "copyPasteNodes"
+                    );
+
+                  const actIsActionActive =
+                    typeof actInstance.getActiveAction() !== "undefined";
+                  const actCanCopy = weaveCopyPasteNodesPlugin.canCopy();
+                  const actCanPaste = weaveCopyPasteNodesPlugin.canPaste();
+
+                  setContextMenuShow(true);
+                  setContextMenuPosition(point);
+                  const contextMenu: ContextMenuOption[] = [
+                    {
+                      id: "copy",
+                      type: "button",
+                      label: "Copy",
+                      icon: <Copy size={16} />,
+                      disabled: actIsActionActive || !actCanCopy,
+                      onClick: () => {
+                        const weaveCopyPasteNodesPlugin =
+                          actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
+                            "copyPasteNodes"
+                          );
+                        if (weaveCopyPasteNodesPlugin) {
+                          return weaveCopyPasteNodesPlugin.copy();
+                        }
+                      },
+                    },
+                    {
+                      id: "paste",
+                      type: "button",
+                      label: "Paste",
+                      icon: <Clipboard size={16} />,
+                      disabled: actIsActionActive || !actCanPaste,
+                      onClick: () => {
+                        const weaveCopyPasteNodesPlugin =
+                          actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
+                            "copyPasteNodes"
+                          );
+                        if (weaveCopyPasteNodesPlugin) {
+                          return weaveCopyPasteNodesPlugin.paste();
+                        }
+                      },
+                    },
+                    {
+                      id: "div-1",
+                      type: "divider",
+                    },
+                    {
+                      id: "bring-to-front",
+                      type: "button",
+                      label: "Bring to front",
+                      icon: <BringToFront size={16} />,
+                      disabled: nodes.length !== 1,
+                      onClick: () => {
+                        actInstance.bringToFront(nodes[0].instance);
+                      },
+                    },
+                    {
+                      id: "move-up",
+                      type: "button",
+                      label: "Move up",
+                      icon: <ArrowUp size={16} />,
+                      disabled: nodes.length !== 1,
+                      onClick: () => {
+                        actInstance.moveUp(nodes[0].instance);
+                      },
+                    },
+                    {
+                      id: "move-down",
+                      type: "button",
+                      label: "Move down",
+                      icon: <ArrowDown size={16} />,
+                      disabled: nodes.length !== 1,
+                      onClick: () => {
+                        actInstance.moveDown(nodes[0].instance);
+                      },
+                    },
+                    {
+                      id: "send-to-back",
+                      type: "button",
+                      label: "Send to back",
+                      icon: <SendToBack size={16} />,
+                      disabled: nodes.length !== 1,
+                      onClick: () => {
+                        actInstance.sendToBack(nodes[0].instance);
+                      },
+                    },
+                    {
+                      id: "div-2",
+                      type: "divider",
+                    },
+                    {
+                      id: "group",
+                      type: "button",
+                      label: "Group",
+                      icon: <Group size={16} />,
+                      disabled: !canGroup,
+                      onClick: () => {
+                        actInstance.group(nodes.map((n) => n.node));
+                      },
+                    },
+                    {
+                      id: "ungroup",
+                      type: "button",
+                      label: "Ungroup",
+                      icon: <Ungroup size={16} />,
+                      disabled: !canUnGroup,
+                      onClick: () => {
+                        actInstance.unGroup(nodes[0].node);
+                      },
+                    },
+                    {
+                      id: "div-3",
+                      type: "divider",
+                    },
+                    {
+                      id: "delete",
+                      type: "button",
+                      label: "Delete",
+                      icon: <Trash size={16} />,
+                      onClick: () => {
+                        for (const node of nodes) {
+                          actInstance.removeNode(node.node);
+                        }
+                      },
+                    },
+                  ];
+
+                  setContextMenuOptions(contextMenu);
+                },
+              }
+            ),
+          ]}
+        >
+          <RoomLayout />
+        </WeaveProvider>
+      )}
+    </>
   );
 };
