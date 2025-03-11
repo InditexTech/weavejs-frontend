@@ -65,7 +65,7 @@ export function MultiuseOverlay() {
   return (
     <div
       className={
-        "pointer-events-none absolute top-[calc(50px+8px+4px)] right-2 bottom-[calc(50px+8px+4px)] flex flex-col gap-5 justify-center items-center"
+        "pointer-events-none absolute top-[calc(99px+12px)] right-2 bottom-[calc(50px+8px+4px)] flex flex-col gap-5 justify-center items-center"
       }
     >
       <div className="w-[320px] p-0 h-full bg-white border border-light-border-3 shadow-xs flex justify-start items-center gap-3 overflow-hidden">

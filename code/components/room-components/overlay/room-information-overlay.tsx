@@ -15,11 +15,13 @@ import {
 import { Logo } from "@/components/utils/logo";
 import { Image as ImageIcon, FileText, Ellipsis, LogOut } from "lucide-react";
 import { WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
+import { ConnectionStatus } from "../connection-status";
 
 export function RoomInformationOverlay() {
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const room = useCollaborationRoom((state) => state.room);
 
@@ -54,6 +56,7 @@ export function RoomInformationOverlay() {
       <div className="p-1 pl-3 bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-2">
         <Logo kind="small" />
         <div className="w-[1px] h-4 mx-2 bg-zinc-200"></div>
+        <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
         <div className="flex justify-start items-center font-noto-sans-mono text-foreground !normal-case min-h-[32px] pr-2">
           {room}
         </div>
