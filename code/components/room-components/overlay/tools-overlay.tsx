@@ -4,6 +4,8 @@ import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import {
   Brush,
+  Images,
+  Braces,
   ImagePlus,
   PenTool,
   Square,
@@ -12,9 +14,11 @@ import {
   Redo2,
   Undo2,
   Frame,
+  Presentation,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
+import { useCollaborationRoom } from "@/store/store";
 
 export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -24,6 +28,19 @@ export function ToolsOverlay() {
 
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
+
+  const workspacesLibraryVisible = useCollaborationRoom(
+    (state) => state.workspaces.library.visible
+  );
+  const setWorkspacesLibraryVisible = useCollaborationRoom(
+    (state) => state.setWorkspacesLibraryVisible
+  );
+  const imagesLibraryVisible = useCollaborationRoom(
+    (state) => state.images.library.visible
+  );
+  const setImagesLibraryVisible = useCollaborationRoom(
+    (state) => state.setImagesLibraryVisible
+  );
 
   const triggerRectangleTool = React.useCallback(() => {
     if (instance && actualAction !== "rectangleTool") {
@@ -142,6 +159,24 @@ export function ToolsOverlay() {
           onClick={triggerPantoneTool}
           label="Add a Pantone color"
         />
+        <ToolbarButton
+          icon={<Images />}
+          active={imagesLibraryVisible}
+          onClick={() => {
+            setWorkspacesLibraryVisible(false);
+            setImagesLibraryVisible(!imagesLibraryVisible);
+          }}
+          label="Images"
+        />
+        <ToolbarButton
+          icon={<Presentation />}
+          active={workspacesLibraryVisible}
+          onClick={() => {
+            setImagesLibraryVisible(false);
+            setWorkspacesLibraryVisible(!workspacesLibraryVisible);
+          }}
+          label="Frames"
+        />
       </Toolbar>
       <Toolbar>
         <ToolbarButton
@@ -154,7 +189,6 @@ export function ToolsOverlay() {
             }
           }}
           label="Undo"
-          tooltipSide="top"
         />
         <ToolbarButton
           icon={<Redo2 />}
@@ -166,7 +200,23 @@ export function ToolsOverlay() {
             }
           }}
           label="Redo"
-          tooltipSide="top"
+        />
+      </Toolbar>
+      <Toolbar>
+        <ToolbarButton
+          icon={<Braces />}
+          disabled={isActionActive}
+          onClick={() => {
+            if (instance) {
+              // eslint-disable-next-line no-console
+              console.log({
+                appState: JSON.parse(
+                  JSON.stringify(instance.getStore().getState())
+                ),
+              });
+            }
+          }}
+          label="Print model state to console"
         />
       </Toolbar>
     </div>
