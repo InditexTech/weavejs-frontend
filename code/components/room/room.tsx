@@ -54,6 +54,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
+import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -187,12 +188,21 @@ export const Room = () => {
         loadingFetchConnectionUrl ||
         status !== WEAVE_INSTANCE_STATUS.RUNNING ||
         (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-        <div className="w-full h-full flex justify-center items-center">
-          <RoomLoader
-            roomId={room ? room : "-"}
-            content="LOADING ROOM"
-            description={loadingDescription}
-          />
+        <div className="w-full h-full bg-black flex justify-center items-center relative">
+          <div className="absolute top-0 left-0 right-0 h-full">
+            <Threads
+              amplitude={2}
+              distance={0}
+              enableMouseInteraction={false}
+            />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
+            <RoomLoader
+              roomId={room ? room : "-"}
+              content="LOADING ROOM"
+              description={loadingDescription}
+            />
+          </div>
         </div>
       )}
       {loadedParams && room && (

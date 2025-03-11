@@ -34,14 +34,14 @@ export function RoomLoader({
         transition={{ duration: 0.8 }}
         className="flex flex-col justify-center items-center"
       >
-        <div className="font-noto-sans font-extralight text-base text-primary uppercase">
+        <div className="font-noto-sans font-extralight text-2xl text-white uppercase">
           {content}
         </div>
         {roomId && (
-          <div className="font-noto-sans text-2xl text-primary">{roomId}</div>
+          <div className="font-noto-sans text-4xl text-white">{roomId}</div>
         )}
         {description && (
-          <div className="font-noto-sans-mono text-base text-primary mt-3">
+          <div className="font-noto-sans-mono text-xl text-white mt-8">
             {description}
           </div>
         )}
