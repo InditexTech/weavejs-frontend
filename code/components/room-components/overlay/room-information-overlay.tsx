@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Logo } from "@/components/utils/logo";
-import { Image, FileText, Ellipsis, LogOut } from "lucide-react";
+import { Image as ImageIcon, FileText, Ellipsis, LogOut } from "lucide-react";
 import { WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
 
 export function RoomInformationOverlay() {
@@ -32,7 +32,7 @@ export function RoomInformationOverlay() {
         },
       });
     }
-  }, [router]);
+  }, [instance]);
 
   const handleExportToPdf = React.useCallback(() => {
     if (instance) {
@@ -43,7 +43,7 @@ export function RoomInformationOverlay() {
         },
       });
     }
-  }, [router]);
+  }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
     router.push("/");
@@ -72,7 +72,7 @@ export function RoomInformationOverlay() {
               className="text-foreground cursor-pointer hover:rounded-none"
               onClick={handleExportToImage}
             >
-              <Image /> Export to image
+              <ImageIcon /> Export to image
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none"
