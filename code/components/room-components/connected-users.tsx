@@ -18,7 +18,7 @@ export const ConnectedUsers = ({ connectedUsers }: Readonly<ConnectionStatusProp
       {Object.keys(connectedUsers).map((user) => {
         const userInfo = connectedUsers[user];
         return (
-          <Avatar key={user}>
+          <Avatar key={user} className="w-[32px] h-[32px]">
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>{userInfo.name.slice(0, 2)}</AvatarFallback>
           </Avatar>

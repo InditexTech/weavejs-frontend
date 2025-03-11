@@ -20,8 +20,8 @@ export function OperationsOverlay() {
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
   return (
-    <div className="pointer-events-none absolute bottom-[20px] left-[20px] right-[20px] flex gap-5 justify-center items-center">
-      <div className="p-1 bg-white rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3">
+    <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex gap-5 justify-center items-center">
+      <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3">
         <div className="flex justify-start items-center">
           <ToolbarButton
             icon={<Group />}

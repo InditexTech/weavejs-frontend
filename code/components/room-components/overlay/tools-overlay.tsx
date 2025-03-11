@@ -76,7 +76,7 @@ export function ToolsOverlay() {
   }, [instance, actualAction]);
 
   return (
-    <div className="pointer-events-none absolute top-[20px] left-[20px] bottom-[20px] flex flex-col gap-5 justify-center items-center">
+    <div className="absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-5 justify-center items-center">
       <Toolbar>
         <ToolbarButton
           icon={<Square />}

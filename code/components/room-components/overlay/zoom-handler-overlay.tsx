@@ -14,9 +14,9 @@ export function ZoomHandlerOverlay() {
   const canZoomOut = useWeave((state) => state.zoom.canZoomOut);
 
   return (
-    <div className="w-full py-1 flex justify-between items-center border-t border-light-border-3">
+    <div className="w-full flex justify-between items-center">
       <div className="w-full grid grid-cols-[auto_1fr]">
-        <div className="flex justify-start items-center">
+        <div className="flex justify-start items-center gap-1">
           <ToolbarButton
             icon={<ZoomIn />}
             disabled={!canZoomIn}
@@ -61,7 +61,7 @@ export function ZoomHandlerOverlay() {
             tooltipSide="top"
           />
         </div>
-        <div className="w-full px-4 font-mono flex justify-end items-center bg-light-background-1">
+        <div className="w-full px-4 font-noto-sans-mono flex justify-end items-center text-muted-foreground">
           {parseFloat(`${zoomValue * 100}`).toFixed(2)}%
         </div>
       </div>

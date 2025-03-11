@@ -8,11 +8,11 @@ export function RoomInformationOverlay() {
   const room = useCollaborationRoom((state) => state.room);
 
   return (
-    <div className="pointer-events-none absolute top-[20px] left-[20px] flex gap-1 justify-center items-center">
-      <div className="pl-3 p-3 bg-white rounded-lg border border-light-border-3 shadow-md flex justify-start items-center gap-3">
+    <div className="absolute top-2 left-2 flex gap-1 justify-center items-center">
+      <div className="p-2 bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-2">
         <Logo kind="small" />
-        <div className="w-[1px] h-[20px] bg-light-content-1"></div>
-        <div className="font-mono text-light-content-3 !normal-case">{room}</div>
+        <div className="w-[1px] h-4 bg-zinc-200"></div>
+        <div className="flex justify-start items-center font-noto-sans-mono text-foreground !normal-case min-h-[32px]">{room}</div>
       </div>
     </div>
   );
