@@ -55,7 +55,7 @@ export function OperationsOverlay() {
             tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
+            <div className="w-[1px] h-4 bg-accent mx-2"></div>
           </div>
           <ToolbarButton
             icon={<Copy />}
@@ -92,7 +92,7 @@ export function OperationsOverlay() {
             tooltipSide="top"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
+            <div className="w-[1px] h-4 bg-accent mx-2"></div>
           </div>
           <ToolbarButton
             icon={<ImageDown />}
@@ -133,7 +133,7 @@ export function OperationsOverlay() {
             label="Export canvas as image"
           />
           <div className="w-full flex justify-center items-center">
-            <div className="w-[1px] h-4 bg-zinc-200 mx-2"></div>
+            <div className="w-[1px] h-4 bg-accent mx-2"></div>
           </div>
           <ToolbarButton
             icon={<Trash2 />}

@@ -27,6 +27,7 @@ import {
   WeaveUser,
   WeaveSelection,
   WEAVE_INSTANCE_STATUS,
+  WeaveSelectionToolAction,
 } from "@inditextech/weavejs-sdk";
 // import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets";
 import {
@@ -69,6 +70,7 @@ export const Room = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
@@ -112,18 +114,16 @@ export const Room = () => {
   }, []);
 
   React.useEffect(() => {
-    setTimeout(() => {
-      const roomId = params.roomId;
-      const userName = searchParams.get("userName");
-      if (roomId && userName) {
-        setRoom(roomId);
-        setUser({
-          name: userName,
-          email: `${userName}@weave.js`,
-        });
-      }
-      setLoadedParams(true);
-    }, 1000);
+    const roomId = params.roomId;
+    const userName = searchParams.get("userName");
+    if (roomId && userName) {
+      setRoom(roomId);
+      setUser({
+        name: userName,
+        email: `${userName}@weave.js`,
+      });
+    }
+    setLoadedParams(true);
   }, [params.roomId, searchParams, setRoom, setUser]);
 
   const getUser = React.useCallback(() => {
@@ -154,6 +154,12 @@ export const Room = () => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   //   [],
   // );
+
+  React.useEffect(() => {
+    if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
+      instance.triggerAction("selectionTool");
+    }
+  }, [instance, status, roomLoaded]);
 
   const loadingDescription = React.useMemo(() => {
     if (!loadedParams) {
@@ -188,10 +194,11 @@ export const Room = () => {
         loadingFetchConnectionUrl ||
         status !== WEAVE_INSTANCE_STATUS.RUNNING ||
         (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-        <div className="w-full h-full bg-black flex justify-center items-center relative">
+        <div className="w-full h-full bg-white flex justify-center items-center relative">
           <div className="absolute top-0 left-0 right-0 h-full">
             <Threads
-              amplitude={2}
+              color={[246 / 255, 246 / 255, 246 / 255]}
+              amplitude={1}
               distance={0}
               enableMouseInteraction={false}
             />
@@ -250,6 +257,7 @@ export const Room = () => {
             new WorkspaceNode(),
           ]}
           actions={[
+            new WeaveSelectionToolAction(),
             new WeaveRectangleToolAction(),
             new WeavePenToolAction(),
             new WeaveBrushToolAction(),

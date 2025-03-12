@@ -11,6 +11,7 @@ import RectangleOverlayOptions from "./rectangle-overlay-options";
 import CommonOverlayOptions from "./common-overlay-options";
 import StrokeOverlayOptions from "./stroke-overlay-options";
 import ExtraImageOverlayOptions from "./extra-image-overlay-options";
+import { Accordion } from "@/components/ui/accordion";
 
 export const NodeProperties = () => {
   const node = useWeave((state) => state.selection.node);
@@ -45,18 +46,20 @@ export const NodeProperties = () => {
 
   return (
     <div className="w-full justify-center items-center">
-      <div className="w-full p-3 border-b bg-muted/40">
-        <h2 className="text-sm font-medium">{nodeType}</h2>
+      <div className="w-full p-3 border-b bg-accent">
+        <h2 className="text-sm font-noto-sans-mono font-light">{nodeType}</h2>
       </div>
       <div className="flex-1">
-        <PantoneOverlayOptions types={["pantone"]}/>
-        <WorkspaceOverlayOptions types={["workspace"]}/>
-        <ImageOverlayOptions types={["image"]}/>
-        <CommonOverlayOptions/>
-        <TextOverlayOptions types={["text"]}/>
-        <RectangleOverlayOptions types={["rectangle"]}/>
-        <StrokeOverlayOptions types={["rectangle", "line", "image"]}/>
-        <ExtraImageOverlayOptions types={["image"]}/>
+        <Accordion type="multiple" className="w-full">
+          <PantoneOverlayOptions types={["pantone"]} />
+          <WorkspaceOverlayOptions types={["workspace"]} />
+          <ImageOverlayOptions types={["image"]} />
+          <CommonOverlayOptions />
+          <TextOverlayOptions types={["text"]} />
+          <RectangleOverlayOptions types={["rectangle"]} />
+          <StrokeOverlayOptions types={["rectangle", "line", "image"]} />
+          <ExtraImageOverlayOptions types={["image"]} />
+        </Accordion>
       </div>
     </div>
   );

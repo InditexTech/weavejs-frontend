@@ -1,4 +1,8 @@
-import { WeaveElementAttributes, WeaveElementInstance, WeaveNode } from "@inditextech/weavejs-sdk";
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+  WeaveNode,
+} from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 import { getNearestPantone } from "pantone-tcx";
 
@@ -23,8 +27,6 @@ export class PantoneNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const { id } = props;
 
-    const stage = this.instance.getStage();
-
     const pantoneColor = props.pantone ?? "#DEFFA0";
 
     const nearestColor = getNearestPantone(pantoneColor);
@@ -34,12 +36,12 @@ export class PantoneNode extends WeaveNode {
     };
     delete pantoneParams.zIndex;
 
+    console.log("pantoneParams", pantoneParams);
+
     const pantone = new Konva.Group({
       ...pantoneParams,
       width: pantoneParams.width,
       height: pantoneParams.height,
-      draggable: true,
-      cornerRadius: 12,
     });
 
     const internalRect = new Konva.Rect({
@@ -47,10 +49,12 @@ export class PantoneNode extends WeaveNode {
       x: 0,
       y: 0,
       fill: "#FFFFFFFF",
-      cornerRadius: 12,
       width: pantoneParams.width,
       height: pantoneParams.height,
       draggable: false,
+      listening: true,
+      stroke: "black",
+      strokeWidth: 2,
     });
 
     pantone.add(internalRect);
@@ -58,11 +62,10 @@ export class PantoneNode extends WeaveNode {
     const internalRect2 = new Konva.Rect({
       id: `${id}-pantone-1`,
       groupId: id,
-      x: 0,
-      y: 0,
-      cornerRadius: 12,
+      x: 1,
+      y: 1,
       fill: pantoneColor,
-      width: pantoneParams.width,
+      width: pantoneParams.width - 2,
       height: (pantoneParams.height ?? 0) - 120,
       draggable: false,
     });
@@ -72,10 +75,10 @@ export class PantoneNode extends WeaveNode {
     const internalRect3 = new Konva.Rect({
       id: `${id}-pantone-2`,
       groupId: id,
-      x: 0,
+      x: 1,
       y: 168,
       fill: pantoneColor,
-      width: pantoneParams.width,
+      width: pantoneParams.width - 2,
       height: 12,
       draggable: false,
     });
@@ -89,7 +92,9 @@ export class PantoneNode extends WeaveNode {
         x: 20,
         y: 200,
         width: (pantoneParams.width ?? 0) - 150,
-        height: ((pantoneParams.width ?? 0) - 150) * (imageObj.height / imageObj.width),
+        height:
+          ((pantoneParams.width ?? 0) - 150) *
+          (imageObj.height / imageObj.width),
         image: imageObj,
         draggable: false,
       });
@@ -139,35 +144,15 @@ export class PantoneNode extends WeaveNode {
 
     pantone.add(internalText2);
 
-    pantone.on("transform", (e) => {
-      this.instance.updateNode(this.toNode(pantone));
-      e.cancelBubble = true;
-    });
-
-    pantone.on("dragmove", (e) => {
-      this.instance.updateNode(this.toNode(pantone));
-      e.cancelBubble = true;
-    });
-
-    pantone.on("dragend", (e) => {
-      this.instance.updateNode(this.toNode(pantone));
-      e.cancelBubble = true;
-    });
-
-    pantone.on("mouseenter", (e) => {
-      stage.container().style.cursor = "pointer";
-      e.cancelBubble = true;
-    });
-
-    pantone.on("mouseleave", (e) => {
-      stage.container().style.cursor = "default";
-      e.cancelBubble = true;
-    });
+    this.setupDefaultNodeEvents(pantone);
 
     return pantone;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     const { id, pantone } = nextProps;
 
     const pantoneNode = nodeInstance as Konva.Group;
@@ -211,11 +196,14 @@ export class PantoneNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
     return {
       key: attrs.id ?? "",
       type: attrs.nodeType,
       props: {
-        ...attrs,
+        ...cleanedAttrs,
         id: attrs.id ?? "",
         nodeType: attrs.nodeType,
         children: [],

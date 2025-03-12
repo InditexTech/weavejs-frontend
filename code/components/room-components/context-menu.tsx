@@ -104,7 +104,7 @@ export const ContextMenuRender = ({
         }
         if (option.type === "divider") {
           return (
-            <div key={option.id} className="w-full h-[1px] bg-zinc-200"></div>
+            <div key={option.id} className="w-full h-[1px] bg-accent"></div>
           );
         }
       })}

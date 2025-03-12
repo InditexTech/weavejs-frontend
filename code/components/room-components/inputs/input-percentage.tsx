@@ -36,7 +36,7 @@ export const InputPercentage = ({
     <div
       tabIndex={0}
       className={cn(
-        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded transition-all duration-200",
+        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded-none transition-all duration-200",
         {
           "border border-gray-200": inputState === "idle",
           "border border-gray-400": inputState === "hover",
@@ -45,7 +45,9 @@ export const InputPercentage = ({
       )}
     >
       {label && (
-        <div className="text-xs font-medium whitespace-nowrap">{label}</div>
+        <div className="text-xs font-noto-sans-mono font-base whitespace-nowrap">
+          {label}
+        </div>
       )}
       <input
         type="text"
@@ -69,7 +71,10 @@ export const InputPercentage = ({
             e.preventDefault();
             e.stopPropagation();
             debugger;
-            if (Number(actualValue * 100) + 0.01 <= max && Number(actualValue * 100) + 0.01 >= min) {
+            if (
+              Number(actualValue * 100) + 0.01 <= max &&
+              Number(actualValue * 100) + 0.01 >= min
+            ) {
               onChange(actualValue + 0.01);
             }
           }
@@ -77,7 +82,10 @@ export const InputPercentage = ({
             e.preventDefault();
             e.stopPropagation();
             debugger;
-            if (Number(actualValue * 100) - 0.01 <= max && Number(actualValue * 100) - 0.01 >= min) {
+            if (
+              Number(actualValue * 100) - 0.01 <= max &&
+              Number(actualValue * 100) - 0.01 >= min
+            ) {
               onChange(actualValue - 0.01);
             }
           }

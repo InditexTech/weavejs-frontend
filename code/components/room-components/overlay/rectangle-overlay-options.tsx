@@ -1,43 +1,46 @@
 import { InputColor } from "./../inputs/input-color";
-import { cn } from "@/lib/utils";
-
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ToggleIconButton } from "./../toggle-icon-button";
 import { Eye, EyeOff } from "lucide-react";
 import withInstanceNode from "../with-instance-node";
 import { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
 
-function RectangleOverlayOptions({ instance, node }: {
+function RectangleOverlayOptions({
+  instance,
+  node,
+}: {
   instance: Weave;
   node: WeaveStateElement;
 }) {
   return (
-    <div className="w-full font-body-m-light p-4 pb-2">
-      <div
-        className={cn("flex justify-between items-center mb-3", {
-          ["mb-0"]: !(node.props.fillEnabled ?? true),
-        })}
-      >
-        <div className="text-sm font-medium">Fill</div>
-        <div className="flex justify-end items-center">
-          <ToggleIconButton
-            kind="toggle"
-            icon={<Eye size={16} />}
-            pressedIcon={<EyeOff size={16} />}
-            pressed={node.props.fillEnabled ?? true}
-            onClick={() => {
-              const updatedNode = {
-                ...node,
-                props: {
-                  ...node.props,
-                  fillEnabled: !(node.props.fillEnabled ?? true),
-                },
-              };
-              instance.updateNode(updatedNode);
-            }}
-          />
-        </div>
+    <AccordionItem value="fill">
+      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+        <AccordionTrigger className="cursor-pointer hover:no-underline items-center py-0">
+          <span className="text-xs font-noto-sans-mono font-light">Fill</span>
+        </AccordionTrigger>
+        <ToggleIconButton
+          kind="toggle"
+          icon={<Eye size={12} />}
+          pressedIcon={<EyeOff size={12} />}
+          pressed={node.props.fillEnabled ?? true}
+          onClick={(e) => {
+            e.stopPropagation();
+            const updatedNode = {
+              ...node,
+              props: {
+                ...node.props,
+                fillEnabled: !(node.props.fillEnabled ?? true),
+              },
+            };
+            instance.updateNode(updatedNode);
+          }}
+        />
       </div>
-      {(node.props.fillEnabled ?? true) && (
+      <AccordionContent className="px-4 pb-4">
         <div className="grid grid-cols-1 gap-3 w-full">
           <InputColor
             label="Color"
@@ -54,11 +57,13 @@ function RectangleOverlayOptions({ instance, node }: {
             }}
           />
         </div>
-      )}
-    </div>
+      </AccordionContent>
+    </AccordionItem>
   );
 }
-const RectangleOverlayOptionsWithInstance = withInstanceNode(RectangleOverlayOptions);
+const RectangleOverlayOptionsWithInstance = withInstanceNode(
+  RectangleOverlayOptions
+);
 RectangleOverlayOptionsWithInstance.displayName = " RectangleOverlayOptions";
 
 export default RectangleOverlayOptionsWithInstance;

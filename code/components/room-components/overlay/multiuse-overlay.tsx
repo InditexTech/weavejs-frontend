@@ -36,16 +36,19 @@ export function MultiuseOverlay() {
   React.useEffect(() => {
     if (selectedNodes.length !== 1) {
       setNodePropertiesVisible(false);
+      return;
     }
     if (selectedNodes.length === 1) {
       setNodePropertiesVisible(true);
       setWorkspacesLibraryVisible(false);
       setImagesLibraryVisible(false);
+      return;
     }
     if (isActionActive || selectedNodes.length === 0) {
       setNodePropertiesVisible(false);
       setWorkspacesLibraryVisible(false);
       setImagesLibraryVisible(false);
+      return;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedNodes]);
@@ -65,11 +68,11 @@ export function MultiuseOverlay() {
   return (
     <div
       className={
-        "pointer-events-none absolute top-[calc(99px+12px)] right-2 bottom-[calc(50px+8px+4px)] flex flex-col gap-5 justify-center items-center"
+        "absolute top-[calc(50px+16px)] right-2 bottom-[calc(50px+16px)] flex flex-col gap-5 justify-center items-center"
       }
     >
-      <div className="w-[320px] p-0 h-full bg-white border border-light-border-3 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
-        <div className="pointer-events-auto w-full h-full overflow-auto custom-scrollbar !px-0">
+      <div className="w-[320px] p-0 h-full bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
+        <div className="w-full h-full overflow-auto custom-scrollbar !px-0">
           <ImagesLibrary />
           <WorkspacesLibrary />
           <SelectionInformation />
