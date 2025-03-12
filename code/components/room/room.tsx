@@ -2,6 +2,8 @@
 
 import React from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { postImage } from "@/api/post-image";
 import {
   Weave,
   WeaveRectangleToolAction,
@@ -65,6 +67,11 @@ const statusMap = {
 };
 
 export const Room = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const inputFileRef = React.useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fileUploadFinishRef = React.useRef<any>(null);
+
   const params = useParams<{ roomId: string }>();
   const [loadedParams, setLoadedParams] = React.useState(false);
   const searchParams = useSearchParams();
@@ -107,6 +114,12 @@ export const Room = () => {
   const setLoadingImage = useCollaborationRoom(
     (state) => state.setLoadingImage
   );
+
+  const mutationUpload = useMutation({
+    mutationFn: async (file: File) => {
+      return await postImage(room ?? "", file);
+    },
+  });
 
   React.useEffect(() => {
     setFetchConnectionUrlError(null);
@@ -237,12 +250,12 @@ export const Room = () => {
           }
           fonts={[
             {
-              id: "NotoSansMono",
-              name: "Noto Sans Mono",
+              id: "NotoSans",
+              name: "Noto Sans",
             },
             {
-              id: "NeueHelveticaZara",
-              name: "Neue Helvetica Zara",
+              id: "NotoSansMono",
+              name: "Noto Sans Mono",
             },
           ]}
           nodes={[
@@ -264,13 +277,8 @@ export const Room = () => {
             new WeaveTextToolAction(),
             new WeaveImageToolAction({
               onUploadImage: async (finished: (imageURL: string) => void) => {
-                setUploadingImage(true);
-                setTimeout(() => {
-                  setUploadingImage(false);
-                  finished(
-                    "https://lostintokyo.co.uk/content/uploads/sites/3/2017/02/test-image-7MB.jpg"
-                  );
-                }, 1000);
+                fileUploadFinishRef.current = finished;
+                inputFileRef.current.click();
               },
               onImageLoadStart: () => {
                 setLoadingImage(true);
@@ -441,6 +449,30 @@ export const Room = () => {
             ),
           ]}
         >
+          <input
+            type="file"
+            accept="image/png,image/gif,image/jpeg"
+            name="image"
+            ref={inputFileRef}
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setUploadingImage(true);
+                mutationUpload.mutate(file, {
+                  onSuccess: (data) => {
+                    setUploadingImage(false);
+                    const room = data.fileName.split("/")[0];
+                    const imageId = data.fileName.split("/")[1];
+
+                    fileUploadFinishRef.current(
+                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                    );
+                  },
+                });
+              }
+            }}
+          />
           <RoomLayout />
         </WeaveProvider>
       )}

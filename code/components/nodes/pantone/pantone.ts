@@ -36,8 +36,6 @@ export class PantoneNode extends WeaveNode {
     };
     delete pantoneParams.zIndex;
 
-    console.log("pantoneParams", pantoneParams);
-
     const pantone = new Konva.Group({
       ...pantoneParams,
       width: pantoneParams.width,

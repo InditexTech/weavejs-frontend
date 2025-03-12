@@ -96,14 +96,14 @@ export function ToolsOverlay() {
           onClick={() => triggerTool("workspaceTool")}
           label="Add a frame"
         />
-      </Toolbar>
-      <Toolbar>
         <ToolbarButton
           icon={<SwatchBook />}
           active={actualAction === "pantoneTool"}
           onClick={() => triggerTool("pantoneTool")}
           label="Add a pantone color"
         />
+      </Toolbar>
+      <Toolbar>
         <ToolbarButton
           icon={<Images />}
           active={imagesLibraryVisible}

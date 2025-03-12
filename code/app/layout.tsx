@@ -4,11 +4,13 @@ import "./globals.css";
 import { AppProviders } from "./providers";
 
 const notoSans = Noto_Sans({
+  preload: true,
   variable: "--font-noto-sans",
   subsets: ["latin"],
 });
 
 const notoSansMono = Noto_Sans_Mono({
+  preload: true,
   variable: "--font-noto-sans-mono",
   subsets: ["latin"],
 });
@@ -28,9 +30,7 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${notoSansMono.variable} antialiased`}
       >
-        <AppProviders>
-          {children}
-        </AppProviders>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

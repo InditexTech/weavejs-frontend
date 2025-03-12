@@ -2,7 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import { WeaveWorkspaceToolActionState } from "./types";
 import { WORKSPACE_TOOL_STATE } from "./constants";
-import { WEAVE_NODE_LAYER_ID, WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weavejs-sdk";
+import {
+  WEAVE_NODE_LAYER_ID,
+  WeaveAction,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export class WorkspaceToolAction extends WeaveAction {
@@ -61,7 +65,8 @@ export class WorkspaceToolAction extends WeaveAction {
   private addWorkspace() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -127,14 +132,14 @@ export class WorkspaceToolAction extends WeaveAction {
 
     stage.container().style.cursor = "default";
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.show();
       const node = stage.findOne(`#${this.workspaceId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
+      this.instance.triggerAction("selectionTool");
     }
 
     this.workspaceId = null;

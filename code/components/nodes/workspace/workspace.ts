@@ -5,8 +5,15 @@ import {
   WeaveStateElement,
 } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
+import { Noto_Sans_Mono } from "next/font/google";
 
 export const WORKSPACE_NODE_TYPE = "workspace";
+
+const notoSansMono = Noto_Sans_Mono({
+  preload: true,
+  variable: "--font-noto-sans-mono",
+  subsets: ["latin"],
+});
 
 export class WorkspaceNode extends WeaveNode {
   protected nodeType = WORKSPACE_NODE_TYPE;
@@ -70,7 +77,7 @@ export class WorkspaceNode extends WeaveNode {
       width: workspaceWidth,
       height: titleHeight - 10,
       fontSize: 20,
-      fontFamily: "NeueHelveticaZara",
+      fontFamily: notoSansMono.style.fontFamily,
       align: "left",
       text: workspaceParams.title,
       stroke: "black",
