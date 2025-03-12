@@ -7,7 +7,7 @@ type ToggleIconButtonKind = "toggle" | "switch";
 
 interface ToggleIconButtonCommonProps {
   kind: ToggleIconButtonKind;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   pressed: boolean;
   disabled?: boolean;
 }
@@ -24,7 +24,9 @@ type ToggleIconButtonSwitchProps = ToggleIconButtonCommonProps & {
   pressedIcon?: never;
 };
 
-type ToggleIconButtonProps = ToggleIconButtonToggleProps | ToggleIconButtonSwitchProps;
+type ToggleIconButtonProps =
+  | ToggleIconButtonToggleProps
+  | ToggleIconButtonSwitchProps;
 
 export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
   const { kind, onClick, pressed, disabled, icon, pressedIcon } = props;
@@ -38,17 +40,18 @@ export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
   return (
     <button
       className={cn(
-        "flex items-center justify-center cursor-pointer",
+        "flex items-center justify-center cursor-pointer p-1",
         "transition-all duration-200 ease-in-out",
         "disabled:cursor-not-allowed disabled:opacity-50",
         {
-          ["p-[3px] rounded border border-gray-50"]: kind === "switch",
-          ["bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border hover:border-gray-900"]: (kind === "switch" && !isPressed) || kind === "toggle",
-          ["bg-gray-200 border border-gray-500 hover:bg-gray-300"]: kind === "switch" && isPressed,
-        },
+          ["p-1"]: kind === "switch",
+          ["bg-white hover:bg-accent"]:
+            (kind === "switch" && !isPressed) || kind === "toggle",
+          ["bg-zinc-700 text-white"]: kind === "switch" && isPressed,
+        }
       )}
       disabled={disabled}
-      onClick={onClick}
+      onClick={(e) => onClick?.(e)}
     >
       {kind === "toggle" && (isPressed ? pressedIcon : icon)}
       {kind === "switch" && icon}

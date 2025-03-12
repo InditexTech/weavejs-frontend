@@ -2,7 +2,10 @@ import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import { WeavePantoneToolActionState } from "./types";
 import { PANTONE_TOOL_STATE } from "./constants";
-import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weavejs-sdk";
+import {
+  WeaveAction,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export class PantoneToolAction extends WeaveAction {
@@ -61,12 +64,6 @@ export class PantoneToolAction extends WeaveAction {
   private addPantone() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
-
     stage.container().style.cursor = "crosshair";
     stage.container().focus();
 
@@ -91,7 +88,6 @@ export class PantoneToolAction extends WeaveAction {
       width: 300,
       height: 300,
       opacity: 1,
-      draggable: true,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -122,14 +118,14 @@ export class PantoneToolAction extends WeaveAction {
 
     stage.container().style.cursor = "default";
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.show();
       const node = stage.findOne(`#${this.pantoneId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
+      this.instance.triggerAction("selectionTool");
     }
 
     this.pantoneId = null;

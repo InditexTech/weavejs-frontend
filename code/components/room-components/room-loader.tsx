@@ -32,18 +32,14 @@ export function RoomLoader({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="flex flex-col justify-center items-center"
+        className="flex flex-col justify-center items-center text-black"
       >
-        <div className="font-noto-sans font-extralight text-2xl text-white uppercase">
+        <div className="font-noto-sans font-extralight text-2xl uppercase">
           {content}
         </div>
-        {roomId && (
-          <div className="font-noto-sans text-4xl text-white">{roomId}</div>
-        )}
+        {roomId && <div className="font-noto-sans text-4xl">{roomId}</div>}
         {description && (
-          <div className="font-noto-sans-mono text-xl text-white mt-8">
-            {description}
-          </div>
+          <div className="font-noto-sans-mono text-xl mt-8">{description}</div>
         )}
       </motion.div>
     </div>

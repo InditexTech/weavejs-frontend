@@ -1,4 +1,9 @@
-import { WeaveElementAttributes, WeaveElementInstance, WeaveNode, WeaveStateElement } from "@inditextech/weavejs-sdk";
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+  WeaveNode,
+  WeaveStateElement,
+} from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export const WORKSPACE_NODE_TYPE = "workspace";
@@ -94,37 +99,15 @@ export class WorkspaceNode extends WeaveNode {
 
     workspace.add(workspaceInternal);
 
-    workspace.on("transform", (e) => {
-      this.instance.updateNode(this.toNode(workspace));
-      e.cancelBubble = true;
-    });
-
-    workspace.on("dragmove", (e) => {
-      this.instance.updateNode(this.toNode(workspace));
-      e.cancelBubble = true;
-    });
-
-    workspace.on("dragend", (e) => {
-      this.instance.updateNode(this.toNode(workspace));
-      e.cancelBubble = true;
-    });
-
-    workspace.on("mouseenter", (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "pointer";
-      e.cancelBubble = true;
-    });
-
-    workspace.on("mouseleave", (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "default";
-      e.cancelBubble = true;
-    });
+    this.setupDefaultNodeEvents(workspace);
 
     return workspace;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     const { id } = nextProps;
 
     const workspaceNode = nodeInstance as Konva.Group;
@@ -151,22 +134,29 @@ export class WorkspaceNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
-    const workspaceInternal = (instance as Konva.Group).findOne(`#${attrs.containerId}`) as Konva.Group | undefined;
+    const workspaceInternal = (instance as Konva.Group).findOne(
+      `#${attrs.containerId}`
+    ) as Konva.Group | undefined;
 
     const childrenMapped: WeaveStateElement[] = [];
     if (workspaceInternal) {
-      const children: WeaveElementInstance[] = [...(workspaceInternal as Konva.Group).getChildren()];
+      const children: WeaveElementInstance[] = [
+        ...(workspaceInternal as Konva.Group).getChildren(),
+      ];
       for (const node of children) {
         const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));
         childrenMapped.push(handler.toNode(node));
       }
     }
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
     return {
       key: attrs.id ?? "",
       type: attrs.nodeType,
       props: {
-        ...attrs,
+        ...cleanedAttrs,
         id: attrs.id ?? "",
         nodeType: attrs.nodeType,
         children: childrenMapped,

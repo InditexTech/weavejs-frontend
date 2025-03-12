@@ -7,11 +7,25 @@ import { useWeave } from "@inditextech/weavejs-react";
 
 export function ZoomHandlerOverlay() {
   const instance = useWeave((state) => state.instance);
+  const actualAction = useWeave((state) => state.actions.actual);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const zoomValue = useWeave((state) => state.zoom.value);
   const canZoomIn = useWeave((state) => state.zoom.canZoomIn);
   const canZoomOut = useWeave((state) => state.zoom.canZoomOut);
+
+  const handleTriggerAction = React.useCallback(
+    (actionName: string) => {
+      if (instance) {
+        const triggerSelection = actualAction === "selectionTool";
+        instance.triggerAction(actionName);
+        if (triggerSelection) {
+          instance.triggerAction("selectionTool");
+        }
+      }
+    },
+    [instance, actualAction]
+  );
 
   return (
     <div className="absolute bottom-2 right-2 flex flex-col gap-1 justify-center items-center">
@@ -23,9 +37,7 @@ export function ZoomHandlerOverlay() {
                 icon={<ZoomIn />}
                 disabled={!canZoomIn}
                 onClick={() => {
-                  if (instance) {
-                    instance.triggerAction("zoomInTool");
-                  }
+                  handleTriggerAction("zoomInTool");
                 }}
                 label="Zoom in"
                 tooltipSide="top"
@@ -34,9 +46,7 @@ export function ZoomHandlerOverlay() {
                 icon={<ZoomOut />}
                 disabled={!canZoomOut}
                 onClick={() => {
-                  if (instance) {
-                    instance.triggerAction("zoomOutTool");
-                  }
+                  handleTriggerAction("zoomOutTool");
                 }}
                 label="Zoom out"
                 tooltipSide="top"
@@ -44,9 +54,7 @@ export function ZoomHandlerOverlay() {
               <ToolbarButton
                 icon={<Maximize />}
                 onClick={() => {
-                  if (instance) {
-                    instance.triggerAction("fitToScreenTool");
-                  }
+                  handleTriggerAction("fitToScreenTool");
                 }}
                 label="Fit to screen"
                 tooltipSide="top"
@@ -55,9 +63,7 @@ export function ZoomHandlerOverlay() {
                 icon={<Fullscreen />}
                 disabled={selectedNodes.length === 0}
                 onClick={() => {
-                  if (instance) {
-                    instance.triggerAction("fitToSelectionTool");
-                  }
+                  handleTriggerAction("fitToSelectionTool");
                 }}
                 label="Fit to selection"
                 tooltipSide="top"

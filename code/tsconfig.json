@@ -18,10 +18,20 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "konva": ["./node_modules/konva"],
+      "konva/lib/types": ["./node_modules/konva/lib/types"]
     }
   },
-  "include": ["new-types.d.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "new-types.d.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next.config.mts"
+  ],
   "exclude": ["node_modules"]
 }

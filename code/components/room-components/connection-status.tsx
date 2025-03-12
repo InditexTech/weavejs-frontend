@@ -12,8 +12,6 @@ type ConnectionStatusProps = {
 export const ConnectionStatus = ({
   weaveConnectionStatus,
 }: Readonly<ConnectionStatusProps>) => {
-  console.log(weaveConnectionStatus);
-
   return (
     <div className="flex">
       <div

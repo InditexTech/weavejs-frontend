@@ -3,9 +3,7 @@
 import React from "react";
 import { Pin, PinOff } from "lucide-react";
 import type { Weave, WeaveStateElement } from "@inditextech/weavejs-sdk";
-import { motion } from "framer-motion";
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -15,14 +13,10 @@ import { ToggleIconButton } from "../toggle-icon-button";
 import { InputPercentage } from "../inputs/input-percentage";
 import withInstanceNode from "../with-instance-node";
 
-const motionProps = {
-  initial: { opacity: 0, height: 0 },
-  animate: { opacity: 1, height: "auto" },
-  exit: { opacity: 0, height: 0 },
-  transition: { duration: 0.8, ease: "easeInOut" },
-};
-
-function CommonOverlayOptions({ instance, node }: {
+function CommonOverlayOptions({
+  instance,
+  node,
+}: {
   instance: Weave;
   node: WeaveStateElement;
 }) {
@@ -93,180 +87,176 @@ function CommonOverlayOptions({ instance, node }: {
   );
 
   return (
-    <div className="w-full">
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="position">
-          <div className="flex justify-between items-center p-2">
-            <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-2">
-              <span className="text-sm font-medium">Position</span>
-            </AccordionTrigger>
-            <ToggleIconButton
-              kind="toggle"
-              icon={<Pin size={16} />}
-              pressedIcon={<PinOff size={16} />}
-              pressed={node.props.draggable ?? true}
-              onClick={() => {
+    <>
+      <AccordionItem value="position">
+        <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+          <AccordionTrigger className="cursor-pointer hover:no-underline items-center py-0">
+            <span className="text-xs font-noto-sans-mono font-light">
+              Position
+            </span>
+          </AccordionTrigger>
+          <ToggleIconButton
+            kind="toggle"
+            icon={<Pin size={12} />}
+            pressedIcon={<PinOff size={12} />}
+            pressed={node.props.draggable ?? true}
+            onClick={(e) => {
+              e.stopPropagation();
+              const updatedNode = {
+                ...node,
+                props: {
+                  ...node.props,
+                  draggable: !(node.props.draggable ?? true),
+                },
+              };
+              instance.updateNode(updatedNode);
+            }}
+          />
+        </div>
+        <AccordionContent className="px-4 pb-4">
+          <div className="grid grid-cols-1 gap-3 w-full">
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <InputNumber
+                label="X"
+                value={node.props.x ?? 0}
+                onChange={(value) => {
+                  const updatedNode = {
+                    ...node,
+                    props: {
+                      ...node.props,
+                      x: value,
+                    },
+                  };
+                  instance.updateNode(updatedNode);
+                }}
+              />
+              <InputNumber
+                label="Y"
+                value={node.props.y ?? 0}
+                onChange={(value) => {
+                  const updatedNode = {
+                    ...node,
+                    props: {
+                      ...node.props,
+                      y: value,
+                    },
+                  };
+                  instance.updateNode(updatedNode);
+                }}
+              />
+            </div>
+            <InputNumber
+              label="Rotation"
+              value={node.props.rotation ?? 0}
+              onChange={onRotationChange}
+            />
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="size">
+        <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+          <AccordionTrigger className="cursor-pointer hover:no-underline items-center py-0">
+            <span className="text-xs font-noto-sans-mono font-light">Size</span>
+          </AccordionTrigger>
+        </div>
+        <AccordionContent className="px-4 pb-4">
+          <div className="grid grid-cols-1 gap-3 w-full">
+            <div className="w-full flex gap-3">
+              <InputNumber
+                label="W"
+                disabled={["pantone"].includes(node.type)}
+                value={node.props.width ?? 0}
+                onChange={(value) => {
+                  const updatedNode = {
+                    ...node,
+                    props: {
+                      ...node.props,
+                      width: value,
+                    },
+                  };
+                  instance.updateNode(updatedNode);
+                }}
+              />
+              <InputNumber
+                label="H"
+                disabled={["pantone"].includes(node.type)}
+                value={node.props.height ?? 0}
+                onChange={(value) => {
+                  const updatedNode = {
+                    ...node,
+                    props: {
+                      ...node.props,
+                      height: value,
+                    },
+                  };
+                  instance.updateNode(updatedNode);
+                }}
+              />
+            </div>
+            <InputPercentage
+              label="Scale"
+              value={node.props.scaleX ?? 1}
+              onChange={(value) => {
                 const updatedNode = {
                   ...node,
                   props: {
                     ...node.props,
-                    draggable: !(node.props.draggable ?? true),
+                    scaleX: value,
+                    scaleY: value,
                   },
                 };
                 instance.updateNode(updatedNode);
               }}
             />
           </div>
-          <AccordionContent className="px-4 pb-4">
-            <motion.div
-              {...motionProps}
-              className="grid grid-cols-1 gap-3 w-full"
-            >
-              <div className="grid grid-cols-2 gap-3 w-full">
-                <InputNumber
-                  label="X"
-                  value={node.props.x ?? 0}
-                  onChange={(value) => {
-                    const updatedNode = {
-                      ...node,
-                      props: {
-                        ...node.props,
-                        x: value,
-                      },
-                    };
-                    instance.updateNode(updatedNode);
-                  }}
-                />
-                <InputNumber
-                  label="Y"
-                  value={node.props.y ?? 0}
-                  onChange={(value) => {
-                    const updatedNode = {
-                      ...node,
-                      props: {
-                        ...node.props,
-                        y: value,
-                      },
-                    };
-                    instance.updateNode(updatedNode);
-                  }}
-                />
-              </div>
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="appearance">
+        <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+          <AccordionTrigger className="cursor-pointer hover:no-underline items-center py-0">
+            <span className="text-xs font-noto-sans-mono font-light">
+              Appearance
+            </span>
+          </AccordionTrigger>
+        </div>
+        <AccordionContent className="px-4 pb-4">
+          <div className="grid grid-cols-1 gap-3 w-full">
+            <InputPercentage
+              label="Opacity"
+              max={100}
+              min={0}
+              value={node.props.opacity ?? 1}
+              onChange={(value) => {
+                const updatedNode = {
+                  ...node,
+                  props: {
+                    ...node.props,
+                    opacity: value,
+                  },
+                };
+                instance.updateNode(updatedNode);
+              }}
+            />
+            {["rectangle"].includes(node.type) && (
               <InputNumber
-                label="Rotation"
-                value={node.props.rotation ?? 0}
-                onChange={onRotationChange}
-              />
-            </motion.div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="size">
-          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-4">
-            <span className="text-sm font-medium">Size</span>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <motion.div
-              {...motionProps}
-              className="grid grid-cols-1 gap-3 w-full"
-            >
-              <div className="w-full flex gap-3">
-                <InputNumber
-                  label="W"
-                  disabled={["pantone"].includes(node.type)}
-                  value={node.props.width ?? 0}
-                  onChange={(value) => {
-                    const updatedNode = {
-                      ...node,
-                      props: {
-                        ...node.props,
-                        width: value,
-                      },
-                    };
-                    instance.updateNode(updatedNode);
-                  }}
-                />
-                <InputNumber
-                  label="H"
-                  disabled={["pantone"].includes(node.type)}
-                  value={node.props.height ?? 0}
-                  onChange={(value) => {
-                    const updatedNode = {
-                      ...node,
-                      props: {
-                        ...node.props,
-                        height: value,
-                      },
-                    };
-                    instance.updateNode(updatedNode);
-                  }}
-                />
-              </div>
-              <InputPercentage
-                label="Scale"
-                value={node.props.scaleX ?? 1}
+                label="Corner Radius"
+                value={node.props.cornerRadius ?? 0}
                 onChange={(value) => {
                   const updatedNode = {
                     ...node,
                     props: {
                       ...node.props,
-                      scaleX: value,
-                      scaleY: value,
+                      cornerRadius: value,
                     },
                   };
                   instance.updateNode(updatedNode);
                 }}
               />
-            </motion.div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="appearance">
-          <AccordionTrigger className="pointer pointer-events-auto hover:no-underline p-4">
-            <span className="text-sm font-medium">Appearance</span>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <motion.div
-              {...motionProps}
-              className="grid grid-cols-1 gap-3 w-full"
-            >
-              <InputPercentage
-                label="Opacity"
-                max={100}
-                min={0}
-                value={node.props.opacity ?? 1}
-                onChange={(value) => {
-                  const updatedNode = {
-                    ...node,
-                    props: {
-                      ...node.props,
-                      opacity: value,
-                    },
-                  };
-                  instance.updateNode(updatedNode);
-                }}
-              />
-              {["rectangle"].includes(node.type) && (
-                <InputNumber
-                  label="Corner Radius"
-                  value={node.props.cornerRadius ?? 0}
-                  onChange={(value) => {
-                    const updatedNode = {
-                      ...node,
-                      props: {
-                        ...node.props,
-                        cornerRadius: value,
-                      },
-                    };
-                    instance.updateNode(updatedNode);
-                  }}
-                />
-              )}
-            </motion.div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
+            )}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </>
   );
 }
 
