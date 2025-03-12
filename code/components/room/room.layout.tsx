@@ -1,6 +1,5 @@
 "use client";
 
-import { Hourglass } from "lucide-react";
 import React from "react";
 import { ContextMenuRender } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
@@ -11,6 +10,7 @@ import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-o
 import { useWeave } from "@inditextech/weavejs-react";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
+import { Logo } from "../utils/logo";
 
 export const RoomLayout = () => {
   const status = useWeave((state) => state.status);
@@ -52,18 +52,22 @@ export const RoomLayout = () => {
           <ZoomHandlerOverlay />
           <MultiuseOverlay />
           {uploadingImage && (
-            <div className="w-full h-full bg-light-background-inverse/25 flex justify-center items-center absolute top-0 left-0">
-              <div className="flex flex-col gap-2 bg-light-background-1 p-8 justify-center items-center">
-                <Hourglass size={64} />
-                <div className="font-label-l-regular">Uploading image</div>
+            <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                <Logo kind="large" variant="no-text" />
+                <div className="font-noto-sans-mono text-base">
+                  Uploading image...
+                </div>
               </div>
             </div>
           )}
           {loadingImage && (
-            <div className="w-full h-full bg-light-background-inverse/25 flex justify-center items-center absolute top-0 left-0">
-              <div className="flex flex-col gap-2 bg-light-background-1 p-8 justify-center items-center">
-                <Hourglass size={64} />
-                <div className="font-label-l-regular">Loading image</div>
+            <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                <Logo kind="large" variant="no-text" />
+                <div className="font-noto-sans-mono text-base">
+                  Loading image...
+                </div>
               </div>
             </div>
           )}
