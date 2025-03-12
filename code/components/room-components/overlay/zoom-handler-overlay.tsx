@@ -4,6 +4,7 @@ import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
+import { HelpDrawer } from "../help-drawer";
 
 export function ZoomHandlerOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -28,8 +29,8 @@ export function ZoomHandlerOverlay() {
   );
 
   return (
-    <div className="absolute bottom-2 right-2 flex flex-col gap-1 justify-center items-center">
-      <div className="w-[320px] p-1 bg-white border border-zinc-200 shadow-xs flex flex-col justify-start items-center">
+    <div className="absolute bottom-2 right-2 flex gap-1 justify-center items-center">
+      <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
         <div className="w-full flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">
             <div className="flex justify-start items-center gap-1">
@@ -71,6 +72,15 @@ export function ZoomHandlerOverlay() {
             </div>
             <div className="w-full px-4 font-noto-sans-mono flex justify-end items-center text-muted-foreground">
               {parseFloat(`${zoomValue * 100}`).toFixed(2)}%
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
+        <div className="w-full flex justify-between items-center">
+          <div className="w-full grid grid-cols-[auto_1fr]">
+            <div className="flex justify-start items-center gap-1">
+              <HelpDrawer />
             </div>
           </div>
         </div>
