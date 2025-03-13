@@ -38,8 +38,8 @@ import {
 } from "@inditextech/weavejs-store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
-import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
-import { WorkspaceToolAction } from "@/components/actions/workspace-tool/workspace-tool";
+import { FrameNode } from "@/components/nodes/frame/frame";
+import { FrameToolAction } from "@/components/actions/frame-tool/frame-tool";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
@@ -58,7 +58,6 @@ import {
   ArrowDown,
 } from "lucide-react";
 import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
-import { HelpDrawer } from "../room-components/help-drawer";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -98,6 +97,9 @@ export const Room = () => {
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
+  );
+  const setNodePropertiesCreateProps = useCollaborationRoom(
+    (state) => state.setNodePropertiesCreateProps
   );
 
   const setContextMenuShow = useCollaborationRoom(
@@ -268,15 +270,30 @@ export const Room = () => {
             new WeaveTextNode(),
             new WeaveImageNode(),
             new PantoneNode(),
-            new WorkspaceNode(),
+            new FrameNode(),
           ]}
           actions={[
             new WeaveSelectionToolAction(),
-            new WeaveRectangleToolAction(),
-            new WeavePenToolAction(),
-            new WeaveBrushToolAction(),
+            new WeaveRectangleToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new WeavePenToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new WeaveBrushToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
             new WeaveTextToolAction(),
             new WeaveImageToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
               onUploadImage: async (finished: (imageURL: string) => void) => {
                 fileUploadFinishRef.current = finished;
                 inputFileRef.current.click();
@@ -292,8 +309,16 @@ export const Room = () => {
             new WeaveZoomInToolAction(),
             new WeaveFitToScreenToolAction(),
             new WeaveFitToSelectionToolAction(),
-            new PantoneToolAction(),
-            new WorkspaceToolAction(),
+            new PantoneToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new FrameToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
             new AlignElementsToolAction(),
             new WeaveExportNodeToolAction(),
             new WeaveExportStageToolAction(),
@@ -462,6 +487,7 @@ export const Room = () => {
                 setUploadingImage(true);
                 mutationUpload.mutate(file, {
                   onSuccess: (data) => {
+                    inputFileRef.current.value = null;
                     setUploadingImage(false);
                     const room = data.fileName.split("/")[0];
                     const imageId = data.fileName.split("/")[1];
@@ -475,7 +501,6 @@ export const Room = () => {
             }}
           />
           <RoomLayout />
-          <HelpDrawer />
         </WeaveProvider>
       )}
     </>

@@ -62,12 +62,11 @@ export function RoomInformationOverlay() {
 
   return (
     <div className="absolute top-2 left-2 flex gap-1 justify-center items-center">
-      <div className="bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-0">
-        <div className="bg-accent h-[50px] flex justify-start items-center p-1 px-2">
+      <div className="bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-0 pr-1">
+        <div className="bg-accent h-[48px] flex justify-start items-center py-0 px-2">
           <Logo kind="small" />
         </div>
         <div className="flex justify-start items-center p-1 gap-1">
-          {/* <div className="w-[1px] h-5 mx-1 bg-accent"></div> */}
           <DropdownMenu onOpenChange={(open) => setMenuOpen(open)}>
             <DropdownMenuTrigger
               className={cn(
@@ -114,7 +113,6 @@ export function RoomInformationOverlay() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/* <div className="w-[1px] h-5 mx-1 bg-accent"></div> */}
           <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
         </div>
       </div>

@@ -4,7 +4,7 @@ import React from "react";
 import { ContextMenuRender } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { RoomInformationOverlay } from "@/components/room-components/overlay/room-information-overlay";
-import { RoomStatusOverlay } from "@/components/room-components/overlay/room-status-overlay";
+import { RoomUsersOverlay } from "@/components/room-components/overlay/room-users-overlay";
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
 import { useWeave } from "@inditextech/weavejs-react";
@@ -47,7 +47,7 @@ export const RoomLayout = () => {
             options={contextMenuOptions}
           />
           <RoomInformationOverlay />
-          <RoomStatusOverlay />
+          <RoomUsersOverlay />
           <ToolsOverlay />
           <ZoomHandlerOverlay />
           <MultiuseOverlay />

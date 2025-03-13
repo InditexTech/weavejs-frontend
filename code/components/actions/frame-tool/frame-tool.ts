@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
-import { WeaveWorkspaceToolActionState } from "./types";
-import { WORKSPACE_TOOL_STATE } from "./constants";
+import { FrameToolActionState, FrameToolCallbacks } from "./types";
+import { FRAME_TOOL_STATE } from "./constants";
 import {
   WEAVE_NODE_LAYER_ID,
   WeaveAction,
@@ -9,27 +9,36 @@ import {
 } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
-export class WorkspaceToolAction extends WeaveAction {
+export class FrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveWorkspaceToolActionState;
-  protected workspaceId: string | null;
+  protected state: FrameToolActionState;
+  protected frameId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
+  internalUpdate = undefined;
   init = undefined;
 
-  constructor() {
-    super();
+  constructor(callbacks: FrameToolCallbacks) {
+    super(callbacks);
 
     this.initialized = false;
-    this.state = WORKSPACE_TOOL_STATE.IDLE;
-    this.workspaceId = null;
+    this.state = FRAME_TOOL_STATE.IDLE;
+    this.frameId = null;
     this.container = undefined;
     this.clickPoint = null;
   }
 
   getName(): string {
-    return "workspaceTool";
+    return "frameTool";
+  }
+
+  initProps() {
+    return {
+      title: "Frame XXX",
+      editing: false,
+      opacity: 1,
+    };
   }
 
   private setupEvents() {
@@ -45,11 +54,11 @@ export class WorkspaceToolAction extends WeaveAction {
     stage.on("click tap", (e) => {
       e.evt.preventDefault();
 
-      if (this.state === WORKSPACE_TOOL_STATE.IDLE) {
+      if (this.state === FRAME_TOOL_STATE.IDLE) {
         return;
       }
 
-      if (this.state === WORKSPACE_TOOL_STATE.ADDING) {
+      if (this.state === FRAME_TOOL_STATE.ADDING) {
         this.handleAdding();
         return;
       }
@@ -58,26 +67,19 @@ export class WorkspaceToolAction extends WeaveAction {
     this.initialized = true;
   }
 
-  private setState(state: WeaveWorkspaceToolActionState) {
+  private setState(state: FrameToolActionState) {
     this.state = state;
   }
 
-  private addWorkspace() {
+  private addFrame() {
     const stage = this.instance.getStage();
-
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
 
     stage.container().style.cursor = "crosshair";
     stage.container().focus();
 
-    this.workspaceId = null;
+    this.frameId = null;
     this.clickPoint = null;
-    this.setState(WORKSPACE_TOOL_STATE.ADDING);
+    this.setState(FRAME_TOOL_STATE.ADDING);
   }
 
   private handleAdding() {
@@ -91,17 +93,14 @@ export class WorkspaceToolAction extends WeaveAction {
     this.clickPoint = mousePoint;
     this.container = container;
 
-    this.workspaceId = uuidv4();
+    this.frameId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler("workspace");
+    const nodeHandler = this.instance.getNodeHandler("frame");
 
-    const node = nodeHandler.createNode(this.workspaceId, {
-      title: "Workspace 1",
-      editing: false,
+    const node = nodeHandler.createNode(this.frameId, {
+      ...this.props,
       x: this.clickPoint.x,
       y: this.clickPoint.y,
-      opacity: 1,
-      draggable: true,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -124,7 +123,8 @@ export class WorkspaceToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
-    this.addWorkspace();
+    this.props = this.initProps();
+    this.addFrame();
   }
 
   cleanup() {
@@ -135,16 +135,16 @@ export class WorkspaceToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
-      const node = stage.findOne(`#${this.workspaceId}`);
+      const node = stage.findOne(`#${this.frameId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
       this.instance.triggerAction("selectionTool");
     }
 
-    this.workspaceId = null;
+    this.frameId = null;
     this.container = undefined;
     this.clickPoint = null;
-    this.setState(WORKSPACE_TOOL_STATE.IDLE);
+    this.setState(FRAME_TOOL_STATE.IDLE);
   }
 }

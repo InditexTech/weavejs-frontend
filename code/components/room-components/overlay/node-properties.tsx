@@ -3,18 +3,24 @@
 import React from "react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
-import PantoneOverlayOptions from "./pantone-overlay-options";
-import WorkspaceOverlayOptions from "./workspace-overlay-options";
-import ImageOverlayOptions from "./image-overlay-options";
-import TextOverlayOptions from "./text-overlay-options";
-import RectangleOverlayOptions from "./rectangle-overlay-options";
-import CommonOverlayOptions from "./common-overlay-options";
-import StrokeOverlayOptions from "./stroke-overlay-options";
-import ExtraImageOverlayOptions from "./extra-image-overlay-options";
-import { Accordion } from "@/components/ui/accordion";
+import { PositionProperties } from "./../node-properties/position-properties";
+import { SizeProperties } from "./../node-properties/size-properties";
+import { AppearanceProperties } from "./../node-properties/appearance-properties";
+import { FillProperties } from "./../node-properties/fill-properties";
+import { StrokeProperties } from "./../node-properties/stroke-properties";
+import { TextProperties } from "./../node-properties/text-properties";
+import { ImageProperties } from "../node-properties/image-properties";
+import { PantoneProperties } from "../node-properties/pantone-properties";
+import { FrameProperties } from "../node-properties/frame-properties";
+import { CropProperties } from "../node-properties/crop-properties";
 
 export const NodeProperties = () => {
+  const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
+
+  const nodePropertiesAction = useCollaborationRoom(
+    (state) => state.nodeProperties.action
+  );
   const nodePropertiesVisible = useCollaborationRoom(
     (state) => state.nodeProperties.visible
   );
@@ -32,13 +38,39 @@ export const NodeProperties = () => {
       case "image":
         return "Image";
       case "pantone":
-        return "Pantone color";
-      case "workspace":
-        return "Workspace";
+        return "Pantone";
+      case "frame":
+        return "Frame";
       default:
         return "Unknown";
     }
   }, [node]);
+
+  const actionType = React.useMemo(() => {
+    switch (actualAction) {
+      case "rectangleTool":
+        return "Rectangle";
+      case "brushTool":
+        return "Vector path";
+      case "penTool":
+        return "Vector path";
+      case "imageTool":
+        return "Image";
+      case "pantoneTool":
+        return "Pantone";
+      case "frameTool":
+        return "Frame";
+      default:
+        return "Unknown";
+    }
+  }, [actualAction]);
+
+  const title = React.useMemo(() => {
+    if (nodePropertiesAction === "create") {
+      return actionType;
+    }
+    return nodeType;
+  }, [nodeType, actionType, nodePropertiesAction]);
 
   if (!nodePropertiesVisible) {
     return null;
@@ -46,20 +78,20 @@ export const NodeProperties = () => {
 
   return (
     <div className="w-full justify-center items-center">
-      <div className="w-full p-3 border-b bg-accent">
-        <h2 className="text-sm font-noto-sans-mono font-light">{nodeType}</h2>
+      <div className="w-full p-3 border-b">
+        <h2 className="text-md font-noto-sans-mono font-light">{title}</h2>
       </div>
       <div className="flex-1">
-        <Accordion type="multiple" className="w-full">
-          <PantoneOverlayOptions types={["pantone"]} />
-          <WorkspaceOverlayOptions types={["workspace"]} />
-          <ImageOverlayOptions types={["image"]} />
-          <CommonOverlayOptions />
-          <TextOverlayOptions types={["text"]} />
-          <RectangleOverlayOptions types={["rectangle"]} />
-          <StrokeOverlayOptions types={["rectangle", "line", "image"]} />
-          <ExtraImageOverlayOptions types={["image"]} />
-        </Accordion>
+        <ImageProperties />
+        <PantoneProperties />
+        <FrameProperties />
+        <PositionProperties />
+        <SizeProperties />
+        <AppearanceProperties />
+        <FillProperties />
+        <StrokeProperties />
+        <TextProperties />
+        <CropProperties />
       </div>
     </div>
   );

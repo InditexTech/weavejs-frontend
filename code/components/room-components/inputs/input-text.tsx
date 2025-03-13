@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 type InputTextProps = {
   label: string;
@@ -16,32 +16,20 @@ export const InputText = ({
 }: Readonly<InputTextProps>) => {
   const [actualValue, setActualValue] = React.useState<string>(`${value}`);
 
-  const [inputState, setInputState] = React.useState<
-    "idle" | "hover" | "focus"
-  >("idle");
-
   React.useEffect(() => {
     setActualValue(`${value}`);
   }, [value]);
 
   return (
-    <div
-      tabIndex={0}
-      className={cn(
-        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded-none transition-all duration-200",
-        {
-          "border border-gray-200": inputState === "idle",
-          "border border-gray-400": inputState === "hover",
-          "border border-gray-800": inputState === "focus",
-        }
+    <div className="flex flex-col items-start justify-start relative">
+      {label && (
+        <div className="text-zinc-400 mb-1 text-[11px] font-noto-sans-mono font-light">
+          {label}
+        </div>
       )}
-    >
-      <div className="text-xs font-noto-sans-mono font-base whitespace-nowrap">
-        {label}
-      </div>
-      <input
+      <Input
         type="text"
-        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+        className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent shadow-none"
         value={actualValue}
         onChange={(e) => {
           setActualValue(e.target.value);
@@ -54,15 +42,7 @@ export const InputText = ({
             input.blur();
           }
         }}
-        onMouseEnter={() => setInputState("hover")}
-        onMouseLeave={() =>
-          setInputState((prevState) =>
-            prevState === "focus" ? "focus" : "idle"
-          )
-        }
-        onFocus={() => setInputState("focus")}
         onBlur={() => {
-          setInputState("idle");
           onChange(actualValue);
         }}
       />
