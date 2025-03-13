@@ -7,7 +7,7 @@ import {
 import Konva from "konva";
 import { Noto_Sans_Mono } from "next/font/google";
 
-export const WORKSPACE_NODE_TYPE = "workspace";
+export const FRAME_NODE_TYPE = "frame";
 
 const notoSansMono = Noto_Sans_Mono({
   preload: true,
@@ -15,8 +15,8 @@ const notoSansMono = Noto_Sans_Mono({
   subsets: ["latin"],
 });
 
-export class WorkspaceNode extends WeaveNode {
-  protected nodeType = WORKSPACE_NODE_TYPE;
+export class FrameNode extends WeaveNode {
+  protected nodeType = FRAME_NODE_TYPE;
 
   createNode(key: string, props: WeaveElementAttributes) {
     return {
@@ -34,81 +34,81 @@ export class WorkspaceNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const { id } = props;
 
-    const workspaceParams = {
+    const frameParams = {
       ...props,
     };
-    delete workspaceParams.zIndex;
+    delete frameParams.zIndex;
 
-    const workspaceWidth = 1403;
-    const workspaceHeight = 992;
+    const frameWidth = 1403;
+    const frameHeight = 992;
     const titleHeight = 30;
     const strokeWidth = 2;
 
-    const workspace = new Konva.Group({
-      ...workspaceParams,
+    const frame = new Konva.Group({
+      ...frameParams,
       containerId: `${id}-group-internal`,
-      width: workspaceWidth + strokeWidth * 2,
-      height: workspaceHeight + titleHeight + strokeWidth * 2,
-      fill: "white",
+      width: frameWidth + strokeWidth * 2,
+      height: frameHeight + titleHeight + strokeWidth * 2,
+      fill: "#ffffffff",
       clipX: 0,
       clipY: 0,
-      clipWidth: workspaceWidth + strokeWidth * 2,
-      clipHeight: workspaceHeight + titleHeight + strokeWidth * 2,
+      clipWidth: frameWidth + strokeWidth * 2,
+      clipHeight: frameHeight + titleHeight + strokeWidth * 2,
     });
 
     const background = new Konva.Rect({
       id: `${id}-bg`,
       x: strokeWidth,
       y: titleHeight + strokeWidth,
-      width: workspaceWidth,
-      stroke: "black",
+      width: frameWidth,
+      stroke: "#000000ff",
       strokeWidth: 2,
-      height: workspaceHeight,
-      fill: "#FFFFFFFF",
+      height: frameHeight,
+      fill: "#ffffffff",
       draggable: false,
     });
 
-    workspace.add(background);
+    frame.add(background);
 
     const text = new Konva.Text({
       id: `${id}-title`,
       x: 0,
       y: 0,
-      width: workspaceWidth,
+      width: frameWidth,
       height: titleHeight - 10,
       fontSize: 20,
       fontFamily: notoSansMono.style.fontFamily,
       align: "left",
-      text: workspaceParams.title,
-      stroke: "black",
+      text: frameParams.title,
+      stroke: "#000000ff",
       strokeWidth: 1,
       listening: false,
       draggable: false,
     });
 
-    workspace.add(text);
+    frame.add(text);
 
-    const workspaceInternal = new Konva.Group({
+    const frameInternal = new Konva.Group({
       id: `${id}-group-internal`,
       nodeId: id,
       x: strokeWidth,
       y: titleHeight + strokeWidth,
-      width: workspaceWidth,
-      height: workspaceHeight,
+      width: frameWidth,
+      height: frameHeight,
       draggable: false,
       stroke: "transparent",
       strokeWidth,
       clipX: 0,
       clipY: 0,
-      clipWidth: workspaceWidth,
-      clipHeight: workspaceHeight,
+      clipWidth: frameWidth,
+      clipHeight: frameHeight,
     });
 
-    workspace.add(workspaceInternal);
+    frame.add(frameInternal);
 
-    this.setupDefaultNodeEvents(workspace);
+    this.setupDefaultNodeEvents(frame);
 
-    return workspace;
+    return frame;
   }
 
   updateInstance(
@@ -117,7 +117,7 @@ export class WorkspaceNode extends WeaveNode {
   ) {
     const { id } = nextProps;
 
-    const workspaceNode = nodeInstance as Konva.Group;
+    const frameNode = nodeInstance as Konva.Group;
 
     const newProps = { ...nextProps };
     delete newProps.title;
@@ -126,9 +126,9 @@ export class WorkspaceNode extends WeaveNode {
       ...newProps,
     });
 
-    const workspaceTitle = workspaceNode.findOne(`#${id}-title`);
-    if (workspaceTitle) {
-      workspaceTitle.setAttrs({
+    const frameTitle = frameNode.findOne(`#${id}-title`);
+    if (frameTitle) {
+      frameTitle.setAttrs({
         text: nextProps.title,
       });
     }
@@ -141,14 +141,14 @@ export class WorkspaceNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
-    const workspaceInternal = (instance as Konva.Group).findOne(
+    const frameInternal = (instance as Konva.Group).findOne(
       `#${attrs.containerId}`
     ) as Konva.Group | undefined;
 
     const childrenMapped: WeaveStateElement[] = [];
-    if (workspaceInternal) {
+    if (frameInternal) {
       const children: WeaveElementInstance[] = [
-        ...(workspaceInternal as Konva.Group).getChildren(),
+        ...(frameInternal as Konva.Group).getChildren(),
       ];
       for (const node of children) {
         const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));

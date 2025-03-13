@@ -1,8 +1,13 @@
-import { WeaveAction, WeaveElementInstance, WeaveSelection } from "@inditextech/weavejs-sdk";
+import {
+  WeaveAction,
+  WeaveElementInstance,
+  WeaveSelection,
+} from "@inditextech/weavejs-sdk";
 import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
+  internalUpdate = undefined;
   init = undefined;
 
   getName(): string {
@@ -42,7 +47,9 @@ export class AlignElementsToolAction extends WeaveAction {
       }
 
       if (prevInstance) {
-        const handler = this.instance.getNodeHandler(instance.getAttrs().nodeType);
+        const handler = this.instance.getNodeHandler(
+          instance.getAttrs().nodeType
+        );
         const node = handler.toNode(instance as WeaveElementInstance);
 
         const newNode = {
@@ -68,7 +75,10 @@ export class AlignElementsToolAction extends WeaveAction {
     this.cancelAction?.();
   }
 
-  trigger(cancelAction: () => void, { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }) {
+  trigger(
+    cancelAction: () => void,
+    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }
+  ) {
     if (!this.instance) {
       throw new Error("Instance not defined");
     }

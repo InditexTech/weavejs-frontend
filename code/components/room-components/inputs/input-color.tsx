@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 type InputColorProps = {
   label?: string;
@@ -15,9 +15,6 @@ export const InputColor = ({
   onChange,
 }: Readonly<InputColorProps>) => {
   const [actualValue, setActualValue] = useState<string>(value);
-  const [inputState, setInputState] = useState<"idle" | "hover" | "focus">(
-    "idle"
-  );
 
   useEffect(() => {
     setActualValue(value);
@@ -28,57 +25,37 @@ export const InputColor = ({
   };
 
   const handleBlur = () => {
-    setInputState("idle");
     onChange(actualValue);
   };
 
   return (
-    <div
-      tabIndex={0}
-      className={cn(
-        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded-none transition-all duration-200",
-        {
-          "border border-gray-200": inputState === "idle",
-          "border border-gray-400": inputState === "hover",
-          "border border-gray-800": inputState === "focus",
-        }
-      )}
-    >
+    <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <label
-          htmlFor="color-input"
-          className="text-xs font-noto-sans-mono font-base whitespace-nowrap"
-        >
+        <div className="text-zinc-400 mb-1 text-[11px] font-noto-sans-mono font-light">
           {label}
-        </label>
+        </div>
       )}
-      <input
-        id="color-input"
-        type="text"
-        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
-        value={actualValue}
-        onChange={handleInputChange}
-        onMouseEnter={() => setInputState("hover")}
-        onMouseLeave={() =>
-          setInputState((prevState) =>
-            prevState === "focus" ? "focus" : "idle"
-          )
-        }
-        onFocus={() => setInputState("focus")}
-        onBlur={handleBlur}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-            const input = e.target as HTMLInputElement;
-            input.blur();
-          }
-        }}
-      />
-      <div
-        className="shrink-0 w-5 h-5 border border-light-border-1 rounded-sm shadow-sm"
-        style={{ background: `#${actualValue}` }}
-      />
+      <div className="w-full flex items-center relative">
+        <div
+          className="shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
+          style={{ background: `#${actualValue}` }}
+        />
+        <Input
+          type="text"
+          className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent shadow-none"
+          value={actualValue}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.stopPropagation();
+              const input = e.target as HTMLInputElement;
+              input.blur();
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };

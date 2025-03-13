@@ -1,11 +1,14 @@
 import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
+import { WeaveElementAttributes } from "@inditextech/weavejs-sdk";
 
 type ShowcaseUser = {
   name: string;
   email: string;
 };
+
+type NodePropertiesAction = "create" | "update" | undefined;
 
 interface CollaborationRoomState {
   fetchConnectionUrl: {
@@ -20,6 +23,8 @@ interface CollaborationRoomState {
     options: ContextMenuOption[];
   };
   nodeProperties: {
+    action: NodePropertiesAction;
+    createProps: WeaveElementAttributes | undefined;
     visible: boolean;
   };
   images: {
@@ -29,7 +34,12 @@ interface CollaborationRoomState {
       visible: boolean;
     };
   };
-  workspaces: {
+  frames: {
+    library: {
+      visible: boolean;
+    };
+  };
+  pantones: {
     library: {
       visible: boolean;
     };
@@ -45,9 +55,16 @@ interface CollaborationRoomState {
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
+  setNodePropertiesAction: (
+    newNodePropertiesAction: NodePropertiesAction
+  ) => void;
+  setNodePropertiesCreateProps: (
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
+  ) => void;
   setNodePropertiesVisible: (newNodePropertiesVisible: boolean) => void;
   setImagesLibraryVisible: (newImagesLibraryVisible: boolean) => void;
-  setWorkspacesLibraryVisible: (newWorkspacesLibraryVisible: boolean) => void;
+  setFramesLibraryVisible: (newFramesLibraryVisible: boolean) => void;
+  setPantonesLibraryVisible: (newPantonesLibraryVisible: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -63,7 +80,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     options: [],
   },
   nodeProperties: {
+    action: undefined,
     visible: false,
+    createProps: undefined,
   },
   images: {
     uploading: false,
@@ -72,7 +91,12 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       visible: false,
     },
   },
-  workspaces: {
+  frames: {
+    library: {
+      visible: false,
+    },
+  },
+  pantones: {
     library: {
       visible: false,
     },
@@ -117,6 +141,22 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state,
       images: { ...state.images, loading: newLoadingImage },
     })),
+  setNodePropertiesAction: (newNodePropertiesAction) =>
+    set((state) => ({
+      ...state,
+      nodeProperties: {
+        ...state.nodeProperties,
+        action: newNodePropertiesAction,
+      },
+    })),
+  setNodePropertiesCreateProps: (newNodePropertiesCreateProps) =>
+    set((state) => ({
+      ...state,
+      nodeProperties: {
+        ...state.nodeProperties,
+        createProps: newNodePropertiesCreateProps,
+      },
+    })),
   setNodePropertiesVisible: (newNodePropertiesVisible) =>
     set((state) => ({
       ...state,
@@ -133,14 +173,25 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         library: { ...state.images.library, visible: newImagesLibraryVisible },
       },
     })),
-  setWorkspacesLibraryVisible: (newWorkspacesLibraryVisible) =>
+  setFramesLibraryVisible: (newFramesLibraryVisible) =>
     set((state) => ({
       ...state,
-      workspaces: {
-        ...state.workspaces,
+      frames: {
+        ...state.frames,
         library: {
-          ...state.workspaces.library,
-          visible: newWorkspacesLibraryVisible,
+          ...state.frames.library,
+          visible: newFramesLibraryVisible,
+        },
+      },
+    })),
+  setPantonesLibraryVisible: (newPantonesLibraryVisible) =>
+    set((state) => ({
+      ...state,
+      pantones: {
+        ...state.pantones,
+        library: {
+          ...state.pantones.library,
+          visible: newPantonesLibraryVisible,
         },
       },
     })),

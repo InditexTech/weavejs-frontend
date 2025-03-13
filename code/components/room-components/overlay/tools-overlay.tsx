@@ -15,6 +15,8 @@ import {
   Undo,
   Frame,
   MousePointer,
+  Palette,
+  Layers,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -26,17 +28,23 @@ export function ToolsOverlay() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
-  const workspacesLibraryVisible = useCollaborationRoom(
-    (state) => state.workspaces.library.visible
+  const framesLibraryVisible = useCollaborationRoom(
+    (state) => state.frames.library.visible
   );
-  const setWorkspacesLibraryVisible = useCollaborationRoom(
-    (state) => state.setWorkspacesLibraryVisible
+  const setFramesLibraryVisible = useCollaborationRoom(
+    (state) => state.setFramesLibraryVisible
   );
   const imagesLibraryVisible = useCollaborationRoom(
     (state) => state.images.library.visible
   );
   const setImagesLibraryVisible = useCollaborationRoom(
     (state) => state.setImagesLibraryVisible
+  );
+  const pantonesLibraryVisible = useCollaborationRoom(
+    (state) => state.pantones.library.visible
+  );
+  const setPantonesLibraryVisible = useCollaborationRoom(
+    (state) => state.setPantonesLibraryVisible
   );
 
   const triggerTool = React.useCallback(
@@ -91,16 +99,16 @@ export function ToolsOverlay() {
           label="Add an image"
         />
         <ToolbarButton
-          icon={<Frame />}
-          active={actualAction === "workspaceTool"}
-          onClick={() => triggerTool("workspaceTool")}
-          label="Add a frame"
-        />
-        <ToolbarButton
-          icon={<SwatchBook />}
+          icon={<Palette />}
           active={actualAction === "pantoneTool"}
           onClick={() => triggerTool("pantoneTool")}
-          label="Add a pantone color"
+          label="Add pantone element"
+        />
+        <ToolbarButton
+          icon={<Frame />}
+          active={actualAction === "frameTool"}
+          onClick={() => triggerTool("frameTool")}
+          label="Add a frame"
         />
       </Toolbar>
       <Toolbar>
@@ -108,17 +116,29 @@ export function ToolsOverlay() {
           icon={<Images />}
           active={imagesLibraryVisible}
           onClick={() => {
-            setWorkspacesLibraryVisible(false);
+            setFramesLibraryVisible(false);
+            setPantonesLibraryVisible(false);
             setImagesLibraryVisible(!imagesLibraryVisible);
           }}
           label="Images library"
         />
         <ToolbarButton
-          icon={<Frame />}
-          active={workspacesLibraryVisible}
+          icon={<SwatchBook />}
+          active={pantonesLibraryVisible}
           onClick={() => {
             setImagesLibraryVisible(false);
-            setWorkspacesLibraryVisible(!workspacesLibraryVisible);
+            setFramesLibraryVisible(false);
+            setPantonesLibraryVisible(!pantonesLibraryVisible);
+          }}
+          label="Pantone library"
+        />
+        <ToolbarButton
+          icon={<Layers />}
+          active={framesLibraryVisible}
+          onClick={() => {
+            setImagesLibraryVisible(false);
+            setPantonesLibraryVisible(false);
+            setFramesLibraryVisible(!framesLibraryVisible);
           }}
           label="Frames library"
         />

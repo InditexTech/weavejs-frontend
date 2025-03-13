@@ -1,4 +1,12 @@
+import { WeaveActionCallbacks } from "@inditextech/weavejs-sdk";
 import { PANTONE_TOOL_STATE } from "./constants";
 
-export type WeavePantoneToolActionStateKeys = keyof typeof PANTONE_TOOL_STATE;
-export type WeavePantoneToolActionState = (typeof PANTONE_TOOL_STATE)[WeavePantoneToolActionStateKeys];
+export type PantoneToolActionStateKeys = keyof typeof PANTONE_TOOL_STATE;
+export type PantoneToolActionState =
+  (typeof PANTONE_TOOL_STATE)[PantoneToolActionStateKeys];
+
+export type PantoneToolCallbacks = WeaveActionCallbacks;
+
+export type PantoneToolActionTriggerParams = {
+  color?: string;
+};

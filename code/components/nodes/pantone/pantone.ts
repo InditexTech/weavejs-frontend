@@ -4,9 +4,16 @@ import {
   WeaveNode,
 } from "@inditextech/weavejs-sdk";
 import Konva from "konva";
+import { Noto_Sans_Mono } from "next/font/google";
 import { getNearestPantone } from "pantone-tcx";
 
 export const PANTONE_NODE_TYPE = "pantone";
+
+const notoSansMono = Noto_Sans_Mono({
+  preload: true,
+  variable: "--font-noto-sans-mono",
+  subsets: ["latin"],
+});
 
 export class PantoneNode extends WeaveNode {
   protected nodeType = PANTONE_NODE_TYPE;
@@ -107,7 +114,7 @@ export class PantoneNode extends WeaveNode {
       x: 20,
       y: 240,
       fontSize: 20,
-      fontFamily: "NeueHelveticaZara",
+      fontFamily: notoSansMono.style.fontFamily,
       fill: "#CCCCCCFF",
       strokeEnabled: false,
       stroke: "#000000FF",
@@ -127,11 +134,11 @@ export class PantoneNode extends WeaveNode {
       x: 20,
       y: 260,
       fontSize: 20,
-      fontFamily: "NeueHelveticaZara",
+      fontFamily: notoSansMono.style.fontFamily,
       fill: "#000000FF",
       strokeEnabled: false,
       stroke: "#000000FF",
-      fontStyle: "bold",
+      fontStyle: "normal",
       strokeWidth: 1,
       text: nearestColor.name,
       width: (pantoneParams.width ?? 0) - 40,
