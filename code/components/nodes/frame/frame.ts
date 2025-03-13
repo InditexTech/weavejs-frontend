@@ -54,6 +54,7 @@ export class FrameNode extends WeaveNode {
       clipY: 0,
       clipWidth: frameWidth + strokeWidth * 2,
       clipHeight: frameHeight + titleHeight + strokeWidth * 2,
+      name: "node",
     });
 
     const background = new Konva.Rect({

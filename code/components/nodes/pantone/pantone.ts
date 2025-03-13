@@ -47,6 +47,7 @@ export class PantoneNode extends WeaveNode {
       ...pantoneParams,
       width: pantoneParams.width,
       height: pantoneParams.height,
+      name: "node",
     });
 
     const internalRect = new Konva.Rect({

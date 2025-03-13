@@ -17,6 +17,7 @@ import {
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
+  WeaveNodesSnappingPlugin,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageNode,
@@ -314,6 +315,7 @@ export const Room = () => {
             new WeaveExportStageToolAction(),
           ]}
           customPlugins={[
+            new WeaveNodesSnappingPlugin(),
             new WeaveContextMenuPlugin(
               {
                 xOffset: 10,
