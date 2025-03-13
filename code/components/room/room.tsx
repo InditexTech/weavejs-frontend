@@ -58,6 +58,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
+import { HelpDrawer } from "../room-components/help-drawer";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -474,6 +475,7 @@ export const Room = () => {
             }}
           />
           <RoomLayout />
+          <HelpDrawer />
         </WeaveProvider>
       )}
     </>
