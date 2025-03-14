@@ -13,6 +13,22 @@ on:
         required: true
         default: "main"
 
+<<<<<<< Updated upstream
+=======
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+  AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
+  AZURE_ACR_NAME: "acrweavejsx0j187"
+  AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
+  AZURE_CONTAINER_ENVIRONMENT_NAME: "container-apps-env-weavejs-x0j187"
+  AZURE_CONTAINER_NAME: "frontend-app-9"
+  AZURE_CONTAINER_NAME_BACKEND: "backend-app-9"
+  AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
+
+>>>>>>> Stashed changes
 permissions:
   id-token: write
   contents: read
@@ -44,6 +60,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get backend fqdn
+        working-directory: code
+        run: |
+          ENDPOINT=$(az containerapp show --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_CONTAINER_NAME_BACKEND }} --query properties.configuration.ingress.fqdn)
+          echo "BACKEND_ENDPOINT=http://$(echo $ENDPOINT):8080" >> $GITHUB_ENV
+
       - name: Create .env.production file
         working-directory: code
         run: |
@@ -52,13 +81,6 @@ jobs:
           echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
           echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
             cat .env.production
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: ACR Login
         run: |
