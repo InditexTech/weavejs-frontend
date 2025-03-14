@@ -11,6 +11,7 @@ import { useWeave } from "@inditextech/weavejs-react";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
 import { Logo } from "../utils/logo";
+import { AnimatePresence } from "framer-motion";
 
 export const RoomLayout = () => {
   const status = useWeave((state) => state.status);
@@ -34,8 +35,9 @@ export const RoomLayout = () => {
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
 
   return (
-    <div className="w-full h-full relative flex">
+    <div className="w-full h-full relative flex overflow-hidden">
       <div id="weave" className="w-full h-full"></div>
+      <AnimatePresence>
       {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
         <>
           <ContextMenuRender
@@ -73,6 +75,7 @@ export const RoomLayout = () => {
           )}
         </>
       )}
+      </AnimatePresence>
     </div>
   );
 };

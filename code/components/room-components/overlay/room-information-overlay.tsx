@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
 import {
@@ -23,6 +24,7 @@ import {
 } from "lucide-react";
 import { WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
 import { ConnectionStatus } from "../connection-status";
+import { topElementVariants } from "./variants";
 
 export function RoomInformationOverlay() {
   const router = useRouter();
@@ -61,7 +63,13 @@ export function RoomInformationOverlay() {
   }, [router]);
 
   return (
-    <div className="absolute top-2 left-2 flex gap-1 justify-center items-center">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      variants={topElementVariants}
+      className="absolute top-2 left-2 flex gap-1 justify-center items-center"
+    >
       <div className="bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-0 pr-1">
         <div className="bg-accent h-[48px] flex justify-start items-center py-0 px-2">
           <Logo kind="small" />
@@ -116,6 +124,6 @@ export function RoomInformationOverlay() {
           <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

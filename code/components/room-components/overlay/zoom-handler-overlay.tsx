@@ -2,9 +2,11 @@
 
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
-import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { Fullscreen, Maximize, ZoomIn, ZoomOut, Braces } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { HelpDrawer } from "../help-drawer";
+import { motion } from "framer-motion";
+import { bottomElementVariants } from "./variants";
 
 export function ZoomHandlerOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -29,7 +31,13 @@ export function ZoomHandlerOverlay() {
   );
 
   return (
-    <div className="absolute bottom-2 left-2 right-2 flex gap-1 justify-between items-center">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      variants={bottomElementVariants}
+      className="absolute bottom-2 left-2 right-2 flex gap-1 justify-between items-center overflow-hidden"
+    >
       <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
         <div className="w-full flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">
@@ -78,6 +86,20 @@ export function ZoomHandlerOverlay() {
                 label="Fit to selection"
                 tooltipSide="top"
               />
+              <ToolbarButton
+                icon={<Braces />}
+                onClick={() => {
+                  if (instance) {
+                    // eslint-disable-next-line no-console
+                    console.log({
+                      appState: JSON.parse(
+                        JSON.stringify(instance.getStore().getState())
+                      ),
+                    });
+                  }
+                }}
+                label="Print model state to browser console"
+              />
             </div>
             <div className="w-full px-4 font-noto-sans-mono flex justify-end items-center text-muted-foreground">
               {parseFloat(`${zoomValue * 100}`).toFixed(2)}%
@@ -85,6 +107,6 @@ export function ZoomHandlerOverlay() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
