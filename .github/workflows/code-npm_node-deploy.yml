@@ -34,7 +34,6 @@ jobs:
       AZURE_CONTAINER_NAME: "frontend-app-9"
       AZURE_CONTAINER_NAME_BACKEND: "backend-app-9"
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
-      BACKEND_ENDPOINT: "http://backend-app-9:8080"
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
     steps:
