@@ -480,13 +480,18 @@ export const Room = () => {
                 mutationUpload.mutate(file, {
                   onSuccess: (data) => {
                     inputFileRef.current.value = null;
-                    setUploadingImage(false);
                     const room = data.fileName.split("/")[0];
                     const imageId = data.fileName.split("/")[1];
 
                     fileUploadFinishRef.current(
                       `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
                     );
+                  },
+                  onError: () => {
+                    console.error("Error uploading image");
+                  },
+                  onSettled: () => {
+                    setUploadingImage(false);
                   },
                 });
               }

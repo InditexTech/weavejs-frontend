@@ -39,6 +39,9 @@ export function FillProperties() {
     if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
+    if (!actualAction && !node) {
+      setActualNode(undefined);
+    }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
@@ -57,6 +60,8 @@ export function FillProperties() {
   if (!instance || !actualAction || !actualNode) {
     return null;
   }
+
+  if (!actualAction && !actualNode) return null;
 
   if (!["rectangleTool"].includes(actualAction)) {
     return null;

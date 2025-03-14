@@ -38,6 +38,9 @@ export function AppearanceProperties() {
     if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
+    if (!actualAction && !node) {
+      setActualNode(undefined);
+    }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
@@ -54,6 +57,8 @@ export function AppearanceProperties() {
   );
 
   if (!instance || !actualAction || !actualNode) return null;
+
+  if (!actualAction && !actualNode) return null;
 
   if (["pantoneTool", "frameTool"].includes(actualAction)) return null;
 
