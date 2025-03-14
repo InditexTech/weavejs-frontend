@@ -208,23 +208,11 @@ export const Room = () => {
         loadingFetchConnectionUrl ||
         status !== WEAVE_INSTANCE_STATUS.RUNNING ||
         (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-        <div className="w-full h-full bg-white flex justify-center items-center relative">
-          <div className="absolute top-0 left-0 right-0 h-full">
-            <Threads
-              color={[246 / 255, 246 / 255, 246 / 255]}
-              amplitude={1}
-              distance={0}
-              enableMouseInteraction={false}
-            />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
-            <RoomLoader
-              roomId={room ? room : "-"}
-              content="LOADING ROOM"
-              description={loadingDescription}
-            />
-          </div>
-        </div>
+        <RoomLoader
+          roomId={room ? room : "-"}
+          content="LOADING ROOM"
+          description={loadingDescription}
+        />
       )}
       {loadedParams && room && (
         <WeaveProvider
