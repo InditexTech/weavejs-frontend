@@ -45,7 +45,6 @@ import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
-import { RoomLoader } from "../room-components/room-loader";
 import {
   Copy,
   Clipboard,
@@ -59,6 +58,7 @@ import {
 } from "lucide-react";
 import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
 import { HelpDrawer } from "../room-components/help-drawer";
+import { RoomLoader } from "../room-components/room-loader/room-loader";
 
 const statusMap = {
   ["idle"]: "Idle",
