@@ -38,8 +38,6 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
   }, []);
 
   return (
-    <div className="w-full aspect-video border border-light-border-1">
-      {image}
-    </div>
+    <div className="w-full aspect-video border border-zinc-200">{image}</div>
   );
 };

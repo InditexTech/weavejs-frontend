@@ -11,6 +11,7 @@ import {
   WeaveBrushToolAction,
   WeaveTextToolAction,
   WeaveImageToolAction,
+  WeaveFrameToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveExportNodeToolAction,
@@ -27,6 +28,7 @@ import {
   WeaveLineNode,
   WeaveTextNode,
   WeaveImageNode,
+  WeaveFrameNode,
   WeaveUser,
   WeaveSelection,
   WEAVE_INSTANCE_STATUS,
@@ -38,8 +40,6 @@ import {
 } from "@inditextech/weavejs-store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
-import { FrameNode } from "@/components/nodes/frame/frame";
-import { FrameToolAction } from "@/components/actions/frame-tool/frame-tool";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
@@ -250,8 +250,8 @@ export const Room = () => {
             new WeaveLineNode(),
             new WeaveTextNode(),
             new WeaveImageNode(),
+            new WeaveFrameNode(),
             new PantoneNode(),
-            new FrameNode(),
           ]}
           actions={[
             new WeaveSelectionToolAction(),
@@ -286,16 +286,16 @@ export const Room = () => {
                 setLoadingImage(false);
               },
             }),
+            new WeaveFrameToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
             new WeaveZoomOutToolAction(),
             new WeaveZoomInToolAction(),
             new WeaveFitToScreenToolAction(),
             new WeaveFitToSelectionToolAction(),
             new PantoneToolAction({
-              onPropsChange: (props) => {
-                setNodePropertiesCreateProps(props);
-              },
-            }),
-            new FrameToolAction({
               onPropsChange: (props) => {
                 setNodePropertiesCreateProps(props);
               },
@@ -470,13 +470,18 @@ export const Room = () => {
                 mutationUpload.mutate(file, {
                   onSuccess: (data) => {
                     inputFileRef.current.value = null;
-                    setUploadingImage(false);
                     const room = data.fileName.split("/")[0];
                     const imageId = data.fileName.split("/")[1];
 
                     fileUploadFinishRef.current(
                       `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
                     );
+                  },
+                  onError: () => {
+                    console.error("Error uploading image");
+                  },
+                  onSettled: () => {
+                    setUploadingImage(false);
                   },
                 });
               }

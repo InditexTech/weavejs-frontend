@@ -55,6 +55,9 @@ export function TextProperties() {
     if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
+    if (!actualAction && !node) {
+      setActualNode(undefined);
+    }
   }, [instance, actualAction, node, nodeCreateProps, nodePropertiesAction]);
 
   const updateElement = React.useCallback(
@@ -73,6 +76,8 @@ export function TextProperties() {
   if (!instance || !actualAction || !actualNode) {
     return null;
   }
+
+  if (!actualAction && !actualNode) return null;
 
   if (!["text"].includes(actualNode.type)) {
     return null;

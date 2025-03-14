@@ -37,6 +37,9 @@ export function FrameProperties() {
     if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
+    if (!actualAction && !node) {
+      setActualNode(undefined);
+    }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
@@ -53,6 +56,8 @@ export function FrameProperties() {
   );
 
   if (!instance || !actualNode) return null;
+
+  if (!actualAction && !actualNode) return null;
 
   if (
     actualAction &&

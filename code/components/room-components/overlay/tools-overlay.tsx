@@ -99,16 +99,19 @@ export function ToolsOverlay() {
           label="Add an image"
         />
         <ToolbarButton
-          icon={<Palette />}
-          active={actualAction === "pantoneTool"}
-          onClick={() => triggerTool("pantoneTool")}
-          label="Add pantone element"
-        />
-        <ToolbarButton
           icon={<Frame />}
           active={actualAction === "frameTool"}
           onClick={() => triggerTool("frameTool")}
           label="Add a frame"
+        />
+        <div className="w-full justify-center items-center flex">
+          <div className="w-[20px] h-[1px] bg-zinc-200 my-1"></div>
+        </div>
+        <ToolbarButton
+          icon={<Palette />}
+          active={actualAction === "pantoneTool"}
+          onClick={() => triggerTool("pantoneTool")}
+          label="Add pantone element"
         />
       </Toolbar>
       <Toolbar>
@@ -120,7 +123,7 @@ export function ToolsOverlay() {
             setPantonesLibraryVisible(false);
             setImagesLibraryVisible(!imagesLibraryVisible);
           }}
-          label="Images library"
+          label="Images"
         />
         <ToolbarButton
           icon={<SwatchBook />}
@@ -130,7 +133,7 @@ export function ToolsOverlay() {
             setFramesLibraryVisible(false);
             setPantonesLibraryVisible(!pantonesLibraryVisible);
           }}
-          label="Pantone library"
+          label="Some Pantones"
         />
         <ToolbarButton
           icon={<Layers />}
@@ -140,7 +143,7 @@ export function ToolsOverlay() {
             setPantonesLibraryVisible(false);
             setFramesLibraryVisible(!framesLibraryVisible);
           }}
-          label="Frames library"
+          label="Frames"
         />
       </Toolbar>
       <Toolbar>

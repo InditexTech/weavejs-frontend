@@ -3,11 +3,16 @@ FROM node:20-alpine as base
 # Install dependencies step
 FROM base AS deps
 
+# Need to add this in local for CA in order to make the install of dependencies work
+# ENV NODE_EXTRA_CA_CERTS=/app/cert.pem
+
 RUN sed -i 's/https/http/' /etc/apk/repositories
 RUN apk add --no-cache bash g++ make python3
 RUN apk add --no-cache build-base cairo-dev cairo cairo-tools pango pango-dev jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev
 
 WORKDIR /app
+# Need to add this in local for CA in order to make the install of dependencies work
+# COPY cert.pem ./
 COPY package*.json ./
 RUN npm pkg delete scripts.prepare
 RUN npm ci

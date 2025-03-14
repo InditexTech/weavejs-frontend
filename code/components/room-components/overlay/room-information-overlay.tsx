@@ -67,7 +67,7 @@ export function RoomInformationOverlay() {
           <Logo kind="small" />
         </div>
         <div className="flex justify-start items-center p-1 gap-1">
-          <DropdownMenu onOpenChange={(open) => setMenuOpen(open)}>
+          <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
             <DropdownMenuTrigger
               className={cn(
                 "rounded-none cursor-pointer p-1 px-3 hover:bg-accent focus:outline-none",

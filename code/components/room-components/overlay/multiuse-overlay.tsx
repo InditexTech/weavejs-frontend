@@ -83,6 +83,13 @@ export function MultiuseOverlay() {
       setImagesLibraryVisible(false);
       setPantonesLibraryVisible(false);
     }
+
+    if (!actualAction && selectedNodes.length !== 1) {
+      setNodePropertiesVisible(false);
+      setFramesLibraryVisible(false);
+      setImagesLibraryVisible(false);
+      setPantonesLibraryVisible(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actualAction, selectedNodes]);
 

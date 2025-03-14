@@ -37,6 +37,9 @@ export function SizeProperties() {
     if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
+    if (!actualAction && !node) {
+      setActualNode(undefined);
+    }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
@@ -55,6 +58,8 @@ export function SizeProperties() {
   if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
   }
+
+  if (!actualAction && !actualNode) return null;
 
   if (
     actualAction &&
