@@ -3,30 +3,30 @@ import Image from "next/image";
 import Konva from "konva";
 import { toImageAsync } from "./utils";
 
-type WorkspaceImageProps = {
+type FrameImageProps = {
   node: Konva.Group;
 };
 
-export const WorkspaceImage = ({ node }: Readonly<WorkspaceImageProps>) => {
+export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
   const [image, setImage] = React.useState<React.ReactElement | null>(null);
 
   React.useEffect(() => {
     setInterval(async () => {
       const nodeAttrs = node.getAttrs();
       try {
-        // const box = workspaceInternal.getClientRect({ relativeTo: stage });
-        const workspaceBg = node.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
-        if (!workspaceBg) {
+        // const box = frameInternal.getClientRect({ relativeTo: stage });
+        const frameBg = node.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
+        if (!frameBg) {
           return;
         }
-        const boxBg = workspaceBg.getClientRect();
+        const boxBg = frameBg.getClientRect();
         const img = await toImageAsync(node, boxBg);
         setImage(
           <Image
             src={img.src}
             width={284}
             height={201}
-            alt="A workspace image"
+            alt="A frame image"
             className="object-fit w-full h-full"
           />
         );

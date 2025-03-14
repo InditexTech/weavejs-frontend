@@ -1,8 +1,12 @@
 "use client";
 
 import React from "react";
-import { Cloud, CloudCog, CloudAlert } from "lucide-react";
-import { WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS } from "@inditextech/weavejs-store-websockets";
+import {
+  Cloud,
+  //CloudCog,
+  CloudAlert,
+} from "lucide-react";
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "@inditextech/weavejs-store-azure-web-pubsub";
 import { cn } from "@/lib/utils";
 
 type ConnectionStatusProps = {
@@ -20,26 +24,26 @@ export const ConnectionStatus = ({
           {
             ["bg-emerald-200 text-black"]:
               weaveConnectionStatus ===
-              WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.CONNECTED,
-            ["bg-sky-300 text-white"]:
-              weaveConnectionStatus ===
-              WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.CONNECTING,
+              WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED,
+            // ["bg-sky-300 text-white"]:
+            //   weaveConnectionStatus ===
+            //   WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING,
             ["bg-rose-300 text-white"]:
               weaveConnectionStatus ===
-              WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.DISCONNECTED,
+              WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED,
           }
         )}
       >
         {weaveConnectionStatus ===
-          WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.CONNECTED && (
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED && (
           <Cloud size={20} />
         )}
-        {weaveConnectionStatus ===
-          WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.CONNECTING && (
+        {/* {weaveConnectionStatus ===
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING && (
           <CloudCog size={20} />
-        )}
+        )} */}
         {weaveConnectionStatus ===
-          WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS.DISCONNECTED && (
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED && (
           <CloudAlert size={20} />
         )}
       </div>

@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import { NumberInput } from "./number-input";
 
 type InputNumberProps = {
   label?: string;
   disabled?: boolean;
   value: number;
-  onChange: (value: number) => void;
+  onChange?: (value: number) => void;
+  min?: number;
   max?: number;
 };
 
@@ -16,11 +17,9 @@ export const InputNumber = ({
   value,
   onChange,
   disabled = false,
+  min = -Infinity,
   max = Infinity,
 }: Readonly<InputNumberProps>) => {
-  const [inputState, setInputState] = React.useState<
-    "idle" | "hover" | "focus"
-  >("idle");
   const [actualValue, setActualValue] = React.useState<string>(`${value}`);
 
   React.useEffect(() => {
@@ -33,57 +32,30 @@ export const InputNumber = ({
     if (isNaN(parseFloat(numberToSave))) {
       numberToSave = "0";
     }
-    setInputState("idle");
-    onChange(parseFloat(actualValue));
+    onChange?.(parseFloat(actualValue));
   };
 
   return (
-    <div
-      tabIndex={0}
-      className={cn(
-        "pointer-events-auto flex items-center gap-2 px-2 py-2 rounded-none transition-all duration-200",
-        {
-          "border border-gray-200": inputState === "idle",
-          "border border-gray-400": inputState === "hover",
-          "border border-gray-800": inputState === "focus",
+    <NumberInput
+      label={label}
+      disabled={disabled}
+      min={min}
+      max={max}
+      decimalScale={2}
+      className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+      value={Number(actualValue)}
+      onChange={(e) => {
+        setActualValue(e.target.value);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+          const input = e.target as HTMLInputElement;
+          input.blur();
         }
-      )}
-    >
-      {label && (
-        <label
-          htmlFor="color-input"
-          className="text-xs font-noto-sans-mono font-base whitespace-nowrap"
-        >
-          {label}
-        </label>
-      )}
-      <input
-        type="number"
-        disabled={disabled}
-        max={max}
-        className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
-        value={`${Number(actualValue).toFixed(2)}`}
-        step=".01"
-        onChange={(e) => {
-          setActualValue(e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-            const input = e.target as HTMLInputElement;
-            input.blur();
-          }
-        }}
-        onMouseEnter={() => setInputState("hover")}
-        onMouseLeave={() =>
-          setInputState((prevState) =>
-            prevState === "focus" ? "focus" : "idle"
-          )
-        }
-        onFocus={() => setInputState("focus")}
-        onBlur={handleBlur}
-      />
-    </div>
+      }}
+      onBlur={handleBlur}
+    />
   );
 };

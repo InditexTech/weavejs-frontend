@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Drawer,
   DrawerClose,
   DrawerContent,
@@ -9,18 +15,24 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Keyboard } from "lucide-react";
-import { ToolbarButton } from "./toolbar/toolbar-button";
 
 export const HelpDrawer = () => {
   return (
     <Drawer>
       <DrawerTrigger>
-        <ToolbarButton
-          icon={<Keyboard />}
-          onClick={() => {}}
-          label="Keyboard shortcuts"
-          tooltipSide="top"
-        />
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger
+              asChild
+              className="cursor-pointer hover:text-black hover:bg-accent w-8 h-8 px-2 py-2"
+            >
+              <Keyboard />
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>Keyboard shortcuts</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </DrawerTrigger>
       <DrawerContent className="p-5 bg-black flex flex-col justify-center items-center">
         <DrawerHeader className="w-full flex justify-center items-centers">

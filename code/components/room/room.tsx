@@ -17,6 +17,7 @@ import {
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
+  WeaveNodesSnappingPlugin,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageNode,
@@ -31,15 +32,14 @@ import {
   WEAVE_INSTANCE_STATUS,
   WeaveSelectionToolAction,
 } from "@inditextech/weavejs-sdk";
-// import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets";
 import {
   WeaveStoreAzureWebPubsubConnectionStatus,
   WeaveStoreAzureWebPubsub,
 } from "@inditextech/weavejs-store-azure-web-pubsub";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
-import { WorkspaceNode } from "@/components/nodes/workspace/workspace";
-import { WorkspaceToolAction } from "@/components/actions/workspace-tool/workspace-tool";
+import { FrameNode } from "@/components/nodes/frame/frame";
+import { FrameToolAction } from "@/components/actions/frame-tool/frame-tool";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
@@ -56,8 +56,6 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
-import { HelpDrawer } from "../room-components/help-drawer";
 import { RoomLoader } from "../room-components/room-loader/room-loader";
 
 const statusMap = {
@@ -98,6 +96,9 @@ export const Room = () => {
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
+  );
+  const setNodePropertiesCreateProps = useCollaborationRoom(
+    (state) => state.setNodePropertiesCreateProps
   );
 
   const setContextMenuShow = useCollaborationRoom(
@@ -161,14 +162,6 @@ export const Room = () => {
     []
   );
 
-  // const onConnectionStatusChangeHandler = React.useCallback(
-  //   (status: WeaveStoreWebsocketsConnectionStatus) => {
-  //     setConnectionStatus(status);
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [],
-  // );
-
   React.useEffect(() => {
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       instance.triggerAction("selectionTool");
@@ -219,23 +212,22 @@ export const Room = () => {
           containerId="weave"
           getUser={getUser}
           store={
-            // new WeaveStoreWebsockets({
-            //   roomId: room,
-            //   wsOptions: {
-            //     serverUrl: "ws://localhost:1234",
-            //   },
-            //   callbacks: {
-            //     onConnectionStatusChange: onConnectionStatusChangeHandler,
-            //   },
-            // })
-            new WeaveStoreAzureWebPubsub({
-              roomId: room,
-              url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
-              callbacks: {
-                onFetchConnectionUrl: onFetchConnectionUrlHandler,
-                onConnectionStatusChange: onConnectionStatusChangeHandler,
+            new WeaveStoreAzureWebPubsub(
+              {
+                getUser,
+                undoManagerOptions: {
+                  captureTimeout: 500,
+                },
               },
-            })
+              {
+                roomId: room,
+                url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
+                callbacks: {
+                  onFetchConnectionUrl: onFetchConnectionUrlHandler,
+                  onConnectionStatusChange: onConnectionStatusChangeHandler,
+                },
+              }
+            )
           }
           fonts={[
             {
@@ -256,15 +248,30 @@ export const Room = () => {
             new WeaveTextNode(),
             new WeaveImageNode(),
             new PantoneNode(),
-            new WorkspaceNode(),
+            new FrameNode(),
           ]}
           actions={[
             new WeaveSelectionToolAction(),
-            new WeaveRectangleToolAction(),
-            new WeavePenToolAction(),
-            new WeaveBrushToolAction(),
+            new WeaveRectangleToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new WeavePenToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new WeaveBrushToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
             new WeaveTextToolAction(),
             new WeaveImageToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
               onUploadImage: async (finished: (imageURL: string) => void) => {
                 fileUploadFinishRef.current = finished;
                 inputFileRef.current.click();
@@ -280,13 +287,22 @@ export const Room = () => {
             new WeaveZoomInToolAction(),
             new WeaveFitToScreenToolAction(),
             new WeaveFitToSelectionToolAction(),
-            new PantoneToolAction(),
-            new WorkspaceToolAction(),
+            new PantoneToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
+            new FrameToolAction({
+              onPropsChange: (props) => {
+                setNodePropertiesCreateProps(props);
+              },
+            }),
             new AlignElementsToolAction(),
             new WeaveExportNodeToolAction(),
             new WeaveExportStageToolAction(),
           ]}
           customPlugins={[
+            new WeaveNodesSnappingPlugin(),
             new WeaveContextMenuPlugin(
               {
                 xOffset: 10,
@@ -450,6 +466,7 @@ export const Room = () => {
                 setUploadingImage(true);
                 mutationUpload.mutate(file, {
                   onSuccess: (data) => {
+                    inputFileRef.current.value = null;
                     setUploadingImage(false);
                     const room = data.fileName.split("/")[0];
                     const imageId = data.fileName.split("/")[1];
@@ -463,7 +480,6 @@ export const Room = () => {
             }}
           />
           <RoomLayout />
-          <HelpDrawer />
         </WeaveProvider>
       )}
     </>

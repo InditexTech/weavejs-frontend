@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
-import { WeavePantoneToolActionState } from "./types";
+import {
+  PantoneToolCallbacks,
+  PantoneToolActionState,
+  PantoneToolActionTriggerParams,
+} from "./types";
 import { PANTONE_TOOL_STATE } from "./constants";
 import {
   WeaveAction,
@@ -10,15 +14,15 @@ import Konva from "konva";
 
 export class PantoneToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeavePantoneToolActionState;
+  protected state: PantoneToolActionState;
   protected pantoneId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
-  init = undefined;
+  internalUpdate = undefined;
 
-  constructor() {
-    super();
+  constructor(callbacks: PantoneToolCallbacks) {
+    super(callbacks);
 
     this.initialized = false;
     this.state = PANTONE_TOOL_STATE.IDLE;
@@ -29,6 +33,25 @@ export class PantoneToolAction extends WeaveAction {
 
   getName(): string {
     return "pantoneTool";
+  }
+
+  initProps() {
+    return {
+      pantone: "#000000",
+      width: 300,
+      height: 300,
+      opacity: 1,
+    };
+  }
+
+  init() {
+    this.instance.addEventListener("onStageDrop", () => {
+      if (window.pantoneDragColor) {
+        this.instance.triggerAction("pantoneTool", {
+          color: window.pantoneDragColor,
+        });
+      }
+    });
   }
 
   private setupEvents() {
@@ -57,7 +80,7 @@ export class PantoneToolAction extends WeaveAction {
     this.initialized = true;
   }
 
-  private setState(state: WeavePantoneToolActionState) {
+  private setState(state: PantoneToolActionState) {
     this.state = state;
   }
 
@@ -83,11 +106,9 @@ export class PantoneToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler("pantone");
 
     const node = nodeHandler.createNode(this.pantoneId, {
+      ...this.props,
       x: this.clickPoint.x,
       y: this.clickPoint.y,
-      width: 300,
-      height: 300,
-      opacity: 1,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -95,7 +116,7 @@ export class PantoneToolAction extends WeaveAction {
     this.cancelAction?.();
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void, params?: PantoneToolActionTriggerParams) {
     if (!this.instance) {
       throw new Error("Instance not defined");
     }
@@ -109,6 +130,12 @@ export class PantoneToolAction extends WeaveAction {
     stage.container().focus();
 
     this.cancelAction = cancelAction;
+
+    this.props = this.initProps();
+
+    if (params?.color) {
+      this.props.pantone = params.color;
+    }
 
     this.addPantone();
   }

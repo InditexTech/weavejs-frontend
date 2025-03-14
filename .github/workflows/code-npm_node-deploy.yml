@@ -19,15 +19,15 @@ env:
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
   AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
-  AZURE_ACR_NAME: "weavejs"
-  AZURE_RESOURCE_GROUP: "weavejs-test"
-  AZURE_CONTAINER_ENVIRONMENT_NAME: "managedEnvironment-weavejstest-aad6"
-  AZURE_CONTAINER_NAME: "weavejs-frontend"
-  AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
+  AZURE_ACR_NAME: "acrweavejsx0j187"
+  AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
+  AZURE_CONTAINER_ENVIRONMENT_NAME: "container-apps-env-weavejs-x0j187"
+  AZURE_CONTAINER_NAME: "frontend-app-9"
+  AZURE_CONTAINER_NAME_BACKEND: "backend-app-9"
   AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
   NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-  BACKEND_ENDPOINT: "http://weavejs-backend"
+  BACKEND_ENDPOINT: "http://backend-app-9"
 
 permissions:
   id-token: write
@@ -37,7 +37,7 @@ jobs:
   deploy:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
-    environment: production
+    environment: azure-production
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
@@ -54,6 +54,18 @@ jobs:
           echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
             cat .env.production
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR Login
+        run: |
+          ACR_PASSWORD=$(az acr login --name ${{ env.AZURE_ACR_NAME }} --expose-token --output tsv --query accessToken)
+          echo "AZURE_ACR_PASSWORD=$(echo $ACR_PASSWORD)" >> $GITHUB_ENV
+
       - name: ACR Login
         uses: docker/login-action@v3
         with:
@@ -69,13 +81,6 @@ jobs:
           context: code
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
           file: code/Dockerfile
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy
         uses: azure/cli@v2

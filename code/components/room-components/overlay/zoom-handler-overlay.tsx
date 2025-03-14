@@ -29,8 +29,17 @@ export function ZoomHandlerOverlay() {
   );
 
   return (
-    <div className="absolute bottom-2 right-2 flex gap-1 justify-center items-center">
+    <div className="absolute bottom-2 left-2 right-2 flex gap-1 justify-between items-center">
       <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
+        <div className="w-full flex justify-between items-center">
+          <div className="w-full grid grid-cols-[auto_1fr]">
+            <div className="flex justify-start items-center gap-1">
+              <HelpDrawer />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="w-[320px] p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
         <div className="w-full flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">
             <div className="flex justify-start items-center gap-1">
@@ -72,15 +81,6 @@ export function ZoomHandlerOverlay() {
             </div>
             <div className="w-full px-4 font-noto-sans-mono flex justify-end items-center text-muted-foreground">
               {parseFloat(`${zoomValue * 100}`).toFixed(2)}%
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="p-1 bg-white border border-zinc-200 shadow-xs flex justify-start items-center">
-        <div className="w-full flex justify-between items-center">
-          <div className="w-full grid grid-cols-[auto_1fr]">
-            <div className="flex justify-start items-center gap-1">
-              <HelpDrawer />
             </div>
           </div>
         </div>
