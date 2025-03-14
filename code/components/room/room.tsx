@@ -57,6 +57,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { RoomLoader } from "../room-components/room-loader/room-loader";
+import { AnimatePresence } from "framer-motion";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -197,16 +198,18 @@ export const Room = () => {
 
   return (
     <>
-      {(!loadedParams ||
-        loadingFetchConnectionUrl ||
-        status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-        (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-        <RoomLoader
-          roomId={room ? room : "-"}
-          content="LOADING ROOM"
-          description={loadingDescription}
-        />
-      )}
+      <AnimatePresence>
+        {(!loadedParams ||
+          loadingFetchConnectionUrl ||
+          status !== WEAVE_INSTANCE_STATUS.RUNNING ||
+          (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
+          <RoomLoader
+            roomId={room ? room : "-"}
+            content="LOADING ROOM"
+            description={loadingDescription}
+          />
+        )}
+      </AnimatePresence>
       {loadedParams && room && (
         <WeaveProvider
           containerId="weave"
