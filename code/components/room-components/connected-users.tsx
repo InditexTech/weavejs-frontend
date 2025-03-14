@@ -91,7 +91,9 @@ export const ConnectedUsers = () => {
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <DropdownMenu onOpenChange={(open) => setMenuOpen(open)}>
+                  <DropdownMenu
+                    onOpenChange={(open: boolean) => setMenuOpen(open)}
+                  >
                     <DropdownMenuTrigger
                       className={cn(
                         "rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none",
