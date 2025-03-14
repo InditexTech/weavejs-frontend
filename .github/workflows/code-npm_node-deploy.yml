@@ -55,6 +55,11 @@ jobs:
             cat .env.production
 
       - name: ACR Login
+        run: |
+          ACR_PASSWORD=$(az acr login --name ${{ env.AZURE_ACR_NAME }} --expose-token --output tsv --query accessToken)
+          echo "AZURE_ACR_PASSWORD=$(echo $ACR_PASSWORD)" >> $GITHUB_ENV
+
+      - name: ACR Login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.AZURE_ACR_NAME }}.azurecr.io
@@ -69,13 +74,6 @@ jobs:
           context: code
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{ github.sha }}
           file: code/Dockerfile
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy
         uses: azure/cli@v2
