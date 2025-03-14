@@ -54,6 +54,7 @@ jobs:
         working-directory: code
         run: |
           ENDPOINT=$(az containerapp show --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_CONTAINER_NAME_BACKEND }} --query properties.configuration.ingress.fqdn)
+          echo $ENDPOINT
           echo "BACKEND_ENDPOINT=http://$(echo $ENDPOINT):8080" >> $GITHUB_ENV
 
       - name: Create .env.production file
