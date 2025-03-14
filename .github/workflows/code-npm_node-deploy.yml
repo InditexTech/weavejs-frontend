@@ -36,6 +36,7 @@ jobs:
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+      BACKEND_ENDPOINT: http://backend-app-9
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
@@ -50,13 +51,6 @@ jobs:
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get backend fqdn
-        working-directory: code
-        run: |
-          ENDPOINT=$(az containerapp show --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_CONTAINER_NAME_BACKEND }} --query properties.configuration.ingress.fqdn)
-          echo $ENDPOINT
-          echo "BACKEND_ENDPOINT=http://$(echo $ENDPOINT):8080" >> $GITHUB_ENV
-
       - name: Create .env.production file
         working-directory: code
         run: |
@@ -64,7 +58,7 @@ jobs:
           echo NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
           echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
           echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
-            cat .env.production
+          cat .env.production
 
       - name: ACR Login
         run: |
