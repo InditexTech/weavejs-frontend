@@ -13,22 +13,6 @@ on:
         required: true
         default: "main"
 
-env:
-  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
-  AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
-  AZURE_ACR_NAME: "acrweavejsx0j187"
-  AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
-  AZURE_CONTAINER_ENVIRONMENT_NAME: "container-apps-env-weavejs-x0j187"
-  AZURE_CONTAINER_NAME: "frontend-app-9"
-  AZURE_CONTAINER_NAME_BACKEND: "backend-app-9"
-  AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
-  NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
-  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-  BACKEND_ENDPOINT: "http://backend-app-9"
-
 permissions:
   id-token: write
   contents: read
@@ -38,6 +22,21 @@ jobs:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
     environment: azure-production
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+      AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
+      AZURE_ACR_NAME: "acrweavejsx0j187"
+      AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
+      AZURE_CONTAINER_ENVIRONMENT_NAME: "container-apps-env-weavejs-x0j187"
+      AZURE_CONTAINER_NAME: "frontend-app-9"
+      AZURE_CONTAINER_NAME_BACKEND: "backend-app-9"
+      AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
+      BACKEND_ENDPOINT: "http://backend-app-9:8080"
+      NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+      NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
