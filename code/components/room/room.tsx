@@ -45,7 +45,6 @@ import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
-import { RoomLoader } from "../room-components/room-loader";
 import {
   Copy,
   Clipboard,
@@ -57,7 +56,8 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import Threads from "../ui/reactbits/Backgrounds/Threads/Threads";
+import { RoomLoader } from "../room-components/room-loader/room-loader";
+import { AnimatePresence } from "framer-motion";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -198,28 +198,18 @@ export const Room = () => {
 
   return (
     <>
-      {(!loadedParams ||
-        loadingFetchConnectionUrl ||
-        status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-        (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-        <div className="w-full h-full bg-white flex justify-center items-center relative">
-          <div className="absolute top-0 left-0 right-0 h-full">
-            <Threads
-              color={[246 / 255, 246 / 255, 246 / 255]}
-              amplitude={1}
-              distance={0}
-              enableMouseInteraction={false}
-            />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
-            <RoomLoader
-              roomId={room ? room : "-"}
-              content="LOADING ROOM"
-              description={loadingDescription}
-            />
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {(!loadedParams ||
+          loadingFetchConnectionUrl ||
+          status !== WEAVE_INSTANCE_STATUS.RUNNING ||
+          (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
+          <RoomLoader
+            roomId={room ? room : "-"}
+            content="LOADING ROOM"
+            description={loadingDescription}
+          />
+        )}
+      </AnimatePresence>
       {loadedParams && room && (
         <WeaveProvider
           containerId="weave"
