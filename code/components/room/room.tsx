@@ -2,8 +2,6 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { postImage } from "@/api/post-image";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
@@ -13,6 +11,7 @@ import { AnimatePresence } from "framer-motion";
 import useGetWeaveJSProps from "../room-components/hooks/use-get-weave-js-props";
 import useGetWsProvider from "../room-components/hooks/use-get-ws-provider";
 import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
+import { UploadFile } from "../room-components/upload-file";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -22,11 +21,6 @@ const statusMap = {
 };
 
 export const Room = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const inputFileRef = React.useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fileUploadFinishRef = React.useRef<any>(null);
-
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
@@ -44,16 +38,6 @@ export const Room = () => {
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
   );
-
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
-  );
-
-  const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
-    },
-  });
 
   const { loadedParams } = useHandleRouteParams();
 
@@ -78,22 +62,17 @@ export const Room = () => {
     return "";
   }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
 
-  const { fonts, nodes, customPlugins, actions } = useGetWeaveJSProps({
-    inputFileRef,
-    fileUploadFinishRef,
-  });
+  const { fonts, nodes, customPlugins, actions } = useGetWeaveJSProps();
 
   const wsStoreProvider = useGetWsProvider({
     loadedParams,
     getUser,
   });
-  
 
   React.useEffect(() => {
     setFetchConnectionUrlError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   React.useEffect(() => {
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
@@ -135,36 +114,7 @@ export const Room = () => {
           actions={actions}
           customPlugins={customPlugins}
         >
-          <input
-            type="file"
-            accept="image/png,image/gif,image/jpeg"
-            name="image"
-            ref={inputFileRef}
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setUploadingImage(true);
-                mutationUpload.mutate(file, {
-                  onSuccess: (data) => {
-                    inputFileRef.current.value = null;
-                    const room = data.fileName.split("/")[0];
-                    const imageId = data.fileName.split("/")[1];
-
-                    fileUploadFinishRef.current(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                    );
-                  },
-                  onError: () => {
-                    console.error("Error uploading image");
-                  },
-                  onSettled: () => {
-                    setUploadingImage(false);
-                  },
-                });
-              }
-            }}
-          />
+          <UploadFile />
           <RoomLayout />
         </WeaveProvider>
       )}

@@ -60,7 +60,7 @@ export const ImagesLibrary = () => {
   return (
     <div className="pointer-events-auto w-full h-full">
       <div className="w-full font-title-xs p-1 border-b border-zinc-200 bg-white flex justify-between items-center">
-        <div className="flex justify-between h-8 font-noto-sans-mono font-light items-center text-md pl-2">
+        <div className="flex justify-between font-noto-sans-mono font-light items-center text-md pl-2">
           Images
         </div>
         <div className="flex justify-end items-center gap-1">

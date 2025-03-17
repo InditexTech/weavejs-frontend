@@ -10,6 +10,8 @@ type ShowcaseUser = {
 
 type NodePropertiesAction = "create" | "update" | undefined;
 
+type FinishUploadCallback = (imageURL: string) => void;
+
 interface CollaborationRoomState {
   fetchConnectionUrl: {
     loading: boolean;
@@ -28,8 +30,10 @@ interface CollaborationRoomState {
     visible: boolean;
   };
   images: {
+    showSelectFile: boolean;
     uploading: boolean;
     loading: boolean;
+    finishUploadCallback: FinishUploadCallback | null;
     library: {
       visible: boolean;
     };
@@ -54,7 +58,11 @@ interface CollaborationRoomState {
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
+  setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
+  setFinishUploadCallbackImage: (
+    newFinishUploadCallbackImage: FinishUploadCallback | null
+  ) => void;
   setNodePropertiesAction: (
     newNodePropertiesAction: NodePropertiesAction
   ) => void;
@@ -85,8 +93,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     createProps: undefined,
   },
   images: {
+    showSelectFile: false,
     uploading: false,
     loading: false,
+    finishUploadCallback: null,
     library: {
       visible: false,
     },
@@ -136,10 +146,23 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state,
       images: { ...state.images, uploading: newUploadingImage },
     })),
+  setShowSelectFileImage: (newShowSelectFileImage) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, showSelectFile: newShowSelectFileImage },
+    })),
   setLoadingImage: (newLoadingImage) =>
     set((state) => ({
       ...state,
       images: { ...state.images, loading: newLoadingImage },
+    })),
+  setFinishUploadCallbackImage: (newFinishUploadCallbackImage) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        finishUploadCallback: newFinishUploadCallbackImage,
+      },
     })),
   setNodePropertiesAction: (newNodePropertiesAction) =>
     set((state) => ({

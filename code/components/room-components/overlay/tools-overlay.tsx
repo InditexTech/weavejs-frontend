@@ -62,22 +62,24 @@ export function ToolsOverlay() {
 
   const libraryToggle = React.useCallback(
     (library: string, active: boolean) => {
-      if (instance && actualAction) {
-        instance.cancelAction(actualAction);
-      }
-
-      setImagesLibraryVisible(false);
-      setPantonesLibraryVisible(false);
-      setFramesLibraryVisible(false);
+      // if (instance && actualAction) {
+      //   instance.cancelAction(actualAction);
+      // }
 
       switch (library) {
         case "images":
+          setPantonesLibraryVisible(false);
+          setFramesLibraryVisible(false);
           setImagesLibraryVisible(!active);
           break;
         case "pantones":
+          setImagesLibraryVisible(false);
+          setFramesLibraryVisible(false);
           setPantonesLibraryVisible(!active);
           break;
         case "frames":
+          setImagesLibraryVisible(false);
+          setPantonesLibraryVisible(false);
           setFramesLibraryVisible(!active);
           break;
         default:
@@ -85,8 +87,8 @@ export function ToolsOverlay() {
       }
     },
     [
-      instance,
-      actualAction,
+      // instance,
+      // actualAction,
       setImagesLibraryVisible,
       setPantonesLibraryVisible,
       setFramesLibraryVisible,

@@ -20,7 +20,7 @@ export const Pantone = ({ color }: Readonly<PantoneProps>) => {
     <div
       className="cursor-pointer w-full h-full p-3"
       draggable="true"
-      data-pantoneColor={nearestColor.hex}
+      data-pantonecolor={nearestColor.hex}
       style={{ background: nearestColor.hex }}
     >
       <div
