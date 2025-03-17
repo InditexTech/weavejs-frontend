@@ -2,14 +2,13 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weavejs-react";
-import { SelectionInformation } from "./../selection-information";
 import { NodeProperties } from "./node-properties";
 import { useCollaborationRoom } from "@/store/store";
 import { ImagesLibrary } from "./../images-library/images-library";
 import { FramesLibrary } from "../frames-library/frames-library";
 import { PantonesLibrary } from "../pantones-library/pantones-library";
-import { motion, AnimatePresence } from "framer-motion";
-import { rightElementVariants } from "./variants";
+import { AnimatePresence } from "framer-motion";
+import OverlayAnimationWrapper from "./overlay-animation-wrapper";
 
 export function MultiuseOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -149,75 +148,29 @@ export function MultiuseOverlay() {
   return (
     <AnimatePresence mode="wait">
       {activePanel === "imagesLibrary" && (
-        <motion.div
-          key="imagesLibrary"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={rightElementVariants}
-          className="absolute top-[calc(50px+16px)] right-2 bottom-[calc(50px+16px)] flex flex-col gap-5 justify-center items-center"
-        >
-          <div className="w-[320px] p-0 h-full bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
-            <div className="w-full h-full overflow-auto custom-scrollbar !px-0">
-              <ImagesLibrary />
-              <SelectionInformation />
-            </div>
-          </div>
-        </motion.div>
+        <OverlayAnimationWrapper panelId="imagesLibrary">
+          <ImagesLibrary />
+        </OverlayAnimationWrapper>
       )}
 
       {activePanel === "framesLibrary" && (
-        <motion.div
-          key="framesLibrary"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={rightElementVariants}
-          className="absolute top-[calc(50px+16px)] right-2 bottom-[calc(50px+16px)] flex flex-col gap-5 justify-center items-center"
-        >
-          <div className="w-[320px] p-0 h-full bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
-            <div className="w-full h-full overflow-auto custom-scrollbar !px-0">
-              <FramesLibrary />
-              <SelectionInformation />
-            </div>
-          </div>
-        </motion.div>
+        <OverlayAnimationWrapper panelId="framesLibrary">
+          <FramesLibrary />
+        </OverlayAnimationWrapper>
       )}
 
       {activePanel === "pantonesLibrary" && (
-        <motion.div
-          key="pantonesLibrary"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={rightElementVariants}
-          className="absolute top-[calc(50px+16px)] right-2 bottom-[calc(50px+16px)] flex flex-col gap-5 justify-center items-center"
-        >
-          <div className="w-[320px] p-0 h-full bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
-            <div className="w-full h-full overflow-auto custom-scrollbar !px-0">
-              <PantonesLibrary />
-              <SelectionInformation />
-            </div>
-          </div>
-        </motion.div>
+        <OverlayAnimationWrapper panelId="pantonesLibrary">
+          <PantonesLibrary />
+        </OverlayAnimationWrapper>
       )}
 
       {activePanel === "nodeProperties" && (
-        <motion.div
-          key={`nodeProperties-${nodeType}-${actionType}`}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={rightElementVariants}
-          className="absolute top-[calc(50px+16px)] right-2 bottom-[calc(50px+16px)] flex flex-col gap-5 justify-center items-center"
+        <OverlayAnimationWrapper
+          panelId={`nodeProperties-${nodeType}-${actionType}`}
         >
-          <div className="w-[320px] p-0 h-full bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-3 overflow-hidden">
-            <div className="w-full h-full overflow-auto custom-scrollbar !px-0">
-              <NodeProperties />
-              <SelectionInformation />
-            </div>
-          </div>
-        </motion.div>
+          <NodeProperties />
+        </OverlayAnimationWrapper>
       )}
     </AnimatePresence>
   );

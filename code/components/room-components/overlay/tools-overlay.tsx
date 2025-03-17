@@ -60,6 +60,39 @@ export function ToolsOverlay() {
     [instance, actualAction]
   );
 
+  const libraryToggle = React.useCallback(
+    (library: string, active: boolean) => {
+      if (instance && actualAction) {
+        instance.cancelAction(actualAction);
+      }
+
+      setImagesLibraryVisible(false);
+      setPantonesLibraryVisible(false);
+      setFramesLibraryVisible(false);
+
+      switch (library) {
+        case "images":
+          setImagesLibraryVisible(!active);
+          break;
+        case "pantones":
+          setPantonesLibraryVisible(!active);
+          break;
+        case "frames":
+          setFramesLibraryVisible(!active);
+          break;
+        default:
+          break;
+      }
+    },
+    [
+      instance,
+      actualAction,
+      setImagesLibraryVisible,
+      setPantonesLibraryVisible,
+      setFramesLibraryVisible,
+    ]
+  );
+
   return (
     <motion.div
       initial="hidden"
@@ -123,9 +156,7 @@ export function ToolsOverlay() {
           icon={<Images />}
           active={imagesLibraryVisible}
           onClick={() => {
-            setFramesLibraryVisible(false);
-            setPantonesLibraryVisible(false);
-            setImagesLibraryVisible(!imagesLibraryVisible);
+            libraryToggle("images", imagesLibraryVisible);
           }}
           label="Images library"
         />
@@ -133,9 +164,7 @@ export function ToolsOverlay() {
           icon={<SwatchBook />}
           active={pantonesLibraryVisible}
           onClick={() => {
-            setImagesLibraryVisible(false);
-            setFramesLibraryVisible(false);
-            setPantonesLibraryVisible(!pantonesLibraryVisible);
+            libraryToggle("pantones", pantonesLibraryVisible);
           }}
           label="Pantone library"
         />
@@ -143,9 +172,7 @@ export function ToolsOverlay() {
           icon={<Layers />}
           active={framesLibraryVisible}
           onClick={() => {
-            setImagesLibraryVisible(false);
-            setPantonesLibraryVisible(false);
-            setFramesLibraryVisible(!framesLibraryVisible);
+            libraryToggle("frames", framesLibraryVisible);
           }}
           label="Frames library"
         />
