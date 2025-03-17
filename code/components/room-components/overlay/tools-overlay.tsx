@@ -5,7 +5,6 @@ import { ToolbarButton } from "../toolbar/toolbar-button";
 import {
   Brush,
   Images,
-  Braces,
   ImagePlus,
   PenTool,
   Square,
@@ -21,6 +20,8 @@ import {
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { useCollaborationRoom } from "@/store/store";
+import { motion } from "framer-motion";
+import { leftElementVariants } from "./variants";
 
 export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -59,8 +60,47 @@ export function ToolsOverlay() {
     [instance, actualAction]
   );
 
+  const libraryToggle = React.useCallback(
+    (library: string, active: boolean) => {
+      if (instance && actualAction) {
+        instance.cancelAction(actualAction);
+      }
+
+      setImagesLibraryVisible(false);
+      setPantonesLibraryVisible(false);
+      setFramesLibraryVisible(false);
+
+      switch (library) {
+        case "images":
+          setImagesLibraryVisible(!active);
+          break;
+        case "pantones":
+          setPantonesLibraryVisible(!active);
+          break;
+        case "frames":
+          setFramesLibraryVisible(!active);
+          break;
+        default:
+          break;
+      }
+    },
+    [
+      instance,
+      actualAction,
+      setImagesLibraryVisible,
+      setPantonesLibraryVisible,
+      setFramesLibraryVisible,
+    ]
+  );
+
   return (
-    <div className="absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-1 justify-center items-center">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      variants={leftElementVariants}
+      className="absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-1 justify-center items-center"
+    >
       <Toolbar>
         <ToolbarButton
           icon={<MousePointer />}
@@ -119,9 +159,7 @@ export function ToolsOverlay() {
           icon={<Images />}
           active={imagesLibraryVisible}
           onClick={() => {
-            setFramesLibraryVisible(false);
-            setPantonesLibraryVisible(false);
-            setImagesLibraryVisible(!imagesLibraryVisible);
+            libraryToggle("images", imagesLibraryVisible);
           }}
           label="Images"
         />
@@ -129,9 +167,7 @@ export function ToolsOverlay() {
           icon={<SwatchBook />}
           active={pantonesLibraryVisible}
           onClick={() => {
-            setImagesLibraryVisible(false);
-            setFramesLibraryVisible(false);
-            setPantonesLibraryVisible(!pantonesLibraryVisible);
+            libraryToggle("pantones", pantonesLibraryVisible);
           }}
           label="Some Pantones"
         />
@@ -139,9 +175,7 @@ export function ToolsOverlay() {
           icon={<Layers />}
           active={framesLibraryVisible}
           onClick={() => {
-            setImagesLibraryVisible(false);
-            setPantonesLibraryVisible(false);
-            setFramesLibraryVisible(!framesLibraryVisible);
+            libraryToggle("frames", framesLibraryVisible);
           }}
           label="Frames"
         />
@@ -170,22 +204,6 @@ export function ToolsOverlay() {
           label="Redo"
         />
       </Toolbar>
-      <Toolbar>
-        <ToolbarButton
-          icon={<Braces />}
-          onClick={() => {
-            if (instance) {
-              // eslint-disable-next-line no-console
-              console.log({
-                appState: JSON.parse(
-                  JSON.stringify(instance.getStore().getState())
-                ),
-              });
-            }
-          }}
-          label="Print model state to browser console"
-        />
-      </Toolbar>
-    </div>
+    </motion.div>
   );
 }
