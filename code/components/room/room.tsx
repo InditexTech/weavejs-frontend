@@ -12,7 +12,7 @@ import { RoomLoader } from "../room-components/room-loader/room-loader";
 import { AnimatePresence } from "framer-motion";
 import useGetWeaveJSProps from "../room-components/hooks/use-get-weave-js-props";
 import useGetWsProvider from "../room-components/hooks/use-get-ws-provider";
-import useHandleRouteParams from "../room-components/hooks/use-params-handler";
+import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
 
 const statusMap = {
   ["idle"]: "Idle",
