@@ -11,7 +11,7 @@ import { useWeave } from "@inditextech/weavejs-react";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
 import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
 import { Logo } from "../utils/logo";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const RoomLayout = () => {
   const status = useWeave((state) => state.status);
@@ -33,48 +33,56 @@ export const RoomLayout = () => {
     (state) => state.images.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
-
   return (
     <div className="w-full h-full relative flex overflow-hidden">
-      <div id="weave" className="w-full h-full"></div>
       <AnimatePresence>
-      {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
-        <>
-          <ContextMenuRender
-            show={contextMenuShow}
-            onChanged={(show: boolean) => {
-              setContextMenuShow(show);
-            }}
-            position={contextMenuPosition}
-            options={contextMenuOptions}
-          />
-          <RoomInformationOverlay />
-          <RoomUsersOverlay />
-          <ToolsOverlay />
-          <ZoomHandlerOverlay />
-          <MultiuseOverlay />
-          {uploadingImage && (
-            <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                <Logo kind="large" variant="no-text" />
-                <div className="font-noto-sans-mono text-base">
-                  Uploading image...
+        <motion.div
+          animate={{ filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) ? "blur(10px)" : "blur(0px)" }}
+          transition={{
+            duration: 0.5,
+            delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) ? 0 : 0.5,
+          }}
+          className="w-full h-full"
+        >
+          <div id="weave" className="w-full h-full"></div>
+          {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+            <>
+              <ContextMenuRender
+                show={contextMenuShow}
+                onChanged={(show: boolean) => {
+                  setContextMenuShow(show);
+                }}
+                position={contextMenuPosition}
+                options={contextMenuOptions}
+              />
+              <RoomInformationOverlay />
+              <RoomUsersOverlay />
+              <ToolsOverlay />
+              <ZoomHandlerOverlay />
+              <MultiuseOverlay />
+              {uploadingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-noto-sans-mono text-base">
+                      Uploading image...
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-          {loadingImage && (
-            <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                <Logo kind="large" variant="no-text" />
-                <div className="font-noto-sans-mono text-base">
-                  Loading image...
+              )}
+              {loadingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-noto-sans-mono text-base">
+                      Loading image...
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </motion.div>
       </AnimatePresence>
     </div>
   );
