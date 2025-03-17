@@ -96,10 +96,10 @@ export function MultiuseOverlay() {
   }, [actualAction, selectedNodes]);
 
   const activePanel = React.useMemo(() => {
-    if (nodePropertiesVisible) return "nodeProperties";
     if (framesLibraryVisible) return "framesLibrary";
     if (pantonesLibraryVisible) return "pantonesLibrary";
     if (imagesLibraryVisible) return "imagesLibrary";
+    if (nodePropertiesVisible) return "nodeProperties";
     return null;
   }, [
     nodePropertiesVisible,
@@ -154,6 +154,13 @@ export function MultiuseOverlay() {
 
   return (
     <AnimatePresence mode="wait">
+      {activePanel === "nodeProperties" && (
+        <OverlayAnimationWrapper
+          panelId={`nodeProperties-${nodeType}-${actionType}`}
+        >
+          <NodeProperties />
+        </OverlayAnimationWrapper>
+      )}
       {activePanel === "imagesLibrary" && (
         <OverlayAnimationWrapper panelId="imagesLibrary">
           <ImagesLibrary />
@@ -169,14 +176,6 @@ export function MultiuseOverlay() {
       {activePanel === "pantonesLibrary" && (
         <OverlayAnimationWrapper panelId="pantonesLibrary">
           <PantonesLibrary />
-        </OverlayAnimationWrapper>
-      )}
-
-      {activePanel === "nodeProperties" && (
-        <OverlayAnimationWrapper
-          panelId={`nodeProperties-${nodeType}-${actionType}`}
-        >
-          <NodeProperties />
         </OverlayAnimationWrapper>
       )}
     </AnimatePresence>

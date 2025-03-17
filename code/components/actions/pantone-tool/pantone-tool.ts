@@ -50,6 +50,7 @@ export class PantoneToolAction extends WeaveAction {
         this.instance.triggerAction("pantoneTool", {
           color: window.pantoneDragColor,
         });
+        window.pantoneDragColor = undefined;
       }
     });
   }
