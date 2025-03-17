@@ -125,6 +125,25 @@ export const Room = () => {
   });
 
   React.useEffect(() => {
+    // Detect cancel or esc when selecting files
+    const fileInput = inputFileRef.current;
+    if (!fileInput) {
+      return;
+    }
+
+    const onCancel = () => {
+      if (instance) {
+        instance.cancelAction("imageTool");
+      }
+    };
+
+    fileInput.addEventListener("cancel", onCancel);
+    return () => {
+      fileInput.removeEventListener("cancel", onCancel);
+    };
+  }, [instance]);
+
+  React.useEffect(() => {
     setFetchConnectionUrlError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
