@@ -7,11 +7,12 @@ type FrameImageProps = {
   node: Konva.Group;
 };
 
-export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
+export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [image, setImage] = React.useState<React.ReactElement | null>(null);
 
   React.useEffect(() => {
-    setInterval(async () => {
+    async function loadPresentationImage() {
       const nodeAttrs = node.getAttrs();
       try {
         // const box = frameInternal.getClientRect({ relativeTo: stage });
@@ -20,29 +21,41 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
           return;
         }
         const boxBg = frameBg.getClientRect();
+        setLoading(true);
         const img = await toImageAsync(node, {
-          x: boxBg.x + 1,
-          y: boxBg.y + 1,
-          width: boxBg.width - 2,
-          height: boxBg.height - 2,
+          pixelRatio: 2,
+          x: boxBg.x + 2,
+          y: boxBg.y + 2,
+          width: boxBg.width - 4,
+          height: boxBg.height - 4,
         });
+        setLoading(false);
         setImage(
           <Image
             src={img.src}
-            width={284}
-            height={201}
+            width={500}
+            height={600}
             alt="A frame image"
-            className="object-fit w-full h-full"
+            className="object-contain w-full h-full"
           />
         );
       } catch (ex) {
         console.error(ex);
       }
-    }, 100);
+    }
+    loadPresentationImage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="w-full aspect-video border border-zinc-200">{image}</div>
-  );
+  if (loading) {
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+        <div className="font-noto-sans-mono text-2xl text-white">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  return image;
 };
