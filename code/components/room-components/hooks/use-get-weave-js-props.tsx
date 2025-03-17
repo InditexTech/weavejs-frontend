@@ -3,29 +3,35 @@ import React from "react";
 
 import {
   WeaveBrushToolAction,
+  WeaveFrameToolAction,
   WeaveImageToolAction,
   WeavePenToolAction,
   WeaveRectangleToolAction,
 } from "@inditextech/weavejs-sdk";
 
 import { useCollaborationRoom } from "@/store/store";
-import { ACTIONS, CUSTOM_PLUGINS, FONTS, NODES } from "@/components/utils/constants";
+import {
+  ACTIONS,
+  CUSTOM_PLUGINS,
+  FONTS,
+  NODES,
+} from "@/components/utils/constants";
 import useContextMenu from "./use-context-menu";
 import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
 
-function useGetWeaveJSProps({
-  inputFileRef,
-  fileUploadFinishRef,
-}: {
-  inputFileRef: React.MutableRefObject<any>;
-  fileUploadFinishRef: React.MutableRefObject<any>;
-}) {
+function useGetWeaveJSProps() {
   const setLoadingImage = useCollaborationRoom(
     (state) => state.setLoadingImage
   );
 
   const setNodePropertiesCreateProps = useCollaborationRoom(
     (state) => state.setNodePropertiesCreateProps
+  );
+  const setShowSelectFileImage = useCollaborationRoom(
+    (state) => state.setShowSelectFileImage
+  );
+  const setFinishUploadCallbackImage = useCollaborationRoom(
+    (state) => state.setFinishUploadCallbackImage
   );
 
   const { contextMenu } = useContextMenu();
@@ -52,14 +58,19 @@ function useGetWeaveJSProps({
           setNodePropertiesCreateProps(props);
         },
         onUploadImage: async (finished: (imageURL: string) => void) => {
-          fileUploadFinishRef.current = finished;
-          inputFileRef.current.click();
+          setFinishUploadCallbackImage(finished);
+          setShowSelectFileImage(true);
         },
         onImageLoadStart: () => {
           setLoadingImage(true);
         },
         onImageLoadEnd: () => {
           setLoadingImage(false);
+        },
+      }),
+      new WeaveFrameToolAction({
+        onPropsChange: (props) => {
+          setNodePropertiesCreateProps(props);
         },
       }),
       new PantoneToolAction({
@@ -69,7 +80,12 @@ function useGetWeaveJSProps({
       }),
       ...ACTIONS,
     ],
-    [setNodePropertiesCreateProps, fileUploadFinishRef, inputFileRef, setLoadingImage]
+    [
+      setNodePropertiesCreateProps,
+      setLoadingImage,
+      setFinishUploadCallbackImage,
+      setShowSelectFileImage,
+    ]
   );
 
   const memoizedCustomPlugins = React.useMemo(() => {
