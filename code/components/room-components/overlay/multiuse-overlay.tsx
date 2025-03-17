@@ -4,9 +4,6 @@ import React from "react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { NodeProperties } from "./node-properties";
 import { useCollaborationRoom } from "@/store/store";
-import { ImagesLibrary } from "./../images-library/images-library";
-import { FramesLibrary } from "../frames-library/frames-library";
-import { PantonesLibrary } from "../pantones-library/pantones-library";
 import { AnimatePresence } from "framer-motion";
 import OverlayAnimationWrapper from "./overlay-animation-wrapper";
 
@@ -25,24 +22,6 @@ export function MultiuseOverlay() {
   );
   const setNodePropertiesVisible = useCollaborationRoom(
     (state) => state.setNodePropertiesVisible
-  );
-  const imagesLibraryVisible = useCollaborationRoom(
-    (state) => state.images.library.visible
-  );
-  const setFramesLibraryVisible = useCollaborationRoom(
-    (state) => state.setFramesLibraryVisible
-  );
-  const framesLibraryVisible = useCollaborationRoom(
-    (state) => state.frames.library.visible
-  );
-  const setImagesLibraryVisible = useCollaborationRoom(
-    (state) => state.setImagesLibraryVisible
-  );
-  const pantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.pantones.library.visible
-  );
-  const setPantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.setPantonesLibraryVisible
   );
 
   React.useEffect(() => {
@@ -63,9 +42,6 @@ export function MultiuseOverlay() {
     ) {
       setNodePropertiesAction("update");
       setNodePropertiesVisible(true);
-      setFramesLibraryVisible(false);
-      setImagesLibraryVisible(false);
-      setPantonesLibraryVisible(false);
     }
     if (
       isActionActive &&
@@ -81,32 +57,13 @@ export function MultiuseOverlay() {
     ) {
       setNodePropertiesAction("create");
       setNodePropertiesVisible(true);
-      setFramesLibraryVisible(false);
-      setImagesLibraryVisible(false);
-      setPantonesLibraryVisible(false);
     }
 
     if (!actualAction && selectedNodes.length !== 1) {
       setNodePropertiesVisible(false);
-      setFramesLibraryVisible(false);
-      setImagesLibraryVisible(false);
-      setPantonesLibraryVisible(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actualAction, selectedNodes]);
-
-  const activePanel = React.useMemo(() => {
-    if (framesLibraryVisible) return "framesLibrary";
-    if (pantonesLibraryVisible) return "pantonesLibrary";
-    if (imagesLibraryVisible) return "imagesLibrary";
-    if (nodePropertiesVisible) return "nodeProperties";
-    return null;
-  }, [
-    nodePropertiesVisible,
-    framesLibraryVisible,
-    pantonesLibraryVisible,
-    imagesLibraryVisible,
-  ]);
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
@@ -148,36 +105,17 @@ export function MultiuseOverlay() {
     }
   }, [actualAction]);
 
-  if (!instance || !activePanel) {
+  if (!instance || !nodePropertiesVisible) {
     return null;
   }
 
   return (
     <AnimatePresence mode="wait">
-      {activePanel === "nodeProperties" && (
-        <OverlayAnimationWrapper
-          panelId={`nodeProperties-${nodeType}-${actionType}`}
-        >
-          <NodeProperties />
-        </OverlayAnimationWrapper>
-      )}
-      {activePanel === "imagesLibrary" && (
-        <OverlayAnimationWrapper panelId="imagesLibrary">
-          <ImagesLibrary />
-        </OverlayAnimationWrapper>
-      )}
-
-      {activePanel === "framesLibrary" && (
-        <OverlayAnimationWrapper panelId="framesLibrary">
-          <FramesLibrary />
-        </OverlayAnimationWrapper>
-      )}
-
-      {activePanel === "pantonesLibrary" && (
-        <OverlayAnimationWrapper panelId="pantonesLibrary">
-          <PantonesLibrary />
-        </OverlayAnimationWrapper>
-      )}
+      <OverlayAnimationWrapper
+        panelId={`nodeProperties-${nodeType}-${actionType}`}
+      >
+        <NodeProperties />
+      </OverlayAnimationWrapper>
     </AnimatePresence>
   );
 }

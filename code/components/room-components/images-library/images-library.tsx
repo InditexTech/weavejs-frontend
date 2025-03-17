@@ -59,7 +59,7 @@ export const ImagesLibrary = () => {
 
   return (
     <div className="pointer-events-auto w-full h-full">
-      <div className="w-full font-title-xs p-1 border-b border-zinc-200 bg-white flex justify-between items-center">
+      <div className="w-[calc(100%-38px)] font-title-xs p-1 pr-0 flex justify-between items-center">
         <div className="flex justify-between font-noto-sans-mono font-light items-center text-md pl-2">
           Images
         </div>
@@ -90,11 +90,11 @@ export const ImagesLibrary = () => {
               }
             }}
           >
-            <ImagePlus />
+            <ImagePlus size={16} />
           </button>
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)]">
+      <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200">
         <div
           className="grid grid-cols-2 gap-2 w-full weaveDraggable p-4"
           onDragStart={(e) => {

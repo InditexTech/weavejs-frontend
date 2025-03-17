@@ -3,6 +3,7 @@ import Konva from "konva";
 export const toImageAsync = (
   node: Konva.Node,
   properties: {
+    pixelRatio?: number;
     x: number;
     y: number;
     width: number;
@@ -13,10 +14,11 @@ export const toImageAsync = (
     node.toImage({
       mimeType: "image/jpeg",
       quality: 1,
-      x: properties.x + 1,
-      y: properties.y + 1,
-      width: properties.width - 2,
-      height: properties.height - 2,
+      pixelRatio: properties.pixelRatio ?? 1,
+      x: properties.x,
+      y: properties.y,
+      width: properties.width,
+      height: properties.height,
       callback(img) {
         resolve(img);
       },
