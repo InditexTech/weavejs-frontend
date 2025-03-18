@@ -20,7 +20,6 @@ import type { WeaveStateElement } from "@inditextech/weavejs-sdk";
 import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
-import { InputText } from "../inputs/input-text";
 import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
 import InputFontFamily from "../inputs/input-font-family";
