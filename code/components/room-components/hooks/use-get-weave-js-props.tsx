@@ -27,9 +27,6 @@ function useGetWeaveJSProps() {
   const setNodePropertiesCreateProps = useCollaborationRoom(
     (state) => state.setNodePropertiesCreateProps
   );
-  const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
-  );
   const setFinishUploadCallbackImage = useCollaborationRoom(
     (state) => state.setFinishUploadCallbackImage
   );
@@ -59,7 +56,6 @@ function useGetWeaveJSProps() {
         },
         onUploadImage: async (finished: (imageURL: string) => void) => {
           setFinishUploadCallbackImage(finished);
-          setShowSelectFileImage(true);
         },
         onImageLoadStart: () => {
           setLoadingImage(true);
@@ -84,7 +80,6 @@ function useGetWeaveJSProps() {
       setNodePropertiesCreateProps,
       setLoadingImage,
       setFinishUploadCallbackImage,
-      setShowSelectFileImage,
     ]
   );
 
