@@ -4,9 +4,9 @@ import {
   WeaveCopyPasteNodesPlugin,
   WeaveSelection,
 } from "@inditextech/weavejs-sdk";
-import { useMutation } from "@tanstack/react-query";
-import { postImage } from "@/api/post-image";
-import { removeBackground, preload } from "@imgly/background-removal";
+// import { useMutation } from "@tanstack/react-query";
+// import { postImage } from "@/api/post-image";
+// import { removeBackground, preload } from "@imgly/background-removal";
 import {
   Copy,
   Clipboard,
@@ -17,15 +17,15 @@ import {
   BringToFront,
   ArrowUp,
   ArrowDown,
-  ImageMinus,
+  // ImageMinus,
 } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { ContextMenuOption } from "../context-menu";
-import Konva from "konva";
+// import Konva from "konva";
 
 function useContextMenu() {
-  const room = useCollaborationRoom((state) => state.room);
+  // const room = useCollaborationRoom((state) => state.room);
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
   );
@@ -35,39 +35,38 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
-  const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
-  );
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
-  );
+  // const setTransformingImage = useCollaborationRoom(
+  //   (state) => state.setTransformingImage
+  // );
+  // const setUploadingImage = useCollaborationRoom(
+  //   (state) => state.setUploadingImage
+  // );
 
-  const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
-    },
-  });
+  // const mutationUpload = useMutation({
+  //   mutationFn: async (file: File) => {
+  //     return await postImage(room ?? "", file);
+  //   },
+  // });
 
-  React.useEffect(() => {
-    console.log("PRELOADING???");
-    preload({
-      progress: (key, current, total) => {
-        console.log(`Downloading ${key}: ${current} of ${total}`);
-      },
-      publicPath: `${window.location.origin}/background-remover/`,
-      model: "isnet_quint8",
-      output: {
-        format: "image/png",
-        quality: 1,
-      },
-    })
-      .then(() => {
-        console.log("Asset preloading succeeded");
-      })
-      .catch((ex) => {
-        console.error(ex);
-      });
-  }, []);
+  // React.useEffect(() => {
+  //   preload({
+  //     progress: (key, current, total) => {
+  //       console.log(`Downloading ${key}: ${current} of ${total}`);
+  //     },
+  //     publicPath: `${window.location.origin}/background-remover/`,
+  //     model: "isnet_quint8",
+  //     output: {
+  //       format: "image/png",
+  //       quality: 1,
+  //     },
+  //   })
+  //     .then(() => {
+  //       console.log("Asset preloading succeeded");
+  //     })
+  //     .catch((ex) => {
+  //       console.error(ex);
+  //     });
+  // }, []);
 
   const getContextMenu = React.useCallback(
     ({
@@ -205,86 +204,87 @@ function useContextMenu() {
         },
       ];
 
-      if (nodes.length === 1 && nodes[0].node.type === "image") {
-        options.unshift({
-          id: "div-image",
-          type: "divider",
-        });
-        options.unshift({
-          id: "removeBackground",
-          type: "button",
-          label: "Remove background",
-          icon: <ImageMinus size={16} />,
-          onClick: () => {
-            if (actInstance) {
-              const nodeImage = nodes[0].instance as Konva.Group | undefined;
-              if (nodeImage) {
-                const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`
-                );
-                if (nodeImageInternal) {
-                  const image = nodeImageInternal.getAttr(
-                    "image"
-                  ) as HTMLImageElement;
-                  if (image) {
-                    setTransformingImage(true);
+      // if (nodes.length === 1 && nodes[0].node.type === "image") {
+      //   options.unshift({
+      //     id: "div-image",
+      //     type: "divider",
+      //   });
+      //   options.unshift({
+      //     id: "removeBackground",
+      //     type: "button",
+      //     label: "Remove background",
+      //     icon: <ImageMinus size={16} />,
+      //     onClick: () => {
+      //       if (actInstance) {
+      //         const nodeImage = nodes[0].instance as Konva.Group | undefined;
+      //         if (nodeImage) {
+      //           const nodeImageInternal = nodeImage?.findOne(
+      //             `#${nodeImage.getAttrs().id}-image`
+      //           );
+      //           if (nodeImageInternal) {
+      //             const image = nodeImageInternal.getAttr(
+      //               "image"
+      //             ) as HTMLImageElement;
+      //             if (image) {
+      //               setTransformingImage(true);
 
-                    const res = actInstance.triggerAction("imageTool");
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const { finishUploadCallback } = res as any;
+      //               const res = actInstance.triggerAction("imageTool");
+      //               // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //               const { finishUploadCallback } = res as any;
 
-                    removeBackground(image.src, {
-                      progress: (key, current, total) => {
-                        console.log(
-                          `Downloading ${key}: ${current} of ${total}`
-                        );
-                      },
-                      publicPath: `${window.location.origin}/background-remover/`,
-                      model: "isnet_quint8",
-                      output: {
-                        format: "image/png",
-                        quality: 1,
-                      },
-                    })
-                      .then((blob: Blob) => {
-                        setTransformingImage(false);
-                        const myFile = new File([blob], "removedBg.png", {
-                          type: blob.type,
-                        });
-                        setUploadingImage(true);
-                        mutationUpload.mutate(myFile as File, {
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          onSuccess: (data: any) => {
-                            const room = data.fileName.split("/")[0];
-                            const imageId = data.fileName.split("/")[1];
+      //               removeBackground(image.src, {
+      //                 progress: (key, current, total) => {
+      //                   console.log(
+      //                     `Downloading ${key}: ${current} of ${total}`
+      //                   );
+      //                 },
+      //                 publicPath: `${window.location.origin}/background-remover/`,
+      //                 model: "isnet_quint8",
+      //                 output: {
+      //                   format: "image/png",
+      //                   quality: 1,
+      //                 },
+      //               })
+      //                 .then((blob: Blob) => {
+      //                   setTransformingImage(false);
+      //                   const myFile = new File([blob], "removedBg.png", {
+      //                     type: blob.type,
+      //                   });
+      //                   setUploadingImage(true);
+      //                   mutationUpload.mutate(myFile as File, {
+      //                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //                     onSuccess: (data: any) => {
+      //                       const room = data.fileName.split("/")[0];
+      //                       const imageId = data.fileName.split("/")[1];
 
-                            finishUploadCallback?.(
-                              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                            );
-                          },
-                          onError: () => {
-                            console.error("Error uploading image");
-                          },
-                          onSettled: () => {
-                            setUploadingImage(false);
-                          },
-                        });
-                      })
-                      .catch((ex) => {
-                        setTransformingImage(false);
-                        console.error(ex);
-                      });
-                  }
-                }
-              }
-            }
-          },
-        });
-      }
+      //                       finishUploadCallback?.(
+      //                         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+      //                       );
+      //                     },
+      //                     onError: () => {
+      //                       console.error("Error uploading image");
+      //                     },
+      //                     onSettled: () => {
+      //                       setUploadingImage(false);
+      //                     },
+      //                   });
+      //                 })
+      //                 .catch((ex) => {
+      //                   setTransformingImage(false);
+      //                   console.error(ex);
+      //                 });
+      //             }
+      //           }
+      //         }
+      //       }
+      //     },
+      //   });
+      // }
 
       return options;
     },
-    [mutationUpload, setTransformingImage, setUploadingImage]
+    []
+    // [mutationUpload, setTransformingImage, setUploadingImage]
   );
 
   const onNodeMenu = React.useCallback(
