@@ -23,6 +23,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { InputText } from "../inputs/input-text";
 import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
+import InputFontFamily from "../inputs/input-font-family";
 
 export function TextProperties() {
   const instance = useWeave((state) => state.instance);
@@ -95,20 +96,16 @@ export function TextProperties() {
       <div className="px-4 pb-4">
         <div className="grid grid-cols-2 gap-3 w-full">
           <div className="col-span-2">
-            <InputText
-              label="Font"
-              value={`${actualNode.props.fontFamily ?? null}`}
-              onChange={(value) => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    fontFamily: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
+            <InputFontFamily value={`${actualNode.props.fontFamily ?? null}`} onChange={(value) => {
+               const updatedNode: WeaveStateElement = {
+                ...actualNode,
+                props: {
+                  ...actualNode.props,
+                  fontFamily: value,
+                },
+              };
+              updateElement(updatedNode);
+            }}/>
           </div>
           <div className="col-span-2">
             <InputColor
