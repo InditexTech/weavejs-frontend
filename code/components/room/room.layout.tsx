@@ -29,6 +29,9 @@ export const RoomLayout = () => {
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
   );
+  const transformingImage = useCollaborationRoom(
+    (state) => state.images.transforming
+  );
   const uploadingImage = useCollaborationRoom(
     (state) => state.images.uploading
   );
@@ -37,10 +40,16 @@ export const RoomLayout = () => {
     <div className="w-full h-full relative flex overflow-hidden">
       <AnimatePresence>
         <motion.div
-          animate={{ filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) ? "blur(10px)" : "blur(0px)" }}
+          animate={{
+            filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
+              ? "blur(10px)"
+              : "blur(0px)",
+          }}
           transition={{
             duration: 0.5,
-            delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) ? 0 : 0.5,
+            delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
+              ? 0
+              : 0.5,
           }}
           className="w-full h-full"
         >
@@ -60,6 +69,16 @@ export const RoomLayout = () => {
               <ToolsOverlay />
               <ZoomHandlerOverlay />
               <MultiuseOverlay />
+              {transformingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-noto-sans-mono text-base">
+                      Transforming image...
+                    </div>
+                  </div>
+                </div>
+              )}
               {uploadingImage && (
                 <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
                   <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">

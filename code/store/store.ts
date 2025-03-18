@@ -31,6 +31,7 @@ interface CollaborationRoomState {
   };
   images: {
     showSelectFile: boolean;
+    transforming: boolean;
     uploading: boolean;
     loading: boolean;
     finishUploadCallback: FinishUploadCallback | null;
@@ -57,6 +58,7 @@ interface CollaborationRoomState {
   setContextMenuShow: (newContextMenuShow: boolean) => void;
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
+  setTransformingImage: (newTransformingImage: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
@@ -94,6 +96,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   },
   images: {
     showSelectFile: false,
+    transforming: false,
     uploading: false,
     loading: false,
     finishUploadCallback: null,
@@ -140,6 +143,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       contextMenu: { ...state.contextMenu, options: newContextMenuOptions },
+    })),
+  setTransformingImage: (newTransformingImage) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, transforming: newTransformingImage },
     })),
   setUploadingImage: (newUploadingImage) =>
     set((state) => ({
