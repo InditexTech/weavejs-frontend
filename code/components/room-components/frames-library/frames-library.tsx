@@ -138,8 +138,6 @@ export const FramesLibrary = () => {
     return undefined;
   }, [actualFrame, selectedFrames, framesAvailable]);
 
-  console.log({ actualFrame, selectedFrames, actualNodePresentation });
-
   if (!instance) {
     return null;
   }

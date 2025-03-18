@@ -18,12 +18,17 @@ import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
 import { leftElementVariants } from "./variants";
+import { useCollaborationRoom } from "@/store/store";
 
 export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
+
+  const setShowSelectFileImage = useCollaborationRoom(
+    (state) => state.setShowSelectFileImage
+  );
 
   const triggerTool = React.useCallback(
     (toolName: string) => {
@@ -79,7 +84,10 @@ export function ToolsOverlay() {
         <ToolbarButton
           icon={<ImagePlus />}
           active={actualAction === "imageTool"}
-          onClick={() => triggerTool("imageTool")}
+          onClick={() => {
+            triggerTool("imageTool");
+            setShowSelectFileImage(true);
+          }}
           label="Add an image"
         />
         <ToolbarButton
