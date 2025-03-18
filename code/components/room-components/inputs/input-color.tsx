@@ -2,6 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  ColorPicker,
+  ColorPickerAlpha,
+  ColorPickerEyeDropper,
+  ColorPickerFormatEditor,
+  ColorPickerHue,
+  ColorPickerFormatSelector,
+  ColorPickerSaturation,
+} from "@/components/ui/color-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type InputColorProps = {
   label?: string;
@@ -36,10 +50,36 @@ export const InputColor = ({
         </div>
       )}
       <div className="w-full flex items-center relative">
-        <div
-          className="shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
-          style={{ background: `#${actualValue}` }}
-        />
+        <Popover>
+          <PopoverTrigger>
+            <div
+              className="cursor-pointer shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
+              style={{ background: `#${actualValue}` }}
+            />
+          </PopoverTrigger>
+          <PopoverContent>
+            <ColorPicker
+              value={`#${actualValue}`}
+              onChange={(color) => {
+                onChange((color as string).slice(1));
+              }}
+            >
+              <ColorPickerSaturation />
+              <div className="flex items-center gap-4">
+                <ColorPickerEyeDropper />
+                <div className="w-full grid gap-1">
+                  <ColorPickerHue />
+                  <ColorPickerAlpha />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <ColorPickerFormatSelector />
+                <ColorPickerFormatEditor />
+              </div>
+            </ColorPicker>
+          </PopoverContent>
+        </Popover>
+
         <Input
           type="text"
           className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent shadow-none"
