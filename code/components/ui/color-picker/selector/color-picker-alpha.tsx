@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { cn } from "@/lib/utils";
 import { Range, Root, Thumb, Track } from "@radix-ui/react-slider";
 import {
@@ -18,6 +19,8 @@ export type ColorPickerAlphaProps = HTMLAttributes<HTMLDivElement>;
  */
 export const ColorPickerAlpha = ({
   className,
+  dir,
+  defaultValue,
   ...props
 }: ColorPickerAlphaProps) => {
   const { color, setColor } = useColorPicker();

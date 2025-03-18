@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -19,8 +20,10 @@ export type ColorPickerHueProps = HTMLAttributes<HTMLDivElement>;
  */
 export const ColorPickerHue = ({
   className,
+  dir,
   ...props
 }: ColorPickerHueProps) => {
+  const { defaultValue, ...restProps } = props;
   const { color, setColor } = useColorPicker();
   const [hueValue, setHueValue] = useState(color.hue());
   const lastHue = useRef(color.hue());
@@ -51,9 +54,8 @@ export const ColorPickerHue = ({
         className
       )}
       onValueChange={onValueChange}
-      onValueCommit={onValueCommit}
       aria-label="Hue"
-      {...props}
+      {...restProps}
     >
       <Track className="relative my-0.5 h-3 w-full grow overflow-hidden rounded-full bg-[linear-gradient(90deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)]">
         <Range className="absolute h-full" />
