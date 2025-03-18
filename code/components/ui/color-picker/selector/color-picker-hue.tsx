@@ -54,6 +54,7 @@ export const ColorPickerHue = ({
         className
       )}
       onValueChange={onValueChange}
+      onValueCommit={onValueCommit}
       aria-label="Hue"
       {...restProps}
     >
