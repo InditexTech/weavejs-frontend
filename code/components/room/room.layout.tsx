@@ -74,7 +74,7 @@ export const RoomLayout = () => {
                   <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
                     <Logo kind="large" variant="no-text" />
                     <div className="font-noto-sans-mono text-base">
-                      Transforming image...
+                      Removing background...
                     </div>
                   </div>
                 </div>

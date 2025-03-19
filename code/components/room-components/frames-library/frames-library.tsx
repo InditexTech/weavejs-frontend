@@ -243,9 +243,8 @@ export const FramesLibrary = () => {
       </div>
       {presentationMode && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
-          <div className="absolute top-8 right-8 flex justify-end items-center bg-white p-1">
-            {/* <div className="font-noto-sans-mono text-3xl">FRAME NAME</div> */}
-            <div className="flex justify-end items-center">
+          <div className="absolute top-8 right-8 flex justify-end items-center p-1">
+            <div className="flex justify-end items-center shadow-lg bg-white">
               <button
                 className="cursor-pointer bg-transparent hover:bg-accent p-2"
                 onClick={() => {
@@ -257,9 +256,8 @@ export const FramesLibrary = () => {
             </div>
           </div>
           <div className="absolute bottom-8 left-8 right-8 flex justify-center items-center">
-            <div className="flex justify-center items-center bg-white p-1">
-              {/* <div className="font-noto-sans-mono text-3xl">FRAME NAME</div> */}
-              <div className="flex justify-end items-center shadow-lg border border-zinc-200 p-1">
+            <div className="flex justify-center items-center  p-1">
+              <div className="flex justify-end items-center shadow-lg bg-white border border-zinc-200 p-1">
                 <button
                   className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
                   disabled={actualFrame === 0}

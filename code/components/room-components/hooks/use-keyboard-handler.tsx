@@ -260,7 +260,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      if (instance && selectedNodes.length === 1) {
+      if (instance) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canPaste()) {
