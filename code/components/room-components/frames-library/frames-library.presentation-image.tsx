@@ -23,7 +23,7 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
         const boxBg = frameBg.getClientRect();
         setLoading(true);
         const img = await toImageAsync(node, {
-          pixelRatio: 2,
+          pixelRatio: 6,
           x: boxBg.x + 2,
           y: boxBg.y + 2,
           width: boxBg.width - 4,

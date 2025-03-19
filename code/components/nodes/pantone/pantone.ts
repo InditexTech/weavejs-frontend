@@ -106,8 +106,7 @@ export class PantoneNode extends WeaveNode {
       });
       pantone.add(pantoneImage);
     };
-    imageObj.src =
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Pantone_logo.svg/1024px-Pantone_logo.svg.png";
+    imageObj.src = "/images/pantone_logo.png";
 
     const internalText = new Konva.Text({
       id: `${id}-pantone-code`,

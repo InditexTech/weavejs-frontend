@@ -32,6 +32,7 @@ export function RoomInformationOverlay() {
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
+  const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -62,15 +63,19 @@ export function RoomInformationOverlay() {
     router.push("/");
   }, [router]);
 
+  if (!showUI) {
+    return null;
+  }
+
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="absolute top-2 left-2 flex gap-1 justify-center items-center"
+      className="pointer-events-none absolute top-2 left-2 flex gap-1 justify-center items-center"
     >
-      <div className="bg-white border border-zinc-200 shadow-xs flex justify-start items-center gap-0 pr-1">
+      <div className="bg-white border border-zinc-200 shadow-lg flex justify-start items-center gap-0 pr-1">
         <div className="bg-accent h-[48px] flex justify-start items-center py-0 px-2">
           <Logo kind="small" />
         </div>
@@ -78,7 +83,7 @@ export function RoomInformationOverlay() {
           <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
             <DropdownMenuTrigger
               className={cn(
-                "rounded-none cursor-pointer p-1 px-3 hover:bg-accent focus:outline-none",
+                "pointer-events-auto rounded-none cursor-pointer p-1 px-3 hover:bg-accent focus:outline-none",
                 {
                   ["bg-accent"]: menuOpen,
                   ["bg-white"]: !menuOpen,

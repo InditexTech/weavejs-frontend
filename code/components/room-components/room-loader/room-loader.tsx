@@ -11,11 +11,19 @@ type RoomLoaderProps = {
 };
 
 const containerVariants = {
-  hidden: { opacity: 0, filter: "blur(10px)", transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1], staggerChildren: 0 } },
+  hidden: {
+    opacity: 0,
+    filter: "blur(10px)",
+    transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1], staggerChildren: 0 },
+  },
   visible: {
     opacity: 1,
     filter: "blur(0)",
-    transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1], staggerChildren: 0.3  },
+    transition: {
+      duration: 1,
+      ease: [0.25, 0.1, 0.25, 1],
+      staggerChildren: 0.3,
+    },
   },
 };
 
