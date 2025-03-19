@@ -17,6 +17,9 @@ interface CollaborationRoomState {
     loading: boolean;
     error: Error | null;
   };
+  ui: {
+    show: boolean;
+  };
   user: ShowcaseUser | undefined;
   room: string | undefined;
   contextMenu: {
@@ -49,6 +52,7 @@ interface CollaborationRoomState {
       visible: boolean;
     };
   };
+  setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
     newFetchConnectionUrlError: Error | null
@@ -78,6 +82,9 @@ interface CollaborationRoomState {
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
+  ui: {
+    show: true,
+  },
   fetchConnectionUrl: {
     loading: false,
     error: null,
@@ -114,6 +121,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       visible: false,
     },
   },
+  setShowUi: (newShowUI) =>
+    set((state) => ({
+      ...state,
+      ui: { ...state.ui, show: newShowUI },
+    })),
   setFetchConnectionUrlLoading: (newLoading) =>
     set((state) => ({
       ...state,

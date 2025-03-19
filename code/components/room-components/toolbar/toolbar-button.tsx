@@ -14,8 +14,9 @@ type ToolbarButtonProps = {
   onClick: () => void;
   active?: boolean;
   disabled?: boolean;
-  label?: string;
+  label?: React.ReactNode;
   tooltipSide?: "top" | "bottom" | "left" | "right";
+  tooltipAlign?: "start" | "center" | "end";
 };
 
 export function ToolbarButton({
@@ -25,6 +26,7 @@ export function ToolbarButton({
   disabled = false,
   active = false,
   tooltipSide = "right",
+  tooltipAlign = "center",
 }: Readonly<ToolbarButtonProps>) {
   return (
     <TooltipProvider delayDuration={300}>
@@ -45,8 +47,12 @@ export function ToolbarButton({
             {icon}
           </button>
         </TooltipTrigger>
-        <TooltipContent side={tooltipSide}>
-          <p>{label}</p>
+        <TooltipContent
+          side={tooltipSide}
+          align={tooltipAlign}
+          className="rounded-none"
+        >
+          {label}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

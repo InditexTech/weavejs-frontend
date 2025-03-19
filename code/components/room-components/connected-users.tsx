@@ -55,7 +55,7 @@ export const ConnectedUsers = () => {
           {connectedUserKey && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className="cursor-pointer">
+                <button className="cursor-pointer pointer-events-auto">
                   <AvatarUI className="w-[32px] h-[32px]">
                     <AvatarFallback>
                       <Avatar name={user?.name} variant="beam" />
@@ -63,8 +63,8 @@ export const ConnectedUsers = () => {
                   </AvatarUI>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p className="font-noto-sans-mono text-sm">{user?.name}</p>
+              <TooltipContent side="bottom" className="rounded-none">
+                <p className="font-noto-sans-mono text-xs">{user?.name}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -73,7 +73,7 @@ export const ConnectedUsers = () => {
             return (
               <Tooltip key={user}>
                 <TooltipTrigger asChild>
-                  <button className="cursor-pointer">
+                  <button className="cursor-pointer pointer-events-auto">
                     <AvatarUI className="w-[32px] h-[32px]">
                       <AvatarFallback>
                         <Avatar name={userInfo?.name} variant="beam" />
@@ -96,7 +96,7 @@ export const ConnectedUsers = () => {
                   >
                     <DropdownMenuTrigger
                       className={cn(
-                        "rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none",
+                        " pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none",
                         {
                           ["bg-accent"]: menuOpen,
                           ["bg-white"]: !menuOpen,

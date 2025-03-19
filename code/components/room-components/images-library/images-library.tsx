@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { ImagePlus, Trash } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
@@ -118,12 +117,11 @@ export const ImagesLibrary = () => {
                   key={image}
                   className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border border-zinc-200 relative"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     className="w-full h-full object-cover"
                     draggable="true"
                     src={imageUrl}
-                    width={139}
-                    height={100}
                     alt="An image"
                   />
                   <button

@@ -2,6 +2,7 @@ import {
   Weave,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
+  WeaveExportNodeActionParams,
   WeaveSelection,
 } from "@inditextech/weavejs-sdk";
 // import { useMutation } from "@tanstack/react-query";
@@ -9,7 +10,8 @@ import {
 // import { removeBackground, preload } from "@imgly/background-removal";
 import {
   Copy,
-  Clipboard,
+  ClipboardCopy,
+  ClipboardPaste,
   Group,
   Ungroup,
   Trash,
@@ -17,11 +19,14 @@ import {
   BringToFront,
   ArrowUp,
   ArrowDown,
+  ImageDown,
   // ImageMinus,
 } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { ContextMenuOption } from "../context-menu";
+import { ShortcutElement } from "../help/shortcut-element";
+import { SYSTEM_OS } from "@/lib/utils";
 // import Konva from "konva";
 
 function useContextMenu() {
@@ -35,6 +40,7 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
+
   // const setTransformingImage = useCollaborationRoom(
   //   (state) => state.setTransformingImage
   // );
@@ -71,7 +77,7 @@ function useContextMenu() {
   const getContextMenu = React.useCallback(
     ({
       actInstance,
-      actIsActionActive,
+      actActionActive,
       actCanCopy,
       actCanPaste,
       canUnGroup,
@@ -79,20 +85,103 @@ function useContextMenu() {
       canGroup,
     }: {
       actInstance: Weave;
-      actIsActionActive: boolean;
+      actActionActive: string | undefined;
       actCanCopy: boolean;
       actCanPaste: boolean;
       canUnGroup: boolean;
       canGroup: boolean;
       nodes: WeaveSelection[];
     }): ContextMenuOption[] => {
+      console.log(actCanCopy, actCanPaste);
+
       const options: ContextMenuOption[] = [
+        {
+          id: "duplicate",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Duplicate</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ D",
+                  [SYSTEM_OS.OTHER]: "Ctrl D",
+                }}
+              />
+            </div>
+          ),
+          icon: <Copy size={16} />,
+          disabled: nodes.length > 1,
+          onClick: () => {
+            if (nodes.length === 1) {
+              actInstance.triggerAction<WeaveExportNodeActionParams>(
+                "exportNodeTool",
+                {
+                  node: nodes[0].instance,
+                  options: {
+                    padding: 20,
+                    pixelRatio: 2,
+                  },
+                }
+              );
+            }
+          },
+        },
+        {
+          id: "div--1",
+          type: "divider",
+        },
+        {
+          id: "export",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Export as image</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ E",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
+                }}
+              />
+            </div>
+          ),
+          icon: <ImageDown size={16} />,
+          disabled: nodes.length > 1,
+          onClick: () => {
+            if (nodes.length === 1) {
+              actInstance.triggerAction<WeaveExportNodeActionParams>(
+                "exportNodeTool",
+                {
+                  node: nodes[0].instance,
+                  options: {
+                    padding: 20,
+                    pixelRatio: 2,
+                  },
+                }
+              );
+            }
+          },
+        },
+        {
+          id: "div-0",
+          type: "divider",
+        },
         {
           id: "copy",
           type: "button",
-          label: "Copy",
-          icon: <Copy size={16} />,
-          disabled: actIsActionActive || !actCanCopy,
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Copy</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ C",
+                  [SYSTEM_OS.OTHER]: "Ctrl C",
+                }}
+              />
+            </div>
+          ),
+          icon: <ClipboardCopy size={16} />,
+          disabled:
+            !["selectionTool"].includes(actActionActive ?? "") || !actCanCopy,
           onClick: () => {
             const weaveCopyPasteNodesPlugin =
               actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
@@ -106,9 +195,20 @@ function useContextMenu() {
         {
           id: "paste",
           type: "button",
-          label: "Paste",
-          icon: <Clipboard size={16} />,
-          disabled: actIsActionActive || !actCanPaste,
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Paste</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ P",
+                  [SYSTEM_OS.OTHER]: "Ctrl P",
+                }}
+              />
+            </div>
+          ),
+          icon: <ClipboardPaste size={16} />,
+          disabled:
+            !["selectionTool"].includes(actActionActive ?? "") || !actCanPaste,
           onClick: () => {
             const weaveCopyPasteNodesPlugin =
               actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
@@ -126,7 +226,17 @@ function useContextMenu() {
         {
           id: "bring-to-front",
           type: "button",
-          label: "Bring to front",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Bring to front</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "]",
+                  [SYSTEM_OS.OTHER]: "]",
+                }}
+              />
+            </div>
+          ),
           icon: <BringToFront size={16} />,
           disabled: nodes.length !== 1,
           onClick: () => {
@@ -136,7 +246,17 @@ function useContextMenu() {
         {
           id: "move-up",
           type: "button",
-          label: "Move up",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Move up</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ ]",
+                  [SYSTEM_OS.OTHER]: "Ctrl ]",
+                }}
+              />
+            </div>
+          ),
           icon: <ArrowUp size={16} />,
           disabled: nodes.length !== 1,
           onClick: () => {
@@ -146,7 +266,17 @@ function useContextMenu() {
         {
           id: "move-down",
           type: "button",
-          label: "Move down",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Move down</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ [",
+                  [SYSTEM_OS.OTHER]: "Ctrl [",
+                }}
+              />
+            </div>
+          ),
           icon: <ArrowDown size={16} />,
           disabled: nodes.length !== 1,
           onClick: () => {
@@ -156,7 +286,17 @@ function useContextMenu() {
         {
           id: "send-to-back",
           type: "button",
-          label: "Send to back",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Send to back</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "[",
+                  [SYSTEM_OS.OTHER]: "[",
+                }}
+              />
+            </div>
+          ),
           icon: <SendToBack size={16} />,
           disabled: nodes.length !== 1,
           onClick: () => {
@@ -170,7 +310,17 @@ function useContextMenu() {
         {
           id: "group",
           type: "button",
-          label: "Group",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Group</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ G",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
+                }}
+              />
+            </div>
+          ),
           icon: <Group size={16} />,
           disabled: !canGroup,
           onClick: () => {
@@ -180,7 +330,17 @@ function useContextMenu() {
         {
           id: "ungroup",
           type: "button",
-          label: "Ungroup",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Un-group</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ U",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
+                }}
+              />
+            </div>
+          ),
           icon: <Ungroup size={16} />,
           disabled: !canUnGroup,
           onClick: () => {
@@ -194,7 +354,17 @@ function useContextMenu() {
         {
           id: "delete",
           type: "button",
-          label: "Delete",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Delete</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "Del",
+                  [SYSTEM_OS.OTHER]: "Del",
+                }}
+              />
+            </div>
+          ),
           icon: <Trash size={16} />,
           onClick: () => {
             for (const node of nodes) {
@@ -299,8 +469,7 @@ function useContextMenu() {
       const weaveCopyPasteNodesPlugin =
         actInstance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
 
-      const actIsActionActive =
-        typeof actInstance.getActiveAction() !== "undefined";
+      const actActionActive = actInstance.getActiveAction();
       const actCanCopy = weaveCopyPasteNodesPlugin.canCopy();
       const actCanPaste = weaveCopyPasteNodesPlugin.canPaste();
 
@@ -309,7 +478,7 @@ function useContextMenu() {
 
       const contextMenu = getContextMenu({
         actInstance,
-        actIsActionActive,
+        actActionActive,
         actCanCopy,
         actCanPaste,
         canUnGroup,

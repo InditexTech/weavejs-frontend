@@ -16,7 +16,7 @@ export type ContextMenuOption = {
 } & (
   | {
       type: "button";
-      label: string;
+      label: string | React.ReactNode;
       icon?: React.ReactNode;
       disabled?: boolean;
       onClick: () => void;
@@ -42,7 +42,7 @@ function ContextMenuButton({
   return (
     <button
       className={cn(
-        "!cursor-pointer w-[calc(100%-8px)] flex justify-start items-center gap-2 font-noto-sans-mono text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
+        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-noto-sans-mono text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
@@ -51,7 +51,7 @@ function ContextMenuButton({
       disabled={disabled}
       onClick={onClick}
     >
-      {icon} {label}
+      {icon} <div className="w-full">{label}</div>
     </button>
   );
 }
@@ -83,7 +83,7 @@ export const ContextMenuRender = ({
   return (
     <div
       ref={ref}
-      className="fixed w-[200px] bg-white flex flex-col border border-zinc-200 shadow-xs"
+      className="fixed w-[300px] bg-white flex flex-col border border-zinc-200 shadow-lg"
       style={{
         display: show ? "block" : "none",
         top: `${position.y}px`,

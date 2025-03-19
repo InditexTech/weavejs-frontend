@@ -196,7 +196,7 @@ export const FramesLibrary = () => {
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-2 w-full h-[calc(100%-53px)] p-4 overflow-scroll border-t border-zinc-200">
+        <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200 p-3">
           {framesAvailable.length === 0 && (
             <div className="col-span-2 w-full flex flex-col justify-center items-center text-sm py-5 text-center">
               <b>No frames created</b>
@@ -259,7 +259,7 @@ export const FramesLibrary = () => {
           <div className="absolute bottom-8 left-8 right-8 flex justify-center items-center">
             <div className="flex justify-center items-center bg-white p-1">
               {/* <div className="font-noto-sans-mono text-3xl">FRAME NAME</div> */}
-              <div className="flex justify-end items-center shadow-xs border border-zinc-200 p-1">
+              <div className="flex justify-end items-center shadow-lg border border-zinc-200 p-1">
                 <button
                   className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
                   disabled={actualFrame === 0}
