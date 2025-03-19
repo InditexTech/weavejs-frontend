@@ -245,12 +245,12 @@ export function useKeyboardHandler() {
   /* Keyboard shortcuts editing */
 
   useKeyDown(
-    () => {
+    async () => {
       if (instance && selectedNodes.length > 0) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canCopy()) {
-          weaveCopyPasteNodesPlugin.copy();
+          await weaveCopyPasteNodesPlugin.copy();
         }
       }
     },
@@ -273,12 +273,12 @@ export function useKeyboardHandler() {
   );
 
   useKeyDown(
-    () => {
+    async () => {
       if (instance && selectedNodes.length === 1) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canCopy()) {
-          weaveCopyPasteNodesPlugin.copy();
+          await weaveCopyPasteNodesPlugin.copy();
           weaveCopyPasteNodesPlugin.paste();
         }
       }

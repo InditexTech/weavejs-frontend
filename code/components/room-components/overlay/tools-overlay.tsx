@@ -2,6 +2,8 @@
 
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
+import { useMutation } from "@tanstack/react-query";
+import { postImage } from "@/api/post-image";
 import {
   Brush,
   ImagePlus,
@@ -30,8 +32,20 @@ export function ToolsOverlay() {
   const actualAction = useWeave((state) => state.actions.actual);
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
+  const blobToPaste = useWeave((state) => state.copyPaste.blobToPaste);
+  const setBlobToPaste = useWeave((state) => state.setBlobToPaste);
 
+  const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
+  const setUploadingImage = useCollaborationRoom(
+    (state) => state.setUploadingImage
+  );
+
+  const mutationUpload = useMutation({
+    mutationFn: async (file: File) => {
+      return await postImage(room ?? "", file);
+    },
+  });
 
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
@@ -48,6 +62,41 @@ export function ToolsOverlay() {
     },
     [instance, actualAction]
   );
+
+  React.useEffect(() => {
+    if (blobToPaste) {
+      setUploadingImage(true);
+      const file = new File([blobToPaste], "external.image");
+      mutationUpload.mutate(file, {
+        onSuccess: (data) => {
+          const room = data.fileName.split("/")[0];
+          const imageId = data.fileName.split("/")[1];
+
+          const { finishUploadCallback } = instance?.triggerAction(
+            "imageTool"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ) as any;
+
+          finishUploadCallback?.(
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+          );
+        },
+        onError: () => {
+          console.error("Error uploading image");
+        },
+        onSettled: () => {
+          setBlobToPaste(null);
+          setUploadingImage(false);
+        },
+      });
+    }
+  }, [
+    blobToPaste,
+    instance,
+    mutationUpload,
+    setBlobToPaste,
+    setUploadingImage,
+  ]);
 
   if (!showUI) {
     return null;

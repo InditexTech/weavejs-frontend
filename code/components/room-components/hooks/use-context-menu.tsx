@@ -85,7 +85,7 @@ function useContextMenu() {
           ),
           icon: <Copy size={16} />,
           disabled: nodes.length > 1,
-          onClick: () => {
+          onClick: async () => {
             if (nodes.length === 1) {
               const weaveCopyPasteNodesPlugin =
                 actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
@@ -95,7 +95,7 @@ function useContextMenu() {
                 weaveCopyPasteNodesPlugin &&
                 weaveCopyPasteNodesPlugin.canCopy()
               ) {
-                weaveCopyPasteNodesPlugin.copy();
+                await weaveCopyPasteNodesPlugin.copy();
                 weaveCopyPasteNodesPlugin.paste();
               }
             }
@@ -157,13 +157,13 @@ function useContextMenu() {
           icon: <ClipboardCopy size={16} />,
           disabled:
             !["selectionTool"].includes(actActionActive ?? "") || !actCanCopy,
-          onClick: () => {
+          onClick: async () => {
             const weaveCopyPasteNodesPlugin =
               actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
                 "copyPasteNodes"
               );
             if (weaveCopyPasteNodesPlugin) {
-              return weaveCopyPasteNodesPlugin.copy();
+              await weaveCopyPasteNodesPlugin.copy();
             }
           },
         },
