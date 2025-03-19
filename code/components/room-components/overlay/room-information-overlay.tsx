@@ -17,7 +17,6 @@ import {
 import { Logo } from "@/components/utils/logo";
 import {
   Image as ImageIcon,
-  FileText,
   LogOut,
   ChevronDown,
   ChevronUp,
@@ -48,16 +47,16 @@ export function RoomInformationOverlay() {
     }
   }, [instance]);
 
-  const handleExportToPdf = React.useCallback(() => {
-    if (instance) {
-      instance.triggerAction<WeaveExportStageActionParams>("exportStageTool", {
-        options: {
-          padding: 20,
-          pixelRatio: 2,
-        },
-      });
-    }
-  }, [instance]);
+  // const handleExportToPdf = React.useCallback(() => {
+  //   if (instance) {
+  //     instance.triggerAction<WeaveExportStageActionParams>("exportStageTool", {
+  //       options: {
+  //         padding: 20,
+  //         pixelRatio: 2,
+  //       },
+  //     });
+  //   }
+  // }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
     router.push("/");
@@ -110,13 +109,13 @@ export function RoomInformationOverlay() {
               >
                 <ImageIcon /> Export to image
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
                 onClick={handleExportToPdf}
               >
                 <FileText />
                 Export to PDF
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
