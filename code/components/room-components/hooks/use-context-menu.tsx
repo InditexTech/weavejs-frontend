@@ -43,9 +43,6 @@ function useContextMenu() {
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
   );
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
-  );
 
   const mutationUpload = useMutation({
     mutationFn: async (imageId: string) => {
@@ -404,7 +401,7 @@ function useContextMenu() {
 
       return options;
     },
-    [mutationUpload, setTransformingImage, setUploadingImage]
+    [mutationUpload, setTransformingImage]
   );
 
   const onNodeMenu = React.useCallback(
