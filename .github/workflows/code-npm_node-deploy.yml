@@ -36,7 +36,7 @@ jobs:
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-      BACKEND_ENDPOINT: http://weavejs-backend
+      BACKEND_ENDPOINT: https://weavejs-backend.ashydune-2ca0d589.westeurope.azurecontainerapps.io
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
