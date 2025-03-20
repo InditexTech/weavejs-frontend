@@ -18,7 +18,7 @@ export const useKeyDown = (
         callback();
       }
     },
-    [callback, keys, modifiers]
+    [callback, keys, active, modifiers]
   );
 
   React.useEffect(() => {
