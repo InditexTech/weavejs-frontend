@@ -6,7 +6,7 @@ const nextConfig = {
     return config;
   },
   experimental: {
-    proxyTimeout: 120,
+    proxyTimeout: 60000 * 5,
   },
   async rewrites() {
     return {
