@@ -4,7 +4,7 @@ FROM node:20 as base
 FROM base AS deps
 
 # Need to add this in local for CA in order to make the install of dependencies work
-ENV NODE_EXTRA_CA_CERTS=/app/cert.pem
+# ENV NODE_EXTRA_CA_CERTS=/app/cert.pem
 
 RUN apt-get update -y
 RUN apt-get install -y bash g++ make python3
@@ -12,7 +12,7 @@ RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev
 
 WORKDIR /app
 # Need to add this in local for CA in order to make the install of dependencies work
-COPY cert.pem ./
+# COPY cert.pem ./
 COPY package*.json ./
 RUN npm pkg delete scripts.prepare
 RUN npm ci
