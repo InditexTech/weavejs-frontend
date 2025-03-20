@@ -5,6 +5,9 @@ const nextConfig = {
     config.externals = [...config.externals, { canvas: "canvas" }]; // required to make Konva work
     return config;
   },
+  experimental: {
+    proxyTimeout: 120,
+  },
   async rewrites() {
     return {
       beforeFiles: [
