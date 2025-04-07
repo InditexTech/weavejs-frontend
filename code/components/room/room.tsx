@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-sdk";
+import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-types";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
