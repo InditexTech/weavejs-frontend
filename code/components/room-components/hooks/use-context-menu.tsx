@@ -3,8 +3,8 @@ import {
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodeActionParams,
-  WeaveSelection,
 } from "@inditextech/weavejs-sdk";
+import { WeaveSelection } from "@inditextech/weavejs-types";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
 import {

@@ -16,7 +16,7 @@ import {
   Strikethrough,
   Underline,
 } from "lucide-react";
-import type { WeaveStateElement } from "@inditextech/weavejs-sdk";
+import { WeaveStateElement } from "@inditextech/weavejs-types";
 import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weavejs-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -95,16 +95,19 @@ export function TextProperties() {
       <div className="px-4 pb-4">
         <div className="grid grid-cols-2 gap-3 w-full">
           <div className="col-span-2">
-            <InputFontFamily value={`${actualNode.props.fontFamily ?? null}`} onChange={(value) => {
-               const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  fontFamily: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}/>
+            <InputFontFamily
+              value={`${actualNode.props.fontFamily ?? null}`}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontFamily: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
           </div>
           <div className="col-span-2">
             <InputColor

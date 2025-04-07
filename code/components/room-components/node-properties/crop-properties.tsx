@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { WeaveStateElement } from "@inditextech/weavejs-sdk";
+import { WeaveStateElement } from "@inditextech/weavejs-types";
 import { Crop } from "lucide-react";
 import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weavejs-react";

@@ -1,8 +1,8 @@
+import { WeaveAction } from "@inditextech/weavejs-sdk";
 import {
-  WeaveAction,
   WeaveElementInstance,
   WeaveSelection,
-} from "@inditextech/weavejs-sdk";
+} from "@inditextech/weavejs-types";
 import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {

@@ -2,7 +2,7 @@
 
 import React from "react";
 // import { Pin, PinOff } from "lucide-react";
-import type { WeaveStateElement } from "@inditextech/weavejs-sdk";
+import { WeaveStateElement } from "@inditextech/weavejs-types";
 import { InputNumber } from "../inputs/input-number";
 // import { ToggleIconButton } from "../toggle-icon-button";
 import { useWeave } from "@inditextech/weavejs-react";

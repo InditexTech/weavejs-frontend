@@ -1,6 +1,7 @@
-import React from 'react';
+import React from "react";
 import { useWeave } from "@inditextech/weavejs-react";
-import { Weave, WeaveStateElement } from '@inditextech/weavejs-sdk';
+import { Weave } from "@inditextech/weavejs-sdk";
+import { WeaveStateElement } from "@inditextech/weavejs-types";
 
 interface InjectedProps {
   instance: Weave;
@@ -18,7 +19,9 @@ interface RequiredProps {
 function withInstanceNode<P extends object>(
   WrappedComponent: React.ComponentType<P & InjectedProps>
 ): React.FC<Omit<P, keyof InjectedProps> & RequiredProps> {
-  const ComponentWithInstanceNode: React.FC<Omit<P, keyof InjectedProps> & RequiredProps> = (props) => {
+  const ComponentWithInstanceNode: React.FC<
+    Omit<P, keyof InjectedProps> & RequiredProps
+  > = (props) => {
     const instance = useWeave((state) => state.instance);
     const node = useWeave((state) => state.selection.node);
 
@@ -30,14 +33,18 @@ function withInstanceNode<P extends object>(
       return null;
     }
 
-    return <WrappedComponent {...(props as unknown as P)} instance={instance} node={node} />;
+    return (
+      <WrappedComponent
+        {...(props as unknown as P)}
+        instance={instance}
+        node={node}
+      />
+    );
   };
 
-  const wrappedComponentName = 
-    WrappedComponent.displayName || 
-    WrappedComponent.name || 
-    'Component';
-  
+  const wrappedComponentName =
+    WrappedComponent.displayName || WrappedComponent.name || "Component";
+
   ComponentWithInstanceNode.displayName = `withInstanceNode(${wrappedComponentName})`;
 
   return ComponentWithInstanceNode;

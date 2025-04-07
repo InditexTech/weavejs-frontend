@@ -1,5 +1,5 @@
 import { PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-sdk";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-types";
 import React from "react";
 import Konva from "konva";
 import { Checkbox } from "@/components/ui/checkbox";

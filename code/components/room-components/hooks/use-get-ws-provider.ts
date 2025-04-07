@@ -1,6 +1,6 @@
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weavejs-react";
-import { WeaveUser } from "@inditextech/weavejs-sdk";
+import { WeaveUser } from "@inditextech/weavejs-types";
 import {
   WeaveStoreAzureWebPubsub,
   WeaveStoreAzureWebPubsubConnectionStatus,

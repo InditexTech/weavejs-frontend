@@ -1,8 +1,8 @@
+import { WeaveNode } from "@inditextech/weavejs-sdk";
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
-  WeaveNode,
-} from "@inditextech/weavejs-sdk";
+} from "@inditextech/weavejs-types";
 import Konva from "konva";
 import { Noto_Sans_Mono } from "next/font/google";
 import { getNearestPantone } from "pantone-tcx";
