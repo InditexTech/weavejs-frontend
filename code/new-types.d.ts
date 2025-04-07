@@ -4,3 +4,5 @@ interface Window {
   weaveDragImageURL?: string;
   pantoneDragColor?: string;
 }
+
+declare module "platform-detect";
