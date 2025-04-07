@@ -7,7 +7,7 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
-import { macos } from "platform-detect/os.mjs";
+import { macos } from "platform-detect";
 import { EffectComposer, wrapEffect } from "@react-three/postprocessing";
 import { Effect } from "postprocessing";
 import * as THREE from "three";
