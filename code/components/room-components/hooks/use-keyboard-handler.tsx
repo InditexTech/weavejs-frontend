@@ -119,7 +119,6 @@ export function useKeyboardHandler() {
     },
     ["KeyS"],
     () => {
-      console.log(actualAction);
       return (
         !window.weaveTextEditing &&
         !window.weaveTextEditing &&

@@ -126,14 +126,14 @@ export function ZoomHandlerOverlay() {
       className="pointer-events-none absolute bottom-2 left-2 right-2 flex gap- justify-between items-center overflow-hidden"
     >
       <div className="flex gap-2 justify-start items-center">
-        <div className="bg-white border border-zinc-200 shadow-lg p-1 w-full flex justify-between items-center">
+        <div className="bg-white border border-zinc-200 shadow-lg p-1 flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">
             <div className="flex justify-start items-center gap-1">
               <HelpDrawer />
             </div>
           </div>
         </div>
-        <div className="bg-white border border-zinc-200 shadow-lg p-1 w-full flex justify-between items-center">
+        <div className="bg-white border border-zinc-200 shadow-lg p-1 flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">
             <div className="flex justify-start items-center gap-1">
               <ToolbarButton

@@ -11,7 +11,6 @@ export const useKeyDown = (
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      // console.log({ event, code: event.code, mod: modifiers?.(event) ?? true });
       const wasAnyKeyPressed = keys.some((key: string) => event.code === key);
       if ((wasAnyKeyPressed && active?.(event) && modifiers?.(event)) ?? true) {
         event.preventDefault();

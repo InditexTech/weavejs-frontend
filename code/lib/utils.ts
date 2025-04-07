@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import * as platforms from "platform-detect";
 
 export const SYSTEM_OS = {
   ["WINDOWS"]: "Windows",
@@ -27,20 +28,15 @@ export function colorIsLight(bgColor: string) {
 }
 
 export function detectOS() {
-  const userAgent =
-    // if a browser has no support for navigator.userAgentData.platform use platform as fallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window.navigator as any).userAgentData.platform.toLowerCase();
-
-  if (userAgent.includes("win")) {
+  if (platforms.windows) {
     return SYSTEM_OS.WINDOWS;
-  } else if (userAgent.includes("android")) {
+  } else if (platforms.android) {
     return SYSTEM_OS.ANDROID;
-  } else if (userAgent.includes("mac")) {
+  } else if (platforms.macos) {
     return SYSTEM_OS.MAC;
-  } else if (userAgent.includes("iphone") || userAgent.includes("ipad")) {
+  } else if (platforms.ios) {
     return SYSTEM_OS.IOS;
-  } else if (userAgent.includes("linux")) {
+  } else if (platforms.linux) {
     return SYSTEM_OS.LINUX;
   }
   return SYSTEM_OS.OTHER;

@@ -20,8 +20,18 @@ import {
   LogOut,
   ChevronDown,
   ChevronUp,
+  Grid2X2PlusIcon,
+  Grid2x2XIcon,
+  Grid3X3Icon,
+  GripIcon,
+  CheckIcon,
 } from "lucide-react";
-import { WeaveExportStageActionParams } from "@inditextech/weavejs-sdk";
+import {
+  WEAVE_GRID_TYPES,
+  WeaveExportStageActionParams,
+  WeaveStageGridPlugin,
+  WeaveStageGridType,
+} from "@inditextech/weavejs-sdk";
 import { ConnectionStatus } from "../connection-status";
 import { topElementVariants } from "./variants";
 
@@ -35,6 +45,35 @@ export function RoomInformationOverlay() {
   const room = useCollaborationRoom((state) => state.room);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [gridEnabled, setGridEnabled] = React.useState(true);
+  const [gridType, setGridType] = React.useState<WeaveStageGridType>(
+    WEAVE_GRID_TYPES.LINES
+  );
+
+  const handleToggleGrid = React.useCallback(() => {
+    if (instance && instance.isPluginEnabled("stageGrid")) {
+      instance.disablePlugin("stageGrid");
+      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+      return;
+    }
+    if (instance && !instance.isPluginEnabled("stageGrid")) {
+      instance.enablePlugin("stageGrid");
+      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+      return;
+    }
+  }, [instance]);
+
+  const handleSetGridType = React.useCallback(
+    (type: WeaveStageGridType) => {
+      if (instance) {
+        (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
+          type
+        );
+        setGridType(type);
+      }
+    },
+    [instance]
+  );
 
   const handleExportToImage = React.useCallback(() => {
     if (instance) {
@@ -44,6 +83,21 @@ export function RoomInformationOverlay() {
           pixelRatio: 2,
         },
       });
+    }
+  }, [instance]);
+
+  React.useEffect(() => {
+    if (instance) {
+      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+    }
+  }, [instance]);
+
+  React.useEffect(() => {
+    if (instance) {
+      const stageGridPlugin = instance.getPlugin(
+        "stageGrid"
+      ) as WeaveStageGridPlugin;
+      setGridType(stageGridPlugin?.getType());
     }
   }, [instance]);
 
@@ -103,6 +157,56 @@ export function RoomInformationOverlay() {
               sideOffset={4}
               className="font-noto-sans-mono rounded-none"
             >
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={handleToggleGrid}
+              >
+                {!gridEnabled && (
+                  <>
+                    <Grid2X2PlusIcon /> Enable grid
+                  </>
+                )}
+                {gridEnabled && (
+                  <>
+                    <Grid2x2XIcon /> Disable grid
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={
+                  !gridEnabled ||
+                  (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
+                }
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={() => {
+                  handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                }}
+              >
+                <div className="w-full flex justify-between items-center">
+                  <div className="w-full flex justify-start items-center gap-2">
+                    <GripIcon size={16} /> Dots grid
+                  </div>
+                  {gridType === WEAVE_GRID_TYPES.DOTS && <CheckIcon />}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={
+                  !gridEnabled ||
+                  (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
+                }
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={() => {
+                  handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                }}
+              >
+                <div className="w-full flex justify-between items-center">
+                  <div className="w-full flex justify-start items-center gap-2">
+                    <Grid3X3Icon size={16} /> Lines grid
+                  </div>
+                  {gridType === WEAVE_GRID_TYPES.LINES && <CheckIcon />}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
                 onClick={handleExportToImage}

@@ -7,6 +7,7 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
+import { macos } from "platform-detect/os.mjs";
 import { EffectComposer, wrapEffect } from "@react-three/postprocessing";
 import { Effect } from "postprocessing";
 import * as THREE from "three";
@@ -322,12 +323,7 @@ export default function Dither({
   const [isMac, setIsMac] = useState(false);
 
   React.useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isOnMac = (navigator as any).userAgentData
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (navigator as any).userAgentData.platform.toLowerCase() === "macos"
-      : /macintosh|mac os x/i.test(navigator.userAgent);
-    setIsMac(isOnMac);
+    setIsMac(macos);
     setDevicePixelRatio(window.devicePixelRatio);
   }, []);
 

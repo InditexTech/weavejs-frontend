@@ -65,6 +65,12 @@ export const RoomLayout = () => {
                 options={contextMenuOptions}
               />
               <RoomInformationOverlay />
+              <div className="absolute top-[8px] left-[20px] right-[20px] flex justify-center items-center">
+                <div className="bg-transparent bg-white/50 p-1 font-noto-sans-mono text-[10px] text-zinc-300">
+                  To move the canvas, keep the mouse wheel or the space bar
+                  pressed while dragging.
+                </div>
+              </div>
               <RoomUsersOverlay />
               <ToolsOverlay />
               <ZoomHandlerOverlay />

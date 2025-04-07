@@ -51,8 +51,6 @@ export function UploadFile() {
               const room = data.fileName.split("/")[0];
               const imageId = data.fileName.split("/")[1];
 
-              console.log("UPLOADED!");
-
               finishUploadCallback?.(
                 `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
               );
