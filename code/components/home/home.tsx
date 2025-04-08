@@ -9,7 +9,7 @@ import RotatingText from "../ui/reactbits/TextAnimations/RotatingText/RotatingTe
 
 export const Home = () => {
   return (
-    <main className="w-full h-full grid grid-cols-[1fr_1fr]">
+    <main className="w-full h-full grid grid-cols-2">
       <motion.section
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}

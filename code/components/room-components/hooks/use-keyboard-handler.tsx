@@ -293,7 +293,7 @@ export function useKeyboardHandler() {
       if (instance && selectedNodes.length > 0) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canCopy()) {
+        if (weaveCopyPasteNodesPlugin) {
           await weaveCopyPasteNodesPlugin.copy();
         }
       }
@@ -309,7 +309,7 @@ export function useKeyboardHandler() {
       if (instance) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canPaste()) {
+        if (weaveCopyPasteNodesPlugin) {
           weaveCopyPasteNodesPlugin.paste();
         }
       }
@@ -325,7 +325,7 @@ export function useKeyboardHandler() {
       if (instance && selectedNodes.length === 1) {
         const weaveCopyPasteNodesPlugin =
           instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin && weaveCopyPasteNodesPlugin.canCopy()) {
+        if (weaveCopyPasteNodesPlugin) {
           await weaveCopyPasteNodesPlugin.copy();
           weaveCopyPasteNodesPlugin.paste();
         }

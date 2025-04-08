@@ -34,6 +34,7 @@ import {
 } from "@inditextech/weavejs-sdk";
 import { ConnectionStatus } from "../connection-status";
 import { topElementVariants } from "./variants";
+import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 
 export function RoomInformationOverlay() {
   const router = useRouter();
@@ -157,21 +158,27 @@ export function RoomInformationOverlay() {
               sideOffset={4}
               className="font-noto-sans-mono rounded-none"
             >
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+                Grid Visibility
+              </DropdownMenuLabel>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
                 onClick={handleToggleGrid}
               >
                 {!gridEnabled && (
                   <>
-                    <Grid2X2PlusIcon /> Enable grid
+                    <Grid2X2PlusIcon /> Enable
                   </>
                 )}
                 {gridEnabled && (
                   <>
-                    <Grid2x2XIcon /> Disable grid
+                    <Grid2x2XIcon /> Disable
                   </>
                 )}
               </DropdownMenuItem>
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+                Grid Kind
+              </DropdownMenuLabel>
               <DropdownMenuItem
                 disabled={
                   !gridEnabled ||
@@ -184,7 +191,7 @@ export function RoomInformationOverlay() {
               >
                 <div className="w-full flex justify-between items-center">
                   <div className="w-full flex justify-start items-center gap-2">
-                    <GripIcon size={16} /> Dots grid
+                    <GripIcon size={16} /> Dots
                   </div>
                   {gridType === WEAVE_GRID_TYPES.DOTS && <CheckIcon />}
                 </div>
@@ -201,17 +208,20 @@ export function RoomInformationOverlay() {
               >
                 <div className="w-full flex justify-between items-center">
                   <div className="w-full flex justify-start items-center gap-2">
-                    <Grid3X3Icon size={16} /> Lines grid
+                    <Grid3X3Icon size={16} /> Lines
                   </div>
                   {gridType === WEAVE_GRID_TYPES.LINES && <CheckIcon />}
                 </div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+                Exporting
+              </DropdownMenuLabel>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
                 onClick={handleExportToImage}
               >
-                <ImageIcon /> Export to image
+                <ImageIcon /> Stage to image
               </DropdownMenuItem>
               {/* <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"

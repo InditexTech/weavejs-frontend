@@ -32,8 +32,6 @@ export function ToolsOverlay() {
   const actualAction = useWeave((state) => state.actions.actual);
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
-  const blobToPaste = useWeave((state) => state.copyPaste.blobToPaste);
-  const setBlobToPaste = useWeave((state) => state.setBlobToPaste);
 
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
@@ -64,9 +62,24 @@ export function ToolsOverlay() {
   );
 
   React.useEffect(() => {
-    if (blobToPaste) {
+    const onPasteExternalImage = async (item: ClipboardItem) => {
+      let blob: Blob | null = null;
+      if (item.types.includes("image/png")) {
+        blob = await item.getType("image/png");
+      }
+      if (item.types.includes("image/jpeg")) {
+        blob = await item.getType("image/jpeg");
+      }
+      if (item.types.includes("image/gif")) {
+        blob = await item.getType("image/gif");
+      }
+
+      if (!blob) {
+        return;
+      }
+
       setUploadingImage(true);
-      const file = new File([blobToPaste], "external.image");
+      const file = new File([blob], "external.image");
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
           const room = data.fileName.split("/")[0];
@@ -85,18 +98,21 @@ export function ToolsOverlay() {
           console.error("Error uploading image");
         },
         onSettled: () => {
-          setBlobToPaste(null);
           setUploadingImage(false);
         },
       });
+    };
+
+    if (instance) {
+      instance.addEventListener("onPasteExternal", onPasteExternalImage);
     }
-  }, [
-    blobToPaste,
-    instance,
-    mutationUpload,
-    setBlobToPaste,
-    setUploadingImage,
-  ]);
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener("onPasteExternal", onPasteExternalImage);
+      }
+    };
+  }, [instance, mutationUpload, setShowSelectFileImage, setUploadingImage]);
 
   if (!showUI) {
     return null;

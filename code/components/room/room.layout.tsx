@@ -36,8 +36,9 @@ export const RoomLayout = () => {
     (state) => state.images.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
+
   return (
-    <div className="w-full h-full relative flex overflow-hidden">
+    <div className="w-full h-full relative flex">
       <AnimatePresence>
         <motion.div
           animate={{
@@ -65,9 +66,9 @@ export const RoomLayout = () => {
                 options={contextMenuOptions}
               />
               <RoomInformationOverlay />
-              <div className="absolute top-[8px] left-[20px] right-[20px] flex justify-center items-center">
-                <div className="bg-transparent bg-white/50 p-1 font-noto-sans-mono text-[10px] text-zinc-300">
-                  To move the canvas, keep the mouse wheel or the space bar
+              <div className="absolute top-[8px] left-[20px] right-[20px] flex justify-center items-center pointer-events-none">
+                <div className="bg-transparent bg-white/50 p-1 font-noto-sans-mono text-[10px] text-zinc-400">
+                  To pan the canvas, keep the mouse wheel or the space bar
                   pressed while dragging.
                 </div>
               </div>

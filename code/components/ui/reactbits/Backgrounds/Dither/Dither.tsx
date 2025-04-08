@@ -7,7 +7,6 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
-import * as platforms from "platform-detect";
 import { EffectComposer, wrapEffect } from "@react-three/postprocessing";
 import { Effect } from "postprocessing";
 import * as THREE from "three";
@@ -320,17 +319,17 @@ export default function Dither({
   mouseRadius = 1,
 }: DitherProps) {
   const [devicePixelRatio, setDevicePixelRatio] = useState(1);
-  const [isMac, setIsMac] = useState(false);
+  // const [isMac, setIsMac] = useState(false);
 
   React.useEffect(() => {
-    setIsMac(platforms.macos);
+    // setIsMac(platforms.macos);
     setDevicePixelRatio(window.devicePixelRatio);
   }, []);
 
   return (
     <Canvas
       className="w-full h-full relative"
-      style={{ padding: isMac ? "1px" : "2px" }}
+      // style={{ padding: 0 }}
       camera={{ position: [0, 0, 6] }}
       dpr={devicePixelRatio}
       gl={{ antialias: true, preserveDrawingBuffer: true }}

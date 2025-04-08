@@ -54,22 +54,21 @@ function useContextMenu() {
     ({
       actInstance,
       actActionActive,
-      actCanCopy,
-      actCanPaste,
       canUnGroup,
       nodes,
       canGroup,
     }: {
       actInstance: Weave;
       actActionActive: string | undefined;
-      actCanCopy: boolean;
-      actCanPaste: boolean;
       canUnGroup: boolean;
       canGroup: boolean;
       nodes: WeaveSelection[];
     }): ContextMenuOption[] => {
-      const options: ContextMenuOption[] = [
-        {
+      const options: ContextMenuOption[] = [];
+
+      if (nodes.length > 0) {
+        // DUPLICATE
+        options.push({
           id: "duplicate",
           type: "button",
           label: (
@@ -91,21 +90,24 @@ function useContextMenu() {
                 actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
                   "copyPasteNodes"
                 );
-              if (
-                weaveCopyPasteNodesPlugin &&
-                weaveCopyPasteNodesPlugin.canCopy()
-              ) {
+              if (weaveCopyPasteNodesPlugin) {
                 await weaveCopyPasteNodesPlugin.copy();
                 weaveCopyPasteNodesPlugin.paste();
               }
             }
           },
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // SEPARATOR
+        options.push({
           id: "div--1",
           type: "divider",
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // EXPORT
+        options.push({
           id: "export",
           type: "button",
           label: (
@@ -135,70 +137,76 @@ function useContextMenu() {
               );
             }
           },
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // SEPARATOR
+        options.push({
           id: "div-0",
           type: "divider",
+        });
+        // COPY
+      }
+      // COPY
+      options.push({
+        id: "copy",
+        type: "button",
+        label: (
+          <div className="w-full flex justify-between items-center">
+            <div>Copy</div>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "⌘ C",
+                [SYSTEM_OS.OTHER]: "Ctrl C",
+              }}
+            />
+          </div>
+        ),
+        icon: <ClipboardCopy size={16} />,
+        disabled: !["selectionTool"].includes(actActionActive ?? ""),
+        onClick: async () => {
+          const weaveCopyPasteNodesPlugin =
+            actInstance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+          if (weaveCopyPasteNodesPlugin) {
+            await weaveCopyPasteNodesPlugin.copy();
+          }
         },
-        {
-          id: "copy",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Copy</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ C",
-                  [SYSTEM_OS.OTHER]: "Ctrl C",
-                }}
-              />
-            </div>
-          ),
-          icon: <ClipboardCopy size={16} />,
-          disabled:
-            !["selectionTool"].includes(actActionActive ?? "") || !actCanCopy,
-          onClick: async () => {
-            const weaveCopyPasteNodesPlugin =
-              actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                "copyPasteNodes"
-              );
-            if (weaveCopyPasteNodesPlugin) {
-              await weaveCopyPasteNodesPlugin.copy();
-            }
-          },
+      });
+      // PASTE
+      options.push({
+        id: "paste",
+        type: "button",
+        label: (
+          <div className="w-full flex justify-between items-center">
+            <div>Paste</div>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "⌘ P",
+                [SYSTEM_OS.OTHER]: "Ctrl P",
+              }}
+            />
+          </div>
+        ),
+        icon: <ClipboardPaste size={16} />,
+        disabled: !["selectionTool"].includes(actActionActive ?? ""),
+        onClick: () => {
+          const weaveCopyPasteNodesPlugin =
+            actInstance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+          if (weaveCopyPasteNodesPlugin) {
+            return weaveCopyPasteNodesPlugin.paste();
+          }
         },
-        {
-          id: "paste",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Paste</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ P",
-                  [SYSTEM_OS.OTHER]: "Ctrl P",
-                }}
-              />
-            </div>
-          ),
-          icon: <ClipboardPaste size={16} />,
-          disabled:
-            !["selectionTool"].includes(actActionActive ?? "") || !actCanPaste,
-          onClick: () => {
-            const weaveCopyPasteNodesPlugin =
-              actInstance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                "copyPasteNodes"
-              );
-            if (weaveCopyPasteNodesPlugin) {
-              return weaveCopyPasteNodesPlugin.paste();
-            }
-          },
-        },
-        {
+      });
+      if (nodes.length > 0) {
+        // SEPARATOR
+        options.push({
           id: "div-1",
           type: "divider",
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // BRING TO FRONT
+        options.push({
           id: "bring-to-front",
           type: "button",
           label: (
@@ -217,8 +225,9 @@ function useContextMenu() {
           onClick: () => {
             actInstance.bringToFront(nodes[0].instance);
           },
-        },
-        {
+        });
+        // MOVE UP
+        options.push({
           id: "move-up",
           type: "button",
           label: (
@@ -237,8 +246,9 @@ function useContextMenu() {
           onClick: () => {
             actInstance.moveUp(nodes[0].instance);
           },
-        },
-        {
+        });
+        // MOVE DOWN
+        options.push({
           id: "move-down",
           type: "button",
           label: (
@@ -257,8 +267,9 @@ function useContextMenu() {
           onClick: () => {
             actInstance.moveDown(nodes[0].instance);
           },
-        },
-        {
+        });
+        // SEND TO BACK
+        options.push({
           id: "send-to-back",
           type: "button",
           label: (
@@ -277,12 +288,17 @@ function useContextMenu() {
           onClick: () => {
             actInstance.sendToBack(nodes[0].instance);
           },
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        options.push({
           id: "div-2",
           type: "divider",
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // GROUP
+        options.push({
           id: "group",
           type: "button",
           label: (
@@ -301,8 +317,9 @@ function useContextMenu() {
           onClick: () => {
             actInstance.group(nodes.map((n) => n.node));
           },
-        },
-        {
+        });
+        // UNGROUP
+        options.push({
           id: "ungroup",
           type: "button",
           label: (
@@ -321,12 +338,18 @@ function useContextMenu() {
           onClick: () => {
             actInstance.unGroup(nodes[0].node);
           },
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // SEPARATOR
+        options.push({
           id: "div-3",
           type: "divider",
-        },
-        {
+        });
+      }
+      if (nodes.length > 0) {
+        // DELETE
+        options.push({
           id: "delete",
           type: "button",
           label: (
@@ -346,8 +369,8 @@ function useContextMenu() {
               actInstance.removeNode(node.node);
             }
           },
-        },
-      ];
+        });
+      }
 
       if (nodes.length === 1 && nodes[0].node.type === "image") {
         options.unshift({
@@ -413,12 +436,7 @@ function useContextMenu() {
       const canGroup = nodes.length > 1;
       const canUnGroup = nodes.length === 1 && nodes[0].node.type === "group";
 
-      const weaveCopyPasteNodesPlugin =
-        actInstance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-
       const actActionActive = actInstance.getActiveAction();
-      const actCanCopy = weaveCopyPasteNodesPlugin.canCopy();
-      const actCanPaste = weaveCopyPasteNodesPlugin.canPaste();
 
       setContextMenuShow(true);
       setContextMenuPosition(point);
@@ -426,8 +444,6 @@ function useContextMenu() {
       const contextMenu = getContextMenu({
         actInstance,
         actActionActive,
-        actCanCopy,
-        actCanPaste,
         canUnGroup,
         nodes,
         canGroup,

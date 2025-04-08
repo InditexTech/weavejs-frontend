@@ -1,7 +1,5 @@
 import { Room } from "@/components/room/room";
 
 export default function RoomPage() {
-  return (
-    <Room />
-  );
+  return <Room />;
 }
