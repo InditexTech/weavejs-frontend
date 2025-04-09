@@ -15,6 +15,10 @@ on:
       ENVIRONMENT:
         description: "Deploy environment"
         required: true
+        type: choice
+        options:
+          - azure-development
+          - azure-production
         default: "azure-development"
 
 permissions:
