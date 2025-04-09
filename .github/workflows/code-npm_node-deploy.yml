@@ -12,6 +12,10 @@ on:
         description: "Baseline branch"
         required: true
         default: "main"
+      ENVIRONMENT:
+        description: "Deploy environment"
+        required: true
+        default: "azure-development"
 
 permissions:
   id-token: write
@@ -21,22 +25,22 @@ jobs:
   deploy:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
-    environment: azure-production
+    environment: ${{ github.event.inputs.ENVIRONMENT && github.event.inputs.ENVIRONMENT || 'azure-production' }}
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
       AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
-      AZURE_ACR_NAME: "acrweavejsx0j187"
+      AZURE_ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
+      AZURE_CONTAINER_ENVIRONMENT_NAME: ${{ vars.AZURE_CONTAINER_ENVIRONMENT_NAME }}
       AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
-      AZURE_CONTAINER_ENVIRONMENT_NAME: "container-apps-env-weavejs-x0j187"
       AZURE_CONTAINER_NAME: "weavejs-frontend"
       AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-      BACKEND_ENDPOINT: https://weavejs-backend.ashydune-2ca0d589.westeurope.azurecontainerapps.io
+      BACKEND_ENDPOINT: http://weavejs-backend
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
