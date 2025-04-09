@@ -44,7 +44,6 @@ jobs:
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
-      BACKEND_ENDPOINT: http://weavejs-backend
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
@@ -58,6 +57,10 @@ jobs:
           client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get Backend endpoint
+        run: |
+          BACKEND_ENDPOINT=https://$(az containerapp show -g <resource-group-name> -n <container-app-name> --query properties.configuration.ingress.fqdn)
 
       - name: Create .env.production file
         working-directory: code
