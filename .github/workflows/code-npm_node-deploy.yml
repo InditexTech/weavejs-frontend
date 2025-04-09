@@ -75,6 +75,13 @@ jobs:
           ACR_PASSWORD=$(az acr login --name ${{ env.AZURE_ACR_NAME }} --expose-token --output tsv --query accessToken)
           echo "AZURE_ACR_PASSWORD=$(echo $ACR_PASSWORD)" >> $GITHUB_ENV
 
+      - name: ACR Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.AZURE_ACR_NAME }}.azurecr.io
+          username: ${{ env.AZURE_ACR_USERNAME }}
+          password: ${{ env.AZURE_ACR_PASSWORD }}
+
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
         with:
