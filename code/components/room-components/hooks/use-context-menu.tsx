@@ -39,9 +39,20 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
-
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
+  );
+  const setNodePropertiesVisible = useCollaborationRoom(
+    (state) => state.setNodePropertiesVisible
+  );
+  const setFramesLibraryVisible = useCollaborationRoom(
+    (state) => state.setFramesLibraryVisible
+  );
+  const setImagesLibraryVisible = useCollaborationRoom(
+    (state) => state.setImagesLibraryVisible
+  );
+  const setPantonesLibraryVisible = useCollaborationRoom(
+    (state) => state.setPantonesLibraryVisible
   );
 
   const mutationUpload = useMutation({
@@ -94,6 +105,7 @@ function useContextMenu() {
                 await weaveCopyPasteNodesPlugin.copy();
                 weaveCopyPasteNodesPlugin.paste();
               }
+              setContextMenuShow(false);
             }
           },
         });
@@ -136,6 +148,7 @@ function useContextMenu() {
                 }
               );
             }
+            setContextMenuShow(false);
           },
         });
       }
@@ -170,6 +183,7 @@ function useContextMenu() {
           if (weaveCopyPasteNodesPlugin) {
             await weaveCopyPasteNodesPlugin.copy();
           }
+          setContextMenuShow(false);
         },
       });
       // PASTE
@@ -195,6 +209,7 @@ function useContextMenu() {
           if (weaveCopyPasteNodesPlugin) {
             return weaveCopyPasteNodesPlugin.paste();
           }
+          setContextMenuShow(false);
         },
       });
       if (nodes.length > 0) {
@@ -224,6 +239,7 @@ function useContextMenu() {
           disabled: nodes.length !== 1,
           onClick: () => {
             actInstance.bringToFront(nodes[0].instance);
+            setContextMenuShow(false);
           },
         });
         // MOVE UP
@@ -245,6 +261,7 @@ function useContextMenu() {
           disabled: nodes.length !== 1,
           onClick: () => {
             actInstance.moveUp(nodes[0].instance);
+            setContextMenuShow(false);
           },
         });
         // MOVE DOWN
@@ -266,6 +283,7 @@ function useContextMenu() {
           disabled: nodes.length !== 1,
           onClick: () => {
             actInstance.moveDown(nodes[0].instance);
+            setContextMenuShow(false);
           },
         });
         // SEND TO BACK
@@ -287,6 +305,7 @@ function useContextMenu() {
           disabled: nodes.length !== 1,
           onClick: () => {
             actInstance.sendToBack(nodes[0].instance);
+            setContextMenuShow(false);
           },
         });
       }
@@ -316,6 +335,7 @@ function useContextMenu() {
           disabled: !canGroup,
           onClick: () => {
             actInstance.group(nodes.map((n) => n.node));
+            setContextMenuShow(false);
           },
         });
         // UNGROUP
@@ -337,6 +357,7 @@ function useContextMenu() {
           disabled: !canUnGroup,
           onClick: () => {
             actInstance.unGroup(nodes[0].node);
+            setContextMenuShow(false);
           },
         });
       }
@@ -368,6 +389,8 @@ function useContextMenu() {
             for (const node of nodes) {
               actInstance.removeNode(node.node);
             }
+
+            setContextMenuShow(false);
           },
         });
       }
@@ -418,27 +441,36 @@ function useContextMenu() {
                 });
               }
             }
+            setContextMenuShow(false);
           },
         });
       }
 
       return options;
     },
-    [mutationUpload, setTransformingImage]
+    [mutationUpload, setTransformingImage, setContextMenuShow]
   );
 
   const onNodeMenu = React.useCallback(
     (
       actInstance: Weave,
       nodes: WeaveSelection[],
-      point: { x: number; y: number }
+      point: { x: number; y: number },
+      visible: boolean
     ) => {
       const canGroup = nodes.length > 1;
       const canUnGroup = nodes.length === 1 && nodes[0].node.type === "group";
 
       const actActionActive = actInstance.getActiveAction();
 
-      setContextMenuShow(true);
+      if (visible) {
+        setNodePropertiesVisible(false);
+        setPantonesLibraryVisible(false);
+        setFramesLibraryVisible(false);
+        setImagesLibraryVisible(false);
+      }
+
+      setContextMenuShow(visible);
       setContextMenuPosition(point);
 
       const contextMenu = getContextMenu({
@@ -455,6 +487,10 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
+      setFramesLibraryVisible,
+      setImagesLibraryVisible,
+      setNodePropertiesVisible,
+      setPantonesLibraryVisible,
     ]
   );
 

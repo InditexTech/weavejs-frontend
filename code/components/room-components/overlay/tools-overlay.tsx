@@ -10,11 +10,10 @@ import {
   PenTool,
   Square,
   Type,
-  Redo,
-  Undo,
   Frame,
   MousePointer,
-  SwatchBook,
+  Hand,
+  Tags,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weavejs-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -30,8 +29,6 @@ export function ToolsOverlay() {
 
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
-  const canUndo = useWeave((state) => state.undoRedo.canUndo);
-  const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
@@ -127,6 +124,23 @@ export function ToolsOverlay() {
       className="pointer-events-none absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-2 justify-center items-center"
     >
       <Toolbar>
+        <ToolbarButton
+          icon={<Hand />}
+          active={actualAction === "moveTool"}
+          onClick={() => triggerTool("moveTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Move</p>
+              <ShortcutElement
+                variant="light"
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "M",
+                  [SYSTEM_OS.OTHER]: "M",
+                }}
+              />
+            </div>
+          }
+        />
         <ToolbarButton
           icon={<MousePointer />}
           active={actualAction === "selectionTool"}
@@ -253,7 +267,7 @@ export function ToolsOverlay() {
           <div className="w-[20px] h-[1px] bg-zinc-200 my-1"></div>
         </div>
         <ToolbarButton
-          icon={<SwatchBook />}
+          icon={<Tags />}
           active={actualAction === "pantoneTool"}
           onClick={() => triggerTool("pantoneTool")}
           label={
@@ -264,52 +278,6 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "P",
                   [SYSTEM_OS.OTHER]: "P",
-                }}
-              />
-            </div>
-          }
-        />
-      </Toolbar>
-      <Toolbar>
-        <ToolbarButton
-          icon={<Undo />}
-          disabled={!canUndo}
-          onClick={() => {
-            if (instance) {
-              const actualStore = instance.getStore();
-              actualStore.undoStateStep();
-            }
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Undo latest changes</p>
-              <ShortcutElement
-                variant="light"
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ ,",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl ,",
-                }}
-              />
-            </div>
-          }
-        />
-        <ToolbarButton
-          icon={<Redo />}
-          disabled={!canRedo}
-          onClick={() => {
-            if (instance) {
-              const actualStore = instance.getStore();
-              actualStore.redoStateStep();
-            }
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Redo latest changes</p>
-              <ShortcutElement
-                variant="light"
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ .",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl .",
                 }}
               />
             </div>

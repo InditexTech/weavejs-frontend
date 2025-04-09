@@ -17,6 +17,9 @@ export function MultiuseOverlay() {
   const nodePropertiesVisible = useCollaborationRoom(
     (state) => state.nodeProperties.visible
   );
+  const contextMenuVisible = useCollaborationRoom(
+    (state) => state.contextMenu.show
+  );
   const setNodePropertiesAction = useCollaborationRoom(
     (state) => state.setNodePropertiesAction
   );
@@ -29,7 +32,8 @@ export function MultiuseOverlay() {
       isActionActive &&
       actualAction &&
       ["selectionTool"].includes(actualAction) &&
-      selectedNodes.length !== 1
+      selectedNodes.length !== 1 &&
+      !contextMenuVisible
     ) {
       setNodePropertiesAction(undefined);
       setNodePropertiesVisible(false);
@@ -38,7 +42,8 @@ export function MultiuseOverlay() {
       isActionActive &&
       actualAction &&
       ["selectionTool"].includes(actualAction) &&
-      selectedNodes.length === 1
+      selectedNodes.length === 1 &&
+      !contextMenuVisible
     ) {
       setNodePropertiesAction("update");
       setNodePropertiesVisible(true);
@@ -53,7 +58,8 @@ export function MultiuseOverlay() {
         "imageTool",
         "pantoneTool",
         "frameTool",
-      ].includes(actualAction)
+      ].includes(actualAction) &&
+      !contextMenuVisible
     ) {
       setNodePropertiesAction("create");
       setNodePropertiesVisible(true);
@@ -63,7 +69,7 @@ export function MultiuseOverlay() {
       setNodePropertiesVisible(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actualAction, selectedNodes]);
+  }, [contextMenuVisible, actualAction, selectedNodes]);
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {

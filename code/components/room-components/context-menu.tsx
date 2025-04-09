@@ -65,17 +65,55 @@ export const ContextMenuRender = ({
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    if (ref.current && show) {
+      const boundingRect = ref.current.getBoundingClientRect();
+      let X = boundingRect.x;
+      let Y = boundingRect.y;
+
+      X = Math.max(
+        20,
+        Math.min(X, window.innerWidth - boundingRect.width - 20)
+      );
+      Y = Math.max(
+        20,
+        Math.min(Y, window.innerHeight - boundingRect.height - 20)
+      );
+
+      ref.current.style.top = `${Y}px`;
+      ref.current.style.left = `${X}px`;
+    }
+  }, [show]);
+
+  React.useEffect(() => {
     function checkIfClickedOutside(e: MouseEvent) {
-      if (ref.current && e.target !== ref.current) {
+      if (
+        ref.current &&
+        e.target !== ref.current &&
+        !ref.current.contains(e.target as Node)
+      ) {
+        ref.current.style.display = `none`;
+        onChanged(false);
+      }
+    }
+
+    function checkIfTouchOutside(e: TouchEvent) {
+      console.log(e);
+      if (
+        ref.current &&
+        e.target !== ref.current &&
+        !ref.current.contains(e.target as Node)
+      ) {
         ref.current.style.display = `none`;
         onChanged(false);
       }
     }
 
     window.addEventListener("click", checkIfClickedOutside);
+    window.addEventListener("touchstart", checkIfTouchOutside);
 
     return () => {
       window.removeEventListener("click", checkIfClickedOutside);
+      window.removeEventListener("touchstart", checkIfTouchOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -88,6 +126,7 @@ export const ContextMenuRender = ({
         display: show ? "block" : "none",
         top: `${position.y}px`,
         left: `${position.x}px`,
+        zIndex: 10,
       }}
     >
       {options.map((option) => {

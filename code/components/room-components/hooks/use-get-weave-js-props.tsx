@@ -3,12 +3,13 @@ import React from "react";
 
 import {
   WeaveBrushToolAction,
+  WeaveCopyPasteNodesPlugin,
   WeaveFrameToolAction,
   WeaveImageToolAction,
   WeavePenToolAction,
   WeaveRectangleToolAction,
 } from "@inditextech/weavejs-sdk";
-
+import { toast } from "sonner";
 import { useCollaborationRoom } from "@/store/store";
 import {
   ACTIONS,
@@ -84,7 +85,28 @@ function useGetWeaveJSProps() {
   );
 
   const memoizedCustomPlugins = React.useMemo(() => {
-    return [...CUSTOM_PLUGINS, contextMenu];
+    return [
+      ...CUSTOM_PLUGINS,
+      contextMenu,
+      new WeaveCopyPasteNodesPlugin({
+        onCopy: (error?: Error) => {
+          if (error) {
+            console.error("onCopy", error);
+            toast.error("Aan error occurred when copying to the clipboard");
+          } else {
+            toast.success("Copy successful");
+          }
+        },
+        onPaste: (error?: Error) => {
+          if (error) {
+            console.error("onPaste", error);
+            toast.error("Aan error occurred when reading from the clipboard");
+          } else {
+            toast.success("Paste successful");
+          }
+        },
+      }),
+    ];
   }, [contextMenu]);
 
   return {

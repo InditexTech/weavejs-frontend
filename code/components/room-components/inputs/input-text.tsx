@@ -23,7 +23,7 @@ export const InputText = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-400 mb-1 text-[11px] font-noto-sans-mono font-light">
+        <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
           {label}
         </div>
       )}

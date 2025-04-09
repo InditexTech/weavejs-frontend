@@ -51,7 +51,7 @@ export const HelpDrawer = () => {
               <Keyboard />
             </TooltipTrigger>
             <TooltipContent side="top" align="start" className="rounded-none">
-              <div className="flex gap-3 justify-start items-center">
+              <div className="flex flex-col gap-2 justify-start items-end">
                 <p>Keyboard shortcuts</p>
                 <ShortcutElement
                   variant="light"

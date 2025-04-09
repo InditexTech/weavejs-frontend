@@ -156,7 +156,7 @@ export function StrokeProperties() {
                 />
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
                   Line join
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -208,7 +208,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
                   Line cap
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -260,7 +260,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
                   Open / Closed
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -297,7 +297,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
                   Bezier
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">

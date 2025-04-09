@@ -37,7 +37,7 @@ function InputFontFamily({
 
   return (
     <div className="flex flex-col items-start justify-start relative">
-      <div className="text-zinc-400 mb-1 text-[11px] font-noto-sans-mono font-light">
+      <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
         Font Family
       </div>
       <Popover open={open} onOpenChange={setOpen}>
@@ -55,9 +55,16 @@ function InputFontFamily({
         </PopoverTrigger>
         <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)]">
           <Command>
-            <CommandInput className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none" placeholder="Search font..." />
+            <CommandInput
+              className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+              placeholder="Search font..."
+            />
             <CommandList>
-              <CommandEmpty><span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">No font found.</span></CommandEmpty>
+              <CommandEmpty>
+                <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">
+                  No font found.
+                </span>
+              </CommandEmpty>
               <CommandGroup>
                 {FONTS.map((font) => (
                   <CommandItem
@@ -69,7 +76,12 @@ function InputFontFamily({
                     }}
                     className="flex items-center"
                   >
-                    <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none" style={{ fontFamily: font.name }}>{font.name}</span>
+                    <span
+                      className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+                      style={{ fontFamily: font.name }}
+                    >
+                      {font.name}
+                    </span>
                     {selectedFont === font.id && (
                       <Check className="ml-auto h-4 w-4" />
                     )}

@@ -155,7 +155,7 @@ export function TextProperties() {
           />
 
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
               Style
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -264,7 +264,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
               Variant
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -301,7 +301,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
               Decoration
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -357,7 +357,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
               Horizontal alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -409,7 +409,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-400 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
               Vertical alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">

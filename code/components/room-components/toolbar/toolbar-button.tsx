@@ -34,7 +34,7 @@ export function ToolbarButton({
         <TooltipTrigger asChild>
           <button
             className={cn(
-              "pointer-events-auto cursor-pointer hover:text-black hover:bg-accent px-2 py-2 flex justify-center items-center",
+              "pointer-events-auto relative cursor-pointer hover:text-black hover:bg-accent px-2 py-2 flex justify-center items-center",
               {
                 ["bg-zinc-700 text-white"]: active,
                 ["pointer-events-none cursor-default text-black opacity-50"]:

@@ -158,7 +158,7 @@ export function RoomInformationOverlay() {
               sideOffset={4}
               className="font-noto-sans-mono rounded-none"
             >
-              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                 Grid Visibility
               </DropdownMenuLabel>
               <DropdownMenuItem
@@ -176,7 +176,7 @@ export function RoomInformationOverlay() {
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                 Grid Kind
               </DropdownMenuLabel>
               <DropdownMenuItem
@@ -214,7 +214,7 @@ export function RoomInformationOverlay() {
                 </div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-400 text-xs">
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                 Exporting
               </DropdownMenuLabel>
               <DropdownMenuItem

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-types";
 import { useCollaborationRoom } from "@/store/store";
@@ -118,6 +119,7 @@ export const Room = () => {
           <RoomLayout />
         </WeaveProvider>
       )}
+      <Toaster position="bottom-center" />
     </>
   );
 };
