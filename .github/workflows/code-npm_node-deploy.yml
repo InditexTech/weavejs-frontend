@@ -60,7 +60,7 @@ jobs:
 
       - name: Get Backend endpoint
         run: |
-          BACKEND_ENDPOINT=https://$(az containerapp show -g ${{ env.AZURE_RESOURCE_GROUP }} -n ${{ env.AZURE_CONTAINER_NAME_BACKEND }} --query properties.configuration.ingress.fqdn)
+          BACKEND_ENDPOINT=https://$(az containerapp show -g ${{ env.AZURE_RESOURCE_GROUP }} -n ${{ env.AZURE_CONTAINER_NAME_BACKEND }} --query properties.configuration.ingress.fqdn --output tsv)
           echo "BACKEND_ENDPOINT=$(echo $BACKEND_ENDPOINT)" >> $GITHUB_ENV
 
       - name: Create .env.production file
