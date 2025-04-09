@@ -38,7 +38,7 @@ jobs:
       AZURE_ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
       AZURE_ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       AZURE_CONTAINER_ENVIRONMENT_NAME: ${{ vars.AZURE_CONTAINER_ENVIRONMENT_NAME }}
-      AZURE_RESOURCE_GROUP: "cloudcotwo-rsg-weu1-pro-weavejs"
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
       AZURE_CONTAINER_NAME: "weavejs-frontend"
       AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
@@ -74,13 +74,6 @@ jobs:
         run: |
           ACR_PASSWORD=$(az acr login --name ${{ env.AZURE_ACR_NAME }} --expose-token --output tsv --query accessToken)
           echo "AZURE_ACR_PASSWORD=$(echo $ACR_PASSWORD)" >> $GITHUB_ENV
-
-      - name: ACR Login
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.AZURE_ACR_NAME }}.azurecr.io
-          username: ${{ env.AZURE_ACR_USERNAME }}
-          password: ${{ env.AZURE_ACR_PASSWORD }}
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
