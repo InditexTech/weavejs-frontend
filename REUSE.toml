@@ -6,6 +6,7 @@ SPDX-PackageDownloadLocation = "https://github.com/InditexTech/weavejs"
 [[annotations]]
 path = [
     # root level licensing
+    ".github/**",
     "REUSE.toml",
     "repolinter.json",
 
