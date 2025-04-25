@@ -1,4 +1,4 @@
-import { WeaveActionCallbacks } from "@inditextech/weavejs-sdk";
+import { WeaveActionCallbacks } from "@inditextech/weave-sdk";
 import { PANTONE_TOOL_STATE } from "./constants";
 
 export type PantoneToolActionStateKeys = keyof typeof PANTONE_TOOL_STATE;

@@ -9,7 +9,7 @@
   --font-noto-sans-mono: var(--font-noto-sans-mono);
 }
 
-.custom-scrollbar { 
+.custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
   padding-right: 6px;
@@ -179,7 +179,7 @@
     @apply w-full h-full;
   }
   body {
-    @apply bg-background text-foreground w-full h-full font-noto-sans;
+    @apply bg-background ring-0 text-foreground w-full h-full;
   }
 }
 
@@ -188,6 +188,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background ring-0 text-foreground;
   }
 }

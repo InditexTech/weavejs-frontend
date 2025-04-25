@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
+import { WeaveStateElement } from "@inditextech/weave-types";
 import { Crop } from "lucide-react";
 import { InputNumber } from "../inputs/input-number";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ToggleIconButton } from "../toggle-icon-button";
 

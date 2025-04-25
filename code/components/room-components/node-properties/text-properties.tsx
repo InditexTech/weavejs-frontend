@@ -16,9 +16,9 @@ import {
   Strikethrough,
   Underline,
 } from "lucide-react";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
+import { WeaveStateElement } from "@inditextech/weave-types";
 import { InputNumber } from "../inputs/input-number";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";

@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
+import { WeaveStateElement } from "@inditextech/weave-types";
 import { Eye, EyeOff } from "lucide-react";
 import { InputColor } from "./../inputs/input-color";
 import { ToggleIconButton } from "./../toggle-icon-button";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 
 export function FillProperties() {

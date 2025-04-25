@@ -1,10 +1,10 @@
 import { PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-types";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import Konva from "konva";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import {
   AlignStartHorizontal,
   Download,

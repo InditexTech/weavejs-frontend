@@ -4,7 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import {
   DropdownMenu,
@@ -31,7 +31,7 @@ import {
   WeaveExportStageActionParams,
   WeaveStageGridPlugin,
   WeaveStageGridType,
-} from "@inditextech/weavejs-sdk";
+} from "@inditextech/weave-sdk";
 import { ConnectionStatus } from "../connection-status";
 import { topElementVariants } from "./variants";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";

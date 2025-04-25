@@ -6,7 +6,7 @@ import {
   //CloudCog,
   CloudAlert,
 } from "lucide-react";
-import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "@inditextech/weavejs-store-azure-web-pubsub";
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { cn } from "@/lib/utils";
 
 type ConnectionStatusProps = {

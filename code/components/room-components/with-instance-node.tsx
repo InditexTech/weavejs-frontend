@@ -1,7 +1,7 @@
 import React from "react";
-import { useWeave } from "@inditextech/weavejs-react";
-import { Weave } from "@inditextech/weavejs-sdk";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
+import { useWeave } from "@inditextech/weave-react";
+import { Weave } from "@inditextech/weave-sdk";
+import { WeaveStateElement } from "@inditextech/weave-types";
 
 interface InjectedProps {
   instance: Weave;

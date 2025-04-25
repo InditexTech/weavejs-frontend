@@ -7,8 +7,8 @@ import { RoomInformationOverlay } from "@/components/room-components/overlay/roo
 import { RoomUsersOverlay } from "@/components/room-components/overlay/room-users-overlay";
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
-import { useWeave } from "@inditextech/weavejs-react";
-import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-types";
+import { useWeave } from "@inditextech/weave-react";
+import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
 import { Logo } from "../utils/logo";
 import { AnimatePresence, motion } from "framer-motion";

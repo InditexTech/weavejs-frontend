@@ -17,7 +17,7 @@ import {
   WeaveTextNode,
   WeaveImageNode,
   WeaveFrameNode,
-} from "@inditextech/weavejs-sdk";
+} from "@inditextech/weave-sdk";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 
