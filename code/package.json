@@ -2,6 +2,9 @@
   "name": "@inditextech/weavejs-frontend",
   "version": "0.1.0",
   "private": true,
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "repository": "github:InditexTech/weavejs-frontend",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "next build",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",

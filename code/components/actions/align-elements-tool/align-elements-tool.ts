@@ -1,5 +1,12 @@
-import { WeaveAction } from "@inditextech/weave-sdk";
-import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+import { WeaveAction } from "@inditextech/weavejs-sdk";
+import {
+  WeaveElementInstance,
+  WeaveSelection,
+} from "@inditextech/weavejs-types";
 import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {
