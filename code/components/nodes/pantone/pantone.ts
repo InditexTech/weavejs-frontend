@@ -22,20 +22,7 @@ const notoSansMono = Noto_Sans_Mono({
 export class PantoneNode extends WeaveNode {
   protected nodeType = PANTONE_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes) {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes) {
+  onRender(props: WeaveElementAttributes) {
     const { id } = props;
 
     const pantoneColor = props.pantone ?? "#DEFFA0";
@@ -158,7 +145,7 @@ export class PantoneNode extends WeaveNode {
     return pantone;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ) {
@@ -196,27 +183,5 @@ export class PantoneNode extends WeaveNode {
     if (pantoneName) {
       pantoneName.setAttr("text", nearestColor.name);
     }
-  }
-
-  removeInstance(nodeInstance: WeaveElementInstance) {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance) {
-    const attrs = instance.getAttrs();
-
-    const cleanedAttrs = { ...attrs };
-    delete cleanedAttrs.draggable;
-
-    return {
-      key: attrs.id ?? "",
-      type: attrs.nodeType,
-      props: {
-        ...cleanedAttrs,
-        id: attrs.id ?? "",
-        nodeType: attrs.nodeType,
-        children: [],
-      },
-    };
   }
 }

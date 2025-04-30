@@ -9,7 +9,7 @@ import Konva from "konva";
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   getName(): string {
     return "alignElementsTool";
@@ -51,7 +51,7 @@ export class AlignElementsToolAction extends WeaveAction {
         const handler = this.instance.getNodeHandler(
           instance.getAttrs().nodeType
         );
-        const node = handler.toNode(instance as WeaveElementInstance);
+        const node = handler.serialize(instance as WeaveElementInstance);
 
         const newNode = {
           ...node,

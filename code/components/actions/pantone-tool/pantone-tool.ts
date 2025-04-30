@@ -45,7 +45,7 @@ export class PantoneToolAction extends WeaveAction {
     };
   }
 
-  init() {
+  onInit() {
     this.instance.addEventListener("onStageDrop", () => {
       if (window.pantoneDragColor) {
         this.instance.triggerAction("pantoneTool", {
@@ -107,7 +107,7 @@ export class PantoneToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler("pantone");
 
-    const node = nodeHandler.createNode(this.pantoneId, {
+    const node = nodeHandler.create(this.pantoneId, {
       ...this.props,
       x: this.clickPoint.x,
       y: this.clickPoint.y,
