@@ -10,7 +10,11 @@ import {
   PantoneToolActionTriggerParams,
 } from "./types";
 import { PANTONE_TOOL_STATE } from "./constants";
-import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import {
+  WeaveAction,
+  WeaveNode,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weave-sdk";
 import Konva from "konva";
 
 export class PantoneToolAction extends WeaveAction {
@@ -105,7 +109,7 @@ export class PantoneToolAction extends WeaveAction {
 
     this.pantoneId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler("pantone");
+    const nodeHandler = this.instance.getNodeHandler<WeaveNode>("pantone");
 
     const node = nodeHandler.create(this.pantoneId, {
       ...this.props,
