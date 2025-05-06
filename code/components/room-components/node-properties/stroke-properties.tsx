@@ -77,9 +77,9 @@ export function StrokeProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["pantoneTool", "frameTool"].includes(actualAction)) return null;
+  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
 
-  if (["text", "pantone", "frame"].includes(actualNode.type)) {
+  if (["text", "color-token", "frame"].includes(actualNode.type)) {
     return null;
   }
 

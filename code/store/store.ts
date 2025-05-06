@@ -51,10 +51,13 @@ interface CollaborationRoomState {
       visible: boolean;
     };
   };
-  pantones: {
+  colorToken: {
     library: {
       visible: boolean;
     };
+  };
+  nodesTree: {
+    visible: boolean;
   };
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
@@ -82,7 +85,8 @@ interface CollaborationRoomState {
   setNodePropertiesVisible: (newNodePropertiesVisible: boolean) => void;
   setImagesLibraryVisible: (newImagesLibraryVisible: boolean) => void;
   setFramesLibraryVisible: (newFramesLibraryVisible: boolean) => void;
-  setPantonesLibraryVisible: (newPantonesLibraryVisible: boolean) => void;
+  setColorTokensLibraryVisible: (newColorTokensLibraryVisible: boolean) => void;
+  setNodesTreeVisible: (newNodesTreeVisible: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -120,10 +124,13 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       visible: false,
     },
   },
-  pantones: {
+  colorToken: {
     library: {
       visible: false,
     },
+  },
+  nodesTree: {
+    visible: false,
   },
   setShowUi: (newShowUI) =>
     set((state) => ({
@@ -231,15 +238,23 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         },
       },
     })),
-  setPantonesLibraryVisible: (newPantonesLibraryVisible) =>
+  setColorTokensLibraryVisible: (newColorTokensLibraryVisible) =>
     set((state) => ({
       ...state,
-      pantones: {
-        ...state.pantones,
+      colorToken: {
+        ...state.colorToken,
         library: {
-          ...state.pantones.library,
-          visible: newPantonesLibraryVisible,
+          ...state.colorToken.library,
+          visible: newColorTokensLibraryVisible,
         },
+      },
+    })),
+  setNodesTreeVisible: (newNodesTreeVisible) =>
+    set((state) => ({
+      ...state,
+      nodesTree: {
+        ...state.nodesTree,
+        visible: newNodesTreeVisible,
       },
     })),
 }));

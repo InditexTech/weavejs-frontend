@@ -93,7 +93,13 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             fixedDecimalScale={fixedDecimalScale}
             allowNegative={min < 0}
             valueIsNumericString
-            onBlur={handleBlur}
+            onFocus={() => {
+              window.weaveOnFieldFocus = true;
+            }}
+            onBlur={() => {
+              window.weaveOnFieldFocus = false;
+              handleBlur();
+            }}
             max={max}
             min={min}
             customInput={Input}

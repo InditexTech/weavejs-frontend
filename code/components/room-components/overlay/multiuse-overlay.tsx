@@ -60,7 +60,7 @@ export function MultiuseOverlay() {
         "brushTool",
         "penTool",
         "imageTool",
-        "pantoneTool",
+        "colorTokenTool",
         "frameTool",
       ].includes(actualAction) &&
       !contextMenuVisible
@@ -87,8 +87,8 @@ export function MultiuseOverlay() {
         return "Text";
       case "image":
         return "Image";
-      case "pantone":
-        return "Pantone";
+      case "color-token":
+        return "Color Token";
       case "frame":
         return "Frame";
       default:
@@ -106,8 +106,8 @@ export function MultiuseOverlay() {
         return "Vector path";
       case "imageTool":
         return "Image";
-      case "pantoneTool":
-        return "Pantone";
+      case "colorTokenTool":
+        return "Color Token";
       case "frameTool":
         return "Frame";
       default:

@@ -34,6 +34,9 @@ export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
 
+  const nodeCreateProps = useCollaborationRoom(
+    (state) => state.nodeProperties.createProps
+  );
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
@@ -51,9 +54,9 @@ export function ToolsOverlay() {
   );
 
   const triggerTool = React.useCallback(
-    (toolName: string) => {
+    (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
-        instance.triggerAction(toolName);
+        instance.triggerAction(toolName, params);
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
@@ -253,7 +256,7 @@ export function ToolsOverlay() {
         <ToolbarButton
           icon={<Frame />}
           active={actualAction === "frameTool"}
-          onClick={() => triggerTool("frameTool")}
+          onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a frame</p>
@@ -272,11 +275,11 @@ export function ToolsOverlay() {
         </div>
         <ToolbarButton
           icon={<Tags />}
-          active={actualAction === "pantoneTool"}
-          onClick={() => triggerTool("pantoneTool")}
+          active={actualAction === "colorTokenTool"}
+          onClick={() => triggerTool("colorTokenTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add pantone reference</p>
+              <p>Add color token reference</p>
               <ShortcutElement
                 variant="light"
                 shortcuts={{

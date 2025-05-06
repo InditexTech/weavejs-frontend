@@ -64,7 +64,7 @@ export function AppearanceProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["pantoneTool", "frameTool"].includes(actualAction)) return null;
+  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
 
   return (
     <div className="border-b border-zinc-200">

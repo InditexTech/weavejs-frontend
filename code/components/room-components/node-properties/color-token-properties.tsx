@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 "use client";
 
 import React from "react";
@@ -10,7 +6,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputColor } from "../inputs/input-color";
 
-export function PantoneProperties() {
+export function ColorTokenProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -66,12 +62,15 @@ export function PantoneProperties() {
   if (
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
-    !["pantone"].includes(actualNode.type)
+    !["color-token"].includes(actualNode.type)
   ) {
     return null;
   }
 
-  if (actualAction && !["selectionTool", "pantoneTool"].includes(actualAction))
+  if (
+    actualAction &&
+    !["selectionTool", "colorTokenTool"].includes(actualAction)
+  )
     return null;
 
   return (
@@ -79,7 +78,7 @@ export function PantoneProperties() {
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-xs font-noto-sans-mono font-light">
-            Pantone
+            Color Token
           </span>
         </div>
       </div>
@@ -87,7 +86,7 @@ export function PantoneProperties() {
         <div className="grid grid-cols-1 gap-3 w-full">
           <InputColor
             label="Color (#RGB)"
-            value={`${(actualNode.props.pantone ?? "#000000").replace(
+            value={`${(actualNode.props.colorToken ?? "#000000").replace(
               "#",
               ""
             )}`}
@@ -96,7 +95,7 @@ export function PantoneProperties() {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  pantone: `#${value}`,
+                  colorToken: `#${value}`,
                 },
               };
               updateElement(updatedNode);

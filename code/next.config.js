@@ -6,6 +6,12 @@ const nextConfig = {
   output: "standalone",
   reactStrictMode: false,
   webpack: (config) => {
+    if (process.env.WEAVE_KONVA_PATH) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        konva: process.env.WEAVE_KONVA_PATH,
+      };
+    }
     config.externals = [...config.externals, { canvas: "canvas" }]; // required to make Konva work
     return config;
   },

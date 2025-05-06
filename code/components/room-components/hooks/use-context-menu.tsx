@@ -55,8 +55,8 @@ function useContextMenu() {
   const setImagesLibraryVisible = useCollaborationRoom(
     (state) => state.setImagesLibraryVisible
   );
-  const setPantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.setPantonesLibraryVisible
+  const setColorTokensLibraryVisible = useCollaborationRoom(
+    (state) => state.setColorTokensLibraryVisible
   );
 
   const mutationUpload = useMutation({
@@ -469,7 +469,7 @@ function useContextMenu() {
 
       if (visible) {
         setNodePropertiesVisible(false);
-        setPantonesLibraryVisible(false);
+        setColorTokensLibraryVisible(false);
         setFramesLibraryVisible(false);
         setImagesLibraryVisible(false);
       }
@@ -494,21 +494,21 @@ function useContextMenu() {
       setFramesLibraryVisible,
       setImagesLibraryVisible,
       setNodePropertiesVisible,
-      setPantonesLibraryVisible,
+      setColorTokensLibraryVisible,
     ]
   );
 
   const contextMenu = React.useMemo(
     () =>
-      new WeaveContextMenuPlugin(
-        {
+      new WeaveContextMenuPlugin({
+        config: {
           xOffset: 10,
           yOffset: 10,
         },
-        {
+        callbacks: {
           onNodeMenu,
-        }
-      ),
+        },
+      }),
     [onNodeMenu]
   );
 

@@ -22,7 +22,7 @@ import {
   NODES,
 } from "@/components/utils/constants";
 import useContextMenu from "./use-context-menu";
-import { PantoneToolAction } from "@/components/actions/pantone-tool/pantone-tool";
+import { ColorTokenToolAction } from "@/components/actions/color-token-tool/color-token-tool";
 
 function useGetWeaveJSProps() {
   const setLoadingImage = useCollaborationRoom(
@@ -74,7 +74,7 @@ function useGetWeaveJSProps() {
           setNodePropertiesCreateProps(props);
         },
       }),
-      new PantoneToolAction({
+      new ColorTokenToolAction({
         onPropsChange: (props) => {
           setNodePropertiesCreateProps(props);
         },
@@ -93,21 +93,23 @@ function useGetWeaveJSProps() {
       ...CUSTOM_PLUGINS,
       contextMenu,
       new WeaveCopyPasteNodesPlugin({
-        onCopy: (error?: Error) => {
-          if (error) {
-            console.error("onCopy", error);
-            toast.error("Aan error occurred when copying to the clipboard");
-          } else {
-            toast.success("Copy successful");
-          }
-        },
-        onPaste: (error?: Error) => {
-          if (error) {
-            console.error("onPaste", error);
-            toast.error("Aan error occurred when reading from the clipboard");
-          } else {
-            toast.success("Paste successful");
-          }
+        callbacks: {
+          onCopy: (error?: Error) => {
+            if (error) {
+              console.error("onCopy", error);
+              toast.error("Aan error occurred when copying to the clipboard");
+            } else {
+              toast.success("Copy successful");
+            }
+          },
+          onPaste: (error?: Error) => {
+            if (error) {
+              console.error("onPaste", error);
+              toast.error("Aan error occurred when reading from the clipboard");
+            } else {
+              toast.success("Paste successful");
+            }
+          },
         },
       }),
     ];

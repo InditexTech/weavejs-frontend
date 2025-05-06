@@ -14,7 +14,7 @@ import { FillProperties } from "./../node-properties/fill-properties";
 import { StrokeProperties } from "./../node-properties/stroke-properties";
 import { TextProperties } from "./../node-properties/text-properties";
 import { ImageProperties } from "../node-properties/image-properties";
-import { PantoneProperties } from "../node-properties/pantone-properties";
+import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { CropProperties } from "../node-properties/crop-properties";
 
@@ -41,8 +41,8 @@ export const NodeProperties = () => {
         return "Text";
       case "image":
         return "Image";
-      case "pantone":
-        return "Pantone";
+      case "color-token":
+        return "Color Token";
       case "frame":
         return "Frame";
       default:
@@ -60,8 +60,8 @@ export const NodeProperties = () => {
         return "Vector path";
       case "imageTool":
         return "Image";
-      case "pantoneTool":
-        return "Pantone";
+      case "colorTokenTool":
+        return "Color Token";
       case "frameTool":
         return "Frame";
       default:
@@ -87,7 +87,7 @@ export const NodeProperties = () => {
       </div>
       <div className="flex-1">
         <ImageProperties />
-        <PantoneProperties />
+        <ColorTokenProperties />
         <FrameProperties />
         <PositionProperties />
         <SizeProperties />

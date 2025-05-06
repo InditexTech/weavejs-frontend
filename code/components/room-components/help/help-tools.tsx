@@ -81,7 +81,7 @@ export const HelpTools = () => {
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<SwatchBook />}
-          label="Pantone tool"
+          label="Color Token tool"
           shortcuts={{
             [SYSTEM_OS.MAC]: "P",
             [SYSTEM_OS.OTHER]: "P",

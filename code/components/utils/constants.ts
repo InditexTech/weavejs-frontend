@@ -21,8 +21,9 @@ import {
   WeaveTextNode,
   WeaveImageNode,
   WeaveFrameNode,
+  // ColorTokenNode,
 } from "@inditextech/weave-sdk";
-import { PantoneNode } from "@/components/nodes/pantone/pantone";
+import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 
 const FONTS = [
@@ -101,7 +102,7 @@ const NODES = [
   new WeaveTextNode(),
   new WeaveImageNode(),
   new WeaveFrameNode(),
-  new PantoneNode(),
+  new ColorTokenNode(),
 ];
 
 const ACTIONS = [

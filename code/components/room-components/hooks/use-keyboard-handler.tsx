@@ -39,11 +39,17 @@ export function useKeyboardHandler() {
   const setImagesLibraryVisible = useCollaborationRoom(
     (state) => state.setImagesLibraryVisible
   );
-  const pantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.pantones.library.visible
+  const colorTokensLibraryVisible = useCollaborationRoom(
+    (state) => state.colorToken.library.visible
   );
-  const setPantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.setPantonesLibraryVisible
+  const setColorTokensLibraryVisible = useCollaborationRoom(
+    (state) => state.setColorTokensLibraryVisible
+  );
+  const nodesTreeVisible = useCollaborationRoom(
+    (state) => state.nodesTree.visible
+  );
+  const setNodesTreeVisible = useCollaborationRoom(
+    (state) => state.setNodesTreeVisible
   );
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
@@ -65,41 +71,52 @@ export function useKeyboardHandler() {
     (library: string) => {
       switch (library) {
         case "images":
-          setPantonesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
           setFramesLibraryVisible(false);
           setImagesLibraryVisible(!imagesLibraryVisible);
+          setNodesTreeVisible(false);
           break;
-        case "pantones":
+        case "colorTokens":
           setImagesLibraryVisible(false);
           setFramesLibraryVisible(false);
-          setPantonesLibraryVisible(!pantonesLibraryVisible);
+          setColorTokensLibraryVisible(!colorTokensLibraryVisible);
+          setNodesTreeVisible(false);
           break;
         case "frames":
           setImagesLibraryVisible(false);
-          setPantonesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
           setFramesLibraryVisible(!framesLibraryVisible);
+          setNodesTreeVisible(false);
+          break;
+        case "nodeTree":
+          setImagesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
+          setFramesLibraryVisible(false);
+          setNodesTreeVisible(!nodesTreeVisible);
           break;
         default:
           break;
       }
     },
     [
-      pantonesLibraryVisible,
+      colorTokensLibraryVisible,
       framesLibraryVisible,
       imagesLibraryVisible,
+      nodesTreeVisible,
       setImagesLibraryVisible,
-      setPantonesLibraryVisible,
+      setColorTokensLibraryVisible,
       setFramesLibraryVisible,
+      setNodesTreeVisible,
     ]
   );
 
   const handleTriggerAction = React.useCallback(
-    (actionName: string) => {
+    (actionName: string, actionParams: unknown) => {
       if (instance) {
         const triggerSelection = actualAction === "selectionTool";
-        instance.triggerAction(actionName);
+        instance.triggerAction(actionName, actionParams);
         if (triggerSelection) {
-          instance.triggerAction("selectionTool");
+          instance.triggerAction("selectionTool", actionParams);
         }
       }
     },
@@ -186,7 +203,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      triggerTool("pantoneTool");
+      triggerTool("colorTokenTool");
     },
     ["KeyP"],
     () =>
@@ -481,9 +498,9 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle("pantones");
+      libraryToggle("colorTokens");
     },
-    ["KeyP"],
+    ["KeyO"],
     () =>
       !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
@@ -503,11 +520,23 @@ export function useKeyboardHandler() {
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
+  useKeyDown(
+    () => {
+      libraryToggle("nodeTree");
+    },
+    ["KeyE"],
+    () =>
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
+    (e) =>
+      e.altKey &&
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+  );
+
   /* Keyboard shortcuts zoom */
 
   useKeyDown(
     () => {
-      handleTriggerAction("zoomInTool");
+      handleTriggerAction("zoomInTool", { previousAction: actualAction });
     },
     ["BracketRight"],
     () =>
@@ -517,7 +546,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      handleTriggerAction("zoomOutTool");
+      handleTriggerAction("zoomOutTool", { previousAction: actualAction });
     },
     ["Slash"],
     () =>
@@ -527,7 +556,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      handleTriggerAction("fitToScreenTool");
+      handleTriggerAction("fitToScreenTool", { previousAction: actualAction });
     },
     ["Digit1"],
     () =>
@@ -537,7 +566,9 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      handleTriggerAction("fitToSelectionTool");
+      handleTriggerAction("fitToSelectionTool", {
+        previousAction: actualAction,
+      });
     },
     ["Digit2"],
     () =>

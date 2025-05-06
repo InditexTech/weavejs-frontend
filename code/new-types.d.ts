@@ -4,9 +4,10 @@
 
 interface Window {
   weave: Weave;
+  weaveOnFieldFocus?: boolean;
   weaveTextEditing?: boolean;
   weaveDragImageURL?: string;
-  pantoneDragColor?: string;
+  colorTokenDragColor?: string;
 }
 
 declare module "platform-detect";

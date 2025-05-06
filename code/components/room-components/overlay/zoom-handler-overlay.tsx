@@ -24,17 +24,19 @@ import {
   Undo,
   Redo,
   Projector,
+  ListTree,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { motion } from "framer-motion";
 import { bottomElementVariants } from "./variants";
 import { useCollaborationRoom } from "@/store/store";
-import { PantonesLibrary } from "../pantones-library/pantones-library";
+import { ColorTokensLibrary } from "../color-tokens-library/color-tokens-library";
 import { FramesLibrary } from "../frames-library/frames-library";
 import { ImagesLibrary } from "../images-library/images-library";
 import { HelpDrawer } from "../help/help-drawer";
 import { SYSTEM_OS } from "@/lib/utils";
 import { ShortcutElement } from "../help/shortcut-element";
+import { ElementsTree } from "../elements-tree/elements-tree";
 
 export function ZoomHandlerOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -60,11 +62,17 @@ export function ZoomHandlerOverlay() {
   const setImagesLibraryVisible = useCollaborationRoom(
     (state) => state.setImagesLibraryVisible
   );
-  const pantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.pantones.library.visible
+  const colorTokensLibraryVisible = useCollaborationRoom(
+    (state) => state.colorToken.library.visible
   );
-  const setPantonesLibraryVisible = useCollaborationRoom(
-    (state) => state.setPantonesLibraryVisible
+  const setColorTokensLibraryVisible = useCollaborationRoom(
+    (state) => state.setColorTokensLibraryVisible
+  );
+  const nodesTreeVisible = useCollaborationRoom(
+    (state) => state.nodesTree.visible
+  );
+  const setNodesTreeVisible = useCollaborationRoom(
+    (state) => state.setNodesTreeVisible
   );
 
   const handleTriggerActionWithParams = React.useCallback(
@@ -93,31 +101,42 @@ export function ZoomHandlerOverlay() {
     (library: string) => {
       switch (library) {
         case "images":
-          setPantonesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
           setFramesLibraryVisible(false);
           setImagesLibraryVisible(!imagesLibraryVisible);
+          setNodesTreeVisible(false);
           break;
-        case "pantones":
+        case "colorTokens":
           setImagesLibraryVisible(false);
           setFramesLibraryVisible(false);
-          setPantonesLibraryVisible(!pantonesLibraryVisible);
+          setColorTokensLibraryVisible(!colorTokensLibraryVisible);
+          setNodesTreeVisible(false);
           break;
         case "frames":
           setImagesLibraryVisible(false);
-          setPantonesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
           setFramesLibraryVisible(!framesLibraryVisible);
+          setNodesTreeVisible(false);
+          break;
+        case "nodesTree":
+          setImagesLibraryVisible(false);
+          setColorTokensLibraryVisible(false);
+          setFramesLibraryVisible(false);
+          setNodesTreeVisible(!nodesTreeVisible);
           break;
         default:
           break;
       }
     },
     [
-      pantonesLibraryVisible,
+      colorTokensLibraryVisible,
       framesLibraryVisible,
       imagesLibraryVisible,
+      nodesTreeVisible,
       setImagesLibraryVisible,
-      setPantonesLibraryVisible,
+      setColorTokensLibraryVisible,
       setFramesLibraryVisible,
+      setNodesTreeVisible,
     ]
   );
 
@@ -162,7 +181,7 @@ export function ZoomHandlerOverlay() {
                   />
                 </SheetTrigger>
                 <SheetContent className="w-[328px]">
-                  <SheetClose className="absolute top-0 right-0 p-1">
+                  <SheetClose className="absolute top-1 right-1 p-1" asChild>
                     <button
                       className="cursor-pointer bg-transparent hover:bg-accent p-2"
                       onClick={() => {
@@ -201,7 +220,7 @@ export function ZoomHandlerOverlay() {
                   />
                 </SheetTrigger>
                 <SheetContent className="w-[328px]">
-                  <SheetClose className="absolute top-0 right-0 p-1">
+                  <SheetClose className="absolute top-1 right-1 p-1" asChild>
                     <button
                       className="cursor-pointer bg-transparent hover:bg-accent p-2"
                       onClick={() => {
@@ -215,22 +234,22 @@ export function ZoomHandlerOverlay() {
                   <FramesLibrary />
                 </SheetContent>
               </Sheet>
-              <Sheet modal={false} open={pantonesLibraryVisible}>
+              <Sheet modal={false} open={colorTokensLibraryVisible}>
                 <SheetTrigger asChild>
                   <ToolbarButton
                     icon={<SwatchBook />}
-                    active={pantonesLibraryVisible}
+                    active={colorTokensLibraryVisible}
                     onClick={() => {
-                      libraryToggle("pantones");
+                      libraryToggle("colorTokens");
                     }}
                     label={
                       <div className="flex flex-col gap-2 justify-start items-end">
-                        <p>Pantones toolbar</p>
+                        <p>Color Tokens toolbar</p>
                         <ShortcutElement
                           variant="light"
                           shortcuts={{
-                            [SYSTEM_OS.MAC]: "⌥ ⌘ P",
-                            [SYSTEM_OS.OTHER]: "Alt Ctrl P",
+                            [SYSTEM_OS.MAC]: "⌥ ⌘ O",
+                            [SYSTEM_OS.OTHER]: "Alt Ctrl O",
                           }}
                         />
                       </div>
@@ -240,18 +259,58 @@ export function ZoomHandlerOverlay() {
                   />
                 </SheetTrigger>
                 <SheetContent className="w-[328px]">
-                  <SheetClose className="absolute top-0 right-0 p-1">
+                  <SheetClose className="absolute top-1 right-1 p-1" asChild>
                     <button
                       className="cursor-pointer bg-transparent hover:bg-accent p-2"
                       onClick={() => {
-                        libraryToggle("pantones");
+                        libraryToggle("colorTokens");
                       }}
                     >
                       <XIcon size={16} />
                       <span className="sr-only">Close</span>
                     </button>
                   </SheetClose>
-                  <PantonesLibrary />
+                  <ColorTokensLibrary />
+                </SheetContent>
+              </Sheet>
+
+              <Sheet modal={false} open={nodesTreeVisible}>
+                <SheetTrigger asChild>
+                  <ToolbarButton
+                    icon={<ListTree />}
+                    active={nodesTreeVisible}
+                    onClick={() => {
+                      libraryToggle("nodesTree");
+                    }}
+                    label={
+                      <div className="flex flex-col gap-2 justify-start items-end">
+                        <p>Elements toolbar</p>
+                        <ShortcutElement
+                          variant="light"
+                          shortcuts={{
+                            [SYSTEM_OS.MAC]: "⌥ ⌘ E",
+                            [SYSTEM_OS.OTHER]: "Alt Ctrl E",
+                          }}
+                        />
+                      </div>
+                    }
+                    tooltipSide="top"
+                    tooltipAlign="start"
+                  />
+                </SheetTrigger>
+                <SheetContent className="w-[328px]">
+                  <SheetClose className="absolute top-1 right-1 p-1" asChild>
+                    <button
+                      className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                      onClick={() => {
+                        libraryToggle("nodesTree");
+                      }}
+                    >
+                      <XIcon size={16} />
+                      <span className="sr-only">Close</span>
+                    </button>
+                  </SheetClose>
+                  <ElementsTree />
                 </SheetContent>
               </Sheet>
             </div>

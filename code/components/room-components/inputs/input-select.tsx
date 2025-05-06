@@ -19,55 +19,70 @@ import { Check, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
-import { FONTS } from "@/components/utils/constants";
 
-function InputFontFamily({
+function InputSelect({
+  label,
+  options,
   value,
   onChange,
+  disabled,
 }: {
+  label?: string;
+  options: { value: string; label: string }[];
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
-  const [selectedFont, setSelectedFont] = useState<string>(value);
+  const [selectedOption, setSelectedOption] = useState<string>(value);
   const [open, setOpen] = useState(false);
-  const lastSelectedFontFamily = useRef<string>(value);
+  const lastSelectedOption = useRef<string>(value);
 
   useEffect(() => {
-    if (onChange && selectedFont !== lastSelectedFontFamily.current) {
-      lastSelectedFontFamily.current = selectedFont;
-      onChange(selectedFont);
+    if (onChange && selectedOption !== lastSelectedOption.current) {
+      lastSelectedOption.current = selectedOption;
+      onChange(selectedOption);
     }
-  }, [selectedFont, onChange]);
+  }, [selectedOption, onChange]);
 
   return (
     <div className="flex flex-col items-start justify-start relative">
       <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
-        Font Family
+        {label}
       </div>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={(value) => {
+          if (!disabled) {
+            setOpen(value);
+          }
+        }}
+      >
         <PopoverTrigger className="w-full" asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            disabled={disabled}
             className="w-full h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
-            style={{ fontFamily: selectedFont }}
           >
-            {selectedFont}
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            {options.find((option) => option.value === selectedOption)?.label ??
+              "-"}
+            {!disabled && (
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)]">
           <Command>
             <CommandInput
               className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
-              placeholder="Search font..."
               onFocus={() => {
                 window.weaveOnFieldFocus = true;
               }}
               onBlur={() => {
                 window.weaveOnFieldFocus = false;
               }}
+              placeholder="Search..."
             />
             <CommandList>
               <CommandEmpty>
@@ -76,23 +91,20 @@ function InputFontFamily({
                 </span>
               </CommandEmpty>
               <CommandGroup>
-                {FONTS.map((font) => (
+                {options.map((option) => (
                   <CommandItem
-                    key={font.id}
-                    value={font.name}
+                    key={option.value}
+                    value={option.value}
                     onSelect={() => {
-                      setSelectedFont(font.name);
+                      setSelectedOption(option.value);
                       setOpen(false);
                     }}
                     className="flex items-center"
                   >
-                    <span
-                      className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
-                      style={{ fontFamily: font.name }}
-                    >
-                      {font.name}
+                    <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">
+                      {option.label}
                     </span>
-                    {selectedFont === font.id && (
+                    {selectedOption === option.value && (
                       <Check className="ml-auto h-4 w-4" />
                     )}
                   </CommandItem>
@@ -106,4 +118,4 @@ function InputFontFamily({
   );
 }
 
-export default InputFontFamily;
+export default InputSelect;

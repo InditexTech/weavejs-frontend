@@ -16,7 +16,13 @@ export const useKeyDown = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
       const wasAnyKeyPressed = keys.some((key: string) => event.code === key);
-      if ((wasAnyKeyPressed && active?.(event) && modifiers?.(event)) ?? true) {
+      if (
+        (wasAnyKeyPressed &&
+          !window.weaveOnFieldFocus &&
+          active?.(event) &&
+          modifiers?.(event)) ??
+        true
+      ) {
         event.preventDefault();
         callback();
       }

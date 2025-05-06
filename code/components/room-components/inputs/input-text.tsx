@@ -46,7 +46,11 @@ export const InputText = ({
             input.blur();
           }
         }}
+        onFocus={() => {
+          window.weaveOnFieldFocus = true;
+        }}
         onBlur={() => {
+          window.weaveOnFieldFocus = false;
           onChange(actualValue);
         }}
       />
