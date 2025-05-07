@@ -1,4 +1,4 @@
-name: Deploy code
+name: Code deploy
 
 on:
   pull_request:
