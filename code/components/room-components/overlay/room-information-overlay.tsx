@@ -118,8 +118,9 @@ export function RoomInformationOverlay() {
   // }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
+    instance?.getStore().disconnect();
     router.push("/");
-  }, [router]);
+  }, [instance, router]);
 
   if (!showUI) {
     return null;
