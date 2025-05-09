@@ -7,10 +7,10 @@
 import React from "react";
 // import { Pin, PinOff } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { InputNumber } from "../inputs/input-number";
 // import { ToggleIconButton } from "../toggle-icon-button";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function PositionProperties() {
   const instance = useWeave((state) => state.instance);
@@ -111,9 +111,7 @@ export function PositionProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">
-            Position
-          </span>
+          <span className="text-xs font-questrial font-light">Position</span>
         </div>
       </div>
       <div className="px-4 pb-4">

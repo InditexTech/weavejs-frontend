@@ -7,8 +7,9 @@ import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
-import { Frame, Spline, Image, Square, Tag, Type } from "lucide-react";
+import { Frame, Spline, Image, Square, Tag, Type, X } from "lucide-react";
 import { Weave } from "@inditextech/weave-sdk";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -47,11 +48,18 @@ export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
 
-  const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
-    initialSelectedNodes.map((node) => node.node.key)
+  const sidebarLeftActive = useCollaborationRoom(
+    (state) => state.sidebar.left.active
   );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
     []
+  );
+  const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
+    initialSelectedNodes.map((node) => node.node.key)
   );
 
   React.useEffect(() => {
@@ -73,7 +81,7 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sidebarLeftActive]);
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
@@ -93,11 +101,7 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const nodesTreeVisible = useCollaborationRoom(
-    (state) => state.nodesTree.visible
-  );
+  }, [sidebarLeftActive]);
 
   const treeData = React.useMemo<TreeDataItem[]>(() => {
     if (!instance) return [];
@@ -109,16 +113,26 @@ export const ElementsTree = () => {
     return null;
   }
 
-  if (!nodesTreeVisible) {
+  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.nodesTree) {
     return null;
   }
 
   return (
     <>
       <div className="pointer-events-auto w-full h-full">
-        <div className="w-[calc(100%-38px)] font-title-xs p-1 pr-0 bg-white flex justify-between items-center">
-          <div className="flex h-[32px] justify-between font-noto-sans-mono font-light items-center text-md pl-2">
+        <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
+          <div className="flex h-[32px] justify-between font-questrial font-light items-center text-md pl-2">
             Elements
+          </div>
+          <div className="flex justify-end items-center gap-1">
+            <button
+              className="cursor-pointer bg-transparent hover:bg-accent p-2"
+              onClick={() => {
+                setSidebarActive(null);
+              }}
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200 p-2">

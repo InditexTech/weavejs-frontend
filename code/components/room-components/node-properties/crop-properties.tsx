@@ -7,10 +7,10 @@
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { Crop } from "lucide-react";
-import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ToggleIconButton } from "../toggle-icon-button";
+import { InputNumber } from "../inputs/input-number";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
@@ -57,7 +57,7 @@ export function CropProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Crop</span>
+          <span className="text-xs font-questrial font-light">Crop</span>
         </div>
         <div className="flex justify-end items-center">
           <ToggleIconButton

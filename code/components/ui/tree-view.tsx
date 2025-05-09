@@ -11,7 +11,7 @@ const treeVariants = cva(
 );
 
 const selectedTreeVariants = cva(
-  "before:opacity-100 before:bg-accent/70 text-accent-foreground"
+  "before:opacity-100 before:bg-accent/70 text-accent-foreground bg-zinc-100 rounded-lg"
 );
 
 const dragOverVariants = cva(
@@ -311,7 +311,7 @@ const TreeNode = ({
         <AccordionTrigger
           className={cn(
             treeVariants(),
-            selectedItems?.includes(item.id) && selectedTreeVariants(),
+            selectedItems?.includes(item.id) ? selectedTreeVariants() : "",
             isDragOver && dragOverVariants()
           )}
           draggable={!!item.draggable}
@@ -321,7 +321,7 @@ const TreeNode = ({
           onDrop={onDrop}
         >
           <div
-            className="flex justify-start items-center"
+            className="flex"
             onClick={(e) => {
               e.stopPropagation();
               handleSelectChange(e, item);
@@ -463,7 +463,7 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 w-full items-center py-2 transition-all first:[&[data-state=open]>svg]:rotate-90",
+        "cursor-pointer flex flex-1 w-full items-center py-2 transition-all first:[&[data-state=open]>svg]:rotate-90",
         className
       )}
       {...props}

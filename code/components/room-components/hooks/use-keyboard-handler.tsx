@@ -6,7 +6,7 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useKeyDown } from "../hooks/use-key-down";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useGetOs } from "../hooks/use-get-os";
@@ -17,6 +17,7 @@ import {
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -27,29 +28,8 @@ export function useKeyboardHandler() {
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
-  const framesLibraryVisible = useCollaborationRoom(
-    (state) => state.frames.library.visible
-  );
-  const setFramesLibraryVisible = useCollaborationRoom(
-    (state) => state.setFramesLibraryVisible
-  );
-  const imagesLibraryVisible = useCollaborationRoom(
-    (state) => state.images.library.visible
-  );
-  const setImagesLibraryVisible = useCollaborationRoom(
-    (state) => state.setImagesLibraryVisible
-  );
-  const colorTokensLibraryVisible = useCollaborationRoom(
-    (state) => state.colorToken.library.visible
-  );
-  const setColorTokensLibraryVisible = useCollaborationRoom(
-    (state) => state.setColorTokensLibraryVisible
-  );
-  const nodesTreeVisible = useCollaborationRoom(
-    (state) => state.nodesTree.visible
-  );
-  const setNodesTreeVisible = useCollaborationRoom(
-    (state) => state.setNodesTreeVisible
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
   );
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
@@ -67,47 +47,11 @@ export function useKeyboardHandler() {
     [instance, actualAction]
   );
 
-  const libraryToggle = React.useCallback(
-    (library: string) => {
-      switch (library) {
-        case "images":
-          setColorTokensLibraryVisible(false);
-          setFramesLibraryVisible(false);
-          setImagesLibraryVisible(!imagesLibraryVisible);
-          setNodesTreeVisible(false);
-          break;
-        case "colorTokens":
-          setImagesLibraryVisible(false);
-          setFramesLibraryVisible(false);
-          setColorTokensLibraryVisible(!colorTokensLibraryVisible);
-          setNodesTreeVisible(false);
-          break;
-        case "frames":
-          setImagesLibraryVisible(false);
-          setColorTokensLibraryVisible(false);
-          setFramesLibraryVisible(!framesLibraryVisible);
-          setNodesTreeVisible(false);
-          break;
-        case "nodeTree":
-          setImagesLibraryVisible(false);
-          setColorTokensLibraryVisible(false);
-          setFramesLibraryVisible(false);
-          setNodesTreeVisible(!nodesTreeVisible);
-          break;
-        default:
-          break;
-      }
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
     },
-    [
-      colorTokensLibraryVisible,
-      framesLibraryVisible,
-      imagesLibraryVisible,
-      nodesTreeVisible,
-      setImagesLibraryVisible,
-      setColorTokensLibraryVisible,
-      setFramesLibraryVisible,
-      setNodesTreeVisible,
-    ]
+    [setSidebarActive]
   );
 
   const handleTriggerAction = React.useCallback(
@@ -486,7 +430,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle("images");
+      sidebarToggle(SIDEBAR_ELEMENTS.images);
     },
     ["KeyI"],
     () =>
@@ -498,7 +442,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle("colorTokens");
+      sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
     },
     ["KeyO"],
     () =>
@@ -510,7 +454,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle("frames");
+      sidebarToggle(SIDEBAR_ELEMENTS.frames);
     },
     ["KeyF"],
     () =>
@@ -522,7 +466,7 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle("nodeTree");
+      sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
     },
     ["KeyE"],
     () =>

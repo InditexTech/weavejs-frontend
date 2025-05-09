@@ -76,7 +76,7 @@ export function FillProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Fill</span>
+          <span className="text-xs font-questrial font-light">Fill</span>
         </div>
         <ToggleIconButton
           kind="toggle"

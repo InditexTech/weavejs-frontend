@@ -49,13 +49,13 @@ export const InputColor = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+        <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
           {label}
         </div>
       )}
       <div className="w-full flex items-center relative">
         <Popover>
-          <PopoverTrigger>
+          <PopoverTrigger asChild>
             <div
               className="cursor-pointer shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
               style={{ background: `#${actualValue}` }}

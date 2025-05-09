@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import {
-  ColorTokenToolCallbacks,
   ColorTokenToolActionState,
   ColorTokenToolActionTriggerParams,
 } from "./types";
@@ -17,10 +16,10 @@ export class ColorTokenToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
 
-  constructor(callbacks: ColorTokenToolCallbacks) {
-    super(callbacks);
+  constructor() {
+    super();
 
     this.initialized = false;
     this.state = COLOR_TOKEN_TOOL_STATE.IDLE;

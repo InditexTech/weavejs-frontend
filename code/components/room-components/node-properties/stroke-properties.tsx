@@ -17,10 +17,10 @@ import {
   Tally3,
 } from "lucide-react";
 import { InputColor } from "../inputs/input-color";
-import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -87,7 +87,7 @@ export function StrokeProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Stroke</span>
+          <span className="text-xs font-questrial font-light">Stroke</span>
         </div>
         <ToggleIconButton
           kind="toggle"
@@ -160,7 +160,7 @@ export function StrokeProperties() {
                 />
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
                   Line join
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -212,7 +212,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
                   Line cap
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -264,7 +264,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
                   Open / Closed
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">
@@ -301,7 +301,7 @@ export function StrokeProperties() {
                 </div>
               </div>
               <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
                   Bezier
                 </div>
                 <div className="w-full flex justify-end items-center gap-1">

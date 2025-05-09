@@ -6,9 +6,9 @@
 
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function ImageProperties() {
   const instance = useWeave((state) => state.instance);

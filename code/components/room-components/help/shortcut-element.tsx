@@ -30,7 +30,7 @@ export const ShortcutElement = ({
           <span
             key={key}
             className={cn(
-              "inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-noto-sans-mono text-xs",
+              "inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-questrial text-xs",
               {
                 ["bg-accent text-black"]: variant === "light",
                 ["bg-zinc-800 text-white"]: variant === "default",

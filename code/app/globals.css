@@ -11,6 +11,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --questrial: var(--questrial);
   --font-noto-sans: var(--font-noto-sans);
   --font-noto-sans-mono: var(--font-noto-sans-mono);
 }

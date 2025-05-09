@@ -12,7 +12,6 @@ import {
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
-  WeaveNodesSnappingPlugin,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -21,8 +20,8 @@ import {
   WeaveTextNode,
   WeaveImageNode,
   WeaveFrameNode,
-  // ColorTokenNode,
 } from "@inditextech/weave-sdk";
+import { Noto_Sans_Mono } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 
@@ -93,6 +92,12 @@ const FONTS = [
   },
 ];
 
+const notoSansMono = Noto_Sans_Mono({
+  preload: true,
+  variable: "--font-noto-sans-mono",
+  subsets: ["latin"],
+});
+
 const NODES = [
   new WeaveStageNode(),
   new WeaveLayerNode(),
@@ -101,7 +106,12 @@ const NODES = [
   new WeaveLineNode(),
   new WeaveTextNode(),
   new WeaveImageNode(),
-  new WeaveFrameNode(),
+  new WeaveFrameNode({
+    config: {
+      fontFamily: notoSansMono.style.fontFamily,
+      fontStyle: "100",
+    },
+  }),
   new ColorTokenNode(),
 ];
 
@@ -118,6 +128,4 @@ const ACTIONS = [
   new WeaveExportStageToolAction(),
 ];
 
-const CUSTOM_PLUGINS = [new WeaveNodesSnappingPlugin()];
-
-export { FONTS, NODES, ACTIONS, CUSTOM_PLUGINS };
+export { FONTS, NODES, ACTIONS };

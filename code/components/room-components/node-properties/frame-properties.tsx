@@ -10,13 +10,13 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputText } from "../inputs/input-text";
 import InputSelect from "../inputs/input-select";
-import { InputNumber } from "../inputs/input-number";
 import {
   WEAVE_FRAME_NODE_SIZES,
   WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
   WeaveFrameNodeSizes,
   type WeaveFrameNodeSizesOrientation,
 } from "@inditextech/weave-sdk";
+import { InputNumber } from "../inputs/input-number";
 
 export function FrameProperties() {
   const instance = useWeave((state) => state.instance);
@@ -86,7 +86,7 @@ export function FrameProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Frame</span>
+          <span className="text-xs font-questrial font-light">Frame</span>
         </div>
       </div>
       <div className="px-4 pb-4">

@@ -21,12 +21,12 @@ import {
   Underline,
 } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { InputNumber } from "../inputs/input-number";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
 import InputFontFamily from "../inputs/input-font-family";
+import { InputNumber } from "../inputs/input-number";
 
 export function TextProperties() {
   const instance = useWeave((state) => state.instance);
@@ -91,9 +91,7 @@ export function TextProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">
-            Typography
-          </span>
+          <span className="text-xs font-questrial font-light">Typography</span>
         </div>
       </div>
       <div className="px-4 pb-4">
@@ -159,7 +157,7 @@ export function TextProperties() {
           />
 
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Style
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -268,7 +266,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Variant
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -305,7 +303,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Decoration
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -361,7 +359,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Horizontal alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -413,7 +411,7 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Vertical alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">

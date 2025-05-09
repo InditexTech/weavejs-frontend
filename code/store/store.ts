@@ -6,6 +6,7 @@ import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { WeaveElementAttributes } from "@inditextech/weave-types";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 type ShowcaseUser = {
   name: string;
@@ -16,6 +17,9 @@ type NodePropertiesAction = "create" | "update" | undefined;
 
 type FinishUploadCallback = (imageURL: string) => void;
 
+type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
+export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
+
 interface CollaborationRoomState {
   fetchConnectionUrl: {
     loading: boolean;
@@ -23,6 +27,14 @@ interface CollaborationRoomState {
   };
   ui: {
     show: boolean;
+  };
+  sidebar: {
+    left: {
+      active: SidebarActive;
+    };
+    right: {
+      active: SidebarActive;
+    };
   };
   user: ShowcaseUser | undefined;
   room: string | undefined;
@@ -34,7 +46,6 @@ interface CollaborationRoomState {
   nodeProperties: {
     action: NodePropertiesAction;
     createProps: WeaveElementAttributes | undefined;
-    visible: boolean;
   };
   images: {
     showSelectFile: boolean;
@@ -42,22 +53,6 @@ interface CollaborationRoomState {
     uploading: boolean;
     loading: boolean;
     finishUploadCallback: FinishUploadCallback | null;
-    library: {
-      visible: boolean;
-    };
-  };
-  frames: {
-    library: {
-      visible: boolean;
-    };
-  };
-  colorToken: {
-    library: {
-      visible: boolean;
-    };
-  };
-  nodesTree: {
-    visible: boolean;
   };
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
@@ -82,11 +77,10 @@ interface CollaborationRoomState {
   setNodePropertiesCreateProps: (
     newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
-  setNodePropertiesVisible: (newNodePropertiesVisible: boolean) => void;
-  setImagesLibraryVisible: (newImagesLibraryVisible: boolean) => void;
-  setFramesLibraryVisible: (newFramesLibraryVisible: boolean) => void;
-  setColorTokensLibraryVisible: (newColorTokensLibraryVisible: boolean) => void;
-  setNodesTreeVisible: (newNodesTreeVisible: boolean) => void;
+  setSidebarActive: (
+    newSidebarActive: SidebarActive,
+    position?: "left" | "right"
+  ) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -99,6 +93,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   },
   user: undefined,
   room: undefined,
+  sidebar: {
+    left: {
+      active: null,
+    },
+    right: {
+      active: null,
+    },
+  },
   contextMenu: {
     show: false,
     position: { x: 0, y: 0 },
@@ -211,50 +213,15 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         createProps: newNodePropertiesCreateProps,
       },
     })),
-  setNodePropertiesVisible: (newNodePropertiesVisible) =>
+  setSidebarActive: (newSidebarActive, position = "left") =>
     set((state) => ({
       ...state,
-      nodeProperties: {
-        ...state.nodeProperties,
-        visible: newNodePropertiesVisible,
-      },
-    })),
-  setImagesLibraryVisible: (newImagesLibraryVisible) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        library: { ...state.images.library, visible: newImagesLibraryVisible },
-      },
-    })),
-  setFramesLibraryVisible: (newFramesLibraryVisible) =>
-    set((state) => ({
-      ...state,
-      frames: {
-        ...state.frames,
-        library: {
-          ...state.frames.library,
-          visible: newFramesLibraryVisible,
+      sidebar: {
+        ...state.sidebar,
+        [position]: {
+          ...state.sidebar[position],
+          active: newSidebarActive,
         },
-      },
-    })),
-  setColorTokensLibraryVisible: (newColorTokensLibraryVisible) =>
-    set((state) => ({
-      ...state,
-      colorToken: {
-        ...state.colorToken,
-        library: {
-          ...state.colorToken.library,
-          visible: newColorTokensLibraryVisible,
-        },
-      },
-    })),
-  setNodesTreeVisible: (newNodesTreeVisible) =>
-    set((state) => ({
-      ...state,
-      nodesTree: {
-        ...state.nodesTree,
-        visible: newNodesTreeVisible,
       },
     })),
 }));

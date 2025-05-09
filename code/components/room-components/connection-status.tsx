@@ -40,7 +40,10 @@ export const ConnectionStatus = ({
       >
         {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED && (
-          <Cloud size={20} />
+          <>
+            <span className="mr-2 text-xs">connected</span>
+            <Cloud size={20} />
+          </>
         )}
         {/* {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING && (
@@ -48,7 +51,10 @@ export const ConnectionStatus = ({
         )} */}
         {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED && (
-          <CloudAlert size={20} />
+          <>
+            <span className="mr-2 text-xs">disconnected</span>
+            <CloudAlert size={20} />
+          </>
         )}
       </div>
     </div>

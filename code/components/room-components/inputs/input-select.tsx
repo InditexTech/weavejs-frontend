@@ -16,9 +16,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
+import React from "react";
 
 function InputSelect({
   label,
@@ -46,7 +46,7 @@ function InputSelect({
 
   return (
     <div className="flex flex-col items-start justify-start relative">
-      <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+      <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
         {label}
       </div>
       <Popover
@@ -63,7 +63,7 @@ function InputSelect({
             role="combobox"
             aria-expanded={open}
             disabled={disabled}
-            className="w-full h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+            className="w-full pl-3 h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
           >
             {options.find((option) => option.value === selectedOption)?.label ??
               "-"}
@@ -79,7 +79,7 @@ function InputSelect({
               onFocus={() => {
                 window.weaveOnFieldFocus = true;
               }}
-              onBlur={() => {
+              onBlurCapture={() => {
                 window.weaveOnFieldFocus = false;
               }}
               placeholder="Search..."

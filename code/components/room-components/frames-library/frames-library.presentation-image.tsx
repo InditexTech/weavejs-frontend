@@ -54,9 +54,7 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
   if (loading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <div className="font-noto-sans-mono text-2xl text-white">
-          Loading...
-        </div>
+        <div className="font-questrial text-2xl text-white">Loading...</div>
       </div>
     );
   }

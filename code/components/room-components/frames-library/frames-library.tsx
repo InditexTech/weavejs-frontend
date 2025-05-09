@@ -18,25 +18,30 @@ import {
   SquareCheck,
   StepBack,
   StepForward,
+  X,
   XIcon,
 } from "lucide-react";
 import { toImageAsync } from "./utils";
 import { FrameImage } from "./frames-library.image";
 import { FramePresentationImage } from "./frames-library.presentation-image";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
+  const sidebarLeftActive = useCollaborationRoom(
+    (state) => state.sidebar.left.active
+  );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
   const [actualFrame, setActualFrame] = React.useState<number>(0);
   const [selectedFrames, setSelectedFrames] = React.useState<string[]>([]);
-
-  const framesLibraryVisible = useCollaborationRoom(
-    (state) => state.frames.library.visible
-  );
 
   const framesAvailable = React.useMemo(() => {
     if (!instance) {
@@ -44,6 +49,11 @@ export const FramesLibrary = () => {
     }
 
     const stage = instance.getStage();
+
+    if (!stage) {
+      return [];
+    }
+
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
       "frame"
@@ -146,15 +156,15 @@ export const FramesLibrary = () => {
     return null;
   }
 
-  if (!framesLibraryVisible) {
+  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
 
   return (
     <>
       <div className="pointer-events-auto w-full h-full">
-        <div className="w-[calc(100%-38px)] font-title-xs p-1 pr-0 bg-white flex justify-between items-center">
-          <div className="flex justify-between font-noto-sans-mono font-light items-center text-md pl-2">
+        <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
+          <div className="flex justify-between font-questrial font-light items-center text-md pl-2">
             Frames
           </div>
           <div className="flex justify-end items-center gap-1">
@@ -198,6 +208,15 @@ export const FramesLibrary = () => {
             >
               <Download className="group-disabled:text-accent" size={16} />
             </button>
+            <div className="w-[1px] h-[16px] bg-zinc-200" />
+            <button
+              className="cursor-pointer bg-transparent hover:bg-accent p-2"
+              onClick={() => {
+                setSidebarActive(null);
+              }}
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200 p-3">
@@ -216,7 +235,7 @@ export const FramesLibrary = () => {
                 className="w-full bg-light-background-1 flex flex-col gap-2"
               >
                 <div className="w-full flex justify-between items-center">
-                  <div className="w-full text-xs font-noto-sans-mono font-light">
+                  <div className="w-full text-xs font-questrial font-light">
                     {attrs.title}
                   </div>
                   <div className="font-label-l-regular">
@@ -246,7 +265,7 @@ export const FramesLibrary = () => {
         </div>
       </div>
       {presentationMode && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
+        <div className="fixed z-10 top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
           <div className="absolute top-8 right-8 flex justify-end items-center p-1">
             <div className="flex justify-end items-center shadow-lg bg-white">
               <button

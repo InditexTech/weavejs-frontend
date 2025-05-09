@@ -96,7 +96,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             onFocus={() => {
               window.weaveOnFieldFocus = true;
             }}
-            onBlur={() => {
+            onBlurCapture={() => {
               window.weaveOnFieldFocus = false;
               handleBlur();
             }}
