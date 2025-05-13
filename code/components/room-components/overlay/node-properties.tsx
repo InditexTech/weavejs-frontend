@@ -40,8 +40,6 @@ export const NodeProperties = () => {
   );
 
   React.useEffect(() => {
-    if (!instance) return;
-
     if (
       actualAction &&
       [
@@ -65,7 +63,7 @@ export const NodeProperties = () => {
     if (node) {
       setNodePropertiesAction("update");
     }
-  }, [actualAction, node]);
+  }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
@@ -117,7 +115,14 @@ export const NodeProperties = () => {
       return;
     }
     setSidebarActive(null, "right");
-  }, [node, sidebarRightActive, setSidebarActive]);
+  }, [
+    actionType,
+    nodeType,
+    nodePropertiesAction,
+    node,
+    sidebarRightActive,
+    setSidebarActive,
+  ]);
 
   const title = React.useMemo(() => {
     if (nodePropertiesAction === "create") {
