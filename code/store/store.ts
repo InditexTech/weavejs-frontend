@@ -6,7 +6,7 @@ import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { WeaveElementAttributes } from "@inditextech/weave-types";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 type ShowcaseUser = {
   name: string;
@@ -16,6 +16,9 @@ type ShowcaseUser = {
 type NodePropertiesAction = "create" | "update" | undefined;
 
 type FinishUploadCallback = (imageURL: string) => void;
+
+type DrawerKeyKeys = keyof typeof DRAWER_ELEMENTS;
+export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 
 type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
@@ -27,6 +30,11 @@ interface CollaborationRoomState {
   };
   ui: {
     show: boolean;
+  };
+  drawer: {
+    keyboardShortcuts: {
+      visible: boolean;
+    };
   };
   sidebar: {
     left: {
@@ -81,6 +89,7 @@ interface CollaborationRoomState {
     newSidebarActive: SidebarActive,
     position?: "left" | "right"
   ) => void;
+  setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -99,6 +108,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     },
     right: {
       active: null,
+    },
+  },
+  drawer: {
+    keyboardShortcuts: {
+      visible: false,
     },
   },
   contextMenu: {
@@ -221,6 +235,17 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         [position]: {
           ...state.sidebar[position],
           active: newSidebarActive,
+        },
+      },
+    })),
+  setShowDrawer: (drawerKey, newOpen) =>
+    set((state) => ({
+      ...state,
+      drawer: {
+        ...state.drawer,
+        [drawerKey]: {
+          ...state.drawer[drawerKey],
+          visible: newOpen,
         },
       },
     })),
