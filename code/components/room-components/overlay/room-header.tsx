@@ -30,6 +30,8 @@ import {
   GripIcon,
   CheckIcon,
   Braces,
+  Github,
+  Book,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -46,6 +48,7 @@ import { ToolbarButton } from "../toolbar/toolbar-button";
 import { ShortcutElement } from "../help/shortcut-element";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawer } from "../help/help-drawer";
+import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 
 export function RoomHeader() {
   const router = useRouter();
@@ -264,25 +267,53 @@ export function RoomHeader() {
           <Divider />
           <ZoomToolbar />
           <Divider />
-          <HelpDrawer />
-          <ToolbarButton
-            icon={<Braces />}
-            onClick={handlePrintToConsoleState}
-            label={
-              <div className="flex flex-col gap-2 justify-start items-end">
-                <p>Print model state to browser console</p>
-                <ShortcutElement
-                  variant="light"
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⌥ ⌘ C",
-                    [SYSTEM_OS.OTHER]: "Alt Ctrl C",
-                  }}
-                />
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="end"
-          />
+          <div className="flex justify-start items-center gap-0">
+            <HelpDrawer />
+            <ToolbarButton
+              icon={<Braces />}
+              onClick={handlePrintToConsoleState}
+              label={
+                <div className="flex flex-col gap-2 justify-start items-end">
+                  <p>Print model state to browser console</p>
+                  <ShortcutElement
+                    variant="light"
+                    shortcuts={{
+                      [SYSTEM_OS.MAC]: "⌥ ⌘ C",
+                      [SYSTEM_OS.OTHER]: "Alt Ctrl C",
+                    }}
+                  />
+                </div>
+              }
+              tooltipSide="top"
+              tooltipAlign="end"
+            />
+            <ToolbarButton
+              icon={<Github />}
+              onClick={() => {
+                window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+              }}
+              label={
+                <div className="flex flex-col gap-2 justify-start items-end">
+                  <p>Github repository</p>
+                </div>
+              }
+              tooltipSide="top"
+              tooltipAlign="end"
+            />
+            <ToolbarButton
+              icon={<Book />}
+              onClick={() => {
+                window.open(DOCUMENTATION_URL, "_blank", "noopener,noreferrer");
+              }}
+              label={
+                <div className="flex flex-col gap-2 justify-start items-end">
+                  <p>Weave.js documentation</p>
+                </div>
+              }
+              tooltipSide="top"
+              tooltipAlign="end"
+            />
+          </div>
         </div>
       </div>
     </motion.div>

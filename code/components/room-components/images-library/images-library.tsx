@@ -13,6 +13,12 @@ import { getImages } from "@/api/get-images";
 import { postImage } from "@/api/post-image";
 import { delImage } from "@/api/del-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const ImagesLibrary = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,17 +94,30 @@ export const ImagesLibrary = () => {
               }
             }}
           />
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-2"
-            onClick={() => {
-              if (inputFileRef.current) {
-                inputFileRef.current.click();
-                // instance.triggerAction("imageTool");
-              }
-            }}
-          >
-            <ImagePlus size={16} />
-          </button>
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                  onClick={() => {
+                    if (inputFileRef.current) {
+                      inputFileRef.current.click();
+                      // instance.triggerAction("imageTool");
+                    }
+                  }}
+                >
+                  <ImagePlus size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                align="center"
+                className="rounded-none"
+              >
+                Add an image to the library
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <div className="w-[1px] h-[16px] bg-zinc-200" />
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-2"

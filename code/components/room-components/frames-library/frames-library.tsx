@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { PDFDocument } from "pdf-lib";
+import { BlendMode, PDFDocument } from "pdf-lib";
 import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import Konva from "konva";
@@ -25,6 +25,12 @@ import { toImageAsync } from "./utils";
 import { FrameImage } from "./frames-library.image";
 import { FramePresentationImage } from "./frames-library.presentation-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -114,10 +120,11 @@ export const FramesLibrary = () => {
         const frameBg = node.findOne(`#${attrs.id}-bg`) as Konva.Group;
         const boxBg = frameBg.getClientRect();
         const img = await toImageAsync(node, {
-          x: boxBg.x + 2,
-          y: boxBg.y + 2,
-          width: boxBg.width - 4,
-          height: boxBg.height - 4,
+          pixelRatio: 3,
+          x: boxBg.x + 4,
+          y: boxBg.y + 4,
+          width: boxBg.width - 8,
+          height: boxBg.height - 8,
         });
         pages.push({ title: attrs.title, image: img.src });
       }
@@ -126,12 +133,13 @@ export const FramesLibrary = () => {
     const pdfDoc = await PDFDocument.create();
     for (const page of pages) {
       const pdfPage = pdfDoc.addPage([1403, 992]);
-      const imageDoc = await pdfDoc.embedJpg(page.image);
+      const imageDoc = await pdfDoc.embedPng(page.image);
       pdfPage.drawImage(imageDoc, {
         x: 30,
         y: 30,
         width: 1403 - 60,
         height: 992 - 60,
+        blendMode: BlendMode.Normal,
       });
     }
 
@@ -168,46 +176,106 @@ export const FramesLibrary = () => {
             Frames
           </div>
           <div className="flex justify-end items-center gap-1">
-            <button
-              className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-              disabled={selectedFrames.length === 0}
-              onClick={() => {
-                setActualFrame(0);
-                setPresentationMode((prev) => !prev);
-              }}
-            >
-              <Presentation className="group-disabled:text-accent" size={16} />
-            </button>
-            <button
-              className="cursor-pointer bg-transparent hover:bg-accent p-2"
-              disabled={selectedNodes.length <= 1 || !selectedNodesAllFrame}
-              onClick={alignItemsHandler}
-            >
-              <AlignStartHorizontal size={16} />
-            </button>
-            <button
-              className="cursor-pointer bg-transparent hover:bg-accent p-2"
-              onClick={() => {
-                if (selectedFrames.length === 0) {
-                  const frames = framesAvailable.map((frame) => {
-                    const attrs = frame.getAttrs();
-                    return attrs.id ?? "";
-                  });
-                  setSelectedFrames(frames);
-                } else {
-                  setSelectedFrames([]);
-                }
-              }}
-            >
-              <SquareCheck size={16} />
-            </button>
-            <button
-              className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-              disabled={selectedFrames.length === 0}
-              onClick={exportFramesHandler}
-            >
-              <Download className="group-disabled:text-accent" size={16} />
-            </button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
+                    disabled={selectedFrames.length === 0}
+                    onClick={() => {
+                      setActualFrame(0);
+                      setPresentationMode((prev) => !prev);
+                    }}
+                  >
+                    <Presentation
+                      className="group-disabled:text-accent"
+                      size={16}
+                    />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="rounded-none"
+                >
+                  Presentation mode
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                    disabled={
+                      selectedNodes.length <= 1 || !selectedNodesAllFrame
+                    }
+                    onClick={alignItemsHandler}
+                  >
+                    <AlignStartHorizontal size={16} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="rounded-none"
+                >
+                  Align horizontally
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                    onClick={() => {
+                      if (selectedFrames.length === 0) {
+                        const frames = framesAvailable.map((frame) => {
+                          const attrs = frame.getAttrs();
+                          return attrs.id ?? "";
+                        });
+                        setSelectedFrames(frames);
+                      } else {
+                        setSelectedFrames([]);
+                      }
+                    }}
+                  >
+                    <SquareCheck size={16} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="rounded-none"
+                >
+                  Select all frames
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
+                    disabled={selectedFrames.length === 0}
+                    onClick={exportFramesHandler}
+                  >
+                    <Download
+                      className="group-disabled:text-accent"
+                      size={16}
+                    />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="rounded-none"
+                >
+                  Export as PDF
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <div className="w-[1px] h-[16px] bg-zinc-200" />
             <button
               className="cursor-pointer bg-transparent hover:bg-accent p-2"

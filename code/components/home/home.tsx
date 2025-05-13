@@ -11,6 +11,9 @@ import { Logo } from "@/components/utils/logo";
 import LoginForm from "../home-components/login-form";
 import Dither from "../ui/reactbits/Backgrounds/Dither/Dither";
 import RotatingText from "../ui/reactbits/TextAnimations/RotatingText/RotatingText";
+import { Button } from "../ui/button";
+import { Github, Book } from "lucide-react";
+import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 
 export const Home = () => {
   return (
@@ -75,6 +78,30 @@ export const Home = () => {
             </div>
             <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-10 rounded-xl">
               <LoginForm />
+            </div>
+            <div className="w-full flex gap-2 items-center justify-center bg-background p-8 py-2 rounded-xl mt-4">
+              <Button
+                variant="link"
+                onClick={() => {
+                  window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+                }}
+                className="cursor-pointer font-questrial"
+              >
+                <Github /> GITHUB
+              </Button>
+              <Button
+                variant="link"
+                onClick={() => {
+                  window.open(
+                    DOCUMENTATION_URL,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                }}
+                className="cursor-pointer font-questrial"
+              >
+                <Book /> DOCUMENTATION
+              </Button>
             </div>
           </div>
         </motion.section>

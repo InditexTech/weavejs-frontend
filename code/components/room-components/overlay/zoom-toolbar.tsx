@@ -37,7 +37,7 @@ export function ZoomToolbar() {
     <div className="flex justify-end gap-2 items-center">
       <div className="gap-1 flex justify-end items-center">
         <div className="w-full grid grid-cols-[auto_1fr]">
-          <div className="flex justify-start items-center gap-1">
+          <div className="flex justify-start items-center gap-0">
             <ToolbarButton
               icon={<ZoomIn />}
               disabled={!canZoomIn}

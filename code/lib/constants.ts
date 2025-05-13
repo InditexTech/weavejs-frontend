@@ -1,3 +1,9 @@
+export const GITHUB_URL = "https://github.com/InditexTech/weavejs";
+// export const DOCUMENTATION_URL =
+//   "https://stunning-enigma-169l5kv.pages.github.io";
+export const DOCUMENTATION_URL =
+  "https://stunning-enigma-169l5kv.pages.github.io";
+
 export const SIDEBAR_ELEMENTS = {
   images: "images",
   frames: "frames",
