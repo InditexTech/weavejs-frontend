@@ -24,6 +24,16 @@ const nextConfig = {
   experimental: {
     proxyTimeout: 60000 * 5,
   },
+  async redirects() {
+    return [
+      // Wildcard path matching
+      {
+        source: "/room/:slug",
+        destination: "/rooms/:slug",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [

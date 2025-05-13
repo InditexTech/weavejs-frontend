@@ -17,7 +17,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Logo } from "@/components/utils/logo";
 import {
   Image as ImageIcon,
@@ -32,6 +37,7 @@ import {
   Braces,
   Github,
   Book,
+  Cog,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -149,114 +155,30 @@ export function RoomHeader() {
           </div>
           <Divider />
           <div className="flex justify-start items-center gap-1">
-            <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
-              <DropdownMenuTrigger
-                className={cn(
-                  "pointer-events-auto rounded-none cursor-pointer focus:outline-none",
-                  {
-                    ["font-normal"]: menuOpen,
-                    ["font-extralight"]: !menuOpen,
-                  }
-                )}
-              >
-                <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
-                  <div className="font-questrial text-lg">{room}</div>
-                  {menuOpen ? (
-                    <ChevronUp size={16} />
-                  ) : (
-                    <ChevronDown size={16} />
-                  )}
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                side="bottom"
-                alignOffset={0}
-                sideOffset={4}
-                className="font-questrial rounded-none"
-              >
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Grid Visibility
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={handleToggleGrid}
-                >
-                  {!gridEnabled && (
-                    <>
-                      <Grid2X2PlusIcon /> Enable
-                    </>
-                  )}
-                  {gridEnabled && (
-                    <>
-                      <Grid2x2XIcon /> Disable
-                    </>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Grid Kind
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  disabled={
-                    !gridEnabled ||
-                    (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
-                  }
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={() => {
-                    handleSetGridType(WEAVE_GRID_TYPES.DOTS);
-                  }}
-                >
-                  <div className="w-full flex justify-between items-center">
-                    <div className="w-full flex justify-start items-center gap-2">
-                      <GripIcon size={16} /> Dots
-                    </div>
-                    {gridType === WEAVE_GRID_TYPES.DOTS && <CheckIcon />}
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={
-                    !gridEnabled ||
-                    (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
-                  }
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={() => {
-                    handleSetGridType(WEAVE_GRID_TYPES.LINES);
-                  }}
-                >
-                  <div className="w-full flex justify-between items-center">
-                    <div className="w-full flex justify-start items-center gap-2">
-                      <Grid3X3Icon size={16} /> Lines
-                    </div>
-                    {gridType === WEAVE_GRID_TYPES.LINES && <CheckIcon />}
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Exporting
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={handleExportToImage}
-                >
-                  <ImageIcon /> Stage to image
-                </DropdownMenuItem>
-                {/* <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none"
-                onClick={handleExportToPdf}
-              >
-                <FileText />
-                Export to PDF
-              </DropdownMenuItem> */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
+            <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
+              <div className="font-questrial text-lg">{room}</div>
+            </div>
+          </div>
+          <Divider />
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="pointer-events-auto cursor-pointer font-questrial text-sm hover:text-zinc-200 !normal-case min-h-[32px]"
                   onClick={handleExitRoom}
                 >
-                  <LogOut /> Exit room
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                  <LogOut />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                align="center"
+                className="rounded-none"
+              >
+                Exit room
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex justify-end items-center gap-3">
           <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
@@ -314,6 +236,96 @@ export function RoomHeader() {
               tooltipAlign="end"
             />
           </div>
+          <Divider />
+          <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
+            <DropdownMenuTrigger
+              className={cn(
+                "pointer-events-auto rounded-none cursor-pointer focus:outline-none",
+                {
+                  ["font-normal"]: menuOpen,
+                  ["font-extralight"]: !menuOpen,
+                }
+              )}
+            >
+              <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
+                <Cog />
+                {menuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              side="bottom"
+              alignOffset={0}
+              sideOffset={4}
+              className="font-questrial rounded-none"
+            >
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                Grid Visibility
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={handleToggleGrid}
+              >
+                {!gridEnabled && (
+                  <>
+                    <Grid2X2PlusIcon /> Enable
+                  </>
+                )}
+                {gridEnabled && (
+                  <>
+                    <Grid2x2XIcon /> Disable
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                Grid Kind
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                disabled={
+                  !gridEnabled ||
+                  (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
+                }
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={() => {
+                  handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                }}
+              >
+                <div className="w-full flex justify-between items-center">
+                  <div className="w-full flex justify-start items-center gap-2">
+                    <GripIcon size={16} /> Dots
+                  </div>
+                  {gridType === WEAVE_GRID_TYPES.DOTS && <CheckIcon />}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={
+                  !gridEnabled ||
+                  (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
+                }
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={() => {
+                  handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                }}
+              >
+                <div className="w-full flex justify-between items-center">
+                  <div className="w-full flex justify-start items-center gap-2">
+                    <Grid3X3Icon size={16} /> Lines
+                  </div>
+                  {gridType === WEAVE_GRID_TYPES.LINES && <CheckIcon />}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                Exporting
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={handleExportToImage}
+              >
+                <ImageIcon /> Stage to image
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </motion.div>

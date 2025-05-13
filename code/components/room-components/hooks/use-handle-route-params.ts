@@ -16,8 +16,10 @@ function useHandleRouteParams() {
   React.useEffect(() => {
     const roomId = params.roomId;
     const userName = searchParams.get("userName");
-    if (roomId && userName) {
+    if (roomId) {
       setRoom(roomId);
+    }
+    if (userName) {
       setUser({
         name: userName,
         email: `${userName}@weave.js`,
@@ -28,7 +30,7 @@ function useHandleRouteParams() {
 
   return {
     loadedParams,
-  }
+  };
 }
 
 export default useHandleRouteParams;
