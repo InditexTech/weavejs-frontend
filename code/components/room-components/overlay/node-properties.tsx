@@ -125,6 +125,7 @@ export const NodeProperties = () => {
     }
     setSidebarActive(null, "right");
   }, [
+    actualAction,
     actionType,
     nodeType,
     nodePropertiesAction,
