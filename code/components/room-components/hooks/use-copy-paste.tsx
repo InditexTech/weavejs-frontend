@@ -17,7 +17,7 @@ function useCopyPaste() {
     (error: WeaveCopyPasteNodesPluginOnCopyEvent): void => {
       if (error) {
         console.error("onCopy", error);
-        toast.error("Aan error occurred when copying to the clipboard");
+        toast.error("An error occurred when copying to the clipboard");
       } else {
         toast.success("Copy successful");
       }
@@ -29,7 +29,7 @@ function useCopyPaste() {
     (error: WeaveCopyPasteNodesPluginOnPasteEvent): void => {
       if (error) {
         console.error("onPaste", error);
-        toast.error("Aan error occurred when reading from the clipboard");
+        toast.error("An error occurred when reading from the clipboard");
       } else {
         toast.success("Paste successful");
       }

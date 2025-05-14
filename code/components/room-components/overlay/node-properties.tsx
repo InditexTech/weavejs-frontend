@@ -55,7 +55,7 @@ export const NodeProperties = () => {
       setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
     }
 
-    if (!actualAction) {
+    if (!actualAction && !node) {
       setNodePropertiesAction(undefined);
       setSidebarActive(null, "right");
     }
@@ -106,6 +106,15 @@ export const NodeProperties = () => {
   }, [actualAction]);
 
   React.useEffect(() => {
+    if (
+      nodePropertiesAction === "create" &&
+      actualAction === "selectionTool" &&
+      actionType === "Unknown" &&
+      nodeType === "Unknown"
+    ) {
+      setSidebarActive(null, "right");
+      return;
+    }
     if (nodePropertiesAction === "create" && actionType) {
       setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
       return;
@@ -145,9 +154,22 @@ export const NodeProperties = () => {
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-2"
             onClick={() => {
-              if (instance) {
-                instance.selectNodesByKey([]);
+              if (!instance) return;
+              if (
+                actualAction &&
+                [
+                  "rectangleTool",
+                  "brushTool",
+                  "penTool",
+                  "imageTool",
+                  "colorTokenTool",
+                  "frameTool",
+                ].includes(actualAction)
+              ) {
+                instance.cancelAction(actualAction);
               }
+              instance.selectNodesByKey([]);
+              setNodePropertiesAction(undefined);
               setSidebarActive(null, "right");
             }}
           >
