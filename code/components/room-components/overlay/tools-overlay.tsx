@@ -152,7 +152,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Move</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "M",
                   [SYSTEM_OS.OTHER]: "M",
@@ -172,7 +171,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Selection</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "S",
                   [SYSTEM_OS.OTHER]: "S",
@@ -192,7 +190,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add a rectangle</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "R",
                   [SYSTEM_OS.OTHER]: "R",
@@ -212,7 +209,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add a line</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "L",
                   [SYSTEM_OS.OTHER]: "L",
@@ -232,7 +228,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Free draw</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "B",
                   [SYSTEM_OS.OTHER]: "B",
@@ -252,7 +247,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add text</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "T",
                   [SYSTEM_OS.OTHER]: "t",
@@ -275,7 +269,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add an image</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "I",
                   [SYSTEM_OS.OTHER]: "I",
@@ -295,7 +288,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add a frame</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "F",
                   [SYSTEM_OS.OTHER]: "F",
@@ -316,7 +308,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add color token reference</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "P",
                   [SYSTEM_OS.OTHER]: "P",
@@ -342,7 +333,6 @@ export function ToolsOverlay() {
             <div className="flex flex-col gap-2 justify-start items-end">
               <p>Undo latest changes</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "⇧ ⌘ ,",
                   [SYSTEM_OS.OTHER]: "⇧ Ctrl ,",
@@ -367,7 +357,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Redo latest changes</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "⇧ ⌘ .",
                   [SYSTEM_OS.OTHER]: "⇧ Ctrl .",
