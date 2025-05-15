@@ -18,24 +18,17 @@ import {
   MousePointer,
   Hand,
   Tags,
-  Images,
-  Projector,
-  SwatchBook,
-  ListTree,
   Undo,
   Redo,
-  X,
-  Ellipsis,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
 import { topElementVariants } from "./variants";
-import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useCollaborationRoom } from "@/store/store";
 import { ShortcutElement } from "../help/shortcut-element";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 function ToolbarDivider() {
   return (
@@ -45,17 +38,8 @@ function ToolbarDivider() {
   );
 }
 
-const SIDEBAR_ICONS_MAP: Record<string, React.JSX.Element> = {
-  [SIDEBAR_ELEMENTS.images]: <Images />,
-  [SIDEBAR_ELEMENTS.frames]: <Projector />,
-  [SIDEBAR_ELEMENTS.colorTokens]: <SwatchBook />,
-  [SIDEBAR_ELEMENTS.nodesTree]: <ListTree />,
-};
-
 export function ToolsOverlay() {
   useKeyboardHandler();
-
-  const [visibleButtonMenu, setVisibleButtonMenu] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -69,13 +53,6 @@ export function ToolsOverlay() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
-  );
-
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
   );
 
   const mutationUpload = useMutation({
@@ -153,14 +130,6 @@ export function ToolsOverlay() {
     };
   }, [instance, mutationUpload, setShowSelectFileImage, setUploadingImage]);
 
-  const sidebarToggle = React.useCallback(
-    (element: SidebarActive) => {
-      setSidebarActive(element);
-      setVisibleButtonMenu(false);
-    },
-    [setSidebarActive]
-  );
-
   if (!showUI) {
     return null;
   }
@@ -171,12 +140,12 @@ export function ToolsOverlay() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="pointer-events-none absolute left-4 right-4 bottom-4 flex flex-col gap-2 justify-center items-center"
+      className="pointer-events-none absolute left-[24px] right-[24px] bottom-[24px] flex flex-col gap-2 justify-center items-center"
     >
       <Toolbar orientation="horizontal">
         <ToolbarButton
-          className="rounded-l-lg"
-          icon={<Hand />}
+          className="rounded-full !w-[40px]"
+          icon={<Hand className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "moveTool"}
           onClick={() => triggerTool("moveTool")}
           label={
@@ -195,7 +164,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<MousePointer />}
+          className="rounded-full !w-[40px]"
+          icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "selectionTool"}
           onClick={() => triggerTool("selectionTool")}
           label={
@@ -214,7 +184,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Square />}
+          className="rounded-full !w-[40px]"
+          icon={<Square className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "rectangleTool"}
           onClick={() => triggerTool("rectangleTool")}
           label={
@@ -233,7 +204,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<PenTool />}
+          className="rounded-full !w-[40px]"
+          icon={<PenTool className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "penTool"}
           onClick={() => triggerTool("penTool")}
           label={
@@ -252,7 +224,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Brush />}
+          className="rounded-full !w-[40px]"
+          icon={<Brush className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "brushTool"}
           onClick={() => triggerTool("brushTool")}
           label={
@@ -271,7 +244,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Type />}
+          className="rounded-full !w-[40px]"
+          icon={<Type className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "textTool"}
           onClick={() => triggerTool("textTool")}
           label={
@@ -290,7 +264,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<ImagePlus />}
+          className="rounded-full !w-[40px]"
+          icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "imageTool"}
           onClick={() => {
             triggerTool("imageTool");
@@ -312,7 +287,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Frame />}
+          className="rounded-full !w-[40px]"
+          icon={<Frame className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "frameTool"}
           onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
@@ -332,7 +308,8 @@ export function ToolsOverlay() {
         />
         <ToolbarDivider />
         <ToolbarButton
-          icon={<Tags />}
+          className="rounded-full !w-[40px]"
+          icon={<Tags className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "colorTokenTool"}
           onClick={() => triggerTool("colorTokenTool")}
           label={
@@ -351,145 +328,9 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarDivider />
-        <div className="relative">
-          <ToolbarButton
-            icon={
-              sidebarLeftActive ? (
-                SIDEBAR_ICONS_MAP[sidebarLeftActive]
-              ) : (
-                <Ellipsis />
-              )
-            }
-            active={sidebarLeftActive !== null}
-            onClick={() => {
-              setVisibleButtonMenu(!visibleButtonMenu);
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>More options</p>
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="center"
-          />
-          <div
-            className={cn("absolute left-[-4px] bottom-[44px] hidden", {
-              ["flex flex-col bg-white border border-zinc-200 p-1 rounded-xl rounded-b-none"]:
-                visibleButtonMenu,
-            })}
-          >
-            <ToolbarButton
-              icon={<Images />}
-              className="rounded-t-lg"
-              active={sidebarLeftActive === SIDEBAR_ELEMENTS.images}
-              onClick={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.images);
-              }}
-              label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  <p>Images sidebar</p>
-                  <ShortcutElement
-                    variant="light"
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌥ ⌘ R",
-                      [SYSTEM_OS.OTHER]: "Alt Ctrl R",
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="right"
-              tooltipAlign="start"
-            />
-            <ToolbarButton
-              icon={<Projector />}
-              active={sidebarLeftActive === SIDEBAR_ELEMENTS.frames}
-              onClick={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.frames);
-              }}
-              label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  <p>Frames sidebar</p>
-                  <ShortcutElement
-                    variant="light"
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌥ ⌘ F",
-                      [SYSTEM_OS.OTHER]: "Alt Ctrl F",
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="right"
-              tooltipAlign="start"
-            />
-            <ToolbarButton
-              icon={<SwatchBook />}
-              active={sidebarLeftActive === SIDEBAR_ELEMENTS.colorTokens}
-              onClick={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-              }}
-              label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  <p>Color Tokens sidebar</p>
-                  <ShortcutElement
-                    variant="light"
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌥ ⌘ O",
-                      [SYSTEM_OS.OTHER]: "Alt Ctrl O",
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="right"
-              tooltipAlign="start"
-            />
-            <ToolbarButton
-              icon={<ListTree />}
-              active={sidebarLeftActive === SIDEBAR_ELEMENTS.nodesTree}
-              onClick={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-              }}
-              label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  <p>Elements sidebar</p>
-                  <ShortcutElement
-                    variant="light"
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌥ ⌘ E",
-                      [SYSTEM_OS.OTHER]: "Alt Ctrl E",
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="right"
-              tooltipAlign="start"
-            />
-            {sidebarLeftActive && (
-              <ToolbarButton
-                icon={<X />}
-                onClick={() => {
-                  sidebarToggle(null);
-                }}
-                label={
-                  <div className="flex flex-col gap-2 justify-start items-end">
-                    <p>Close sidebar</p>
-                    <ShortcutElement
-                      variant="light"
-                      shortcuts={{
-                        [SYSTEM_OS.MAC]: "⌥ ⌘ E",
-                        [SYSTEM_OS.OTHER]: "Alt Ctrl E",
-                      }}
-                    />
-                  </div>
-                }
-                tooltipSide="right"
-                tooltipAlign="start"
-              />
-            )}
-          </div>
-        </div>
-        <ToolbarDivider />
         <ToolbarButton
-          icon={<Undo />}
+          className="rounded-full !w-[40px]"
+          icon={<Undo className="px-2" size={40} strokeWidth={1} />}
           disabled={!canUndo}
           onClick={() => {
             if (instance) {
@@ -513,8 +354,8 @@ export function ToolsOverlay() {
           tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Redo />}
-          className="rounded-r-lg"
+          className="rounded-full !w-[40px]"
+          icon={<Redo className="px-2" size={40} strokeWidth={1} />}
           disabled={!canRedo}
           onClick={() => {
             if (instance) {

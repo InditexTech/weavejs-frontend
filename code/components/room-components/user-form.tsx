@@ -6,7 +6,6 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,8 +32,6 @@ const formSchema = z
   .required();
 
 function UserForm() {
-  const router = useRouter();
-
   const room = useCollaborationRoom((state) => state.room);
   const setUser = useCollaborationRoom((state) => state.setUser);
 
@@ -46,11 +43,12 @@ function UserForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setUser({
+    const userMapped = {
       name: values.username,
       email: `${values.username}@weavejs.com`,
-    });
-    router.push(`/rooms/${room}?userName=${values.username}`);
+    };
+    setUser(userMapped);
+    localStorage.setItem(`weave.js_${room}`, JSON.stringify(userMapped));
   }
 
   return (
@@ -67,13 +65,13 @@ function UserForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-questrial font-light">
+                <FormLabel className="font-inter font-light text-[#757575]">
                   Username
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="your username"
-                    className="font-questrial rounded-md w-full"
+                    className="font-inter font-light rounded-none border-black w-full"
                     {...field}
                   />
                 </FormControl>
@@ -84,7 +82,7 @@ function UserForm() {
           <div className="w-full flex justify-center items-center">
             <Button
               type="submit"
-              className="cursor-pointer font-questrial rounded-md w-full mt-6"
+              className="cursor-pointer font-inter font-light rounded-none w-full mt-6"
             >
               ENTER
             </Button>

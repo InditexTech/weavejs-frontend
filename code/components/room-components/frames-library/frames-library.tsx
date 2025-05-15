@@ -31,6 +31,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarSelector } from "../sidebar-selector";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -98,6 +100,7 @@ export const FramesLibrary = () => {
         nodes: selectedNodes,
       }
     );
+    instance.triggerAction("selectionTool");
   }, [instance, selectedNodes]);
 
   const exportFramesHandler = React.useCallback(async () => {
@@ -171,16 +174,16 @@ export const FramesLibrary = () => {
   return (
     <>
       <div className="pointer-events-auto w-full h-full">
-        <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
-          <div className="flex justify-between font-questrial font-light items-center text-md pl-2">
-            Frames
+        <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+          <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
+            <SidebarSelector title="Frames" />
           </div>
-          <div className="flex justify-end items-center gap-1">
+          <div className="flex justify-end items-center gap-4">
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
                     disabled={selectedFrames.length === 0}
                     onClick={() => {
                       setActualFrame(0);
@@ -188,8 +191,9 @@ export const FramesLibrary = () => {
                     }}
                   >
                     <Presentation
-                      className="group-disabled:text-accent"
-                      size={16}
+                      className="group-disabled:text-[#cccccc]"
+                      size={20}
+                      strokeWidth={1}
                     />
                   </button>
                 </TooltipTrigger>
@@ -206,13 +210,13 @@ export const FramesLibrary = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                    className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
                     disabled={
                       selectedNodes.length <= 1 || !selectedNodesAllFrame
                     }
                     onClick={alignItemsHandler}
                   >
-                    <AlignStartHorizontal size={16} />
+                    <AlignStartHorizontal size={20} strokeWidth={1} />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -228,7 +232,7 @@ export const FramesLibrary = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    className="cursor-pointer bg-transparent hover:bg-accent p-2"
+                    className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
                     onClick={() => {
                       if (selectedFrames.length === 0) {
                         const frames = framesAvailable.map((frame) => {
@@ -241,7 +245,7 @@ export const FramesLibrary = () => {
                       }
                     }}
                   >
-                    <SquareCheck size={16} />
+                    <SquareCheck size={20} strokeWidth={1} />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -257,13 +261,14 @@ export const FramesLibrary = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
                     disabled={selectedFrames.length === 0}
                     onClick={exportFramesHandler}
                   >
                     <Download
-                      className="group-disabled:text-accent"
-                      size={16}
+                      className="group-disabled:text-[#cccccc]"
+                      size={20}
+                      strokeWidth={1}
                     />
                   </button>
                 </TooltipTrigger>
@@ -276,66 +281,69 @@ export const FramesLibrary = () => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <div className="w-[1px] h-[16px] bg-zinc-200" />
             <button
-              className="cursor-pointer bg-transparent hover:bg-accent p-2"
+              className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
               onClick={() => {
                 setSidebarActive(null);
               }}
             >
-              <X size={16} />
+              <X size={20} strokeWidth={1} />
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200 p-3">
-          {framesAvailable.length === 0 && (
-            <div className="col-span-2 w-full flex flex-col justify-center items-center text-sm py-5 text-center">
-              <b>No frames created</b>
-              <span className="text-xs">Add a frame to the whiteboard</span>
-            </div>
-          )}
-          {framesAvailable.map((node) => {
-            const attrs = node.getAttrs();
-
-            return (
-              <div
-                key={attrs.id}
-                className="w-full bg-light-background-1 flex flex-col gap-2"
-              >
-                <div className="w-full flex justify-between items-center">
-                  <div className="w-full text-xs font-questrial font-light">
-                    {attrs.title}
-                  </div>
-                  <div className="font-label-l-regular">
-                    <Checkbox
-                      className="cursor-pointer"
-                      checked={
-                        selectedFrames.findIndex((e) => e === attrs.id) !== -1
-                      }
-                      onCheckedChange={() => {
-                        setSelectedFrames((prev) => {
-                          const newElements = new Set(prev);
-                          if (newElements.has(attrs.id ?? "")) {
-                            newElements.delete(attrs.id ?? "");
-                          } else {
-                            newElements.add(attrs.id ?? "");
-                          }
-                          return Array.from(newElements);
-                        });
-                      }}
-                    />
-                  </div>
-                </div>
-                <FrameImage node={node as Konva.Group} />
+        <ScrollArea className="w-full h-[calc(100%-95px)]">
+          <div className="flex flex-col gap-[24px] w-full h-full p-[24px]">
+            {framesAvailable.length === 0 && (
+              <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+                <b className="font-normal text-[18px]">No frames created</b>
+                <span className="text-[14px]">
+                  Add a frame to the whiteboard
+                </span>
               </div>
-            );
-          })}
-        </div>
+            )}
+            {framesAvailable.map((node) => {
+              const attrs = node.getAttrs();
+
+              return (
+                <div
+                  key={attrs.id}
+                  className="w-full bg-light-background-1 flex flex-col gap-3"
+                >
+                  <div className="w-full flex justify-between items-center">
+                    <div className="w-full text-[14px] font-inter font-light">
+                      {attrs.title}
+                    </div>
+                    <div className="font-label-l-regular">
+                      <Checkbox
+                        className="cursor-pointer rounded-none"
+                        checked={
+                          selectedFrames.findIndex((e) => e === attrs.id) !== -1
+                        }
+                        onCheckedChange={() => {
+                          setSelectedFrames((prev) => {
+                            const newElements = new Set(prev);
+                            if (newElements.has(attrs.id ?? "")) {
+                              newElements.delete(attrs.id ?? "");
+                            } else {
+                              newElements.add(attrs.id ?? "");
+                            }
+                            return Array.from(newElements);
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <FrameImage node={node as Konva.Group} />
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
       </div>
       {presentationMode && (
         <div className="fixed z-10 top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
           <div className="absolute top-8 right-8 flex justify-end items-center p-1">
-            <div className="flex justify-end items-center shadow-lg bg-white">
+            <div className="flex justify-end items-center bg-white">
               <button
                 className="cursor-pointer bg-transparent hover:bg-accent p-2"
                 onClick={() => {
@@ -348,7 +356,7 @@ export const FramesLibrary = () => {
           </div>
           <div className="absolute bottom-8 left-8 right-8 flex justify-center items-center">
             <div className="flex justify-center items-center  p-1">
-              <div className="flex justify-end items-center shadow-lg bg-white border border-zinc-200 p-1">
+              <div className="flex justify-end items-center bg-white border border-zinc-200 p-1">
                 <button
                   className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
                   disabled={actualFrame === 0}

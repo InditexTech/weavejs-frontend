@@ -46,7 +46,7 @@ function ContextMenuButton({
   return (
     <button
       className={cn(
-        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-questrial text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
+        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-inter text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
@@ -101,7 +101,6 @@ export const ContextMenuRender = ({
     }
 
     function checkIfTouchOutside(e: TouchEvent) {
-      console.log(e);
       if (
         ref.current &&
         e.target !== ref.current &&
@@ -125,7 +124,7 @@ export const ContextMenuRender = ({
   return (
     <div
       ref={ref}
-      className="fixed w-[300px] bg-white flex flex-col border border-zinc-200 shadow-lg"
+      className="fixed w-[300px] bg-white flex flex-col border border-[#c9c9c9] shadow-none"
       style={{
         display: show ? "block" : "none",
         top: `${position.y}px`,

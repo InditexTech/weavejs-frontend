@@ -114,10 +114,10 @@ export const RoomLayout = () => {
             <section
               id="sidebar-left"
               className={cn(
-                "bg-white h-full border-l border-zinc-200 shadow-md",
+                "bg-white h-full border-r border-[#c9c9c9] overflow-hidden",
                 {
                   ["w-0"]: sidebarLeftActive === null,
-                  ["w-[320px]"]: sidebarLeftActive !== null,
+                  ["w-[370px]"]: sidebarLeftActive !== null,
                 }
               )}
             >
@@ -130,15 +130,19 @@ export const RoomLayout = () => {
             </section>
             <section
               className={cn("w-full h-full flex flex-col", {
-                ["w-[calc(100%-320px)]"]:
+                ["w-[calc(100%-370px)]"]:
                   sidebarLeftActive !== null || sidebarRightActive !== null,
-                ["w-[calc(100%-640px)]"]:
+                ["w-[calc(100%-740px)]"]:
                   sidebarLeftActive !== null && sidebarRightActive !== null,
               })}
             >
               <section className="w-full h-full flex relative">
                 <RoomHeader />
-                <div id="weave" className="w-full h-full overflow-hidden"></div>
+                <div
+                  id="weave"
+                  tabIndex={0}
+                  className="w-full h-full overflow-hidden"
+                ></div>
                 {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
                   <>
                     <ContextMenuRender
@@ -149,8 +153,8 @@ export const RoomLayout = () => {
                       position={contextMenuPosition}
                       options={contextMenuOptions}
                     />
-                    <div className="absolute top-[88px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
-                      <div className="max-w-[320px] text-center bg-transparent bg-white/50 p-1 font-questrial text-[10px] text-zinc-600">
+                    <div className="absolute top-[104px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
+                      <div className="max-w-[320px] text-center bg-transparent bg-white/50 p-1 font-inter font-light text-[10px] text-zinc-600">
                         To pan the canvas, keep the mouse wheel or the space bar
                         pressed while dragging or use the hand tool.
                       </div>
@@ -160,7 +164,7 @@ export const RoomLayout = () => {
                       <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
                         <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
                           <Logo kind="large" variant="no-text" />
-                          <div className="font-questrial text-base">
+                          <div className="font-inter text-base">
                             Removing background...
                           </div>
                         </div>
@@ -170,7 +174,7 @@ export const RoomLayout = () => {
                       <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
                         <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
                           <Logo kind="large" variant="no-text" />
-                          <div className="font-questrial text-base">
+                          <div className="font-inter text-base">
                             Uploading image...
                           </div>
                         </div>
@@ -180,7 +184,7 @@ export const RoomLayout = () => {
                       <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
                         <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
                           <Logo kind="large" variant="no-text" />
-                          <div className="font-questrial text-base">
+                          <div className="font-inter text-base">
                             Loading image...
                           </div>
                         </div>
@@ -193,10 +197,10 @@ export const RoomLayout = () => {
             <section
               id="sidebar-right"
               className={cn(
-                "bg-white h-full border-l border-zinc-200 shadow-md",
+                "bg-white h-full border-l border-[#c9c9c9] overflow-hidden",
                 {
                   ["w-0"]: sidebarRightActive === null,
-                  ["w-[320px]"]: sidebarRightActive !== null,
+                  ["w-[370px]"]: sidebarRightActive !== null,
                 }
               )}
             >

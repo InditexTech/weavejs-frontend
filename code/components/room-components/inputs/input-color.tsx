@@ -45,7 +45,7 @@ export const InputColor = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
+        <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
           {label}
         </div>
       )}
@@ -53,11 +53,17 @@ export const InputColor = ({
         <Popover>
           <PopoverTrigger asChild>
             <div
-              className="cursor-pointer shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
+              className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-zinc-200 rounded-none"
               style={{ background: `#${actualValue}` }}
             />
           </PopoverTrigger>
-          <PopoverContent>
+          <PopoverContent
+            align="start"
+            side="top"
+            alignOffset={0}
+            sideOffset={9}
+            className="rounded-none border-black"
+          >
             <ColorPicker
               value={`#${actualValue}`}
               onChange={(color) => {
@@ -79,7 +85,7 @@ export const InputColor = ({
                   <ColorPickerAlpha />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <ColorPickerFormatSelector />
                 <ColorPickerFormatEditor />
               </div>
@@ -89,7 +95,7 @@ export const InputColor = ({
 
         <Input
           type="text"
-          className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent shadow-none"
+          className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
           value={actualValue}
           onChange={handleInputChange}
           onFocus={() => {

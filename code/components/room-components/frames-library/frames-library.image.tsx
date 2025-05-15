@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import _ from "lodash";
 import React from "react";
 import Image from "next/image";
 import Konva from "konva";
 import { toImageAsync } from "./utils";
+import { useWeave } from "@inditextech/weave-react";
 
 type FrameImageProps = {
   node: Konva.Group;
@@ -14,8 +16,10 @@ type FrameImageProps = {
 export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
   const [image, setImage] = React.useState<React.ReactElement | null>(null);
 
+  const instance = useWeave((state) => state.instance);
+
   React.useEffect(() => {
-    setInterval(async () => {
+    const loadImage = async () => {
       const nodeAttrs = node.getAttrs();
       try {
         // const box = frameInternal.getClientRect({ relativeTo: stage });
@@ -25,16 +29,17 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
         }
         const boxBg = frameBg.getClientRect();
         const img = await toImageAsync(node, {
-          x: boxBg.x + 1,
-          y: boxBg.y + 1,
-          width: boxBg.width - 2,
-          height: boxBg.height - 2,
+          x: boxBg.x + 4,
+          y: boxBg.y + 4,
+          pixelRatio: 2,
+          width: boxBg.width - 8,
+          height: boxBg.height - 8,
         });
         setImage(
           <Image
             src={img.src}
-            width={284}
-            height={201}
+            width={320}
+            height={225}
             alt="A frame image"
             className="object-fit w-full h-full"
           />
@@ -42,11 +47,24 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
       } catch (ex) {
         console.error(ex);
       }
-    }, 100);
+    };
+
+    loadImage();
+    const debouncedLoadImage = _.debounce(loadImage, 250);
+
+    const eventHandler = () => {
+      debouncedLoadImage();
+    };
+
+    instance?.addEventListener("onStateChange", eventHandler);
+
+    return () => {
+      instance?.removeEventListener("onStateChange", eventHandler);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [instance]);
 
   return (
-    <div className="w-full aspect-video border border-zinc-200">{image}</div>
+    <div className="w-full aspect-video border border-[#c9c9c9]">{image}</div>
   );
 };

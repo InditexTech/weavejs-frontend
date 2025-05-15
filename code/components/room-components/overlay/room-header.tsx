@@ -9,11 +9,12 @@ import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuShortcut,
@@ -34,6 +35,11 @@ import {
   Check,
   Grid2X2Check,
   Grid2X2X,
+  SwatchBook,
+  ListTree,
+  Projector,
+  Images,
+  PanelLeft,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -44,12 +50,16 @@ import {
 } from "@inditextech/weave-sdk";
 import { ConnectionStatus } from "../connection-status";
 import { topElementVariants } from "./variants";
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 import { ConnectedUsers } from "../connected-users";
 import { Divider } from "./divider";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
-import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
+import {
+  DOCUMENTATION_URL,
+  GITHUB_URL,
+  SIDEBAR_ELEMENTS,
+} from "@/lib/constants";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export function RoomHeader() {
   const router = useRouter();
@@ -59,12 +69,22 @@ export function RoomHeader() {
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
     WEAVE_GRID_TYPES.LINES
+  );
+
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
+    },
+    [setSidebarActive]
   );
 
   const handleToggleUsersPointers = React.useCallback(() => {
@@ -137,9 +157,10 @@ export function RoomHeader() {
   }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
+    localStorage.removeItem(`weave.js_${room}`);
     instance?.getStore().disconnect();
     router.push("/");
-  }, [instance, router]);
+  }, [instance, room, router]);
 
   const handlePrintToConsoleState = React.useCallback(() => {
     if (instance) {
@@ -160,11 +181,15 @@ export function RoomHeader() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="pointer-events-none w-[calc(100%-32px)] z-1 flex gap-1 justify-center items-center absolute top-4 left-4 right-4"
+      className="pointer-events-none w-[calc(100%-48px)] z-1 flex gap-1 justify-center items-center absolute top-[24px] left-[24px] right-[24px]"
     >
-      <div className="w-full bg-white shadow-md flex justify-between items-center gap-0 px-3 rounded-xl border border-zinc-200">
+      <div className="w-full bg-white flex justify-between items-center gap-0 py-[5px] px-[40px] border-[0.5px] border-[#c9c9c9]">
         <div className="flex justify-start items-center gap-3">
-          <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
+          <DropdownMenu
+            onOpenChange={(open: boolean) => {
+              setMenuOpen(open);
+            }}
+          >
             <DropdownMenuTrigger
               className={cn(
                 "pointer-events-auto rounded-none cursor-pointer focus:outline-none",
@@ -182,11 +207,14 @@ export function RoomHeader() {
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
+              onCloseAutoFocus={(e) => {
+                e.preventDefault();
+              }}
               align="start"
               side="bottom"
               alignOffset={0}
-              sideOffset={4}
-              className="font-questrial rounded-none"
+              sideOffset={9}
+              className="font-inter rounded-none"
             >
               <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                 Debug
@@ -317,22 +345,114 @@ export function RoomHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Divider />
           <div className="flex justify-start items-center gap-1">
-            <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
-              <div className="font-questrial text-2xl font-extralight">
-                {room}
-              </div>
+            <div className="flex justify-start items-center gap-2 font-inter text-foreground !normal-case min-h-[32px]">
+              <div className="font-inter text-[24px] font-light">{room}</div>
             </div>
           </div>
         </div>
-        <div className="flex justify-end items-center gap-3">
-          <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
-          <Divider />
-          <div className="max-w-[320px]">
-            <ConnectedUsers />
+        <div className="flex justify-end items-center gap-[24px]">
+          <div className="flex justify-end items-center gap-[16px]">
+            <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
+            <div className="max-w-[320px]">
+              <ConnectedUsers />
+            </div>
           </div>
           <Divider />
           <ZoomToolbar />
+          <div className="relative">
+            <DropdownMenu
+              onOpenChange={(open: boolean) => {
+                setMenuOpen(open);
+              }}
+            >
+              <DropdownMenuTrigger
+                className={cn(
+                  "pointer-events-auto rounded-none cursor-pointer hover:text-[#c9c9c9] focus:outline-none",
+                  {
+                    ["font-normal"]: menuOpen,
+                    ["font-extralight"]: !menuOpen,
+                  }
+                )}
+              >
+                <ToolbarButton
+                  icon={<PanelLeft size={20} strokeWidth={1} />}
+                  onClick={() => {
+                    if (!instance) return;
+                    instance.getStage().container().focus();
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>Sidebars</p>
+                    </div>
+                  }
+                  tooltipSide="bottom"
+                  tooltipAlign="end"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                onCloseAutoFocus={(e) => {
+                  e.preventDefault();
+                }}
+                align="end"
+                side="bottom"
+                alignOffset={0}
+                sideOffset={19}
+                className="font-inter rounded-none"
+              >
+                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  Sidebars
+                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onClick={() => {
+                      sidebarToggle(SIDEBAR_ELEMENTS.images);
+                    }}
+                  >
+                    <Images /> Images
+                    <DropdownMenuShortcut>
+                      {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onClick={() => {
+                      sidebarToggle(SIDEBAR_ELEMENTS.frames);
+                    }}
+                  >
+                    <Projector /> Frames
+                    <DropdownMenuShortcut>
+                      {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onClick={() => {
+                      sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
+                    }}
+                  >
+                    <SwatchBook /> Color tokens
+                    <DropdownMenuShortcut>
+                      {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onClick={() => {
+                      sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+                    }}
+                  >
+                    <ListTree /> Elements tree
+                    <DropdownMenuShortcut>
+                      {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </motion.div>

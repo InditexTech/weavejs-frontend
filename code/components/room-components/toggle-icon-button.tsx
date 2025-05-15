@@ -49,9 +49,9 @@ export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
         "disabled:cursor-not-allowed disabled:opacity-50",
         {
           ["p-1"]: kind === "switch",
-          ["bg-white hover:bg-accent"]:
+          ["text-black bg-white hover:text-[#c9c9c9]"]:
             (kind === "switch" && !isPressed) || kind === "toggle",
-          ["bg-zinc-700 text-white"]: kind === "switch" && isPressed,
+          ["bg-black text-white"]: kind === "switch" && isPressed,
         }
       )}
       disabled={disabled}

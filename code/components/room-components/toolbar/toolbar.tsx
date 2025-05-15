@@ -19,7 +19,7 @@ export const Toolbar = ({
   return (
     <div
       className={cn(
-        "pointer-events-none gap-[1px] shadow-md px-1 py-1 bg-white border rounded-xl border-zinc-200 pointer-events-auto",
+        "pointer-events-none gap-[4px] p-[4px] bg-white border rounded-full border-[#c9c9c9] pointer-events-auto",
         {
           ["flex"]: orientation === "horizontal",
           ["flex flex-col"]: orientation === "vertical",

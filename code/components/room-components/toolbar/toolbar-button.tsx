@@ -40,9 +40,9 @@ export function ToolbarButton({
         <TooltipTrigger asChild>
           <button
             className={cn(
-              "pointer-events-auto relative cursor-pointer hover:text-black hover:bg-accent px-2 py-2 flex justify-center items-center",
+              "pointer-events-auto relative cursor-pointer hover:text-black hover:text-[#c9c9c9] h-[40px] flex justify-center items-center",
               {
-                ["bg-zinc-700 text-white"]: active,
+                ["bg-[#2e2e2e] text-white"]: active,
                 ["pointer-events-none cursor-default text-black opacity-50"]:
                   disabled,
               },
@@ -57,6 +57,7 @@ export function ToolbarButton({
         <TooltipContent
           side={tooltipSide}
           align={tooltipAlign}
+          sideOffset={8}
           className="rounded-none"
         >
           {label}

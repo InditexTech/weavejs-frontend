@@ -6,12 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Color from "color";
 import { PipetteIcon } from "lucide-react";
-import {
-  type ComponentProps,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { type ComponentProps, useCallback, useEffect, useState } from "react";
 import { useColorPicker } from "../context/color-picker-context";
 
 export type ColorPickerEyeDropperProps = ComponentProps<typeof Button>;
@@ -80,7 +75,7 @@ export const ColorPickerEyeDropper = ({
         title="Pick color from screen"
         aria-label="Pick color from screen"
         className={cn(
-          "rounded-none shrink-0 text-muted-foreground",
+          "rounded-none border-none bg-black hover:bg-[#c9c9c9] hover:text-black cursor-pointer shrink-0 text-white",
           isActive && "opacity-50 cursor-not-allowed",
           className
         )}

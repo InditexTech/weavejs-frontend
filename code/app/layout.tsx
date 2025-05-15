@@ -3,26 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Metadata, Viewport } from "next";
-import { Questrial, Noto_Sans, Noto_Sans_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
 
-const questrial = Questrial({
+const inter = Inter({
   weight: "400",
   preload: true,
-  variable: "--questrial",
-  subsets: ["latin"],
-});
-
-const notoSans = Noto_Sans({
-  preload: true,
-  variable: "--font-noto-sans",
-  subsets: ["latin"],
-});
-
-const notoSansMono = Noto_Sans_Mono({
-  preload: true,
-  variable: "--font-noto-sans-mono",
+  variable: "--inter",
   subsets: ["latin"],
 });
 
@@ -47,11 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        contentEditable="true"
-        suppressContentEditableWarning={true}
-        className={`${questrial.variable} ${notoSans.variable} ${notoSansMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

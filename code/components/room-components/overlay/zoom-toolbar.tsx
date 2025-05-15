@@ -15,7 +15,6 @@ export function ZoomToolbar() {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
 
-  const selectedNodes = useWeave((state) => state.selection.nodes);
   const zoomValue = useWeave((state) => state.zoom.value);
   const canZoomIn = useWeave((state) => state.zoom.canZoomIn);
   const canZoomOut = useWeave((state) => state.zoom.canZoomOut);
@@ -37,9 +36,9 @@ export function ZoomToolbar() {
     <div className="flex justify-end gap-2 items-center">
       <div className="gap-1 flex justify-end items-center">
         <div className="w-full grid grid-cols-[auto_1fr]">
-          <div className="flex justify-start items-center gap-0">
+          <div className="flex justify-start items-center gap-[16px]">
             <ToolbarButton
-              icon={<ZoomIn />}
+              icon={<ZoomIn size={20} strokeWidth={1} />}
               disabled={!canZoomIn}
               onClick={() => {
                 handleTriggerActionWithParams("zoomInTool", {
@@ -47,11 +46,9 @@ export function ZoomToolbar() {
                 });
               }}
               label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  {" "}
+                <div className="flex gap-3 justify-start items-center">
                   <p>Zoom in</p>
                   <ShortcutElement
-                    variant="light"
                     shortcuts={{
                       [SYSTEM_OS.MAC]: "⌘ +",
                       [SYSTEM_OS.OTHER]: "Ctrl +",
@@ -59,11 +56,11 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
-              tooltipSide="top"
+              tooltipSide="bottom"
               tooltipAlign="end"
             />
             <ToolbarButton
-              icon={<ZoomOut />}
+              icon={<ZoomOut size={20} strokeWidth={1} />}
               disabled={!canZoomOut}
               onClick={() => {
                 handleTriggerActionWithParams("zoomOutTool", {
@@ -71,10 +68,9 @@ export function ZoomToolbar() {
                 });
               }}
               label={
-                <div className="flex flex-col gap-2 justify-start items-end">
+                <div className="flex gap-3 justify-start items-center">
                   <p>Zoom out</p>
                   <ShortcutElement
-                    variant="light"
                     shortcuts={{
                       [SYSTEM_OS.MAC]: "⌘ -",
                       [SYSTEM_OS.OTHER]: "Ctrl -",
@@ -82,21 +78,20 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
-              tooltipSide="top"
+              tooltipSide="bottom"
               tooltipAlign="end"
             />
             <ToolbarButton
-              icon={<Maximize />}
+              icon={<Maximize size={20} strokeWidth={1} />}
               onClick={() => {
                 handleTriggerActionWithParams("fitToScreenTool", {
                   previousAction: actualAction,
                 });
               }}
               label={
-                <div className="flex flex-col gap-2 justify-start items-end">
+                <div className="flex gap-3 justify-start items-center">
                   <p>Fit to screen</p>
                   <ShortcutElement
-                    variant="light"
                     shortcuts={{
                       [SYSTEM_OS.MAC]: "⇧ 1",
                       [SYSTEM_OS.OTHER]: "⇧ 1",
@@ -104,22 +99,20 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
-              tooltipSide="top"
+              tooltipSide="bottom"
               tooltipAlign="end"
             />
             <ToolbarButton
-              icon={<Fullscreen />}
-              disabled={selectedNodes.length === 0}
+              icon={<Fullscreen size={20} strokeWidth={1} />}
               onClick={() => {
                 handleTriggerActionWithParams("fitToSelectionTool", {
                   previousAction: actualAction,
                 });
               }}
               label={
-                <div className="flex flex-col gap-2 justify-start items-end">
+                <div className="flex gap-3 justify-start items-center">
                   <p>Fit to selection</p>
                   <ShortcutElement
-                    variant="light"
                     shortcuts={{
                       [SYSTEM_OS.MAC]: "⇧ 2",
                       [SYSTEM_OS.OTHER]: "⇧ 2",
@@ -127,12 +120,12 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
-              tooltipSide="top"
+              tooltipSide="bottom"
               tooltipAlign="end"
             />
           </div>
-          <div className="w-full px-4 font-questrial flex justify-end items-center text-muted-foreground">
-            {parseFloat(`${zoomValue * 100}`).toFixed(2)}%
+          <div className="w-full px-4 font-inter flex justify-end items-center text-muted-foreground">
+            {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ import {
   WeaveImageNode,
   WeaveFrameNode,
 } from "@inditextech/weave-sdk";
-import { Noto_Sans_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 
@@ -92,9 +92,9 @@ const FONTS = [
   },
 ];
 
-const notoSansMono = Noto_Sans_Mono({
+const inter = Inter({
   preload: true,
-  variable: "--font-noto-sans-mono",
+  variable: "--inter",
   subsets: ["latin"],
 });
 
@@ -108,7 +108,7 @@ const NODES = [
   new WeaveImageNode(),
   new WeaveFrameNode({
     config: {
-      fontFamily: notoSansMono.style.fontFamily,
+      fontFamily: inter.style.fontFamily,
       fontStyle: "100",
     },
   }),

@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import * as changeCase from "change-case";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -52,12 +53,18 @@ function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setRoom(values.roomId);
-    setUser({
+    const roomIdMapped = changeCase.kebabCase(values.roomId);
+    const userMapped = {
       name: values.username,
       email: `${values.username}@weavejs.com`,
-    });
-    router.push(`/rooms/${values.roomId}?userName=${values.username}`);
+    };
+    setRoom(roomIdMapped);
+    setUser(userMapped);
+    localStorage.setItem(
+      `weave.js_${roomIdMapped}`,
+      JSON.stringify(userMapped)
+    );
+    router.push(`/rooms/${roomIdMapped}`);
   }
 
   return (
@@ -77,13 +84,13 @@ function LoginForm() {
             name="roomId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-questrial font-light">
+                <FormLabel className="text-[#757575] font-inter font-light">
                   Room name
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="room name to join"
-                    className="font-questrial rounded-md"
+                    className="font-inter font-light rounded-none border-black"
                     {...field}
                   />
                 </FormControl>
@@ -96,13 +103,13 @@ function LoginForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-questrial font-light">
+                <FormLabel className="text-[#757575] font-inter font-light">
                   Username
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="your username"
-                    className="font-questrial rounded-md"
+                    className="font-inter font-light rounded-none border-black"
                     {...field}
                   />
                 </FormControl>
@@ -113,7 +120,7 @@ function LoginForm() {
           <div className="w-full flex justify-center items-center">
             <Button
               type="submit"
-              className="cursor-pointer font-questrial rounded-md mt-8"
+              className="cursor-pointer font-inter rounded-none mt-[32px]"
             >
               ENTER
             </Button>

@@ -45,12 +45,27 @@ export const Room = () => {
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
   );
+  const setUser = useCollaborationRoom((state) => state.setUser);
 
   const { loadedParams } = useHandleRouteParams();
 
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
   }, [user]);
+
+  React.useEffect(() => {
+    if (room && !user) {
+      const userStorage = localStorage.getItem(`weave.js_${room}`);
+      try {
+        const userMapped = JSON.parse(userStorage ?? "");
+        if (userMapped) {
+          setUser(userMapped);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
     if (!loadedParams) {

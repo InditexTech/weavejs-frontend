@@ -4,13 +4,13 @@ import {
   WeaveElementInstance,
 } from "@inditextech/weave-types";
 import Konva from "konva";
-import { Noto_Sans_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 export const COLOR_TOKEN_NODE_TYPE = "color-token";
 
-const notoSansMono = Noto_Sans_Mono({
+const inter = Inter({
   preload: true,
-  variable: "--font-noto-sans-mono",
+  variable: "--inter",
   subsets: ["latin"],
 });
 
@@ -70,7 +70,7 @@ export class ColorTokenNode extends WeaveNode {
       x: 20,
       y: 260,
       fontSize: 20,
-      fontFamily: notoSansMono.style.fontFamily,
+      fontFamily: inter.style.fontFamily,
       fill: "#CCCCCCFF",
       strokeEnabled: false,
       stroke: "#000000FF",
