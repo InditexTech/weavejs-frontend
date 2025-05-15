@@ -41,7 +41,7 @@ SPDX-License-Identifier: Apache-2.0
 <h3 align="center">Weave.js Frontend UI Showcase</h3>
 
   <p align="center">
-    Build visual collaborative tools like Canva, Miro or Figma!
+    Build online whiteboard applications like Excalidraw, Miro, Canva, or Figma!
     <br />
     <a href="https://github.com/InditexTech/weavejs-frontend"><strong>Explore the docs »</strong></a>
     <br />
@@ -62,6 +62,7 @@ SPDX-License-Identifier: Apache-2.0
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#related-repositories">Related repositories</a></li>
       </ul>
     </li>
     <li>
@@ -84,15 +85,24 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Weave.js Screen Shot][product-screenshot]](images/screenshot.png)
 
-Weave.js is a powerful framework for building end-to-end visual collaborative applications, enabling real-time multi-user interactions on-the-fly. It provides robust synchronization based on Yjs and SyncedStore and provides an extensible API to streamline the development of interactive, collaborative applications.
+Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, as well as it handles user interactions in real time, so that changes in the visual canvas can be shared among multi users in real time.
+
+It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedStore][https://syncedstore.org/docs/] as well as an extensible API to streamline the development of interactive, collaborative applications.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- [Konva][Konva-url]
-- [Yjs][Yjs-url]
-- [SyncedStore][SyncedStore-url]
+- [Konva][https://konvajs.org/]
+- [Yjs][https://yjs.dev/]
+- [SyncedStore][https://syncedstore.org/docs/]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Related repositories
+
+- [Weave.js][https://github.com/InditexTech/weavejs]
+- [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -100,7 +110,16 @@ Weave.js is a powerful framework for building end-to-end visual collaborative ap
 
 ## Getting Started
 
-TODO
+Follow the [Quickstart documentation][docs-quick-start-url#frontend] to create your Weave.js project frontend and startup a sample application running on your local development environment.
+
+Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
+
+### Prerequisites
+
+- macOS, Windows (WSL), or Linux.
+- Node.js 18.18.0 or later.
+- React 18.2.0 or less than 19.x.
+- A Weave.js backend server created
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -108,7 +127,7 @@ TODO
 
 ## Roadmap
 
-TODO
+Check out [Weave.js roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
