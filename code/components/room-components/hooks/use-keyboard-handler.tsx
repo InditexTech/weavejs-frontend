@@ -202,8 +202,10 @@ export function useKeyboardHandler() {
       if (instance) {
         const usersPointersPlugin =
           instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
-        if (usersPointersPlugin) {
-          usersPointersPlugin.toggleRenderCursors();
+        if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
+          usersPointersPlugin.disable();
+        } else {
+          usersPointersPlugin.enable();
         }
       }
     },
