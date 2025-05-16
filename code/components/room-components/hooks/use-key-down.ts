@@ -5,7 +5,8 @@
 import React from "react";
 
 const canDetectKeyboard = () => {
-  const editingTextNodes = Object.keys(window.weaveTextEditing).length !== 0;
+  const editingTextNodes =
+    Object.keys(window.weaveTextEditing ?? {}).length !== 0;
   return !editingTextNodes;
 };
 
@@ -13,7 +14,7 @@ export const useKeyDown = (
   callback: () => void,
   keys: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modifiers?: (event: any) => boolean = () => true
+  modifiers: (event: any) => boolean = () => true
 ) => {
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
