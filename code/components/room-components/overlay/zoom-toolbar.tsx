@@ -56,6 +56,7 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
+              variant="squared"
               tooltipSide="bottom"
               tooltipAlign="end"
             />
@@ -78,6 +79,7 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
+              variant="squared"
               tooltipSide="bottom"
               tooltipAlign="end"
             />
@@ -99,6 +101,7 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
+              variant="squared"
               tooltipSide="bottom"
               tooltipAlign="end"
             />
@@ -120,11 +123,12 @@ export function ZoomToolbar() {
                   />
                 </div>
               }
+              variant="squared"
               tooltipSide="bottom"
               tooltipAlign="end"
             />
           </div>
-          <div className="w-full px-4 font-inter flex justify-end items-center text-muted-foreground">
+          <div className="w-[75px] px-4 font-inter flex justify-center items-center text-muted-foreground">
             {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
           </div>
         </div>

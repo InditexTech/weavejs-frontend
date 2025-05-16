@@ -11,6 +11,12 @@ import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weave-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -39,7 +45,7 @@ import {
   ListTree,
   Projector,
   Images,
-  PanelLeft,
+  PencilRuler,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -59,13 +65,13 @@ import {
   GITHUB_URL,
   SIDEBAR_ELEMENTS,
 } from "@/lib/constants";
-import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export function RoomHeader() {
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const selectionActive = useWeave((state) => state.selection.active);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
@@ -74,6 +80,7 @@ export function RoomHeader() {
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [sidebarsMenuOpen, setSidebarsMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
@@ -157,7 +164,7 @@ export function RoomHeader() {
   }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
-    localStorage.removeItem(`weave.js_${room}`);
+    sessionStorage.removeItem(`weave.js_${room}`);
     instance?.getStore().disconnect();
     router.push("/");
   }, [instance, room, router]);
@@ -181,7 +188,13 @@ export function RoomHeader() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="pointer-events-none w-[calc(100%-48px)] z-1 flex gap-1 justify-center items-center absolute top-[24px] left-[24px] right-[24px]"
+      className={cn(
+        "w-[calc(100%-48px)] z-1 flex gap-1 justify-center items-center absolute top-[24px] left-[24px] right-[24px]",
+        {
+          ["pointer-events-none"]: selectionActive,
+          ["pointer-events-auto"]: !selectionActive,
+        }
+      )}
     >
       <div className="w-full bg-white flex justify-between items-center gap-0 py-[5px] px-[40px] border-[0.5px] border-[#c9c9c9]">
         <div className="flex justify-start items-center gap-3">
@@ -191,13 +204,10 @@ export function RoomHeader() {
             }}
           >
             <DropdownMenuTrigger
-              className={cn(
-                "pointer-events-auto rounded-none cursor-pointer focus:outline-none",
-                {
-                  ["font-normal"]: menuOpen,
-                  ["font-extralight"]: !menuOpen,
-                }
-              )}
+              className={cn("rounded-none cursor-pointer focus:outline-none", {
+                ["font-normal"]: menuOpen,
+                ["font-extralight"]: !menuOpen,
+              })}
             >
               <div className="flex gap-1 justify-start items-center">
                 <div className="h-[60px] flex justify-start items-center">
@@ -361,35 +371,36 @@ export function RoomHeader() {
           </div>
           <Divider />
           <ZoomToolbar />
-          <div className="relative">
+          <div className="relative flex items-center">
             <DropdownMenu
               onOpenChange={(open: boolean) => {
-                setMenuOpen(open);
+                setSidebarsMenuOpen(open);
               }}
             >
               <DropdownMenuTrigger
                 className={cn(
-                  "pointer-events-auto rounded-none cursor-pointer hover:text-[#c9c9c9] focus:outline-none",
+                  "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
                   {
-                    ["font-normal"]: menuOpen,
-                    ["font-extralight"]: !menuOpen,
+                    ["font-normal"]: sidebarsMenuOpen,
+                    ["font-extralight"]: !sidebarsMenuOpen,
                   }
                 )}
               >
-                <ToolbarButton
-                  icon={<PanelLeft size={20} strokeWidth={1} />}
-                  onClick={() => {
-                    if (!instance) return;
-                    instance.getStage().container().focus();
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>Sidebars</p>
-                    </div>
-                  }
-                  tooltipSide="bottom"
-                  tooltipAlign="end"
-                />
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PencilRuler size={20} strokeWidth={1} />
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      align="end"
+                      sideOffset={8}
+                      className="rounded-none"
+                    >
+                      Toolbars
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 onCloseAutoFocus={(e) => {
@@ -402,7 +413,7 @@ export function RoomHeader() {
                 className="font-inter rounded-none"
               >
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Sidebars
+                  Available Toolbars
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
                   <DropdownMenuItem

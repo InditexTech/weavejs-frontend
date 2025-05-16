@@ -14,7 +14,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -48,7 +47,7 @@ function UserForm() {
       email: `${values.username}@weavejs.com`,
     };
     setUser(userMapped);
-    localStorage.setItem(`weave.js_${room}`, JSON.stringify(userMapped));
+    sessionStorage.setItem(`weave.js_${room}`, JSON.stringify(userMapped));
   }
 
   return (
@@ -65,13 +64,10 @@ function UserForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-inter font-light text-[#757575]">
-                  Username
-                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="your username"
-                    className="font-inter font-light rounded-none border-black w-full"
+                    placeholder="username"
+                    className="font-inter font-light rounded-none text-black border-black w-full"
                     {...field}
                   />
                 </FormControl>

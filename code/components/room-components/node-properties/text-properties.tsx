@@ -115,13 +115,13 @@ export function TextProperties() {
         <div className="col-span-2">
           <InputColor
             label="Color"
-            value={`${actualNode.props.fill.replace("#", "")}`}
+            value={actualNode.props.fill}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  fill: `#${value}`,
+                  fill: value,
                 },
               };
               updateElement(updatedNode);

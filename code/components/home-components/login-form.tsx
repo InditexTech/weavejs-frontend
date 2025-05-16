@@ -60,7 +60,7 @@ function LoginForm() {
     };
     setRoom(roomIdMapped);
     setUser(userMapped);
-    localStorage.setItem(
+    sessionStorage.setItem(
       `weave.js_${roomIdMapped}`,
       JSON.stringify(userMapped)
     );

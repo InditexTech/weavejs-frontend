@@ -8,7 +8,7 @@ import React from "react";
 import {
   Cloud,
   //CloudCog,
-  CloudAlert,
+  CloudOff,
 } from "lucide-react";
 import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,7 @@ export const ConnectionStatus = ({
             // ["bg-sky-300 text-white"]:
             //   weaveConnectionStatus ===
             //   WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING,
-            ["bg-rose-300 text-white"]:
+            ["bg-[#FDB4BB] text-white"]:
               weaveConnectionStatus ===
               WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED,
           }
@@ -52,7 +52,7 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED && (
           <>
-            <CloudAlert size={18} strokeWidth={1} />
+            <CloudOff size={18} strokeWidth={1} />
             <span className="ml-1 font-inter text-xs uppercase">
               disconnected
             </span>

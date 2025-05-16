@@ -27,8 +27,8 @@ import { AlignElementsToolAction } from "@/components/actions/align-elements-too
 
 const FONTS = [
   {
-    id: "NotoSansMono",
-    name: "NotoSansMono, monospace",
+    id: "Inter",
+    name: "Inter, sans-serif",
   },
   {
     id: "Arial",

@@ -54,7 +54,7 @@ export const InputColor = ({
           <PopoverTrigger asChild>
             <div
               className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-zinc-200 rounded-none"
-              style={{ background: `#${actualValue}` }}
+              style={{ background: actualValue }}
             />
           </PopoverTrigger>
           <PopoverContent
@@ -65,9 +65,10 @@ export const InputColor = ({
             className="rounded-none border-black"
           >
             <ColorPicker
-              value={`#${actualValue}`}
+              value={actualValue}
               onChange={(color) => {
-                onChange((color as string).slice(1));
+                setActualValue(color as string);
+                onChange(color as string);
               }}
               onFocus={() => {
                 window.weaveOnFieldFocus = true;
@@ -96,7 +97,7 @@ export const InputColor = ({
         <Input
           type="text"
           className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
-          value={actualValue}
+          value={actualValue ?? "#000000ff"}
           onChange={handleInputChange}
           onFocus={() => {
             window.weaveOnFieldFocus = true;

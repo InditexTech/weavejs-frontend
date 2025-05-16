@@ -20,11 +20,13 @@ import { CropProperties } from "../node-properties/crop-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { WeaveSelection } from "@inditextech/weave-types";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
+  const setNode = useWeave((state) => state.setNode);
 
   const sidebarRightActive = useCollaborationRoom(
     (state) => state.sidebar.right.active
@@ -135,6 +137,21 @@ export const NodeProperties = () => {
     setSidebarActive,
   ]);
 
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleOnNodeChange({ node }: WeaveSelection) {
+      setNode(node);
+    }
+
+    instance.addEventListener("onNodeChange", handleOnNodeChange);
+
+    return () => {
+      instance.removeEventListener("onNodeChange", handleOnNodeChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, instance]);
+
   const title = React.useMemo(() => {
     if (nodePropertiesAction === "create") {
       return actionType;
@@ -147,7 +164,7 @@ export const NodeProperties = () => {
   }
 
   return (
-    <div className="pointer-events-auto w-full h-full">
+    <div className="w-full h-full">
       <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light text-[24px] items-center text-md pl-2 uppercase">
           {title}

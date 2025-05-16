@@ -84,17 +84,14 @@ export function ColorTokenProperties() {
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
         <InputColor
-          label="Color (#RGB)"
-          value={`${(actualNode.props.colorToken ?? "#000000").replace(
-            "#",
-            ""
-          )}`}
+          label="Color (#RGBA)"
+          value={actualNode.props.colorToken}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                colorToken: `#${value}`,
+                colorToken: value,
               },
             };
             updateElement(updatedNode);
