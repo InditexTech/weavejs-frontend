@@ -146,7 +146,7 @@ export const RoomLayout = () => {
               </AnimatePresence>
             </section>
             <section
-              className={cn("w-full h-full flex flex-col", {
+              className={cn("w-full h-full flex flex-col z-0", {
                 ["w-[calc(100%-370px)]"]:
                   sidebarLeftActive !== null || sidebarRightActive !== null,
                 ["w-[calc(100%-740px)]"]:
@@ -214,7 +214,7 @@ export const RoomLayout = () => {
             <section
               id="sidebar-right"
               className={cn(
-                "bg-white h-full border-l border-[#c9c9c9] z-1 overflow-hidden",
+                "bg-white h-full border-l border-[#c9c9c9] z-0 overflow-hidden",
                 {
                   ["w-0"]: sidebarRightActive === null,
                   ["w-[370px]"]: sidebarRightActive !== null,
