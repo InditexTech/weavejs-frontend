@@ -5,7 +5,7 @@
 interface Window {
   weave: Weave;
   weaveOnFieldFocus?: boolean;
-  weaveTextEditing?: boolean;
+  weaveTextEditing?: Record<string, string>;
   weaveDragImageURL?: string;
   colorTokenDragColor?: string;
 }
