@@ -102,7 +102,7 @@ function LoginForm() {
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="mb-0">
                 <FormLabel className="text-[#757575] font-inter font-light">
                   Username
                 </FormLabel>

@@ -123,7 +123,7 @@ export const FramesLibrary = () => {
         const frameBg = node.findOne(`#${attrs.id}-bg`) as Konva.Group;
         const boxBg = frameBg.getClientRect();
         const img = await toImageAsync(node, {
-          pixelRatio: 3,
+          pixelRatio: 2,
           x: boxBg.x + 4,
           y: boxBg.y + 4,
           width: boxBg.width - 8,
@@ -170,6 +170,8 @@ export const FramesLibrary = () => {
   if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
+
+  console.log("AQUI?");
 
   return (
     <>
