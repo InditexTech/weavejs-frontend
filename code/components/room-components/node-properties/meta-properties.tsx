@@ -8,9 +8,9 @@ import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { InputColor } from "../inputs/input-color";
+import { InputText } from "../inputs/input-text";
 
-export function ColorTokenProperties() {
+export function MetaProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -63,39 +63,27 @@ export function ColorTokenProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (
-    actualAction &&
-    ["selectionTool"].includes(actualAction) &&
-    !["color-token"].includes(actualNode.type)
-  ) {
-    return null;
-  }
-
-  if (
-    actualAction &&
-    !["selectionTool", "colorTokenTool"].includes(actualAction)
-  )
-    return null;
+  if (actualAction && !["selectionTool"].includes(actualAction)) return null;
 
   return (
     <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
       <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
-            Color Token
+            Metadata
           </span>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
-        <InputColor
-          label="Color (#RGBA)"
-          value={actualNode.props.colorToken}
+        <InputText
+          label="Name"
+          value={`${actualNode.props.nodeName ?? actualNode.props.id}`}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                colorToken: value,
+                nodeName: value,
               },
             };
             updateElement(updatedNode);

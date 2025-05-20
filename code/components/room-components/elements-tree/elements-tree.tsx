@@ -41,9 +41,9 @@ function mapElementsToTree(
     return {
       id: element.key,
       icon: iconsMap[element.props.nodeType ?? "rectangle"],
-      name: element.key,
+      name: element.props.nodeName ? element.props.nodeName : element.key,
       actions: [
-        <button
+        <div
           key="remove"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
@@ -57,7 +57,7 @@ function mapElementsToTree(
           }}
         >
           <Trash size={16} strokeWidth={1} />
-        </button>,
+        </div>,
       ],
       ...((element.props.children ?? []).length > 0 && {
         children: mapElementsToTree(
@@ -147,7 +147,7 @@ export const ElementsTree = () => {
   }
 
   return (
-    <div className="pointer-events-auto w-full h-full">
+    <div className="w-full h-full">
       <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
           <SidebarSelector title="Elements Tree" />
@@ -164,7 +164,7 @@ export const ElementsTree = () => {
         </div>
       </div>
       <ScrollArea className="w-full h-[calc(100%-95px)]">
-        <div className="flex flex-col gap-2 w-full h-full p-[24px]">
+        <div className="flex flex-col gap-2 w-full h-full">
           {elementsTree.length === 0 && (
             <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
               <b className="font-normal text-[18px]">No elements created</b>

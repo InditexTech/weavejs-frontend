@@ -55,7 +55,7 @@ export const Room = () => {
 
   React.useEffect(() => {
     if (room && !user) {
-      const userStorage = localStorage.getItem(`weave.js_${room}`);
+      const userStorage = sessionStorage.getItem(`weave.js_${room}`);
       try {
         const userMapped = JSON.parse(userStorage ?? "");
         if (userMapped) {
@@ -124,12 +124,19 @@ export const Room = () => {
               key="loader"
               roomId={room ? room : "-"}
               content={
-                loadedParams && room && !user ? "ENTER ROOM" : "LOADING ROOM"
+                loadedParams && room && !user ? (
+                  <div className="text-center">
+                    <p>ENTER YOUR USERNAME</p>
+                    <p>TO ACCESS THE ROOM</p>
+                  </div>
+                ) : (
+                  "LOADING ROOM"
+                )
               }
               description={
                 <>
                   {loadedParams && room && !user ? (
-                    <div className="w-full mt-8">
+                    <div className="w-full">
                       <UserForm />
                     </div>
                   ) : (

@@ -48,28 +48,19 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
       <DropdownMenuTrigger
         className={cn(
-          "pointer-events-auto rounded-none cursor-pointer focus:outline-none",
+          "flex gap-2 rounded-none h-[40px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
-            ["font-normal"]: menuOpen,
-            ["font-extralight"]: !menuOpen,
+            ["font-light text-[#c9c9c9]"]: menuOpen,
+            ["font-light"]: !menuOpen,
           }
         )}
       >
-        <button
-          className={cn(
-            "flex gap-2 h-[40px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer",
-            {
-              ["text-[#c9c9c9]"]: menuOpen,
-            }
-          )}
-        >
-          <span>{title}</span>
-          {menuOpen ? (
-            <ChevronUp size={20} strokeWidth={1} />
-          ) : (
-            <ChevronDown size={20} strokeWidth={1} />
-          )}
-        </button>
+        <span>{title}</span>
+        {menuOpen ? (
+          <ChevronUp size={20} strokeWidth={1} />
+        ) : (
+          <ChevronDown size={20} strokeWidth={1} />
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"

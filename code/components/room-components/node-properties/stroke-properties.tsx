@@ -112,13 +112,13 @@ export function StrokeProperties() {
       <div className="grid grid-cols-2 gap-3 w-full">
         <InputColor
           label="Color (#RGBA)"
-          value={`${(actualNode.props.stroke ?? "#000000FF").replace("#", "")}`}
+          value={actualNode.props.stroke}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                stroke: `#${value}`,
+                stroke: value,
               },
             };
             updateElement(updatedNode);

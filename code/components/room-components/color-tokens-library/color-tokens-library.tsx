@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -46,7 +50,7 @@ export const ColorTokensLibrary = () => {
   }
 
   return (
-    <div className="pointer-events-auto w-full h-full">
+    <div className="w-full h-full">
       <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
           <SidebarSelector title="Color Tokens" />

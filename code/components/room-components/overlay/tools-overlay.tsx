@@ -140,7 +140,7 @@ export function ToolsOverlay() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="pointer-events-none absolute left-[24px] right-[24px] bottom-[24px] flex flex-col gap-2 justify-center items-center"
+      className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
     >
       <Toolbar orientation="horizontal">
         <ToolbarButton

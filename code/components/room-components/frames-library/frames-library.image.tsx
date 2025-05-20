@@ -20,10 +20,13 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
 
   React.useEffect(() => {
     const loadImage = async () => {
+      if (!instance) return;
+
+      const stage = instance.getStage();
       const nodeAttrs = node.getAttrs();
       try {
         // const box = frameInternal.getClientRect({ relativeTo: stage });
-        const frameBg = node.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
+        const frameBg = stage.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
         if (!frameBg) {
           return;
         }

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -7,11 +11,11 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const treeVariants = cva(
-  "group hover:before:opacity-100 before:absolute before:rounded-lg before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10"
+  "group hover:before:opacity-100 before:absolute before:rounded-none before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10"
 );
 
 const selectedTreeVariants = cva(
-  "before:opacity-100 before:bg-accent/70 text-accent-foreground bg-zinc-100 rounded-lg"
+  "before:opacity-100 before:bg-accent/70 text-accent-foreground bg-zinc-100 rounded-none"
 );
 
 const dragOverVariants = cva(
@@ -151,7 +155,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeProps>(
     }, [data, expandAll, initialSelectedItems]);
 
     return (
-      <div className={cn("overflow-hidden relative p-2", className)}>
+      <div className={cn("overflow-hidden relative", className)}>
         <TreeItem
           data={data}
           ref={ref}
@@ -322,7 +326,7 @@ const TreeNode = ({
           onDrop={onDrop}
         >
           <div
-            className="flex"
+            className="flex w-full text-left"
             onClick={(e) => {
               e.stopPropagation();
               handleSelectChange(e, item);
@@ -335,7 +339,7 @@ const TreeNode = ({
               isOpen={value.includes(item.id)}
               default={defaultNodeIcon}
             />
-            <span className="w-[calc(100%-40px)] text-xs truncate">
+            <span className="w-[calc(100%-32px)] text-xs truncate">
               {item.name}
             </span>
             <TreeActions isSelected={selectedItems?.includes(item.id) ?? false}>
@@ -424,7 +428,7 @@ const TreeLeaf = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "relative ml-5 flex text-left items-center py-2 cursor-pointer before:right-1",
+          "relative !pl-[28px] flex text-left rounded-none items-center py-2 cursor-pointer before:right-1",
           treeVariants(),
           className,
           selectedItems?.includes(item.id) && selectedTreeVariants(),
@@ -446,7 +450,9 @@ const TreeLeaf = React.forwardRef<
           isSelected={selectedItems?.includes(item.id)}
           default={defaultLeafIcon}
         />
-        <span className="flex-grow text-xs truncate">{item.name}</span>
+        <span className="flex-grow w-[calc(100%-32px)] text-xs truncate">
+          {item.name}
+        </span>
         <TreeActions isSelected={selectedItems?.includes(item.id) ?? false}>
           {item.actions}
         </TreeActions>
