@@ -41,7 +41,7 @@ SPDX-License-Identifier: Apache-2.0
 <h3 align="center">Weave.js Frontend UI Showcase</h3>
 
   <p align="center">
-    Build online whiteboard applications like Excalidraw, Miro, Canva, or Figma!
+    Build visual collaborative tools like Excalidraw, Miro, Canva, or Figma!
     <br />
     <a href="https://github.com/InditexTech/weavejs-frontend"><strong>Explore the docs »</strong></a>
     <br />
@@ -93,6 +93,7 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 
 ### Built With
 
+- [React Reconciler][ReactReconciler-url]
 - [Konva][https://konvajs.org/]
 - [Yjs][https://yjs.dev/]
 - [SyncedStore][https://syncedstore.org/docs/]
@@ -113,6 +114,8 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 Follow the [Quickstart documentation][docs-quick-start-url#frontend] to create your Weave.js project frontend and startup a sample application running on your local development environment.
 
 Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Prerequisites
 
