@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -424,7 +428,7 @@ const TreeLeaf = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "relative ml-5 flex text-left rounded-none items-center py-2 cursor-pointer before:right-1",
+          "relative !pl-[28px] flex text-left rounded-none items-center py-2 cursor-pointer before:right-1",
           treeVariants(),
           className,
           selectedItems?.includes(item.id) && selectedTreeVariants(),

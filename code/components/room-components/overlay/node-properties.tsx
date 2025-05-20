@@ -21,6 +21,7 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
+import { MetaProperties } from "../node-properties/meta-properties";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -198,6 +199,7 @@ export const NodeProperties = () => {
       </div>
       <ScrollArea className="w-full h-[calc(100%-95px)]">
         <div className="w-full flex flex-col">
+          <MetaProperties />
           <ImageProperties />
           <ColorTokenProperties />
           <FrameProperties />
