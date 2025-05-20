@@ -165,8 +165,12 @@ export const FramesLibrary = () => {
   }, [actualFrame, presentationImages]);
 
   React.useEffect(() => {
+    if (!instance) return;
+
     async function setupPresentation() {
-      const images = await generatePresentation(framesAvailable);
+      if (!instance) return;
+
+      const images = await generatePresentation(instance, framesAvailable);
       setPresentationImages(images);
       setPresentationImagesLoaded(true);
     }
@@ -177,7 +181,7 @@ export const FramesLibrary = () => {
     if (!presentationMode) {
       setPresentationImagesLoaded(false);
     }
-  }, [framesAvailable, presentationMode, presentationImagesLoaded]);
+  }, [instance, framesAvailable, presentationMode, presentationImagesLoaded]);
 
   if (!instance) {
     return null;
