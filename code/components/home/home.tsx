@@ -15,6 +15,7 @@ import { Github, Book } from "lucide-react";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import weavePackage from "../../node_modules/@inditextech/weave-sdk/package.json";
 import weaveReactHelperPackage from "../../node_modules/@inditextech/weave-react/package.json";
+import weaveStorePackage from "../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 
 export const Home = () => {
   return (
@@ -108,7 +109,7 @@ export const Home = () => {
                 </div>
                 <div className="flex gap-1 justify-center items-center">
                   <code className="bg-[#e9e9e9] px-2 py-1">
-                    v{weaveReactHelperPackage.version}
+                    v{weaveStorePackage.version}
                   </code>
                 </div>
               </div>

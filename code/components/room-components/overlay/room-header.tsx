@@ -65,6 +65,9 @@ import {
   GITHUB_URL,
   SIDEBAR_ELEMENTS,
 } from "@/lib/constants";
+import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.json";
+import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json";
+import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 
 export function RoomHeader() {
   const router = useRouter();
@@ -357,6 +360,34 @@ export function RoomHeader() {
                   }}
                 >
                   <Book /> Documentation
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  Weave.js dependencies versions
+                </DropdownMenuLabel>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-sdk</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weavePackage.version}
+                    </code>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-react</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weaveReactHelperPackage.version}
+                    </code>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-store-azure-web-pubsub</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weaveStorePackage.version}
+                    </code>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
