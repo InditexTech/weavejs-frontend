@@ -40,7 +40,7 @@ export const Home = () => {
         >
           <div className="max-w-[520px] w-full flex flex-col items-center justify-between gap-0">
             <div className="w-full flex justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 py-6 border border-[#c9c9c9]">
-              <Logo />
+              <Logo kind="small" />
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
