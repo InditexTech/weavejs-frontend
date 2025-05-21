@@ -10,10 +10,11 @@ import { motion } from "motion/react";
 import { Logo } from "@/components/utils/logo";
 import LoginForm from "../home-components/login-form";
 import Dither from "../ui/reactbits/Backgrounds/Dither/Dither";
-// import RotatingText from "../ui/reactbits/TextAnimations/RotatingText/RotatingText";
 import { Button } from "../ui/button";
 import { Github, Book } from "lucide-react";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
+import weavePackage from "../../node_modules/@inditextech/weave-sdk/package.json";
+import weaveReactHelperPackage from "../../node_modules/@inditextech/weave-react/package.json";
 
 export const Home = () => {
   return (
@@ -55,53 +56,62 @@ export const Home = () => {
                 </h2>
               </motion.div>
             </div>
-            {/* <div className="w-full flex gap-1 items-center justify-center bg-transparent">
-              <RotatingText
-                texts={[
-                  "collaborative",
-                  "easy to use",
-                  "extensible",
-                  "visual",
-                  "open source",
-                ]}
-                mainClassName="font-inter font-light leading-[100px] w-full h-full text-black overflow-hidden justify-center items-center text-3xl"
-                staggerFrom={"last"}
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                exit={{ y: "-120%" }}
-                staggerDuration={0.025}
-                splitBy="characters"
-                splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
-                transition={{ type: "spring", damping: 30, stiffness: 400 }}
-                rotationInterval={2000}
-              />
-            </div> */}
             <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-[32px] border border-[#c9c9c9] mt-[32px]">
               <LoginForm />
             </div>
-            <div className="w-full flex gap-2 items-center justify-center bg-background p-8 py-2 mt-4">
-              <Button
-                variant="link"
-                onClick={() => {
-                  window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-                }}
-                className="cursor-pointer font-inter font-light"
-              >
-                <Github strokeWidth={1} /> GITHUB
-              </Button>
-              <Button
-                variant="link"
-                onClick={() => {
-                  window.open(
-                    DOCUMENTATION_URL,
-                    "_blank",
-                    "noopener,noreferrer"
-                  );
-                }}
-                className="cursor-pointer font-inter font-light"
-              >
-                <Book strokeWidth={1} /> DOCUMENTATION
-              </Button>
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-4">
+              <div className="flex gap-2 justify-center-items-center">
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+                  }}
+                  className="cursor-pointer font-inter font-light"
+                >
+                  <Github strokeWidth={1} /> GITHUB
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    window.open(
+                      DOCUMENTATION_URL,
+                      "_blank",
+                      "noopener,noreferrer"
+                    );
+                  }}
+                  className="cursor-pointer font-inter font-light"
+                >
+                  <Book strokeWidth={1} /> DOCUMENTATION
+                </Button>
+              </div>
+            </div>
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-[32px]">
+              <div className="w-full grid grid-cols-[1fr_auto] gap-1 justify-center-items-center font-light text-[12px] py-3">
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-sdk</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weavePackage.version}
+                  </code>
+                </div>
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-react</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weaveReactHelperPackage.version}
+                  </code>
+                </div>
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-store-azure-web-pubsub</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weaveReactHelperPackage.version}
+                  </code>
+                </div>
+              </div>
             </div>
           </div>
         </motion.section>
