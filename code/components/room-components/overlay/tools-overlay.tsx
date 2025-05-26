@@ -181,6 +181,7 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Square className="px-2" size={40} strokeWidth={1} />}

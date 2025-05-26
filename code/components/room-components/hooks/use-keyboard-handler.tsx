@@ -77,6 +77,9 @@ export function useKeyboardHandler() {
   }, [instance]);
 
   /* Keyboard shortcuts toolbar */
+  useKeyDown(() => {
+    triggerTool("moveTool");
+  }, ["KeyM"]);
 
   useKeyDown(() => {
     triggerTool("selectionTool");
