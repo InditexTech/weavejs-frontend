@@ -68,15 +68,6 @@ SPDX-License-Identifier: Apache-2.0
         <li><a href="#related-repositories">Related repositories</a></li>
       </ul>
     </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -96,10 +87,7 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 
 ### Built With
 
-- [React Reconciler][ReactReconciler-url]
-- [Konva][https://konvajs.org/]
-- [Yjs][https://yjs.dev/]
-- [SyncedStore][https://syncedstore.org/docs/]
+- [Next.js](https://nextjs.org/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -109,49 +97,6 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 - [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- GETTING STARTED -->
-
-## Getting Started
-
-Follow the [Quickstart documentation][docs-quick-start-url#frontend] to create your Weave.js project frontend and startup a sample application running on your local development environment.
-
-Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Prerequisites
-
-- macOS, Windows (WSL), or Linux.
-- Node.js 18.18.0 or later.
-- React 18.2.0 or less than 19.x.
-- A Weave.js backend server created
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ROADMAP -->
-
-## Roadmap
-
-Check out [Weave.js roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTRIBUTING -->
-
-## Contributing
-
-Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Top contributors:
-
-<a href="https://github.com/InditexTech/weavejs-frontend/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=InditexTech/weavejs-frontend" alt="contrib.rocks image" />
-</a>
-
-<!-- LICENSE -->
 
 ## License
 
@@ -185,6 +130,3 @@ Project Link: [https://github.com/InditexTech/weavejs-frontend](https://github.c
 [license-shield]: https://img.shields.io/github/license/InditexTech/weavejs-frontend.svg?style=for-the-badge
 [license-url]: https://github.com/InditexTech/weavejs-frontend/blob/master/LICENSE.txt
 [product-screenshot]: images/screenshot.png
-[Konva-url]: https://github.com/konvajs/konva
-[Yjs-url]: https://github.com/yjs/yjs
-[SyncedStore-url]: https://github.com/yousefed/SyncedStore
