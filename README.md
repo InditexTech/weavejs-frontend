@@ -81,7 +81,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, as well as it handles user interactions in real time, so that changes in the visual canvas can be shared among multi users in real time.
 
-It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedStore][https://syncedstore.org/docs/] as well as an extensible API to streamline the development of interactive, collaborative applications.
+It provides robust synchronization based on [Yjs](https://yjs.dev/) and [SyncedStore](https://syncedstore.org/docs/) as well as an extensible API to streamline the development of interactive, collaborative applications.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -93,8 +93,8 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 
 ### Related repositories
 
-- [Weave.js][https://github.com/InditexTech/weavejs]
-- [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
+- [Weave.js](https://github.com/InditexTech/weavejs)
+- [Weave.js backend](https://github.com/InditexTech/weavejs-backend)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
