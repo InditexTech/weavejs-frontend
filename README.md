@@ -35,7 +35,10 @@ SPDX-License-Identifier: Apache-2.0
 <br />
 <div align="center">
   <a href="https://github.com/InditexTech/weavejs-frontend">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logo_inv.png">
+      <img src="images/logo.png" alt="Weave.js logo" width="80" height="80">
+    </picture>
   </a>
 
 <h3 align="center">Weave.js Frontend UI Showcase</h3>
