@@ -21,12 +21,14 @@ import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 function InputSelect({
+  hideSearch = false,
   label,
   options,
   value,
   onChange,
   disabled,
 }: {
+  hideSearch?: boolean;
   label?: string;
   options: { value: string; label: string }[];
   value: string;
@@ -36,6 +38,10 @@ function InputSelect({
   const [selectedOption, setSelectedOption] = useState<string>(value);
   const [open, setOpen] = useState(false);
   const lastSelectedOption = useRef<string>(value);
+
+  useEffect(() => {
+    setSelectedOption(value);
+  }, [value]);
 
   useEffect(() => {
     if (onChange && selectedOption !== lastSelectedOption.current) {
@@ -74,16 +80,18 @@ function InputSelect({
         </PopoverTrigger>
         <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black rounded-none">
           <Command>
-            <CommandInput
-              className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none"
-              onFocus={() => {
-                window.weaveOnFieldFocus = true;
-              }}
-              onBlurCapture={() => {
-                window.weaveOnFieldFocus = false;
-              }}
-              placeholder="Search..."
-            />
+            {!hideSearch && (
+              <CommandInput
+                className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none"
+                onFocus={() => {
+                  window.weaveOnFieldFocus = true;
+                }}
+                onBlurCapture={() => {
+                  window.weaveOnFieldFocus = false;
+                }}
+                placeholder="Search..."
+              />
+            )}
             <CommandList>
               <CommandEmpty>
                 <span className="!text-[14px] rounded-none text-black justify-between font-normal bg-transparent shadow-none">

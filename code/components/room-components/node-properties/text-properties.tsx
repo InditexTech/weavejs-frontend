@@ -101,6 +101,7 @@ export function TextProperties() {
                   fontFamily: value,
                 },
               };
+
               updateElement(updatedNode);
             }}
           />

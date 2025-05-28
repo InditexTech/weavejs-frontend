@@ -5,6 +5,7 @@
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
+  WeaveEraserToolAction,
   WeaveTextToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
@@ -118,6 +119,7 @@ const NODES = [
 const ACTIONS = [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
+  new WeaveEraserToolAction(),
   new WeaveTextToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),

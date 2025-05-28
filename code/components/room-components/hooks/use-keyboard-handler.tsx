@@ -85,6 +85,10 @@ export function useKeyboardHandler() {
     triggerTool("selectionTool");
   }, ["KeyS"]);
 
+  useKeyDown(() => {
+    triggerTool("eraserTool");
+  }, ["KeyD"]);
+
   useKeyDown(
     () => {
       triggerTool("frameTool");
