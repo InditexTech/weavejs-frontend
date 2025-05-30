@@ -25,6 +25,7 @@ import {
 import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
+import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 
 const FONTS = [
   {
@@ -106,11 +107,30 @@ const NODES = [
   new WeaveRectangleNode(),
   new WeaveLineNode(),
   new WeaveTextNode(),
-  new WeaveImageNode(),
+  new WeaveImageNode({
+    config: {
+      transform: {
+        enabledAnchors: [
+          WEAVE_TRANSFORMER_ANCHORS.TOP_LEFT,
+          WEAVE_TRANSFORMER_ANCHORS.TOP_RIGHT,
+          WEAVE_TRANSFORMER_ANCHORS.BOTTOM_LEFT,
+          WEAVE_TRANSFORMER_ANCHORS.BOTTOM_RIGHT,
+        ],
+        keepRatio: true,
+      },
+    },
+  }),
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
-      fontStyle: "100",
+      fontStyle: "300",
+      transform: {
+        rotateEnabled: false,
+        resizeEnabled: false,
+        enabledAnchors: [] as string[],
+        borderStrokeWidth: 3,
+        padding: 0,
+      },
     },
   }),
   new ColorTokenNode(),

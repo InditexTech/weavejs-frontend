@@ -136,6 +136,7 @@ export function SizeProperties() {
           <InputNumber
             label="Width"
             value={actualNode.props.width ?? 0}
+            disabled={actualNode.type === "frame"}
             onChange={(value) => {
               const isText = actualNode.type === "text";
               const updatedNode: WeaveStateElement = {
@@ -152,6 +153,7 @@ export function SizeProperties() {
           <InputNumber
             label="Height"
             value={actualNode.props.height ?? 0}
+            disabled={actualNode.type === "frame"}
             onChange={(value) => {
               const isText = actualNode.type === "text";
               const updatedNode: WeaveStateElement = {
@@ -169,6 +171,7 @@ export function SizeProperties() {
             <InputNumber
               label="Scale (%)"
               value={(actualNode.props.scaleX ?? 1) * 100}
+              disabled={actualNode.type === "frame"}
               onChange={(value) => {
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,
