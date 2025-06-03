@@ -6,11 +6,11 @@
 
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { Crop } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { ToggleIconButton } from "../toggle-icon-button";
 import { InputNumber } from "../inputs/input-number";
+import Konva from "konva";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
@@ -53,43 +53,31 @@ export function CropProperties() {
           </span>
         </div>
         <div className="flex justify-end items-center">
-          <ToggleIconButton
-            kind="switch"
-            icon={<Crop size={16} strokeWidth={1} />}
-            pressed={typeof actualNode.props.cropX !== "undefined"}
+          <button
+            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
+            disabled={typeof actualNode.props.cropInfo === "undefined"}
             onClick={() => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  ...(typeof actualNode.props.cropX !== "undefined"
-                    ? {
-                        width: actualNode.props.imageInfo.width,
-                        height: actualNode.props.imageInfo.height,
-                        cropX: null,
-                        cropY: null,
-                        cropWidth: null,
-                        cropHeight: null,
-                      }
-                    : {
-                        width: actualNode.props.imageInfo.width,
-                        height: actualNode.props.imageInfo.height,
-                        cropX: 0,
-                        cropY: 0,
-                        cropWidth: actualNode.props.imageInfo.width,
-                        cropHeight: actualNode.props.imageInfo.height,
-                      }),
-                },
-              };
-              updateElement(updatedNode);
+              const stage = instance.getStage();
+              if (!stage) return;
+
+              const node = stage.findOne(`#${actualNode.key}`) as
+                | Konva.Group
+                | undefined;
+
+              if (!node) return;
+
+              node.resetCrop();
             }}
-          />
+          >
+            <RotateCcw size={20} strokeWidth={1} />
+          </button>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 w-full">
         <InputNumber
           label="X"
           value={actualNode.props.cropX ?? 0}
+          disabled
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
@@ -104,6 +92,7 @@ export function CropProperties() {
         <InputNumber
           label="Y"
           value={actualNode.props.cropY ?? 0}
+          disabled
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
@@ -118,6 +107,7 @@ export function CropProperties() {
         <InputNumber
           label="Width"
           value={actualNode.props.cropWidth ?? actualNode.props.width}
+          disabled
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
@@ -133,6 +123,7 @@ export function CropProperties() {
         <InputNumber
           label="Height"
           value={actualNode.props.cropHeight ?? actualNode.props.height}
+          disabled
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
