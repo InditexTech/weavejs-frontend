@@ -61,7 +61,7 @@ export function CropProperties() {
               if (!stage) return;
 
               const node = stage.findOne(`#${actualNode.key}`) as
-                | Konva.Group
+                | Konva.Node
                 | undefined;
 
               if (!node) return;
