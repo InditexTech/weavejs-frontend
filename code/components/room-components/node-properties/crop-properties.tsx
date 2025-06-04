@@ -11,6 +11,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputNumber } from "../inputs/input-number";
 import Konva from "konva";
+import { ToggleIconButton } from "../toggle-icon-button";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
@@ -52,26 +53,25 @@ export function CropProperties() {
             Crop
           </span>
         </div>
-        <div className="flex justify-end items-center">
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            disabled={typeof actualNode.props.cropInfo === "undefined"}
-            onClick={() => {
-              const stage = instance.getStage();
-              if (!stage) return;
+        <ToggleIconButton
+          kind="toggle"
+          icon={<RotateCcw size={20} strokeWidth={1} />}
+          pressedIcon={<RotateCcw size={20} strokeWidth={1} />}
+          pressed={actualNode.props.strokeEnabled ?? true}
+          onClick={(e) => {
+            e.stopPropagation();
+            const stage = instance.getStage();
+            if (!stage) return;
 
-              const node = stage.findOne(`#${actualNode.key}`) as
-                | Konva.Node
-                | undefined;
+            const node = stage.findOne(`#${actualNode.key}`) as
+              | Konva.Node
+              | undefined;
 
-              if (!node) return;
+            if (!node) return;
 
-              node.resetCrop();
-            }}
-          >
-            <RotateCcw size={20} strokeWidth={1} />
-          </button>
-        </div>
+            node.resetCrop();
+          }}
+        />
       </div>
       <div className="grid grid-cols-2 gap-3 w-full">
         <InputNumber
