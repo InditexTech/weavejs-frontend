@@ -126,7 +126,7 @@ const NODES = [
       fontStyle: "300",
       transform: {
         rotateEnabled: false,
-        resizeEnabled: true,
+        resizeEnabled: false,
         enabledAnchors: [] as string[],
         borderStrokeWidth: 3,
         padding: 0,
