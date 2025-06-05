@@ -11,6 +11,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { Scaling } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -60,6 +61,9 @@ export function SizeProperties() {
     if (actualNode && actualNode.type === "image") {
       setMaintainAspectRatio(true);
     }
+    if (actualNode && typeof actualNode.props.keepAspectRatio !== "undefined") {
+      setMaintainAspectRatio(actualNode.props.keepAspectRatio);
+    }
   }, [actualNode]);
 
   if (!instance || !actualNode || !nodePropertiesAction) {
@@ -67,6 +71,14 @@ export function SizeProperties() {
   }
 
   if (!actualAction && !actualNode) return null;
+
+  if (
+    actualAction &&
+    ["selectionTool"].includes(actualAction) &&
+    ["ellipse", "star"].includes(actualNode.type)
+  ) {
+    return null;
+  }
 
   if (
     actualAction &&
@@ -141,10 +153,15 @@ export function SizeProperties() {
             </div>
           </div>
         )}
-        <div className="grid grid-cols-3 gap-3 w-full">
+        <div
+          className={cn("grid gap-3 w-full", {
+            ["grid-cols-3"]: ["update"].includes(nodePropertiesAction),
+            ["grid-cols-2"]: !["update"].includes(nodePropertiesAction),
+          })}
+        >
           <InputNumber
             label="Width"
-            value={actualNode.props.width ?? 0}
+            value={actualNode.props.width ?? 0.0}
             disabled={actualNode.type === "frame"}
             onChange={(value) => {
               const isImage = actualNode.type === "image";
@@ -191,7 +208,7 @@ export function SizeProperties() {
           />
           <InputNumber
             label="Height"
-            value={actualNode.props.height ?? 0}
+            value={actualNode.props.height ?? 0.0}
             disabled={actualNode.type === "frame"}
             onChange={(value) => {
               const isImage = actualNode.type === "image";
@@ -212,12 +229,10 @@ export function SizeProperties() {
                 newHeight = value;
               }
               if (!isImage && maintainAspectRatio) {
-                const ratio =
-                  actualNode.props.imageInfo.height /
-                  actualNode.props.imageInfo.width;
+                const ratio = actualNode.props.width / actualNode.props.height;
 
-                newWidth = value / ratio;
-                newHeight = value;
+                newWidth = value;
+                newHeight = value / ratio;
               }
 
               const updatedNode: WeaveStateElement = {
@@ -257,7 +272,12 @@ export function SizeProperties() {
             />
           )}
 
-          <div className="w-full flex justify-between items-center gap-4 col-span-3">
+          <div
+            className={cn("w-full flex justify-between items-center gap-4", {
+              ["col-span-3"]: ["update"].includes(nodePropertiesAction),
+              ["col-span-2"]: !["update"].includes(nodePropertiesAction),
+            })}
+          >
             <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
               Maintain aspect ratio
             </div>

@@ -6,7 +6,14 @@ import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
   WeaveEraserToolAction,
+  WeaveBrushToolAction,
+  WeaveFrameToolAction,
+  WeaveImageToolAction,
+  WeavePenToolAction,
+  WeaveRectangleToolAction,
+  WeaveEllipseToolAction,
   WeaveTextToolAction,
+  WeaveStarToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveExportNodeToolAction,
@@ -17,15 +24,18 @@ import {
   WeaveLayerNode,
   WeaveGroupNode,
   WeaveRectangleNode,
+  WeaveEllipseNode,
   WeaveLineNode,
   WeaveTextNode,
   WeaveImageNode,
+  WeaveStarNode,
   WeaveFrameNode,
 } from "@inditextech/weave-sdk";
 import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
+import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
 
 const FONTS = [
   {
@@ -105,6 +115,7 @@ const NODES = [
   new WeaveLayerNode(),
   new WeaveGroupNode(),
   new WeaveRectangleNode(),
+  new WeaveEllipseNode(),
   new WeaveLineNode(),
   new WeaveTextNode(),
   new WeaveImageNode({
@@ -120,6 +131,7 @@ const NODES = [
       },
     },
   }),
+  new WeaveStarNode(),
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
@@ -140,6 +152,14 @@ const ACTIONS = [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
+  new WeaveRectangleToolAction(),
+  new WeaveEllipseToolAction(),
+  new WeavePenToolAction(),
+  new WeaveBrushToolAction(),
+  new WeaveImageToolAction(),
+  new WeaveFrameToolAction(),
+  new WeaveStarToolAction(),
+  new ColorTokenToolAction(),
   new WeaveTextToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),
