@@ -5,7 +5,6 @@
 const nextConfig = {
   output: "standalone",
   reactStrictMode: false,
-  // transpilePackages: ["@inditextech/weave-sdk"],
   webpack: (config) => {
     if (process.env.WEAVE_KONVA_PATH) {
       config.resolve.alias = {
