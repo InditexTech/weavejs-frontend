@@ -58,7 +58,7 @@ SPDX-License-Identifier: Apache-2.0
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<details>
+<!-- <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
@@ -71,7 +71,7 @@ SPDX-License-Identifier: Apache-2.0
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
-</details>
+</details> -->
 
 <!-- ABOUT THE PROJECT -->
 
@@ -79,40 +79,58 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Weave.js Screen Shot][product-screenshot]](images/screenshot.png)
 
-Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, as well as it handles user interactions in real time, so that changes in the visual canvas can be shared among multi users in real time.
+This repository contain the Weave.js showcase frontend, its a demo application that highlights the features of Weave.js, a collaborative canvas framework. It provides a user interface for:
 
-It provides robust synchronization based on [Yjs](https://yjs.dev/) and [SyncedStore](https://syncedstore.org/docs/) as well as an extensible API to streamline the development of interactive, collaborative applications.
+- 🖼️ Drawing and manipulating visual elements (like shapes, images, and groups)
+- 🧑‍🤝‍🧑 Real-time collaboration via shared rooms
+- 🧰 Tool usage such as select, transform, move and erase
+- 🔄 Undo/redo and action history
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+This frontend serves both as:
+
+- A reference implementation for developers building on Weave.js
+- A live playground to test and iterate with visual + collaborative features
+
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 ### Built With
 
 - [Next.js](https://nextjs.org/)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-### Related repositories
+### Related repos
 
 - [Weave.js](https://github.com/InditexTech/weavejs)
-- [Weave.js backend](https://github.com/InditexTech/weavejs-backend)
+- Weave.js [showcase backend](https://github.com/InditexTech/weavejs-backend)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
+
+## Quickstart
+
+You can locally launch the frontend showcase by:
+
+- Install dependencies with: `npm install`
+- Create a `.env` file on the folder `/code`, and setup the necessary configuration:
+
+  ```
+  // Azure Web PubSub endpoint name
+  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=weavejs
+  // Weave.js backend endpoint (proxied through Next.js)
+  NEXT_PUBLIC_API_ENDPOINT=/weavebff/api/v1
+  // Real Weave.js backend endpoint
+  BACKEND_ENDPOINT=http://127.0.0.1:8081
+  ```
+
+- Run the frontend: `npm run dev`
+
+You'll need access to a [Azure Web PubSub](https://azure.microsoft.com/es-es/products/web-pubsub) instance.
 
 ## License
 
 This project is licensed under the terms of the [Apache-2.0](LICENSE) license.
 
 © 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTACT -->
-
-## Contact
-
-Jesus Manuel Piñeiro Cid - jesusmpc@inditex.com
-
-Project Link: [https://github.com/InditexTech/weavejs-frontend](https://github.com/InditexTech/weavejs-frontend)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
