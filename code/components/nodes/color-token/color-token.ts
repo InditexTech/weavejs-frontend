@@ -96,7 +96,7 @@ export class ColorTokenNode extends WeaveNode {
 
   onUpdate(
     nodeInstance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ) {
     const { id, colorToken } = nextProps;
 

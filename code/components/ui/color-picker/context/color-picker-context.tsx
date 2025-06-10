@@ -13,9 +13,9 @@ interface ColorPickerContextValue {
   isUpdating: boolean;
 }
 
-export const ColorPickerContext = createContext<ColorPickerContextValue | undefined>(
-  undefined
-);
+export const ColorPickerContext = createContext<
+  ColorPickerContextValue | undefined
+>(undefined);
 
 /**
  * Hook to access the ColorPicker context

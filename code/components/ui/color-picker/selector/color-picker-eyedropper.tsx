@@ -77,7 +77,7 @@ export const ColorPickerEyeDropper = ({
         className={cn(
           "rounded-none border-none bg-black hover:bg-[#c9c9c9] hover:text-black cursor-pointer shrink-0 text-white",
           isActive && "opacity-50 cursor-not-allowed",
-          className
+          className,
         )}
         {...props}
       >

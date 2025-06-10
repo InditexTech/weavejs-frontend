@@ -41,10 +41,10 @@ export const FramesLibrary = () => {
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
+    (state) => state.sidebar.left.active,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const [presentationMode, setPresentationMode] =
@@ -70,7 +70,7 @@ export const FramesLibrary = () => {
 
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      "frame"
+      "frame",
     );
 
     const frames: Konva.Node[] = [];
@@ -104,7 +104,7 @@ export const FramesLibrary = () => {
       {
         gap: 20,
         nodes: selectedNodes,
-      }
+      },
     );
     instance.triggerAction("selectionTool");
   }, [instance, selectedNodes]);

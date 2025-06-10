@@ -52,12 +52,12 @@ export function ToolsOverlay() {
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
 
   const mutationUpload = useMutation({
@@ -67,7 +67,7 @@ export function ToolsOverlay() {
   });
 
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   const triggerTool = React.useCallback(
@@ -79,7 +79,7 @@ export function ToolsOverlay() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   React.useEffect(() => {
@@ -107,12 +107,12 @@ export function ToolsOverlay() {
           const imageId = data.fileName.split("/")[1];
 
           const { finishUploadCallback } = instance?.triggerAction(
-            "imageTool"
+            "imageTool",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
 
           finishUploadCallback?.(
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
           );
         },
         onError: () => {

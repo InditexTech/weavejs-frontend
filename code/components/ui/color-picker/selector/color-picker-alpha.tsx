@@ -46,7 +46,7 @@ export const ColorPickerAlpha = ({
         lastAlpha.current = newAlpha;
       }
     },
-    [color, setColor]
+    [color, setColor],
   );
 
   return (
@@ -56,7 +56,7 @@ export const ColorPickerAlpha = ({
       step={1}
       className={cn(
         "relative flex h-5 w-full touch-none items-center transition-opacity duration-200",
-        className
+        className,
       )}
       onValueChange={onValueChange}
       aria-label="Opacity"

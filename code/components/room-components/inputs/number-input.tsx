@@ -38,12 +38,12 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       value,
       ...props
     },
-    ref
+    ref,
   ) => {
     const editingRef = React.useRef<HTMLInputElement>(null);
     const [editing, setEditing] = React.useState<boolean>(false);
     const [editedValue, setEditedValue] = React.useState<number | undefined>(
-      defaultValue
+      defaultValue,
     );
 
     const handleChange = React.useCallback(
@@ -53,7 +53,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
         setEditedValue(newValue);
       },
-      []
+      [],
     );
 
     const handleBlur = React.useCallback(() => {
@@ -139,7 +139,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 NumberInput.displayName = "NumberInput";

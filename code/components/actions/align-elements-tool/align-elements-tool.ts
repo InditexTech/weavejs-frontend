@@ -49,7 +49,7 @@ export class AlignElementsToolAction extends WeaveAction {
 
       if (prevInstance) {
         const handler = this.instance.getNodeHandler<WeaveNode>(
-          instance.getAttrs().nodeType
+          instance.getAttrs().nodeType,
         );
         const node = handler.serialize(instance as WeaveElementInstance);
 
@@ -78,7 +78,7 @@ export class AlignElementsToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }
+    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] },
   ) {
     if (!this.instance) {
       throw new Error("Instance not defined");

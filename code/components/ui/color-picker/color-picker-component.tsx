@@ -64,7 +64,7 @@ export const ColorPicker = ({
       <div
         className={cn(
           "grid w-full gap-4 rounded-none transition-opacity duration-150",
-          className
+          className,
         )}
         {...props}
       />

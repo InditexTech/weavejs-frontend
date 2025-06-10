@@ -30,7 +30,7 @@ export const ColorPickerHue = ({
     ([hue]: number[]) => {
       setHueValue(hue);
     },
-    [setHueValue]
+    [setHueValue],
   );
 
   const onValueCommit = useCallback(
@@ -38,7 +38,7 @@ export const ColorPickerHue = ({
       lastHue.current = hue;
       setColor(color.hue(hue));
     },
-    [color, setColor]
+    [color, setColor],
   );
 
   return (
@@ -48,7 +48,7 @@ export const ColorPickerHue = ({
       step={1}
       className={cn(
         "relative flex h-5 w-full touch-none items-center transition-opacity duration-200",
-        className
+        className,
       )}
       onValueChange={onValueChange}
       onValueCommit={onValueCommit}

@@ -42,7 +42,7 @@ export const ToolbarButton = React.forwardRef<
       tooltipSide = "right",
       tooltipAlign = "center",
     },
-    forwardedRef
+    forwardedRef,
   ) => {
     const selectionActive = useWeave((state) => state.selection.active);
 
@@ -63,7 +63,7 @@ export const ToolbarButton = React.forwardRef<
                   ["pointer-events-none cursor-default text-black opacity-50"]:
                     disabled,
                 },
-                className
+                className,
               )}
               disabled={disabled}
               onClick={onClick}
@@ -82,7 +82,7 @@ export const ToolbarButton = React.forwardRef<
         </Tooltip>
       </TooltipProvider>
     );
-  }
+  },
 );
 
 ToolbarButton.displayName = "ToolbarButton";

@@ -47,7 +47,7 @@ const PercentageInput = ({
         {...props}
         className={cn(
           "h-[40px] w-[4.7rem] rounded-none !text-[14px] font-normal text-black !border-black text-left focus:outline-none bg-transparent uppercase",
-          className
+          className,
         )}
       />
       <span className="-translate-y-1/2 absolute -translate-x-5 top-1/2 right-2 text-muted-foreground text-xs pointer-events-none">

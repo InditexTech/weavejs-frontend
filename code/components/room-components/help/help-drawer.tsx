@@ -31,7 +31,7 @@ export const HelpDrawerTrigger = () => {
   const os = useGetOs();
 
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 
@@ -40,7 +40,7 @@ export const HelpDrawerTrigger = () => {
       onClick={() => {
         setShowDrawer(
           DRAWER_ELEMENTS.keyboardShortcuts,
-          !keyboardShortcutsVisible
+          !keyboardShortcutsVisible,
         );
       }}
       className="w-full text-foreground cursor-pointer hover:rounded-none"
@@ -55,7 +55,7 @@ export const HelpDrawerTrigger = () => {
 
 export const HelpDrawer = () => {
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 

@@ -14,7 +14,7 @@ export const useKeyDown = (
   callback: () => void,
   keys: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modifiers: (event: any) => boolean = () => true
+  modifiers: (event: any) => boolean = () => true,
 ) => {
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,7 +30,7 @@ export const useKeyDown = (
         callback();
       }
     },
-    [callback, keys, modifiers]
+    [callback, keys, modifiers],
   );
 
   React.useEffect(() => {

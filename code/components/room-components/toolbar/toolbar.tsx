@@ -28,7 +28,7 @@ export const Toolbar = ({
           ["pointer-events-auto"]: !selectionActive,
           ["flex"]: orientation === "horizontal",
           ["flex flex-col"]: orientation === "vertical",
-        }
+        },
       )}
     >
       {children}

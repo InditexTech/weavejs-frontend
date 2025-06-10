@@ -164,7 +164,7 @@ const Threads: React.FC<ThreadsProps> = ({
           value: new Color(
             gl.canvas.width,
             gl.canvas.height,
-            gl.canvas.width / gl.canvas.height
+            gl.canvas.width / gl.canvas.height,
           ),
         },
         uColor: { value: new Color(...color) },

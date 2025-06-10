@@ -18,7 +18,7 @@ export function CropProperties() {
   const node = useWeave((state) => state.selection.node);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const actualNode = React.useMemo(() => {
@@ -36,7 +36,7 @@ export function CropProperties() {
         return;
       }
     },
-    [instance, nodePropertiesAction]
+    [instance, nodePropertiesAction],
   );
 
   if (!instance || !actualNode) return null;

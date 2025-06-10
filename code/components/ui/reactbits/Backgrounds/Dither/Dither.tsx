@@ -165,7 +165,7 @@ class RetroEffectImpl extends Effect {
 }
 
 const RetroEffect = wrapEffect(
-  RetroEffectImpl
+  RetroEffectImpl,
 ) as React.ForwardRefExoticComponent<React.RefAttributes<RetroEffectImpl>>;
 
 interface WaveUniforms {

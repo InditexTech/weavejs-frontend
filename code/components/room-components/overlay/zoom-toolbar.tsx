@@ -29,7 +29,7 @@ export function ZoomToolbar() {
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   return (

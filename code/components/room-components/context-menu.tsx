@@ -50,7 +50,7 @@ function ContextMenuButton({
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
-        }
+        },
       )}
       disabled={disabled}
       onClick={onClick}
@@ -76,11 +76,11 @@ export const ContextMenuRender = ({
 
       X = Math.max(
         20,
-        Math.min(X, window.innerWidth - boundingRect.width - 20)
+        Math.min(X, window.innerWidth - boundingRect.width - 20),
       );
       Y = Math.max(
         20,
-        Math.min(Y, window.innerHeight - boundingRect.height - 20)
+        Math.min(Y, window.innerHeight - boundingRect.height - 20),
       );
 
       ref.current.style.top = `${Y}px`;

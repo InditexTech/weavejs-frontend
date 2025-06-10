@@ -38,19 +38,19 @@ function useContextMenu() {
 
   const room = useCollaborationRoom((state) => state.room);
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
+    (state) => state.setContextMenuShow,
   );
   const setContextMenuPosition = useCollaborationRoom(
-    (state) => state.setContextMenuPosition
+    (state) => state.setContextMenuPosition,
   );
   const setContextMenuOptions = useCollaborationRoom(
-    (state) => state.setContextMenuOptions
+    (state) => state.setContextMenuOptions,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
+    (state) => state.setTransformingImage,
   );
 
   const mutationUpload = useMutation({
@@ -141,7 +141,7 @@ function useContextMenu() {
                     padding: 20,
                     pixelRatio: 2,
                   },
-                }
+                },
               );
             }
             setContextMenuShow(false);
@@ -406,7 +406,7 @@ function useContextMenu() {
               const nodeImage = nodes[0].instance as Konva.Group | undefined;
               if (nodeImage) {
                 const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`
+                  `#${nodeImage.getAttrs().id}-image`,
                 );
                 const imageTokens = nodeImageInternal
                   ?.getAttr("image")
@@ -420,12 +420,12 @@ function useContextMenu() {
                     const imageId = data.fileName.split("/")[1];
 
                     const { finishUploadCallback } = instance.triggerAction(
-                      "imageTool"
+                      "imageTool",
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ) as any;
 
                     finishUploadCallback(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
                     );
                   },
                   onError: () => {
@@ -444,7 +444,7 @@ function useContextMenu() {
 
       return options;
     },
-    [instance, mutationUpload, setTransformingImage, setContextMenuShow]
+    [instance, mutationUpload, setTransformingImage, setContextMenuShow],
   );
 
   const onNodeContextMenuHandler = React.useCallback(
@@ -483,7 +483,7 @@ function useContextMenu() {
       setContextMenuPosition,
       setContextMenuShow,
       setSidebarActive,
-    ]
+    ],
   );
 
   React.useEffect(() => {
@@ -494,7 +494,7 @@ function useContextMenu() {
     return () => {
       instance.removeEventListener(
         "onNodeContextMenu",
-        onNodeContextMenuHandler
+        onNodeContextMenuHandler,
       );
     };
   }, [instance, onNodeContextMenuHandler]);

@@ -30,10 +30,10 @@ export const ImagesLibrary = () => {
 
   const room = useCollaborationRoom((state) => state.room);
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
+    (state) => state.sidebar.left.active,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const mutationUpload = useMutation({

@@ -35,7 +35,7 @@ const iconsMap: Record<string, any> = {
 function mapElementsToTree(
   instance: Weave,
   elements: WeaveStateElement[],
-  selectedNodes: string[]
+  selectedNodes: string[],
 ) {
   const elementsMapped = elements.map((element) => {
     return {
@@ -63,7 +63,7 @@ function mapElementsToTree(
         children: mapElementsToTree(
           instance,
           element.props.children ?? [],
-          selectedNodes
+          selectedNodes,
         ),
       }),
     } as TreeDataItem;
@@ -78,17 +78,17 @@ export const ElementsTree = () => {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
+    (state) => state.sidebar.left.active,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
-    []
+    [],
   );
   const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
-    initialSelectedNodes.map((node) => node.node.key)
+    initialSelectedNodes.map((node) => node.node.key),
   );
 
   React.useEffect(() => {
@@ -125,7 +125,7 @@ export const ElementsTree = () => {
       if (instance) {
         instance.removeEventListener(
           "onNodesChange",
-          handleOnNodesSelectedChange
+          handleOnNodesSelectedChange,
         );
       }
     };
