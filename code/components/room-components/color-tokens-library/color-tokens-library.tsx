@@ -22,10 +22,10 @@ export const ColorTokensLibrary = () => {
   const instance = useWeave((state) => state.instance);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
+    (state) => state.sidebar.left.active,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const commonColorTokens: ColorTokenElement[] = React.useMemo(() => {

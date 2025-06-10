@@ -22,7 +22,7 @@ function useCopyPaste() {
         toast.success("Copy successful");
       }
     },
-    []
+    [],
   );
 
   const onPasteHandler = React.useCallback(
@@ -38,7 +38,7 @@ function useCopyPaste() {
         toast.success("Paste successful");
       }
     },
-    []
+    [],
   );
 
   React.useEffect(() => {

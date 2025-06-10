@@ -37,13 +37,13 @@ export const Room = () => {
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const loadingFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.loading
+    (state) => state.fetchConnectionUrl.loading,
   );
   const errorFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.error
+    (state) => state.fetchConnectionUrl.error,
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
+    (state) => state.setFetchConnectionUrlError,
   );
   const setUser = useCollaborationRoom((state) => state.setUser);
 

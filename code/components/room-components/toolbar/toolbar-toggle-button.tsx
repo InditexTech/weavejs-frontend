@@ -33,7 +33,7 @@ export const ToolbarToggleButton = ({
         {
           ["bg-light-background-1"]: !isPressed,
           ["bg-light-background-3"]: isPressed,
-        }
+        },
       )}
       disabled={disabled}
       onClick={onClick}

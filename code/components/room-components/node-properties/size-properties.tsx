@@ -19,11 +19,11 @@ export function SizeProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(true);
@@ -54,7 +54,7 @@ export function SizeProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   React.useEffect(() => {

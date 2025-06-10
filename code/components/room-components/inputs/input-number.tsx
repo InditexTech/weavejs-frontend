@@ -33,14 +33,14 @@ export const InputNumber = ({
         input.blur();
       }
     },
-    []
+    [],
   );
 
   const handleOnValueChange = React.useCallback(
     (numberValue: number | undefined) => {
       onChange?.(numberValue ?? 0);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

@@ -55,7 +55,7 @@ export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
             (kind === "switch" && !isPressed) || kind === "toggle",
           ["bg-black text-white"]: kind === "switch" && isPressed,
         },
-        className
+        className,
       )}
       disabled={disabled}
       onClick={(e) => onClick?.(e)}

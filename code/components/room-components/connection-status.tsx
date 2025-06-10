@@ -35,7 +35,7 @@ export const ConnectionStatus = ({
             ["bg-[#FDB4BB] text-white"]:
               weaveConnectionStatus ===
               WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED,
-          }
+          },
         )}
       >
         {weaveConnectionStatus ===

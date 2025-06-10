@@ -33,14 +33,14 @@ export const ConnectedUsers = () => {
 
   const connectedUserKey = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser === user?.name
+      (actUser) => actUser === user?.name,
     );
     return filterOwnUser?.[0];
   }, [user, connectedUsers]);
 
   const { showUsers, restUsers } = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser !== user?.name
+      (actUser) => actUser !== user?.name,
     );
     return {
       showUsers: filterOwnUser.slice(0, 4),
@@ -126,7 +126,7 @@ export const ConnectedUsers = () => {
                         {
                           ["bg-accent"]: menuOpen,
                           ["bg-white"]: !menuOpen,
-                        }
+                        },
                       )}
                     >
                       <ChevronDown

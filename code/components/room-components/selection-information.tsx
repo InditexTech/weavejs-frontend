@@ -37,7 +37,7 @@ export const SelectionInformation = () => {
                 height: box.height * stage.scaleY(),
                 callback(img) {
                   const containerNode = document.getElementById(
-                    `selection_${node.node.key}_image_container`
+                    `selection_${node.node.key}_image_container`,
                   );
                   if (containerNode) {
                     containerNode.innerHTML = "";

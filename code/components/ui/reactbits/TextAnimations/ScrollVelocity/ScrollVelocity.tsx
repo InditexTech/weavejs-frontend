@@ -111,7 +111,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
       smoothVelocity,
       velocityMapping?.input || [0, 1000],
       velocityMapping?.output || [0, 5],
-      { clamp: false }
+      { clamp: false },
     );
 
     const copyRef = useRef<HTMLSpanElement>(null);
@@ -151,7 +151,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           ref={i === 0 ? copyRef : null}
         >
           {children}
-        </span>
+        </span>,
       );
     }
 

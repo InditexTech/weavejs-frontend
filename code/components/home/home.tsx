@@ -77,7 +77,7 @@ export const Home = () => {
                     window.open(
                       DOCUMENTATION_URL,
                       "_blank",
-                      "noopener,noreferrer"
+                      "noopener,noreferrer",
                     );
                   }}
                   className="cursor-pointer font-inter font-light"

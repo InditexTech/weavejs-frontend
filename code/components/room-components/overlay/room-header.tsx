@@ -79,7 +79,7 @@ export function RoomHeader() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -87,14 +87,14 @@ export function RoomHeader() {
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
-    WEAVE_GRID_TYPES.LINES
+    WEAVE_GRID_TYPES.LINES,
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const handleToggleUsersPointers = React.useCallback(() => {
@@ -132,12 +132,12 @@ export function RoomHeader() {
     (type: WeaveStageGridType) => {
       if (instance) {
         (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
-          type
+          type,
         );
         setGridType(type);
       }
     },
-    [instance]
+    [instance],
   );
 
   const handleExportToImage = React.useCallback(() => {
@@ -160,7 +160,7 @@ export function RoomHeader() {
   React.useEffect(() => {
     if (instance) {
       const stageGridPlugin = instance.getPlugin(
-        "stageGrid"
+        "stageGrid",
       ) as WeaveStageGridPlugin;
       setGridType(stageGridPlugin?.getType());
     }
@@ -197,7 +197,7 @@ export function RoomHeader() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          }
+          },
         )}
       >
         <div className="bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
@@ -213,7 +213,7 @@ export function RoomHeader() {
                   {
                     ["font-normal"]: menuOpen,
                     ["font-extralight"]: !menuOpen,
-                  }
+                  },
                 )}
               >
                 <div className="flex gap-1 justify-start items-center">
@@ -355,7 +355,7 @@ export function RoomHeader() {
                     window.open(
                       DOCUMENTATION_URL,
                       "_blank",
-                      "noopener,noreferrer"
+                      "noopener,noreferrer",
                     );
                   }}
                 >
@@ -417,7 +417,7 @@ export function RoomHeader() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          }
+          },
         )}
       >
         <div className="w-auto h-[72px] bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
@@ -442,7 +442,7 @@ export function RoomHeader() {
                     {
                       ["font-normal"]: sidebarsMenuOpen,
                       ["font-extralight"]: !sidebarsMenuOpen,
-                    }
+                    },
                   )}
                 >
                   <TooltipProvider delayDuration={300}>

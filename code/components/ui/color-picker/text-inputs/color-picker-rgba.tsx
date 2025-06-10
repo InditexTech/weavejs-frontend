@@ -58,7 +58,7 @@ export const ColorPickerRGBAInput = ({
         className={cn(
           "h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent",
           error && "border-red-500",
-          !error && "border-zinc-200"
+          !error && "border-zinc-200",
         )}
       />
     </div>

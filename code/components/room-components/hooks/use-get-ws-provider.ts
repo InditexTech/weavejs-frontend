@@ -22,11 +22,11 @@ function useGetWsProvider({
   const user = useCollaborationRoom((state) => state.user);
 
   const setFetchConnectionUrlLoading = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlLoading
+    (state) => state.setFetchConnectionUrlLoading,
   );
 
   const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
+    (state) => state.setFetchConnectionUrlError,
   );
 
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
@@ -37,7 +37,7 @@ function useGetWsProvider({
       setFetchConnectionUrlError(error);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const onConnectionStatusChangeHandler = React.useCallback(
@@ -45,7 +45,7 @@ function useGetWsProvider({
       setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const wsProvider = React.useMemo(() => {
@@ -64,7 +64,7 @@ function useGetWsProvider({
             onFetchConnectionUrl: onFetchConnectionUrlHandler,
             onConnectionStatusChange: onConnectionStatusChangeHandler,
           },
-        }
+        },
       );
     }
 

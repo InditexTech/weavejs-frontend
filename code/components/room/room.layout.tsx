@@ -34,35 +34,35 @@ export const RoomLayout = () => {
   const roomLoaded = useWeave((state) => state.room.loaded);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
+    (state) => state.sidebar.left.active,
   );
   const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active
+    (state) => state.sidebar.right.active,
   );
   const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show
+    (state) => state.contextMenu.show,
   );
   const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position
+    (state) => state.contextMenu.position,
   );
   const contextMenuOptions = useCollaborationRoom(
-    (state) => state.contextMenu.options
+    (state) => state.contextMenu.options,
   );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
+    (state) => state.setContextMenuShow,
   );
   const transformingImage = useCollaborationRoom(
-    (state) => state.images.transforming
+    (state) => state.images.transforming,
   );
   const uploadingImage = useCollaborationRoom(
-    (state) => state.images.uploading
+    (state) => state.images.uploading,
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const setLoadingImage = useCollaborationRoom(
-    (state) => state.setLoadingImage
+    (state) => state.setLoadingImage,
   );
   const setNodePropertiesCreateProps = useCollaborationRoom(
-    (state) => state.setNodePropertiesCreateProps
+    (state) => state.setNodePropertiesCreateProps,
   );
 
   React.useEffect(() => {
@@ -135,7 +135,7 @@ export const RoomLayout = () => {
             {
               ["w-0"]: sidebarLeftActive === null,
               ["w-[370px]"]: sidebarLeftActive !== null,
-            }
+            },
           )}
         >
           <AnimatePresence>
@@ -155,7 +155,7 @@ export const RoomLayout = () => {
                 sidebarLeftActive !== null || sidebarRightActive !== null,
               ["w-[calc(100%-740px)]"]:
                 sidebarLeftActive !== null && sidebarRightActive !== null,
-            }
+            },
           )}
         >
           <RoomHeader />
@@ -219,7 +219,7 @@ export const RoomLayout = () => {
             {
               ["w-0"]: sidebarRightActive === null,
               ["w-[370px]"]: sidebarRightActive !== null,
-            }
+            },
           )}
         >
           <NodeProperties />

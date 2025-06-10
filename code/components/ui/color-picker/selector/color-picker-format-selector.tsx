@@ -34,7 +34,7 @@ export const ColorPickerFormatSelector = ({
       <SelectTrigger
         className={cn(
           "h-8 !text-[14px] border-black rounded-none font-normal text-black",
-          className
+          className,
         )}
         data-size="sm"
         aria-label="Color format"

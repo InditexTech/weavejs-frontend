@@ -27,7 +27,7 @@ export function Divider({
         {
           ["bg-[#c9c9c9]"]: color === "normal",
           ["bg-black"]: color === "black",
-        }
+        },
       )}
     ></div>
   );

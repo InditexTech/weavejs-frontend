@@ -121,7 +121,7 @@ export class ColorTokenToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    params?: ColorTokenToolActionTriggerParams
+    params?: ColorTokenToolActionTriggerParams,
   ) {
     if (!this.instance) {
       throw new Error("Instance not defined");
