@@ -11,7 +11,6 @@ import { useKeyDown } from "../hooks/use-key-down";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useGetOs } from "../hooks/use-get-os";
 import {
-  WeaveCopyPasteNodesPlugin,
   WeaveExportNodeActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
@@ -29,10 +28,10 @@ export function useKeyboardHandler() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage,
+    (state) => state.setShowSelectFileImage
   );
 
   const triggerTool = React.useCallback(
@@ -44,14 +43,14 @@ export function useKeyboardHandler() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction],
+    [instance, actualAction]
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive],
+    [setSidebarActive]
   );
 
   const handleTriggerAction = React.useCallback(
@@ -64,7 +63,7 @@ export function useKeyboardHandler() {
         }
       }
     },
-    [instance, actualAction],
+    [instance, actualAction]
   );
 
   const handlePrintToConsoleState = React.useCallback(() => {
@@ -94,7 +93,7 @@ export function useKeyboardHandler() {
       triggerTool("frameTool");
     },
     ["KeyF"],
-    (e) => !(e.ctrlKey || e.metaKey),
+    (e) => !(e.ctrlKey || e.metaKey)
   );
 
   useKeyDown(() => {
@@ -127,7 +126,7 @@ export function useKeyboardHandler() {
       setShowSelectFileImage(true);
     },
     ["KeyI"],
-    (e) => !(e.ctrlKey || e.metaKey),
+    (e) => !(e.ctrlKey || e.metaKey)
   );
 
   useKeyDown(() => {
@@ -143,7 +142,7 @@ export function useKeyboardHandler() {
       triggerTool("colorTokenTool");
     },
     ["KeyP"],
-    (e) => !(e.ctrlKey || e.metaKey),
+    (e) => !(e.ctrlKey || e.metaKey)
   );
 
   useKeyDown(
@@ -154,7 +153,7 @@ export function useKeyboardHandler() {
       }
     },
     ["KeyZ"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -165,7 +164,7 @@ export function useKeyboardHandler() {
       }
     },
     ["KeyY"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts visibility */
@@ -175,7 +174,7 @@ export function useKeyboardHandler() {
       setShowUi(!showUI);
     },
     ["IntlBackslash"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -193,7 +192,7 @@ export function useKeyboardHandler() {
     ["KeyU"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts selection */
@@ -211,7 +210,7 @@ export function useKeyboardHandler() {
     ["KeyA"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -225,53 +224,10 @@ export function useKeyboardHandler() {
       }
     },
     ["Escape"],
-    (e) => e.shiftKey,
+    (e) => e.shiftKey
   );
 
   /* Keyboard shortcuts editing */
-
-  useKeyDown(
-    async () => {
-      if (instance && selectedNodes.length > 0) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin) {
-          await weaveCopyPasteNodesPlugin.copy();
-        }
-      }
-    },
-    ["KeyC"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
-  );
-
-  useKeyDown(
-    () => {
-      if (instance) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin) {
-          weaveCopyPasteNodesPlugin.paste();
-        }
-      }
-    },
-    ["KeyP"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
-  );
-
-  useKeyDown(
-    async () => {
-      if (instance && selectedNodes.length === 1) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-        if (weaveCopyPasteNodesPlugin) {
-          await weaveCopyPasteNodesPlugin.copy();
-          weaveCopyPasteNodesPlugin.paste();
-        }
-      }
-    },
-    ["KeyD"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
-  );
 
   useKeyDown(
     () => {
@@ -288,7 +244,7 @@ export function useKeyboardHandler() {
     ["KeyE"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -301,14 +257,14 @@ export function useKeyboardHandler() {
               padding: 20,
               pixelRatio: 2,
             },
-          },
+          }
         );
       }
     },
     ["KeyV"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts arrange */
@@ -320,7 +276,7 @@ export function useKeyboardHandler() {
       }
     },
     ["BracketRight"],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -330,7 +286,7 @@ export function useKeyboardHandler() {
       }
     },
     ["BracketRight"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -340,7 +296,7 @@ export function useKeyboardHandler() {
       }
     },
     ["BracketLeft"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -350,7 +306,7 @@ export function useKeyboardHandler() {
       }
     },
     ["BracketLeft"],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -362,7 +318,7 @@ export function useKeyboardHandler() {
     ["KeyG"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -378,7 +334,7 @@ export function useKeyboardHandler() {
     ["KeyU"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts sidebars */
@@ -390,7 +346,7 @@ export function useKeyboardHandler() {
     ["KeyI"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -400,7 +356,7 @@ export function useKeyboardHandler() {
     ["KeyO"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -410,7 +366,7 @@ export function useKeyboardHandler() {
     ["KeyF"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -420,7 +376,7 @@ export function useKeyboardHandler() {
     ["KeyE"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts zoom */
@@ -430,7 +386,7 @@ export function useKeyboardHandler() {
       handleTriggerAction("zoomInTool", { previousAction: actualAction });
     },
     ["BracketRight"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -438,7 +394,7 @@ export function useKeyboardHandler() {
       handleTriggerAction("zoomOutTool", { previousAction: actualAction });
     },
     ["Slash"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -446,7 +402,7 @@ export function useKeyboardHandler() {
       handleTriggerAction("fitToScreenTool", { previousAction: actualAction });
     },
     ["Digit1"],
-    (e) => e.shiftKey,
+    (e) => e.shiftKey
   );
 
   useKeyDown(
@@ -456,7 +412,7 @@ export function useKeyboardHandler() {
       });
     },
     ["Digit2"],
-    (e) => e.shiftKey,
+    (e) => e.shiftKey
   );
 
   /* Keyboard shortcuts utility */
@@ -468,6 +424,6 @@ export function useKeyboardHandler() {
     ["KeyC"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 }

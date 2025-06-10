@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { Vector2d } from "konva/lib/types";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
@@ -85,7 +86,13 @@ export function ToolsOverlay() {
   );
 
   React.useEffect(() => {
-    const onPasteExternalImage = async (item: ClipboardItem) => {
+    const onPasteExternalImage = async ({
+      position,
+      item,
+    }: {
+      position: Vector2d;
+      item: ClipboardItem;
+    }) => {
       let blob: Blob | null = null;
       if (item.types.includes("image/png")) {
         blob = await item.getType("image/png");
@@ -110,8 +117,6 @@ export function ToolsOverlay() {
 
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
-
-          const position = instance?.getStage().getPointerPosition();
 
           instance?.triggerAction(
             "imageTool",
