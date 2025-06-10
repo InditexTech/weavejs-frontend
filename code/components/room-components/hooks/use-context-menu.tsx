@@ -17,7 +17,6 @@ import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import Konva from "konva";
 import {
-  Copy,
   ClipboardCopy,
   ClipboardPaste,
   Group,
@@ -37,20 +36,23 @@ function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
+  const contextMenuPosition = useCollaborationRoom(
+    (state) => state.contextMenu.position
+  );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow,
+    (state) => state.setContextMenuShow
   );
   const setContextMenuPosition = useCollaborationRoom(
-    (state) => state.setContextMenuPosition,
+    (state) => state.setContextMenuPosition
   );
   const setContextMenuOptions = useCollaborationRoom(
-    (state) => state.setContextMenuOptions,
+    (state) => state.setContextMenuOptions
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
   const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage,
+    (state) => state.setTransformingImage
   );
 
   const mutationUpload = useMutation({
@@ -75,44 +77,6 @@ function useContextMenu() {
 
       const options: ContextMenuOption[] = [];
 
-      if (nodes.length > 0) {
-        // DUPLICATE
-        options.push({
-          id: "duplicate",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Duplicate</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ D",
-                  [SYSTEM_OS.OTHER]: "Ctrl D",
-                }}
-              />
-            </div>
-          ),
-          icon: <Copy size={16} />,
-          disabled: nodes.length > 1,
-          onClick: async () => {
-            if (nodes.length === 1) {
-              const weaveCopyPasteNodesPlugin =
-                instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-              if (weaveCopyPasteNodesPlugin) {
-                await weaveCopyPasteNodesPlugin.copy();
-                weaveCopyPasteNodesPlugin.paste();
-              }
-              setContextMenuShow(false);
-            }
-          },
-        });
-      }
-      if (nodes.length > 0) {
-        // SEPARATOR
-        options.push({
-          id: "div--1",
-          type: "divider",
-        });
-      }
       if (nodes.length > 0) {
         // EXPORT
         options.push({
@@ -141,7 +105,7 @@ function useContextMenu() {
                     padding: 20,
                     pixelRatio: 2,
                   },
-                },
+                }
               );
             }
             setContextMenuShow(false);
@@ -203,7 +167,7 @@ function useContextMenu() {
           const weaveCopyPasteNodesPlugin =
             instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste();
+            await weaveCopyPasteNodesPlugin.paste(contextMenuPosition);
             setContextMenuShow(false);
           }
         },
@@ -406,7 +370,7 @@ function useContextMenu() {
               const nodeImage = nodes[0].instance as Konva.Group | undefined;
               if (nodeImage) {
                 const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`,
+                  `#${nodeImage.getAttrs().id}-image`
                 );
                 const imageTokens = nodeImageInternal
                   ?.getAttr("image")
@@ -420,12 +384,12 @@ function useContextMenu() {
                     const imageId = data.fileName.split("/")[1];
 
                     const { finishUploadCallback } = instance.triggerAction(
-                      "imageTool",
+                      "imageTool"
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ) as any;
 
                     finishUploadCallback(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
                     );
                   },
                   onError: () => {
@@ -444,7 +408,13 @@ function useContextMenu() {
 
       return options;
     },
-    [instance, mutationUpload, setTransformingImage, setContextMenuShow],
+    [
+      instance,
+      contextMenuPosition,
+      mutationUpload,
+      setTransformingImage,
+      setContextMenuShow,
+    ]
   );
 
   const onNodeContextMenuHandler = React.useCallback(
@@ -483,7 +453,7 @@ function useContextMenu() {
       setContextMenuPosition,
       setContextMenuShow,
       setSidebarActive,
-    ],
+    ]
   );
 
   React.useEffect(() => {
@@ -494,7 +464,7 @@ function useContextMenu() {
     return () => {
       instance.removeEventListener(
         "onNodeContextMenu",
-        onNodeContextMenuHandler,
+        onNodeContextMenuHandler
       );
     };
   }, [instance, onNodeContextMenuHandler]);
