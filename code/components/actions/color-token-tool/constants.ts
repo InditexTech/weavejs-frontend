@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const PANTONE_TOOL_STATE = {
+export const COLOR_TOKEN_TOOL_STATE = {
   ["IDLE"]: "idle",
   ["ADDING"]: "adding",
   ["ADDED"]: "added",

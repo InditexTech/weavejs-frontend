@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@inditextech/weavejs-react";
-import { WeaveUser } from "@inditextech/weavejs-types";
+import { useWeave } from "@inditextech/weave-react";
+import { WeaveUser } from "@inditextech/weave-types";
 import {
   WeaveStoreAzureWebPubsub,
   WeaveStoreAzureWebPubsubConnectionStatus,
-} from "@inditextech/weavejs-store-azure-web-pubsub";
+} from "@inditextech/weave-store-azure-web-pubsub/client";
 import React from "react";
 
 function useGetWsProvider({
@@ -19,13 +19,14 @@ function useGetWsProvider({
   getUser: () => WeaveUser;
 }) {
   const room = useCollaborationRoom((state) => state.room);
+  const user = useCollaborationRoom((state) => state.user);
 
   const setFetchConnectionUrlLoading = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlLoading
+    (state) => state.setFetchConnectionUrlLoading,
   );
 
   const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
+    (state) => state.setFetchConnectionUrlError,
   );
 
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
@@ -36,7 +37,7 @@ function useGetWsProvider({
       setFetchConnectionUrlError(error);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const onConnectionStatusChangeHandler = React.useCallback(
@@ -44,11 +45,11 @@ function useGetWsProvider({
       setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const wsProvider = React.useMemo(() => {
-    if (loadedParams && room) {
+    if (loadedParams && room && user) {
       return new WeaveStoreAzureWebPubsub(
         {
           getUser,
@@ -63,7 +64,7 @@ function useGetWsProvider({
             onFetchConnectionUrl: onFetchConnectionUrlHandler,
             onConnectionStatusChange: onConnectionStatusChangeHandler,
           },
-        }
+        },
       );
     }
 
@@ -74,6 +75,7 @@ function useGetWsProvider({
     onConnectionStatusChangeHandler,
     onFetchConnectionUrlHandler,
     room,
+    user,
   ]);
 
   return wsProvider;

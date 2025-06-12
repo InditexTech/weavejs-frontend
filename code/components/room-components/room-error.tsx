@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Logo } from "../utils/logo"
+import { motion } from "framer-motion";
+import { Logo } from "../utils/logo";
 
 type RoomLoaderProps = {
   content: string;
-}
+};
 
 export function RoomError({ content }: Readonly<RoomLoaderProps>) {
   return (
@@ -24,7 +24,7 @@ export function RoomError({ content }: Readonly<RoomLoaderProps>) {
           ease: "linear",
         }}
       >
-        <Logo kind="large" variant="no-text"/>
+        <Logo kind="large" variant="no-text" />
       </motion.div>
       <motion.div
         initial={{ opacity: 0 }}
@@ -36,6 +36,5 @@ export function RoomError({ content }: Readonly<RoomLoaderProps>) {
         <p className="text-base text-primary">{content}</p>
       </motion.div>
     </div>
-  )
+  );
 }
-

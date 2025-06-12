@@ -1,4 +1,4 @@
-name: Deploy code
+name: Code deploy
 
 on:
   pull_request:
@@ -43,6 +43,7 @@ jobs:
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
+      CDN_IP_LIST: ${{ secrets.CDN_IP_LIST }}
     steps:
       - name: Checkout merge commit
         uses: actions/checkout@v4
@@ -115,3 +116,19 @@ jobs:
               --scale-rule-type http \
               --scale-rule-http-concurrency 10 \
               --query properties.configuration.ingress.fqdn
+
+      - name: Add CDN IP Access Restrictions
+        run: |
+          echo "Adding CDN IP access restrictions..."
+          COUNT=1
+          for IP in $(echo "$CDN_IP_LIST" | tr ',' '\n'); do
+            echo "Adding IP rule $IP"
+            az containerapp ingress access-restriction set \
+              --name $AZURE_CONTAINER_NAME \
+              --resource-group $AZURE_RESOURCE_GROUP \
+              --rule-name "rule-$COUNT" \
+              --ip-address $IP \
+              --description "IP allow $COUNT" \
+              --action Allow
+            ((COUNT++))
+          done

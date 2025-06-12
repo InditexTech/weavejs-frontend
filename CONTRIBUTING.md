@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 # Contributing
 
 Thank you for your interest in contributing to this project! We value and appreciate any contributions you can make.
-To maintain a collaborative and respectful environment, please consider the following guidelines when contributing to
-this project.
+
+To maintain a collaborative and respectful environment, please consider the following guidelines when contributing to this project.
 
 ## Prerequisites
 
@@ -32,29 +32,57 @@ this project.
 
 ## Contribution Guidelines
 
-- All contributors are expected to follow the project's [code of conduct](CODE_OF_CONDUCT.md). Please be respectful and
-  considerate towards other contributors.
-- Before starting work on a new feature or fix, check existing [issues](../../issues) and [pull requests](../../pulls)
-  to avoid duplications and unnecessary discussions.
-- If you wish to work on an existing issue, comment on the issue to inform other contributors that you are working on it.
-  This will help coordinate efforts and prevent conflicts.
-- It is always advisable to discuss and gather feedback from the community before making significant changes to the
-  project's structure or architecture.
+- All contributors are expected to follow the project's [code of conduct](CODE_OF_CONDUCT.md). Please be respectful and considerate towards other contributors.
+- Before starting work on a new feature or fix, check existing [issues](../../issues) and [pull requests](../../pulls) to avoid duplications and unnecessary discussions.
+- If you wish to work on an existing issue, comment on the issue to inform other contributors that you are working on it. This will help coordinate efforts and prevent conflicts.
+- It is always advisable to discuss and gather feedback from the community before making significant changes to the project's structure or architecture.
 - Ensure a clean and organized commit history. Divide your changes into logical and descriptive commits.
-- Document any new changes or features you add. This will help other contributors and project users understand your work
-  and its purpose.
+- Document any new changes or features you add. This will help other contributors and project users understand your work and its purpose.
 - Be sure to link the corresponding issue in your pull request to maintain proper tracking of contributions.
 
 ## Development
 
-[Placeholder: The project owner should provide clear instructions on setting up the development environment, running the project locally, and testing changes. Include details such as required tools, dependencies, commands, and any specific criteria for contributions (e.g., tests, documentation, signed commits).]
+This project uses [Next.js](https://nextjs.org/) and [NPM](https://docs.npmjs.com/about-npm). All code is located on the `/code` folder.
+
+### Installation
+
+Before start we need to install all the dependencies of the showcase frontend, this is done by executing the following command from the `/code` folder.
+
+```
+npm install
+```
+
+### Development Tasks
+
+You can perform several operations on top of the different packages:
+
+- `build`: builds the project.
+- `dev`: launches the local development server.
+- `lint`: lints the project.
+- `format`: formats the project using prettier.
+
+All this operations can be performed by executing the following command .
+
+```
+npm run <operation>
+```
+
+All commands are launched from the `/code` folder.
+
+### Development Flow
+
+1. Install the project dependencies.
+2. Run the project local development server.
+3. Make a change and validate on the frontend.
+
+### Before Submitting
+
+- Lint your code with `npm run lint`.
+- Format your code with `npm run format`.
 
 ## Helpful Resources
 
-- [Project documentation](README.md): Refer to our documentation for more information on the project structure and how
-  to contribute.
-- [Issues](../../issues): Check open issues and look for opportunities to contribute. Make sure to open an issue before
-  starting work on a new feature or fix.
+- [Project documentation](README.md): Refer to our documentation for more information on the project structure and how to contribute.
+- [Issues](../../issues): Check open issues and look for opportunities to contribute. Make sure to open an issue before starting work on a new feature or fix.
 
-Thank you for your time and contribution! Your work helps to grow and improve this project. If you have any questions,
-feel free to reach out to us.
+Thank you for your time and contribution! Your work helps to grow and improve this project. If you have any questions, feel free to reach out to us.

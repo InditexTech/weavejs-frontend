@@ -6,7 +6,7 @@ import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useMutation } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 
 export function UploadFile() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,13 +16,13 @@ export function UploadFile() {
 
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFile = useCollaborationRoom(
-    (state) => state.images.showSelectFile
+    (state) => state.images.showSelectFile,
   );
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   const mutationUpload = useMutation({
@@ -47,12 +47,12 @@ export function UploadFile() {
               const imageId = data.fileName.split("/")[1];
 
               const { finishUploadCallback } = instance.triggerAction(
-                "imageTool"
+                "imageTool",
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ) as any;
 
               finishUploadCallback?.(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
               );
             }
           },
@@ -65,7 +65,7 @@ export function UploadFile() {
         });
       }
     },
-    [instance, mutationUpload, setUploadingImage]
+    [instance, mutationUpload, setUploadingImage],
   );
 
   React.useEffect(() => {
@@ -98,6 +98,9 @@ export function UploadFile() {
     }
 
     if (showSelectFile && inputFileRef.current) {
+      inputFileRef.current.addEventListener("cancel", () => {
+        instance?.cancelAction("imageTool");
+      });
       inputFileRef.current.click();
       setShowSelectFileImage(false);
     }
@@ -123,6 +126,9 @@ export function UploadFile() {
       name="image"
       ref={inputFileRef}
       className="hidden"
+      onClick={() => {
+        inputFileRef.current.value = null;
+      }}
       onChange={(e) => {
         const file = e.target.files?.[0];
         if (file) {

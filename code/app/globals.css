@@ -11,11 +11,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-noto-sans: var(--font-noto-sans);
-  --font-noto-sans-mono: var(--font-noto-sans-mono);
+  --inter: var(--inter);
 }
 
-.custom-scrollbar { 
+.custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
   padding-right: 6px;
@@ -182,10 +181,10 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply w-full h-full;
+    @apply w-full h-full overflow-hidden;
   }
   body {
-    @apply bg-background text-foreground w-full h-full font-noto-sans;
+    @apply bg-background ring-0 text-foreground w-full h-full overflow-hidden;
   }
 }
 
@@ -194,6 +193,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background ring-0 text-foreground overflow-hidden;
   }
 }

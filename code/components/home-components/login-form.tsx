@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import * as changeCase from "change-case";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -52,12 +53,18 @@ function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setRoom(values.roomId);
-    setUser({
+    const roomIdMapped = changeCase.kebabCase(values.roomId);
+    const userMapped = {
       name: values.username,
       email: `${values.username}@weavejs.com`,
-    });
-    router.push(`/room/${values.roomId}?userName=${values.username}`);
+    };
+    setRoom(roomIdMapped);
+    setUser(userMapped);
+    sessionStorage.setItem(
+      `weave.js_${roomIdMapped}`,
+      JSON.stringify(userMapped),
+    );
+    router.push(`/rooms/${roomIdMapped}`);
   }
 
   return (
@@ -77,11 +84,13 @@ function LoginForm() {
             name="roomId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-noto-sans-mono">ROOM</FormLabel>
+                <FormLabel className="text-[#757575] font-inter font-light">
+                  Room name
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="the room name to join"
-                    className="font-noto-sans-mono rounded-none shadow-none"
+                    placeholder="room name to join"
+                    className="font-inter font-light rounded-none border-black"
                     {...field}
                   />
                 </FormControl>
@@ -93,12 +102,14 @@ function LoginForm() {
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-noto-sans-mono">USERNAME</FormLabel>
+              <FormItem className="mb-0">
+                <FormLabel className="text-[#757575] font-inter font-light">
+                  Username
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="your username"
-                    className="font-noto-sans-mono rounded-none shadow-none"
+                    className="font-inter font-light rounded-none border-black"
                     {...field}
                   />
                 </FormControl>
@@ -106,12 +117,14 @@ function LoginForm() {
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="w-full cursor-pointer font-mono rounded-none"
-          >
-            ENTER THE ROOM
-          </Button>
+          <div className="w-full flex justify-center items-center">
+            <Button
+              type="submit"
+              className="cursor-pointer font-inter rounded-none mt-[32px]"
+            >
+              ENTER
+            </Button>
+          </div>
         </form>
       </Form>
     </motion.div>

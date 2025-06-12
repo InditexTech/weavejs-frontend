@@ -35,13 +35,16 @@ SPDX-License-Identifier: Apache-2.0
 <br />
 <div align="center">
   <a href="https://github.com/InditexTech/weavejs-frontend">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logo_inv.png">
+      <img src="images/logo.png" alt="Weave.js logo" width="80" height="80">
+    </picture>
   </a>
 
 <h3 align="center">Weave.js Frontend UI Showcase</h3>
 
   <p align="center">
-    Build visual collaborative tools like Canva, Miro or Figma!
+    Build visual collaborative tools like Excalidraw, Miro, Canva, or Figma!
     <br />
     <a href="https://github.com/InditexTech/weavejs-frontend"><strong>Explore the docs »</strong></a>
     <br />
@@ -55,28 +58,20 @@ SPDX-License-Identifier: Apache-2.0
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<details>
+<!-- <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#related-repositories">Related repositories</a></li>
       </ul>
     </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
-</details>
+</details> -->
 
 <!-- ABOUT THE PROJECT -->
 
@@ -84,65 +79,58 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Weave.js Screen Shot][product-screenshot]](images/screenshot.png)
 
-Weave.js is a powerful framework for building end-to-end visual collaborative applications, enabling real-time multi-user interactions on-the-fly. It provides robust synchronization based on Yjs and SyncedStore and provides an extensible API to streamline the development of interactive, collaborative applications.
+This repository contain the Weave.js showcase frontend, its a demo application that highlights the features of Weave.js, a collaborative canvas framework. It provides a user interface for:
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+- 🖼️ Drawing and manipulating visual elements (like shapes, images, and groups)
+- 🧑‍🤝‍🧑 Real-time collaboration via shared rooms
+- 🧰 Tool usage such as select, transform, move and erase
+- 🔄 Undo/redo and action history
+
+This frontend serves both as:
+
+- A reference implementation for developers building on Weave.js
+- A live playground to test and iterate with visual + collaborative features
+
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 ### Built With
 
-- [Konva][Konva-url]
-- [Yjs][Yjs-url]
-- [SyncedStore][SyncedStore-url]
+- [Next.js](https://nextjs.org/)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-<!-- GETTING STARTED -->
+### Related repos
 
-## Getting Started
+- [Weave.js](https://github.com/InditexTech/weavejs)
+- Weave.js [showcase backend](https://github.com/InditexTech/weavejs-backend)
 
-TODO
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## Quickstart
 
-<!-- ROADMAP -->
+You can locally launch the frontend showcase by:
 
-## Roadmap
+- Install dependencies with: `npm install`
+- Create a `.env` file on the folder `/code`, and setup the necessary configuration:
 
-TODO
+  ```
+  // Azure Web PubSub endpoint name
+  NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=weavejs
+  // Weave.js backend endpoint (proxied through Next.js)
+  NEXT_PUBLIC_API_ENDPOINT=/weavebff/api/v1
+  // Real Weave.js backend endpoint
+  BACKEND_ENDPOINT=http://127.0.0.1:8081
+  ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+- Run the frontend: `npm run dev`
 
-<!-- CONTRIBUTING -->
-
-## Contributing
-
-Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Top contributors:
-
-<a href="https://github.com/InditexTech/weavejs-frontend/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=InditexTech/weavejs-frontend" alt="contrib.rocks image" />
-</a>
-
-<!-- LICENSE -->
+You'll need access to a [Azure Web PubSub](https://azure.microsoft.com/es-es/products/web-pubsub) instance.
 
 ## License
 
 This project is licensed under the terms of the [Apache-2.0](LICENSE) license.
 
 © 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTACT -->
-
-## Contact
-
-Jesus Manuel Piñeiro Cid - jesusmpc@inditex.com
-
-Project Link: [https://github.com/InditexTech/weavejs-frontend](https://github.com/InditexTech/weavejs-frontend)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -160,6 +148,3 @@ Project Link: [https://github.com/InditexTech/weavejs-frontend](https://github.c
 [license-shield]: https://img.shields.io/github/license/InditexTech/weavejs-frontend.svg?style=for-the-badge
 [license-url]: https://github.com/InditexTech/weavejs-frontend/blob/master/LICENSE.txt
 [product-screenshot]: images/screenshot.png
-[Konva-url]: https://github.com/konvajs/konva
-[Yjs-url]: https://github.com/yjs/yjs
-[SyncedStore-url]: https://github.com/yousefed/SyncedStore

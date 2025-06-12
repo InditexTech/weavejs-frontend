@@ -31,7 +31,9 @@ export const ColorPickerSaturation = ({
   const renderGradient = useCallback(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (ctx && containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
         canvas.width = width;
@@ -65,15 +67,17 @@ export const ColorPickerSaturation = ({
       const rect = containerRef.current.getBoundingClientRect();
       const x = Math.max(
         0,
-        Math.min(rect.width - 1, event.clientX - rect.left)
+        Math.min(rect.width - 1, event.clientX - rect.left),
       );
       const y = Math.max(
         0,
-        Math.min(rect.height - 1, event.clientY - rect.top)
+        Math.min(rect.height - 1, event.clientY - rect.top),
       );
       setPosition({ x: x / rect.width, y: y / rect.height });
 
-      const ctx = canvasRef.current.getContext("2d");
+      const ctx = canvasRef.current.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (ctx) {
         const pixel = ctx.getImageData(x, y, 1, 1).data;
 
@@ -92,7 +96,7 @@ export const ColorPickerSaturation = ({
         setColor(newColor);
       }
     },
-    [color, isDragging, setColor]
+    [color, isDragging, setColor],
   );
 
   useEffect(() => {
@@ -122,7 +126,7 @@ export const ColorPickerSaturation = ({
         ref={containerRef}
         className={cn(
           "relative aspect-[4/3] w-full cursor-crosshair rounded-none",
-          className
+          className,
         )}
         style={{
           background: `linear-gradient(0deg, rgb(0,0,0), transparent),linear-gradient(90deg, rgb(255,255,255), hsl(${hue},100%,50%))`,

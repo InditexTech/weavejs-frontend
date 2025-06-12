@@ -5,30 +5,46 @@
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
+  WeaveEraserToolAction,
+  WeaveBrushToolAction,
+  WeaveFrameToolAction,
+  WeaveImageToolAction,
+  WeavePenToolAction,
+  WeaveRectangleToolAction,
+  WeaveEllipseToolAction,
   WeaveTextToolAction,
+  WeaveStarToolAction,
+  WeaveArrowToolAction,
+  WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveExportNodeToolAction,
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
-  WeaveNodesSnappingPlugin,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
   WeaveRectangleNode,
+  WeaveEllipseNode,
   WeaveLineNode,
   WeaveTextNode,
   WeaveImageNode,
+  WeaveStarNode,
+  WeaveArrowNode,
+  WeaveRegularPolygonNode,
   WeaveFrameNode,
-} from "@inditextech/weavejs-sdk";
-import { PantoneNode } from "@/components/nodes/pantone/pantone";
+} from "@inditextech/weave-sdk";
+import { Inter } from "next/font/google";
+import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
+import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
+import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
 
 const FONTS = [
   {
-    id: "NotoSansMono",
-    name: "NotoSansMono, monospace",
+    id: "Inter",
+    name: "Inter, sans-serif",
   },
   {
     id: "Arial",
@@ -92,21 +108,66 @@ const FONTS = [
   },
 ];
 
+const inter = Inter({
+  preload: true,
+  variable: "--inter",
+  subsets: ["latin"],
+});
+
 const NODES = [
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
   new WeaveRectangleNode(),
+  new WeaveEllipseNode(),
   new WeaveLineNode(),
   new WeaveTextNode(),
-  new WeaveImageNode(),
-  new WeaveFrameNode(),
-  new PantoneNode(),
+  new WeaveImageNode({
+    config: {
+      transform: {
+        enabledAnchors: [
+          WEAVE_TRANSFORMER_ANCHORS.TOP_LEFT,
+          WEAVE_TRANSFORMER_ANCHORS.TOP_RIGHT,
+          WEAVE_TRANSFORMER_ANCHORS.BOTTOM_LEFT,
+          WEAVE_TRANSFORMER_ANCHORS.BOTTOM_RIGHT,
+        ],
+        keepRatio: true,
+      },
+    },
+  }),
+  new WeaveStarNode(),
+  new WeaveArrowNode(),
+  new WeaveRegularPolygonNode(),
+  new WeaveFrameNode({
+    config: {
+      fontFamily: inter.style.fontFamily,
+      fontStyle: "300",
+      transform: {
+        rotateEnabled: false,
+        resizeEnabled: false,
+        enabledAnchors: [] as string[],
+        borderStrokeWidth: 3,
+        padding: 0,
+      },
+    },
+  }),
+  new ColorTokenNode(),
 ];
 
 const ACTIONS = [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
+  new WeaveEraserToolAction(),
+  new WeaveRectangleToolAction(),
+  new WeaveEllipseToolAction(),
+  new WeavePenToolAction(),
+  new WeaveBrushToolAction(),
+  new WeaveImageToolAction(),
+  new WeaveFrameToolAction(),
+  new WeaveStarToolAction(),
+  new WeaveArrowToolAction(),
+  new WeaveRegularPolygonToolAction(),
+  new ColorTokenToolAction(),
   new WeaveTextToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),
@@ -117,6 +178,4 @@ const ACTIONS = [
   new WeaveExportStageToolAction(),
 ];
 
-const CUSTOM_PLUGINS = [new WeaveNodesSnappingPlugin()];
-
-export { FONTS, NODES, ACTIONS, CUSTOM_PLUGINS };
+export { FONTS, NODES, ACTIONS };

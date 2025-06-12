@@ -4,11 +4,7 @@
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  type ComponentProps,
-  useEffect,
-  useState,
-} from "react";
+import { type ComponentProps, useEffect, useState } from "react";
 import { useColorPicker } from "../context/color-picker-context";
 import Color, { ColorInstance } from "color";
 
@@ -50,8 +46,8 @@ const PercentageInput = ({
         aria-label="Opacity percentage"
         {...props}
         className={cn(
-          "h-8 w-[4.7rem] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent uppercase",
-          className
+          "h-[40px] w-[4.7rem] rounded-none !text-[14px] font-normal text-black !border-black text-left focus:outline-none bg-transparent uppercase",
+          className,
         )}
       />
       <span className="-translate-y-1/2 absolute -translate-x-5 top-1/2 right-2 text-muted-foreground text-xs pointer-events-none">

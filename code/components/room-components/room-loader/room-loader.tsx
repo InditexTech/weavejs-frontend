@@ -5,18 +5,19 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import Threads from "@/components/ui/reactbits/Backgrounds/Threads/Threads";
 import { Logo } from "@/components/utils/logo";
+import React from "react";
+import ScrollVelocity from "@/components/ui/reactbits/TextAnimations/ScrollVelocity/ScrollVelocity";
 
 type RoomLoaderProps = {
   roomId?: string;
-  content: string;
-  description?: string;
+  content: React.ReactNode;
+  description?: React.ReactNode;
 };
 
 const containerVariants = {
   hidden: {
-    opacity: 0,
+    opacity: 1,
     filter: "blur(10px)",
     transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1], staggerChildren: 0 },
   },
@@ -55,40 +56,44 @@ export function RoomLoader({
       animate="visible"
       exit="hidden"
       variants={containerVariants}
-      className="w-full h-full bg-white flex justify-center items-center overflow-hidden absolute"
+      className="w-full h-full flex justify-center items-center overflow-hidden"
     >
-      <motion.div
-        className="absolute top-0 left-0 right-0 h-full"
-        variants={childVariants}
-      >
-        <Threads
-          color={[246 / 255, 246 / 255, 246 / 255]}
-          amplitude={1}
-          distance={0}
-          enableMouseInteraction={false}
+      <div className="absolute top-0 left-[-100px] right-[-100px] bottom-0 flex justify-center items-center">
+        <ScrollVelocity
+          texts={[
+            "collaborative - easy to use - extensible - visual - open source -",
+            "this is weave.js - this is weave.js - this is weave.js - this is weave.js -",
+            "intuitive - free - html5 canvas - real time - powerful -",
+          ]}
+          velocity={150}
+          numCopies={20}
+          className="text-5xl font-inter font-light text-zinc-500/25"
         />
-      </motion.div>
-
+      </div>
       <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
-        <div className="flex flex-col items-center justify-center space-y-4 p-4">
+        <div className="flex flex-col items-center justify-center min-w-[320px] p-[32px] bg-white border-1 shadow-none border-[#c9c9c9]">
           <motion.div variants={childVariants}>
             <Logo kind="large" variant="no-text" />
           </motion.div>
 
-          <div className="flex flex-col justify-center items-center text-black gap-3">
-            <div className="font-noto-sans font-extralight text-2xl uppercase">
+          <div className="w-full flex flex-col justify-center items-center text-black gap-0 mt-[24px]">
+            <div className="font-inter font-light text-[20px] line-height-[28px] uppercase">
               <motion.span variants={childVariants}>{content}</motion.span>
             </div>
 
             {roomId && (
-              <div className="font-noto-sans text-2xl font-semibold">
+              <div className="font-inter font-light text-[20px] line-height-[28px] mt-3">
                 <motion.span variants={childVariants}>{roomId}</motion.span>
               </div>
             )}
             <AnimatePresence>
               {description && (
-                <div className="font-noto-sans-mono text-xl">
-                  <motion.span variants={childVariants} key={description}>
+                <div className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] mt-[32px]">
+                  <motion.span
+                    className="w-full"
+                    variants={childVariants}
+                    key="description"
+                  >
                     {description}
                   </motion.span>
                 </div>

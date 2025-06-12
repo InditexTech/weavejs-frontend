@@ -2,17 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveAction } from "@inditextech/weavejs-sdk";
-import {
-  WeaveElementInstance,
-  WeaveSelection,
-} from "@inditextech/weavejs-types";
+import { WeaveAction, WeaveNode } from "@inditextech/weave-sdk";
+import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
 import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
-  init = undefined;
+  onPropsChange = undefined;
+  onInit = undefined;
 
   getName(): string {
     return "alignElementsTool";
@@ -51,10 +48,10 @@ export class AlignElementsToolAction extends WeaveAction {
       }
 
       if (prevInstance) {
-        const handler = this.instance.getNodeHandler(
-          instance.getAttrs().nodeType
+        const handler = this.instance.getNodeHandler<WeaveNode>(
+          instance.getAttrs().nodeType,
         );
-        const node = handler.toNode(instance as WeaveElementInstance);
+        const node = handler.serialize(instance as WeaveElementInstance);
 
         const newNode = {
           ...node,
@@ -81,7 +78,7 @@ export class AlignElementsToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }
+    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] },
   ) {
     if (!this.instance) {
       throw new Error("Instance not defined");

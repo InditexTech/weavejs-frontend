@@ -3,19 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans, Noto_Sans_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
 
-const notoSans = Noto_Sans({
+const inter = Inter({
+  weight: "400",
   preload: true,
-  variable: "--font-noto-sans",
-  subsets: ["latin"],
-});
-
-const notoSansMono = Noto_Sans_Mono({
-  preload: true,
-  variable: "--font-noto-sans-mono",
+  variable: "--inter",
   subsets: ["latin"],
 });
 
@@ -40,9 +35,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${notoSans.variable} ${notoSansMono.variable} antialiased`}
-      >
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
+      <body className={`${inter.variable} antialiased`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

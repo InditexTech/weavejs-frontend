@@ -5,8 +5,9 @@
 "use client";
 
 import React from "react";
+import { Vector2d } from "konva/lib/types";
 import { ToolbarButton } from "../toolbar/toolbar-button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import {
   Brush,
@@ -18,27 +19,49 @@ import {
   MousePointer,
   Hand,
   Tags,
+  Undo,
+  Redo,
+  Eraser,
+  Circle,
+  Star,
+  ArrowUpRight,
+  Hexagon,
 } from "lucide-react";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
-import { leftElementVariants } from "./variants";
+import { topElementVariants } from "./variants";
 import { useCollaborationRoom } from "@/store/store";
 import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
+
+function ToolbarDivider() {
+  return (
+    <div className="w-full justify-center items-center flex">
+      <div className="w-[1px] h-[20px] bg-zinc-200 mx-1"></div>
+    </div>
+  );
+}
 
 export function ToolsOverlay() {
   useKeyboardHandler();
 
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
+  const canUndo = useWeave((state) => state.undoRedo.canUndo);
+  const canRedo = useWeave((state) => state.undoRedo.canRedo);
 
+  const nodeCreateProps = useCollaborationRoom(
+    (state) => state.nodeProperties.createProps
+  );
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
   );
+
+  const queryClient = useQueryClient();
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
@@ -51,9 +74,9 @@ export function ToolsOverlay() {
   );
 
   const triggerTool = React.useCallback(
-    (toolName: string) => {
+    (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
-        instance.triggerAction(toolName);
+        instance.triggerAction(toolName, params);
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
@@ -63,7 +86,13 @@ export function ToolsOverlay() {
   );
 
   React.useEffect(() => {
-    const onPasteExternalImage = async (item: ClipboardItem) => {
+    const onPasteExternalImage = async ({
+      position,
+      item,
+    }: {
+      position: Vector2d;
+      item: ClipboardItem;
+    }) => {
       let blob: Blob | null = null;
       if (item.types.includes("image/png")) {
         blob = await item.getType("image/png");
@@ -83,17 +112,20 @@ export function ToolsOverlay() {
       const file = new File([blob], "external.image");
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
-          const room = data.fileName.split("/")[0];
+          const room: string = data.fileName.split("/")[0];
           const imageId = data.fileName.split("/")[1];
 
-          const { finishUploadCallback } = instance?.triggerAction(
-            "imageTool"
+          const queryKey = ["getImages", room];
+          queryClient.invalidateQueries({ queryKey });
+
+          instance?.triggerAction(
+            "imageTool",
+            {
+              position,
+              imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+            }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
-
-          finishUploadCallback?.(
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-          );
         },
         onError: () => {
           console.error("Error uploading image");
@@ -113,7 +145,13 @@ export function ToolsOverlay() {
         instance.removeEventListener("onPasteExternal", onPasteExternalImage);
       }
     };
-  }, [instance, mutationUpload, setShowSelectFileImage, setUploadingImage]);
+  }, [
+    instance,
+    queryClient,
+    mutationUpload,
+    setShowSelectFileImage,
+    setUploadingImage,
+  ]);
 
   if (!showUI) {
     return null;
@@ -124,19 +162,19 @@ export function ToolsOverlay() {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      variants={leftElementVariants}
-      className="pointer-events-none absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-2 justify-center items-center"
+      variants={topElementVariants}
+      className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
     >
-      <Toolbar>
+      <Toolbar orientation="horizontal">
         <ToolbarButton
-          icon={<Hand />}
+          className="rounded-full !w-[40px]"
+          icon={<Hand className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "moveTool"}
           onClick={() => triggerTool("moveTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Move</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "M",
                   [SYSTEM_OS.OTHER]: "M",
@@ -144,16 +182,18 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<MousePointer />}
+          className="rounded-full !w-[40px]"
+          icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "selectionTool"}
           onClick={() => triggerTool("selectionTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Selection</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "S",
                   [SYSTEM_OS.OTHER]: "S",
@@ -161,16 +201,38 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Square />}
+          className="rounded-full !w-[40px]"
+          icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "eraserTool"}
+          onClick={() => triggerTool("eraserTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Erase</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "D",
+                  [SYSTEM_OS.OTHER]: "D",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Square className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "rectangleTool"}
           onClick={() => triggerTool("rectangleTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a rectangle</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "R",
                   [SYSTEM_OS.OTHER]: "R",
@@ -178,16 +240,56 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<PenTool />}
+          className="rounded-full !w-[40px]"
+          icon={<Circle className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "ellipseTool"}
+          onClick={() => triggerTool("ellipseTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a ellipsis</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "E",
+                  [SYSTEM_OS.OTHER]: "E",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Hexagon className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "regularPolygonTool"}
+          onClick={() => triggerTool("regularPolygonTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a regular polygon</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "P",
+                  [SYSTEM_OS.OTHER]: "P",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<PenTool className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "penTool"}
           onClick={() => triggerTool("penTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a line</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "L",
                   [SYSTEM_OS.OTHER]: "L",
@@ -195,16 +297,18 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Brush />}
+          className="rounded-full !w-[40px]"
+          icon={<Brush className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "brushTool"}
           onClick={() => triggerTool("brushTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Free draw</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "B",
                   [SYSTEM_OS.OTHER]: "B",
@@ -212,26 +316,31 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Type />}
+          className="rounded-full !w-[40px]"
+          icon={<Type className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "textTool"}
           onClick={() => triggerTool("textTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add text</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "T",
-                  [SYSTEM_OS.OTHER]: "t",
+                  [SYSTEM_OS.OTHER]: "T",
                 }}
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<ImagePlus />}
+          className="rounded-full !w-[40px]"
+          icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "imageTool"}
           onClick={() => {
             triggerTool("imageTool");
@@ -241,7 +350,6 @@ export function ToolsOverlay() {
             <div className="flex gap-3 justify-start items-center">
               <p>Add an image</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "I",
                   [SYSTEM_OS.OTHER]: "I",
@@ -249,16 +357,56 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
         <ToolbarButton
-          icon={<Frame />}
+          className="rounded-full !w-[40px]"
+          icon={<Star className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "starTool"}
+          onClick={() => triggerTool("starTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a star</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "J",
+                  [SYSTEM_OS.OTHER]: "J",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<ArrowUpRight className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "arrowTool"}
+          onClick={() => triggerTool("arrowTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a arrow</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "A",
+                  [SYSTEM_OS.OTHER]: "A",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Frame className="px-2" size={40} strokeWidth={1} />}
           active={actualAction === "frameTool"}
-          onClick={() => triggerTool("frameTool")}
+          onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a frame</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "F",
                   [SYSTEM_OS.OTHER]: "F",
@@ -266,19 +414,19 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
-        <div className="w-full justify-center items-center flex">
-          <div className="w-[20px] h-[1px] bg-zinc-200 my-1"></div>
-        </div>
+        <ToolbarDivider />
         <ToolbarButton
-          icon={<Tags />}
-          active={actualAction === "pantoneTool"}
-          onClick={() => triggerTool("pantoneTool")}
+          className="rounded-full !w-[40px]"
+          icon={<Tags className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "colorTokenTool"}
+          onClick={() => triggerTool("colorTokenTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add pantone reference</p>
+              <p>Add color token reference</p>
               <ShortcutElement
-                variant="light"
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "P",
                   [SYSTEM_OS.OTHER]: "P",
@@ -286,6 +434,57 @@ export function ToolsOverlay() {
               />
             </div>
           }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Undo className="px-2" size={40} strokeWidth={1} />}
+          disabled={!canUndo}
+          onClick={() => {
+            if (instance) {
+              const actualStore = instance.getStore();
+              actualStore.undoStateStep();
+            }
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Undo latest changes</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ Z",
+                  [SYSTEM_OS.OTHER]: "Ctrl Z",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Redo className="px-2" size={40} strokeWidth={1} />}
+          disabled={!canRedo}
+          onClick={() => {
+            if (instance) {
+              const actualStore = instance.getStore();
+              actualStore.redoStateStep();
+            }
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Redo latest changes</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ Y",
+                  [SYSTEM_OS.OTHER]: "Ctrl Y",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
         />
       </Toolbar>
     </motion.div>

@@ -20,13 +20,12 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "konva": ["./node_modules/konva"],
-      "konva/lib/types": ["./node_modules/konva/lib/types"]
+      "@/*": ["./*"]
     }
   },
   "include": [
-    "new-types.d.ts",
+    "other.d.ts",
+    "weave.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
