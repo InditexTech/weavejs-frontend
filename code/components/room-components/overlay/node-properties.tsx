@@ -34,17 +34,17 @@ export const NodeProperties = () => {
   const setNode = useWeave((state) => state.setNode);
 
   const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active,
+    (state) => state.sidebar.right.active
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
   const setNodePropertiesAction = useCollaborationRoom(
-    (state) => state.setNodePropertiesAction,
+    (state) => state.setNodePropertiesAction
   );
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+    (state) => state.nodeProperties.action
   );
 
   React.useEffect(() => {
@@ -61,6 +61,7 @@ export const NodeProperties = () => {
         "arrowTool",
         "colorTokenTool",
         "frameTool",
+        "textTool",
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
@@ -128,6 +129,8 @@ export const NodeProperties = () => {
         return "Color Token";
       case "frameTool":
         return "Frame";
+      case "textTool":
+        return "Text";
       default:
         return "Unknown";
     }
@@ -212,6 +215,7 @@ export const NodeProperties = () => {
                   "arrowTool",
                   "colorTokenTool",
                   "frameTool",
+                  "textTool",
                 ].includes(actualAction)
               ) {
                 instance.cancelAction(actualAction);
