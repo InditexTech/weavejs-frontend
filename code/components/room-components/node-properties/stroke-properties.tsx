@@ -29,11 +29,11 @@ export function StrokeProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+    (state) => state.nodeProperties.action
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps,
+    (state) => state.nodeProperties.createProps
   );
 
   const actualNode = React.useMemo(() => {
@@ -62,7 +62,7 @@ export function StrokeProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction],
+    [instance, actualAction, nodePropertiesAction]
   );
 
   if (!instance || !actualAction || !actualNode) {
@@ -71,7 +71,8 @@ export function StrokeProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
+  if (["colorTokenTool", "frameTool", "textTool"].includes(actualAction))
+    return null;
 
   if (["text", "color-token", "frame"].includes(actualNode.type)) {
     return null;
