@@ -35,6 +35,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 
 function ToolbarDivider() {
   return (
@@ -51,6 +52,7 @@ export function ToolsOverlay() {
   const actualAction = useWeave((state) => state.actions.actual);
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
@@ -169,6 +171,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Hand className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "moveTool"}
           onClick={() => triggerTool("moveTool")}
           label={
@@ -188,6 +193,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "selectionTool"}
           onClick={() => triggerTool("selectionTool")}
           label={
@@ -207,6 +215,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "eraserTool"}
           onClick={() => triggerTool("eraserTool")}
           label={
@@ -227,6 +238,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Square className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "rectangleTool"}
           onClick={() => triggerTool("rectangleTool")}
           label={
@@ -246,6 +260,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Circle className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "ellipseTool"}
           onClick={() => triggerTool("ellipseTool")}
           label={
@@ -265,6 +282,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Hexagon className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "regularPolygonTool"}
           onClick={() => triggerTool("regularPolygonTool")}
           label={
@@ -284,6 +304,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<PenTool className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "penTool"}
           onClick={() => triggerTool("penTool")}
           label={
@@ -303,6 +326,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Brush className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "brushTool"}
           onClick={() => triggerTool("brushTool")}
           label={
@@ -322,6 +348,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Type className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "textTool"}
           onClick={() => triggerTool("textTool")}
           label={
@@ -341,6 +370,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "imageTool"}
           onClick={() => {
             triggerTool("imageTool");
@@ -363,6 +395,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Star className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "starTool"}
           onClick={() => triggerTool("starTool")}
           label={
@@ -382,6 +417,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ArrowUpRight className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "arrowTool"}
           onClick={() => triggerTool("arrowTool")}
           label={
@@ -401,6 +439,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Frame className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "frameTool"}
           onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
@@ -421,6 +462,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Tags className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           active={actualAction === "colorTokenTool"}
           onClick={() => triggerTool("colorTokenTool")}
           label={
@@ -441,7 +485,10 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Undo className="px-2" size={40} strokeWidth={1} />}
-          disabled={!canUndo}
+          disabled={
+            !canUndo ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           onClick={() => {
             if (instance) {
               const actualStore = instance.getStore();
@@ -465,7 +512,10 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Redo className="px-2" size={40} strokeWidth={1} />}
-          disabled={!canRedo}
+          disabled={
+            !canRedo ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
           onClick={() => {
             if (instance) {
               const actualStore = instance.getStore();

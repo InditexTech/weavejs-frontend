@@ -9,7 +9,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { motion } from "motion/react";
 import { Logo } from "@/components/utils/logo";
 import LoginForm from "../home-components/login-form";
-// import Dither from "../ui/reactbits/Backgrounds/Dither/Dither";
 import { Button } from "../ui/button";
 import { Github, Book } from "lucide-react";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
@@ -21,19 +20,6 @@ export const Home = () => {
   return (
     <>
       <main className="w-full h-full flex justify-center items-center relative p-[40px]">
-        {/* <div className="absolute top-0 left-0 right-0 bottom-0">
-          <Dither
-            waveColor={[0.5, 0.5, 0.5]}
-            disableAnimation={false}
-            enableMouseInteraction={false}
-            mouseRadius={0.3}
-            colorNum={6}
-            pixelSize={1}
-            waveAmplitude={0.1}
-            waveFrequency={6}
-            waveSpeed={0.05}
-          />
-        </div> */}
         <motion.section
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
@@ -77,7 +63,7 @@ export const Home = () => {
                     window.open(
                       DOCUMENTATION_URL,
                       "_blank",
-                      "noopener,noreferrer",
+                      "noopener,noreferrer"
                     );
                   }}
                   className="cursor-pointer font-inter font-light"
