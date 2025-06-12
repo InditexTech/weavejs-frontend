@@ -10,7 +10,10 @@ import { useCollaborationRoom } from "@/store/store";
 import { RoomHeader } from "@/components/room-components/overlay/room-header";
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
-import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
+import {
+  WEAVE_INSTANCE_STATUS,
+  WEAVE_STORE_CONNECTION_STATUS,
+} from "@inditextech/weave-types";
 import { Logo } from "../utils/logo";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -32,37 +35,38 @@ export const RoomLayout = () => {
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active,
+    (state) => state.sidebar.left.active
   );
   const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active,
+    (state) => state.sidebar.right.active
   );
   const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show,
+    (state) => state.contextMenu.show
   );
   const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position,
+    (state) => state.contextMenu.position
   );
   const contextMenuOptions = useCollaborationRoom(
-    (state) => state.contextMenu.options,
+    (state) => state.contextMenu.options
   );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow,
+    (state) => state.setContextMenuShow
   );
   const transformingImage = useCollaborationRoom(
-    (state) => state.images.transforming,
+    (state) => state.images.transforming
   );
   const uploadingImage = useCollaborationRoom(
-    (state) => state.images.uploading,
+    (state) => state.images.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const setLoadingImage = useCollaborationRoom(
-    (state) => state.setLoadingImage,
+    (state) => state.setLoadingImage
   );
   const setNodePropertiesCreateProps = useCollaborationRoom(
-    (state) => state.setNodePropertiesCreateProps,
+    (state) => state.setNodePropertiesCreateProps
   );
 
   React.useEffect(() => {
@@ -115,11 +119,11 @@ export const RoomLayout = () => {
   return (
     <AnimatePresence>
       <motion.div
-        animate={{
-          filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-            ? "blur(10px)"
-            : "blur(0px)",
-        }}
+        // animate={{
+        //   filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
+        //     ? "blur(10px)"
+        //     : "blur(0px)",
+        // }}
         transition={{
           duration: 0.5,
           delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
@@ -135,7 +139,7 @@ export const RoomLayout = () => {
             {
               ["w-0"]: sidebarLeftActive === null,
               ["w-[370px]"]: sidebarLeftActive !== null,
-            },
+            }
           )}
         >
           <AnimatePresence>
@@ -143,6 +147,12 @@ export const RoomLayout = () => {
             <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
             <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
             <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
+            {weaveConnectionStatus !==
+              WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
+              <div className="absolute top-0 left-0 right-0 bottom-0">
+                <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none"></div>
+              </div>
+            )}
           </AnimatePresence>
         </section>
         <section
@@ -155,15 +165,38 @@ export const RoomLayout = () => {
                 sidebarLeftActive !== null || sidebarRightActive !== null,
               ["w-[calc(100%-740px)]"]:
                 sidebarLeftActive !== null && sidebarRightActive !== null,
-            },
+            }
           )}
         >
           <RoomHeader />
           <div
             id="weave"
             tabIndex={0}
-            className="w-full h-full relative overflow-hidden"
+            className={cn("w-full h-full relative overflow-hidden", {
+              ["pointer-events-none"]:
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                status !== WEAVE_INSTANCE_STATUS.RUNNING ||
+                !roomLoaded,
+              ["pointer-events-auto"]:
+                status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
+            })}
           ></div>
+          {weaveConnectionStatus !==
+            WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
+            <div className="absolute top-0 left-0 right-0 bottom-0">
+              <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none">
+                <div className="bg-white p-8 flex justify-center items-center flex-col gap-2">
+                  <div className="text-2xl font-inter font-light uppercase">
+                    CONNECTING
+                  </div>
+                  <div className="text-xl font-inter font-light text-muted-foreground">
+                    Please wait...
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
             <>
               <ContextMenuRender
@@ -219,10 +252,16 @@ export const RoomLayout = () => {
             {
               ["w-0"]: sidebarRightActive === null,
               ["w-[370px]"]: sidebarRightActive !== null,
-            },
+            }
           )}
         >
           <NodeProperties />
+          {weaveConnectionStatus !==
+            WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
+            <div className="absolute top-0 left-0 right-0 bottom-0">
+              <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none"></div>
+            </div>
+          )}
         </section>
       </motion.div>
     </AnimatePresence>

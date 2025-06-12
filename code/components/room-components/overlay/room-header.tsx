@@ -68,18 +68,19 @@ import {
 import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.json";
 import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json";
 import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 
 export function RoomHeader() {
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
-  const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const selectionActive = useWeave((state) => state.selection.active);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -87,14 +88,14 @@ export function RoomHeader() {
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
-    WEAVE_GRID_TYPES.LINES,
+    WEAVE_GRID_TYPES.LINES
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive],
+    [setSidebarActive]
   );
 
   const handleToggleUsersPointers = React.useCallback(() => {
@@ -132,12 +133,12 @@ export function RoomHeader() {
     (type: WeaveStageGridType) => {
       if (instance) {
         (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
-          type,
+          type
         );
         setGridType(type);
       }
     },
-    [instance],
+    [instance]
   );
 
   const handleExportToImage = React.useCallback(() => {
@@ -160,7 +161,7 @@ export function RoomHeader() {
   React.useEffect(() => {
     if (instance) {
       const stageGridPlugin = instance.getPlugin(
-        "stageGrid",
+        "stageGrid"
       ) as WeaveStageGridPlugin;
       setGridType(stageGridPlugin?.getType());
     }
@@ -197,7 +198,7 @@ export function RoomHeader() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          },
+          }
         )}
       >
         <div className="bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
@@ -213,7 +214,7 @@ export function RoomHeader() {
                   {
                     ["font-normal"]: menuOpen,
                     ["font-extralight"]: !menuOpen,
-                  },
+                  }
                 )}
               >
                 <div className="flex gap-1 justify-start items-center">
@@ -259,6 +260,10 @@ export function RoomHeader() {
                   <HelpDrawerTrigger />
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
                     onClick={handleToggleUsersPointers}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -273,6 +278,10 @@ export function RoomHeader() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
                     onClick={handleToggleGrid}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -294,7 +303,9 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     disabled={
                       !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
+                      (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS) ||
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
                     onClick={() => {
@@ -313,7 +324,9 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     disabled={
                       !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
+                      (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES) ||
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
                     onClick={() => {
@@ -336,6 +349,10 @@ export function RoomHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuItem
                   className="text-foreground cursor-pointer hover:rounded-none"
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
                   onClick={handleExportToImage}
                 >
                   <ImageIcon /> Stage to image
@@ -355,7 +372,7 @@ export function RoomHeader() {
                     window.open(
                       DOCUMENTATION_URL,
                       "_blank",
-                      "noopener,noreferrer",
+                      "noopener,noreferrer"
                     );
                   }}
                 >
@@ -417,7 +434,7 @@ export function RoomHeader() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          },
+          }
         )}
       >
         <div className="w-auto h-[72px] bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
@@ -437,12 +454,19 @@ export function RoomHeader() {
                 }}
               >
                 <DropdownMenuTrigger
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
                   className={cn(
                     "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
                     {
                       ["font-normal"]: sidebarsMenuOpen,
                       ["font-extralight"]: !sidebarsMenuOpen,
-                    },
+                      ["disabled:cursor-default disabled:opacity-50"]:
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                    }
                   )}
                 >
                   <TooltipProvider delayDuration={300}>
