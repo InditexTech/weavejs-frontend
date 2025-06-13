@@ -7,8 +7,10 @@
 
 import { cn } from "@/lib/utils";
 import { Range, Root, Thumb, Track } from "@radix-ui/react-slider";
-import { type HTMLAttributes, useCallback, useRef, useState } from "react";
+import { type HTMLAttributes, useCallback, useState } from "react";
 import { useColorPicker } from "../context/color-picker-context";
+import Color from "color";
+import { changeHue } from "../utils";
 
 export type ColorPickerHueProps = HTMLAttributes<HTMLDivElement>;
 
@@ -24,21 +26,24 @@ export const ColorPickerHue = ({
   const { defaultValue, ...restProps } = props;
   const { color, setColor } = useColorPicker();
   const [hueValue, setHueValue] = useState(color.hue());
-  const lastHue = useRef(color.hue());
 
   const onValueChange = useCallback(
     ([hue]: number[]) => {
       setHueValue(hue);
+      const [r, g, b] = color.rgb().array();
+      const newColor = changeHue(r, g, b, hue);
+      setColor(Color(newColor));
     },
-    [setHueValue],
+    [color, setColor, setHueValue]
   );
 
   const onValueCommit = useCallback(
     ([hue]: number[]) => {
-      lastHue.current = hue;
-      setColor(color.hue(hue));
+      const [r, g, b] = color.rgb().array();
+      const newColor = changeHue(r, g, b, hue);
+      setColor(Color(newColor));
     },
-    [color, setColor],
+    [color, setColor]
   );
 
   return (
@@ -48,7 +53,7 @@ export const ColorPickerHue = ({
       step={1}
       className={cn(
         "relative flex h-5 w-full touch-none items-center transition-opacity duration-200",
-        className,
+        className
       )}
       onValueChange={onValueChange}
       onValueCommit={onValueCommit}
