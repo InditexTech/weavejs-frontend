@@ -16,11 +16,11 @@ export const ColorPickerHexaInput = ({
   ...props
 }: ColorPickerFormatEditorProps) => {
   const { color, setColor } = useColorPicker();
-  const [actualValue, setActualValue] = useState<string>(color.hexa());
+  const [actualValue, setActualValue] = useState<string>(color.hex());
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    setActualValue(color.hexa());
+    setActualValue(color.hex());
   }, [color]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +42,18 @@ export const ColorPickerHexaInput = ({
     }
   }, [actualValue, setColor]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        const input = e.target as HTMLInputElement;
+        input.blur();
+      }
+    },
+    []
+  );
+
   return (
     <div
       className={cn("relative flex items-center gap-1", className)}
@@ -52,12 +64,13 @@ export const ColorPickerHexaInput = ({
         value={actualValue}
         onChange={handleInputChange}
         onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         maxLength={9}
         aria-label="Hex color value"
         className={cn(
           "h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent uppercase",
           error && "border-red-500",
-          !error && "border-zinc-200",
+          !error && "border-zinc-200"
         )}
       />
       <PercentageInput />
