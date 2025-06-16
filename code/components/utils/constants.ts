@@ -141,7 +141,10 @@ const NODES = [
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
-      fontStyle: "300",
+      fontStyle: "normal",
+      fontSize: 32,
+      fontColor: "#000000ff",
+      titleMargin: 10,
       transform: {
         rotateEnabled: false,
         resizeEnabled: false,
