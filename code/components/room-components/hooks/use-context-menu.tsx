@@ -4,7 +4,7 @@
 
 import {
   WeaveCopyPasteNodesPlugin,
-  WeaveExportNodeActionParams,
+  WeaveExportNodesActionParams,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
 } from "@inditextech/weave-sdk";
 import { WeaveSelection } from "@inditextech/weave-types";
@@ -94,25 +94,21 @@ function useContextMenu() {
             </div>
           ),
           icon: <ImageDown size={16} />,
-          disabled: nodes.length > 1,
+          disabled: nodes.length <= 0,
           onClick: () => {
-            if (nodes.length === 1) {
-              instance.triggerAction<WeaveExportNodeActionParams>(
-                "exportNodeTool",
-                {
-                  node: nodes[0].instance,
-                  options: {
-                    padding: 20,
-                    pixelRatio: 2,
-                  },
-                }
-              );
-            }
+            instance.triggerAction<WeaveExportNodesActionParams>(
+              "exportNodesTool",
+              {
+                nodes: nodes.map((n) => n.instance),
+                options: {
+                  padding: 20,
+                  pixelRatio: 2,
+                },
+              }
+            );
             setContextMenuShow(false);
           },
         });
-      }
-      if (nodes.length > 0) {
         // SEPARATOR
         options.push({
           id: "div-0",
