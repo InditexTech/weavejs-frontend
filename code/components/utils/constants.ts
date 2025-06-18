@@ -18,7 +18,7 @@ import {
   WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
-  WeaveExportNodesToolAction,
+  WeaveExportNodeToolAction,
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
@@ -177,7 +177,7 @@ const ACTIONS = [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new AlignElementsToolAction(),
-  new WeaveExportNodesToolAction(),
+  new WeaveExportNodeToolAction(),
   new WeaveExportStageToolAction(),
 ];
 
