@@ -23,6 +23,8 @@ export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
+type LLMServerState = "idle" | "generating" | "uploading";
+
 interface CollaborationRoomState {
   fetchConnectionUrl: {
     loading: boolean;
@@ -56,6 +58,11 @@ interface CollaborationRoomState {
     createProps: WeaveElementAttributes | undefined;
   };
   images: {
+    llmPopup: {
+      visible: boolean;
+      state: LLMServerState;
+      error: Error | null;
+    };
     showSelectFile: boolean;
     transforming: boolean;
     uploading: boolean;
@@ -65,7 +72,7 @@ interface CollaborationRoomState {
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
-    newFetchConnectionUrlError: Error | null,
+    newFetchConnectionUrlError: Error | null
   ) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
@@ -73,21 +80,24 @@ interface CollaborationRoomState {
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (newTransformingImage: boolean) => void;
+  setImagesLLMPopupVisible: (newImagesLLMPopupVisible: boolean) => void;
+  setImagesLLMPopupState: (newState: LLMServerState) => void;
+  setImagesLLMPopupError: (newError: Error | null) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
-    newFinishUploadCallbackImage: FinishUploadCallback | null,
+    newFinishUploadCallbackImage: FinishUploadCallback | null
   ) => void;
   setNodePropertiesAction: (
-    newNodePropertiesAction: NodePropertiesAction,
+    newNodePropertiesAction: NodePropertiesAction
   ) => void;
   setNodePropertiesCreateProps: (
-    newNodePropertiesCreateProps: WeaveElementAttributes | undefined,
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
   setSidebarActive: (
     newSidebarActive: SidebarActive,
-    position?: "left" | "right",
+    position?: "left" | "right"
   ) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
 }
@@ -126,6 +136,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     createProps: undefined,
   },
   images: {
+    llmPopup: {
+      visible: false,
+      state: "idle",
+      error: null,
+    },
     showSelectFile: false,
     transforming: false,
     uploading: false,
@@ -192,6 +207,30 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       images: { ...state.images, uploading: newUploadingImage },
+    })),
+  setImagesLLMPopupVisible: (newVisible) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        llmPopup: { ...state.images.llmPopup, visible: newVisible },
+      },
+    })),
+  setImagesLLMPopupState: (newState) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        llmPopup: { ...state.images.llmPopup, state: newState },
+      },
+    })),
+  setImagesLLMPopupError: (newError) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        llmPopup: { ...state.images.llmPopup, error: newError },
+      },
     })),
   setShowSelectFileImage: (newShowSelectFileImage) =>
     set((state) => ({

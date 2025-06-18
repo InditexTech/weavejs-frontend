@@ -17,7 +17,6 @@ import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { CropProperties } from "../node-properties/crop-properties";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
@@ -65,10 +64,9 @@ export const NodeProperties = () => {
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
     }
 
-    if (!actualAction && !node) {
+    if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
       setSidebarActive(null, "right");
     }
@@ -135,35 +133,6 @@ export const NodeProperties = () => {
         return "Unknown";
     }
   }, [actualAction]);
-
-  React.useEffect(() => {
-    if (
-      nodePropertiesAction === "create" &&
-      actualAction === "selectionTool" &&
-      actionType === "Unknown" &&
-      nodeType === "Unknown"
-    ) {
-      setSidebarActive(null, "right");
-      return;
-    }
-    if (nodePropertiesAction === "create" && actionType) {
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-      return;
-    }
-    if (node && nodePropertiesAction === "update" && nodeType) {
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-      return;
-    }
-    setSidebarActive(null, "right");
-  }, [
-    actualAction,
-    actionType,
-    nodeType,
-    nodePropertiesAction,
-    node,
-    sidebarRightActive,
-    setSidebarActive,
-  ]);
 
   React.useEffect(() => {
     if (!instance) return;

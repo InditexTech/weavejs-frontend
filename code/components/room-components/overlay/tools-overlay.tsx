@@ -26,6 +26,7 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
+  Bot,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -61,6 +62,12 @@ export function ToolsOverlay() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
+  );
+  const setImagesLLMPopupVisible = useCollaborationRoom(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const imagesLLMPopupVisible = useCollaborationRoom(
+    (state) => state.images.llmPopup.visible
   );
 
   const queryClient = useQueryClient();
@@ -367,6 +374,7 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
@@ -392,6 +400,30 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Bot className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Generate an image from prompt</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "G",
+                  [SYSTEM_OS.OTHER]: "G",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Star className="px-2" size={40} strokeWidth={1} />}

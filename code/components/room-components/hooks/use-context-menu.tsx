@@ -10,7 +10,6 @@ import {
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
 import { ShortcutElement } from "../help/shortcut-element";
@@ -47,9 +46,6 @@ function useContextMenu() {
   );
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
   );
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
@@ -388,6 +384,8 @@ function useContextMenu() {
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ) as any;
 
+                    instance.updatePropsAction("imageTool", { imageId });
+
                     finishUploadCallback(
                       `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
                     );
@@ -431,10 +429,6 @@ function useContextMenu() {
 
       const actActionActive = instance.getActiveAction();
 
-      if (visible) {
-        setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-      }
-
       setContextMenuShow(visible);
       setContextMenuPosition(point);
 
@@ -452,7 +446,6 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
-      setSidebarActive,
     ]
   );
 

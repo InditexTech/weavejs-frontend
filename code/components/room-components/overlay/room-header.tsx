@@ -46,6 +46,7 @@ import {
   Projector,
   Images,
   PencilRuler,
+  PanelRight,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -76,6 +77,8 @@ export function RoomHeader() {
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const actualAction = useWeave((state) => state.actions.actual);
+  const node = useWeave((state) => state.selection.node);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
@@ -447,7 +450,7 @@ export function RoomHeader() {
             </div>
             <Divider />
             <ZoomToolbar />
-            <div className="relative flex items-center">
+            <div className="relative flex items-center gap-2">
               <DropdownMenu
                 onOpenChange={(open: boolean) => {
                   setSidebarsMenuOpen(open);
@@ -546,6 +549,35 @@ export function RoomHeader() {
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <button
+                className={cn(
+                  "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                  {
+                    ["disabled:cursor-default disabled:opacity-50"]:
+                      !actualAction || !node,
+                  }
+                )}
+                disabled={!actualAction || !node}
+                onClick={() => {
+                  setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+                }}
+              >
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PanelRight size={20} strokeWidth={1} />
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      align="end"
+                      sideOffset={8}
+                      className="rounded-none"
+                    >
+                      Node Properties
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </button>
             </div>
           </div>
         </div>
