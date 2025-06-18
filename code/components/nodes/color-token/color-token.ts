@@ -42,6 +42,7 @@ export class ColorTokenNode extends WeaveNode {
 
     const internalRect = new Konva.Rect({
       groupId: id,
+      nodeId: id,
       id: `${id}-colorToken`,
       x: 0,
       y: 0,
@@ -58,6 +59,7 @@ export class ColorTokenNode extends WeaveNode {
     const internalRect2 = new Konva.Rect({
       id: `${id}-colorToken-1`,
       groupId: id,
+      nodeId: id,
       x: 1,
       y: 1,
       fill: colorTokenColor,
@@ -72,6 +74,7 @@ export class ColorTokenNode extends WeaveNode {
     const internalText = new Konva.Text({
       id: `${id}-colorToken-code`,
       groupId: id,
+      nodeId: id,
       x: 20,
       y: 260,
       fontSize: 20,

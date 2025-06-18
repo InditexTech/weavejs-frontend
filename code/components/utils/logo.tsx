@@ -5,11 +5,12 @@
 import React from "react";
 import Image from "next/image";
 import logoSrc from "@/assets/images/logo.png";
+import logoOnlySrc from "@/assets/images/logo-only.png";
 import logoLandscapeSrc from "@/assets/images/logo-landscape.png";
 import { cn } from "@/lib/utils";
 
 type LogoProps = {
-  kind?: "landscape" | "large" | "small";
+  kind?: "landscape" | "only-logo" | "large" | "small";
   variant?: "no-text" | "text";
 };
 
@@ -31,6 +32,7 @@ export function Logo({
 
   const src = React.useMemo(() => {
     if (kind === "landscape") return logoLandscapeSrc;
+    if (kind === "only-logo") return logoOnlySrc;
     return logoSrc;
   }, [kind]);
 
@@ -43,6 +45,7 @@ export function Logo({
         className={cn(`object-cover`, {
           ["w-[calc(345px*0.6)] h-[calc(40px*0.6)]"]: kind === "landscape",
           ["w-11 h-11"]: kind === "large",
+          ["w-[calc(54px*0.6)] h-[calc(40px*0.6)]"]: kind === "only-logo",
           ["w-[40px] h-[40px]"]: kind === "small",
         })}
         alt="Weave.js logo"
