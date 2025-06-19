@@ -28,7 +28,7 @@ jobs:
   deploy:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
-    environment: ${{ github.event.inputs.ENVIRONMENT && github.event.inputs.ENVIRONMENT || 'azure-production' }}
+    environment: ${{ github.event.inputs.ENVIRONMENT && github.event.inputs.ENVIRONMENT || 'azure-development' }}
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
