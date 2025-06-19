@@ -26,6 +26,7 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
+  Bot,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -36,6 +37,7 @@ import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { useIACapabilities } from "@/store/ia";
 
 function ToolbarDivider() {
   return (
@@ -61,6 +63,16 @@ export function ToolsOverlay() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
+  );
+  const aiEnabled = useIACapabilities((state) => state.enabled);
+  const imagesLLMPopupVisible = useIACapabilities(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupType = useIACapabilities(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisible = useIACapabilities(
+    (state) => state.setImagesLLMPopupVisible
   );
 
   const queryClient = useQueryClient();
@@ -367,6 +379,7 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
@@ -392,6 +405,33 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Bot className="px-2" size={40} strokeWidth={1} />}
+          active={imagesLLMPopupVisible}
+          disabled={
+            !aiEnabled ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            setImagesLLMPopupType("create");
+            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Generate an image from prompt</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "G",
+                  [SYSTEM_OS.OTHER]: "G",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Star className="px-2" size={40} strokeWidth={1} />}

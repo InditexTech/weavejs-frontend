@@ -29,6 +29,7 @@ import {
 } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
+import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -159,19 +160,15 @@ export const RoomLayout = () => {
           </AnimatePresence>
         </section>
         <section
-          className={cn(
-            "absolute top-0 left-0 right-0 bottom-0 flex z-0 overflow-hidden",
-            {
-              ["left-[370px]"]: sidebarLeftActive !== null,
-              ["right-[370px]"]: sidebarRightActive !== null,
-              ["w-[calc(100%-370px)]"]:
-                sidebarLeftActive !== null || sidebarRightActive !== null,
-              ["w-[calc(100%-740px)]"]:
-                sidebarLeftActive !== null && sidebarRightActive !== null,
-            }
-          )}
+          className={cn("w-full h-full flex z-0 overflow-hidden", {
+            // ["left-[370px]"]: sidebarLeftActive !== null,
+            // ["right-[370px]"]: sidebarRightActive !== null,
+            // ["w-[calc(100%-370px)]"]:
+            //   sidebarLeftActive !== null || sidebarRightActive !== null,
+            // ["w-[calc(100%-740px)]"]:
+            //   sidebarLeftActive !== null && sidebarRightActive !== null,
+          })}
         >
-          <RoomHeader />
           <div
             id="weave"
             tabIndex={0}
@@ -185,6 +182,7 @@ export const RoomLayout = () => {
                 status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
             })}
           ></div>
+          <RoomHeader />
           {weaveConnectionStatus !==
             WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -252,6 +250,7 @@ export const RoomLayout = () => {
               )}
             </>
           )}
+          <LLMGenerationPopup />
         </section>
         <section
           id="sidebar-right"

@@ -65,7 +65,7 @@ interface CollaborationRoomState {
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
-    newFetchConnectionUrlError: Error | null,
+    newFetchConnectionUrlError: Error | null
   ) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
@@ -77,17 +77,17 @@ interface CollaborationRoomState {
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
-    newFinishUploadCallbackImage: FinishUploadCallback | null,
+    newFinishUploadCallbackImage: FinishUploadCallback | null
   ) => void;
   setNodePropertiesAction: (
-    newNodePropertiesAction: NodePropertiesAction,
+    newNodePropertiesAction: NodePropertiesAction
   ) => void;
   setNodePropertiesCreateProps: (
-    newNodePropertiesCreateProps: WeaveElementAttributes | undefined,
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
   setSidebarActive: (
     newSidebarActive: SidebarActive,
-    position?: "left" | "right",
+    position?: "left" | "right"
   ) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
 }
@@ -126,6 +126,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     createProps: undefined,
   },
   images: {
+    llmPopup: {
+      visible: false,
+      state: "idle",
+      error: null,
+    },
     showSelectFile: false,
     transforming: false,
     uploading: false,

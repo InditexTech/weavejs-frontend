@@ -10,7 +10,6 @@ import {
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
 import { ShortcutElement } from "../help/shortcut-element";
@@ -20,6 +19,7 @@ import {
   ClipboardCopy,
   ClipboardPaste,
   Group,
+  Bot,
   Ungroup,
   Trash,
   SendToBack,
@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
+import { useIACapabilities } from "@/store/ia";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -48,11 +49,18 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
+  );
+  const aiEnabled = useIACapabilities((state) => state.enabled);
+  const setImagesLLMPopupType = useIACapabilities(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisible = useIACapabilities(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const setImagesLLMPopupImage = useIACapabilities(
+    (state) => state.setImagesLLMPopupImage
   );
 
   const mutationUpload = useMutation({
@@ -351,55 +359,88 @@ function useContextMenu() {
         });
       }
 
-      if (nodes.length === 1 && nodes[0].node.type === "image") {
+      if (
+        nodes.length === 1 &&
+        ["image", "group"].includes(nodes[0].node.type)
+      ) {
         options.unshift({
           id: "div-image",
           type: "divider",
         });
         options.unshift({
-          id: "removeBackground",
+          id: "editIAImage",
           type: "button",
-          label: "Remove background",
-          icon: <ImageMinus size={16} />,
-          onClick: () => {
-            if (instance) {
-              const nodeImage = nodes[0].instance as Konva.Group | undefined;
-              if (nodeImage) {
-                const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`
-                );
-                const imageTokens = nodeImageInternal
-                  ?.getAttr("image")
-                  .src.split("/");
-                const imageId = imageTokens[imageTokens.length - 1];
-                setTransformingImage(true);
-                mutationUpload.mutate(imageId, {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onSuccess: (data: any) => {
-                    const room = data.fileName.split("/")[0];
-                    const imageId = data.fileName.split("/")[1];
+          disabled: !aiEnabled,
+          label: "Edit image with a prompt",
+          icon: <Bot size={16} />,
+          onClick: async () => {
+            const base64URL: unknown =
+              await instance.triggerAction<WeaveExportNodesActionParams>(
+                "exportNodesTool",
+                {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 0,
+                    pixelRatio: 1,
+                  },
+                  download: false,
+                }
+              );
 
-                    const { finishUploadCallback } = instance.triggerAction(
-                      "imageTool"
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ) as any;
-
-                    finishUploadCallback(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                    );
-                  },
-                  onError: () => {
-                    console.error("Error uploading image");
-                  },
-                  onSettled: () => {
-                    setTransformingImage(false);
-                  },
-                });
-              }
-            }
+            setImagesLLMPopupType("edit");
+            setImagesLLMPopupImage(base64URL as string);
+            setImagesLLMPopupVisible(true);
             setContextMenuShow(false);
           },
         });
+        if (nodes.length === 1 && ["image"].includes(nodes[0].node.type)) {
+          options.unshift({
+            id: "removeBackground",
+            type: "button",
+            label: "Remove background",
+            icon: <ImageMinus size={16} />,
+            onClick: () => {
+              if (instance) {
+                const nodeImage = nodes[0].instance as Konva.Group | undefined;
+                if (nodeImage) {
+                  const nodeImageInternal = nodeImage?.findOne(
+                    `#${nodeImage.getAttrs().id}-image`
+                  );
+                  const imageTokens = nodeImageInternal
+                    ?.getAttr("image")
+                    .src.split("/");
+                  const imageId = imageTokens[imageTokens.length - 1];
+                  setTransformingImage(true);
+                  mutationUpload.mutate(imageId, {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onSuccess: (data: any) => {
+                      const room = data.fileName.split("/")[0];
+                      const imageId = data.fileName.split("/")[1];
+
+                      const { finishUploadCallback } = instance.triggerAction(
+                        "imageTool"
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      ) as any;
+
+                      instance.updatePropsAction("imageTool", { imageId });
+
+                      finishUploadCallback(
+                        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                      );
+                    },
+                    onError: () => {
+                      console.error("Error uploading image");
+                    },
+                    onSettled: () => {
+                      setTransformingImage(false);
+                    },
+                  });
+                }
+              }
+              setContextMenuShow(false);
+            },
+          });
+        }
       }
 
       return options;
@@ -408,6 +449,10 @@ function useContextMenu() {
       instance,
       contextMenuPosition,
       mutationUpload,
+      aiEnabled,
+      setImagesLLMPopupType,
+      setImagesLLMPopupVisible,
+      setImagesLLMPopupImage,
       setTransformingImage,
       setContextMenuShow,
     ]
@@ -427,10 +472,6 @@ function useContextMenu() {
 
       const actActionActive = instance.getActiveAction();
 
-      if (visible) {
-        setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-      }
-
       setContextMenuShow(visible);
       setContextMenuPosition(point);
 
@@ -448,7 +489,6 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
-      setSidebarActive,
     ]
   );
 
