@@ -23,8 +23,6 @@ export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
-type LLMServerState = "idle" | "generating" | "uploading";
-
 interface CollaborationRoomState {
   fetchConnectionUrl: {
     loading: boolean;
@@ -58,11 +56,6 @@ interface CollaborationRoomState {
     createProps: WeaveElementAttributes | undefined;
   };
   images: {
-    llmPopup: {
-      visible: boolean;
-      state: LLMServerState;
-      error: Error | null;
-    };
     showSelectFile: boolean;
     transforming: boolean;
     uploading: boolean;
@@ -80,9 +73,6 @@ interface CollaborationRoomState {
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (newTransformingImage: boolean) => void;
-  setImagesLLMPopupVisible: (newImagesLLMPopupVisible: boolean) => void;
-  setImagesLLMPopupState: (newState: LLMServerState) => void;
-  setImagesLLMPopupError: (newError: Error | null) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
@@ -207,30 +197,6 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       images: { ...state.images, uploading: newUploadingImage },
-    })),
-  setImagesLLMPopupVisible: (newVisible) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        llmPopup: { ...state.images.llmPopup, visible: newVisible },
-      },
-    })),
-  setImagesLLMPopupState: (newState) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        llmPopup: { ...state.images.llmPopup, state: newState },
-      },
-    })),
-  setImagesLLMPopupError: (newError) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        llmPopup: { ...state.images.llmPopup, error: newError },
-      },
     })),
   setShowSelectFileImage: (newShowSelectFileImage) =>
     set((state) => ({

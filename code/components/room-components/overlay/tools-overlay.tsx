@@ -37,6 +37,7 @@ import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { useIACapabilities } from "@/store/ia";
 
 function ToolbarDivider() {
   return (
@@ -63,11 +64,15 @@ export function ToolsOverlay() {
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
   );
-  const setImagesLLMPopupVisible = useCollaborationRoom(
-    (state) => state.setImagesLLMPopupVisible
+  const aiEnabled = useIACapabilities((state) => state.enabled);
+  const imagesLLMPopupVisible = useIACapabilities(
+    (state) => state.llmPopup.visible
   );
-  const imagesLLMPopupVisible = useCollaborationRoom(
-    (state) => state.images.llmPopup.visible
+  const setImagesLLMPopupType = useIACapabilities(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisible = useIACapabilities(
+    (state) => state.setImagesLLMPopupVisible
   );
 
   const queryClient = useQueryClient();
@@ -403,10 +408,13 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Bot className="px-2" size={40} strokeWidth={1} />}
+          active={imagesLLMPopupVisible}
           disabled={
+            !aiEnabled ||
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
           onClick={() => {
+            setImagesLLMPopupType("create");
             setImagesLLMPopupVisible(!imagesLLMPopupVisible);
           }}
           label={

@@ -62,7 +62,7 @@ function LoginForm() {
     setUser(userMapped);
     sessionStorage.setItem(
       `weave.js_${roomIdMapped}`,
-      JSON.stringify(userMapped),
+      JSON.stringify(userMapped)
     );
     router.push(`/rooms/${roomIdMapped}`);
   }

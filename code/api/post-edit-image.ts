@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const postGenerateImage = async (
+export const postEditImage = async (
   params: {
     roomId: string;
     model: string;
     prompt: string;
+    image: string;
+    style: string;
+    styleStrength: number;
   },
   options: {
     aspectRatio: string;
@@ -15,8 +18,7 @@ export const postGenerateImage = async (
   }
 ) => {
   const password = sessionStorage.getItem("weave_ai_password");
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/generate?password=${password}`;
-
+  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -25,6 +27,9 @@ export const postGenerateImage = async (
     body: JSON.stringify({
       model: params.model,
       prompt: params.prompt,
+      image: params.image,
+      style: params.style,
+      styleStrength: params.styleStrength,
       aspectRatio: options.aspectRatio,
       personGeneration: options.personGeneration,
       outputOptions: options.outputOptions,

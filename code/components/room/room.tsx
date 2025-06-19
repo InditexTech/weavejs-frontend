@@ -32,6 +32,7 @@ const statusMap: any = {
 };
 
 export const Room = () => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
@@ -56,6 +57,11 @@ export const Room = () => {
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
   }, [user]);
+
+  React.useEffect(() => {
+    console.log("weave", document.getElementById("weave"));
+    containerRef.current = document.getElementById("weave");
+  }, []);
 
   React.useEffect(() => {
     if (room && !user) {
@@ -170,7 +176,9 @@ export const Room = () => {
       </AnimatePresence>
       {loadedParams && room && user && storeProvider && (
         <WeaveProvider
-          containerId="weave"
+          getContainer={() => {
+            return document.getElementById("weave") as HTMLDivElement;
+          }}
           store={storeProvider}
           fonts={FONTS}
           nodes={NODES}

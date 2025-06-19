@@ -47,6 +47,8 @@ import {
   Images,
   PencilRuler,
   PanelRight,
+  ShieldCheck,
+  ShieldX,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -70,6 +72,8 @@ import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.j
 import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json";
 import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { useIACapabilities } from "@/store/ia";
+import { LlmSetupDialog } from "./llm-setup";
 
 export function RoomHeader() {
   const router = useRouter();
@@ -85,6 +89,9 @@ export function RoomHeader() {
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
+
+  const iaEnabled = useIACapabilities((state) => state.enabled);
+  const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [sidebarsMenuOpen, setSidebarsMenuOpen] = React.useState(false);
@@ -256,6 +263,35 @@ export function RoomHeader() {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  IA Capabilities
+                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={iaEnabled}
+                    className="text-foreground cursor-pointer hover:rounded-none"
+                    onClick={() => {
+                      setIASetupVisible(true);
+                    }}
+                  >
+                    <div className="w-full flex justify-between items-center">
+                      <div className="w-full flex justify-start items-center gap-2">
+                        {iaEnabled && (
+                          <>
+                            <ShieldCheck size={16} />
+                            Enabled
+                          </>
+                        )}
+                        {!iaEnabled && (
+                          <>
+                            <ShieldX size={16} />
+                            Disabled
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                   Interface
                 </DropdownMenuLabel>
@@ -582,6 +618,7 @@ export function RoomHeader() {
           </div>
         </div>
       </motion.div>
+      <LlmSetupDialog />
     </>
   );
 }
