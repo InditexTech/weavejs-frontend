@@ -11,7 +11,7 @@ import { useKeyDown } from "../hooks/use-key-down";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useGetOs } from "../hooks/use-get-os";
 import {
-  WeaveExportNodeActionParams,
+  WeaveExportNodesActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
@@ -232,8 +232,8 @@ export function useKeyboardHandler() {
   useKeyDown(
     () => {
       if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodeActionParams>("exportNodeTool", {
-          node: selectedNodes[0].instance,
+        instance.triggerAction<WeaveExportNodesActionParams>("exportNodeTool", {
+          nodes: selectedNodes.map((node) => node.instance),
           options: {
             padding: 20,
             pixelRatio: 2,

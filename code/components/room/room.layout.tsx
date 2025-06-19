@@ -23,7 +23,10 @@ import { ColorTokensLibrary } from "../room-components/color-tokens-library/colo
 import { ElementsTree } from "../room-components/elements-tree/elements-tree";
 import { NodeProperties } from "../room-components/overlay/node-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
+import {
+  WeaveActionPropsChangeEvent,
+  WeaveContextMenuPlugin,
+} from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
 import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
@@ -200,6 +203,11 @@ export const RoomLayout = () => {
               <ContextMenuRender
                 show={contextMenuShow}
                 onChanged={(show: boolean) => {
+                  if (!show) {
+                    instance
+                      ?.getPlugin<WeaveContextMenuPlugin>("contextMenu")
+                      ?.closeContextMenu();
+                  }
                   setContextMenuShow(show);
                 }}
                 position={contextMenuPosition}
