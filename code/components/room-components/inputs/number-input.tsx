@@ -5,6 +5,7 @@
 import React from "react";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export interface NumberInputProps
   extends Omit<NumericFormatProps, "value" | "onValueChange"> {
@@ -38,12 +39,12 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       value,
       ...props
     },
-    ref,
+    ref
   ) => {
     const editingRef = React.useRef<HTMLInputElement>(null);
     const [editing, setEditing] = React.useState<boolean>(false);
     const [editedValue, setEditedValue] = React.useState<number | undefined>(
-      defaultValue,
+      defaultValue
     );
 
     const handleChange = React.useCallback(
@@ -53,7 +54,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
         setEditedValue(newValue);
       },
-      [],
+      []
     );
 
     const handleBlur = React.useCallback(() => {
@@ -110,7 +111,10 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
               placeholder={placeholder}
               getInputRef={ref}
               {...props}
-              className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+              className={cn(
+                "w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none",
+                props.className
+              )}
             />
           )}
           {editing && (
@@ -133,13 +137,16 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
               placeholder={placeholder}
               getInputRef={editingRef}
               {...props}
-              className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+              className={cn(
+                "w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none",
+                props.className
+              )}
             />
           )}
         </div>
       </div>
     );
-  },
+  }
 );
 
 NumberInput.displayName = "NumberInput";

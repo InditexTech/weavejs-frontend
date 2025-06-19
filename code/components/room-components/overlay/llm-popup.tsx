@@ -324,7 +324,7 @@ export function LLMGenerationPopup() {
                 {imagesLLMPopupType === "edit" && "Edit Image"}
               </div>
               <Textarea
-                className="rounded-none"
+                className="rounded-none !border-black !shadow-none"
                 value={prompt}
                 disabled={mutationGenerate.isPending}
                 onFocus={() => {
@@ -341,7 +341,7 @@ export function LLMGenerationPopup() {
                   {imagesLLMPopupType === "edit" && (
                     <>
                       <Select value={styleType} onValueChange={setStyleType}>
-                        <SelectTrigger className="font-inter rounded-none !h-[30px]">
+                        <SelectTrigger className="font-inter rounded-none !h-[30px] !border-black !shadow-none">
                           <SelectValue placeholder="Edit Type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -355,18 +355,23 @@ export function LLMGenerationPopup() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      <InputNumber
-                        max={100}
-                        min={0}
-                        value={parseInt(styleStrength)}
-                        onChange={(value) => {
-                          setStyleStrength(`${value}`);
-                        }}
-                      />
+                      <div className="font-inter text-xs">Style Strength</div>
+                      <div className="w-[60px]">
+                        <InputNumber
+                          className="!h-[30px] !border-black"
+                          max={100}
+                          min={0}
+                          value={parseInt(styleStrength)}
+                          onChange={(value) => {
+                            setStyleStrength(`${value}`);
+                          }}
+                        />
+                      </div>
+                      <div className="font-inter text-xs">%</div>
                     </>
                   )}
                   <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                    <SelectTrigger className="font-inter rounded-none !h-[30px]">
+                    <SelectTrigger className="font-inter rounded-none !h-[30px] !border-black !shadow-none">
                       <SelectValue placeholder="Size" />
                     </SelectTrigger>
                     <SelectContent>

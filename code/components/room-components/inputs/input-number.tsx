@@ -6,9 +6,11 @@
 
 import React from "react";
 import { NumberInput } from "./number-input";
+import { cn } from "@/lib/utils";
 
 type InputNumberProps = {
   label?: string;
+  className?: string;
   disabled?: boolean;
   value: number;
   onChange?: (value: number) => void;
@@ -20,6 +22,7 @@ export const InputNumber = ({
   label,
   value,
   onChange,
+  className,
   disabled = false,
   min = -Infinity,
   max = Infinity,
@@ -33,14 +36,14 @@ export const InputNumber = ({
         input.blur();
       }
     },
-    [],
+    []
   );
 
   const handleOnValueChange = React.useCallback(
     (numberValue: number | undefined) => {
       onChange?.(numberValue ?? 0);
     },
-    [onChange],
+    [onChange]
   );
 
   return (
@@ -50,7 +53,10 @@ export const InputNumber = ({
       min={min}
       max={max}
       decimalScale={2}
-      className="w-full text-[3px] font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+      className={cn(
+        "w-full text-[3px] font-normal text-gray-700 text-right focus:outline-none bg-transparent",
+        className
+      )}
       value={Number(value)}
       onValueChange={handleOnValueChange}
       onKeyDown={handleKeyDown}
