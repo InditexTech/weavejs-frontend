@@ -32,7 +32,7 @@ const statusMap: any = {
 };
 
 export const Room = () => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
