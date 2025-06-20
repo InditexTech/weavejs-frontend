@@ -166,7 +166,8 @@ export function TextProperties() {
                 (actualNode.props.fontStyle ?? "normal").indexOf("normal") !==
                 -1
               }
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,
                   props: {
@@ -184,7 +185,8 @@ export function TextProperties() {
                 (actualNode.props.fontStyle ?? "normal").indexOf("italic") !==
                 -1
               }
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 let items = [
                   ...(actualNode.props.fontStyle ?? "normal")
                     .split(" ")
@@ -224,7 +226,8 @@ export function TextProperties() {
               pressed={
                 (actualNode.props.fontStyle ?? "normal").indexOf("bold") !== -1
               }
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 let items = [
                   ...(actualNode.props.fontStyle ?? "normal")
                     .split(" ")

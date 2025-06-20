@@ -120,6 +120,13 @@ export const Room = () => {
     }
   }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
 
+  const isBrowser =
+    typeof window !== "undefined" && typeof window.document !== "undefined";
+
+  if (!isBrowser) {
+    throw new Error("Weave.js can only be used in a browser environment");
+  }
+
   if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
     return null;
   }
@@ -175,9 +182,9 @@ export const Room = () => {
           }}
           store={storeProvider}
           fonts={FONTS}
-          nodes={NODES}
+          nodes={NODES()}
           plugins={PLUGINS(getUser)}
-          actions={ACTIONS}
+          actions={ACTIONS()}
         >
           <UploadFile />
           <RoomLayout />

@@ -250,7 +250,6 @@ export const RoomLayout = () => {
               )}
             </>
           )}
-          <LLMGenerationPopup />
         </section>
         <section
           id="sidebar-right"
@@ -270,6 +269,7 @@ export const RoomLayout = () => {
             </div>
           )}
         </section>
+        <LLMGenerationPopup />
       </motion.div>
     </AnimatePresence>
   );

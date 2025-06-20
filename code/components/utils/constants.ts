@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use client";
+
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
@@ -127,7 +129,7 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const NODES = [
+const NODES = () => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
@@ -202,7 +204,7 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   }),
 ];
 
-const ACTIONS = [
+const ACTIONS = () => [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),

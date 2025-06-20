@@ -58,6 +58,7 @@ export const InputNumber = ({
         className
       )}
       value={Number(value)}
+      onClick={(e) => e.stopPropagation()}
       onValueChange={handleOnValueChange}
       onKeyDown={handleKeyDown}
     />

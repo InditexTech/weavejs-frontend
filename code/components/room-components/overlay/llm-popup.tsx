@@ -302,8 +302,9 @@ export function LLMGenerationPopup() {
             className={cn(
               "grid gap-5 p-5 bg-white text-black border border-[#c9c9c9] pointer-events-auto",
               {
-                ["grid-cols-1 min-w-[600px]"]: imagesLLMPopupType === "create",
-                ["grid-cols-[auto_1fr] min-w-[820px]"]:
+                ["grid-cols-1 min-w-[600px] max-w-[700px]"]:
+                  imagesLLMPopupType === "create",
+                ["grid-cols-[auto_1fr] min-w-[820px] max-w-[820px]"]:
                   imagesLLMPopupType === "edit",
               }
             )}
@@ -318,7 +319,7 @@ export function LLMGenerationPopup() {
                 />
               </div>
             )}
-            <div className="min-w-[600px] flex flex-col gap-2 justify-center items-start bg-white text-black">
+            <div className="min-w-[600px] max-w-[700px] flex flex-col gap-2 justify-center items-start bg-white text-black">
               <div className="font-inter text-xl mb-4">
                 {imagesLLMPopupType === "create" && "Create an Image"}
                 {imagesLLMPopupType === "edit" && "Edit Image"}
