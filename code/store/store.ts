@@ -56,6 +56,7 @@ interface CollaborationRoomState {
     createProps: WeaveElementAttributes | undefined;
   };
   images: {
+    showSelectFiles: boolean;
     showSelectFile: boolean;
     transforming: boolean;
     uploading: boolean;
@@ -74,6 +75,7 @@ interface CollaborationRoomState {
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (newTransformingImage: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
+  setShowSelectFilesImages: (newShowSelectFilesImages: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
@@ -131,6 +133,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       state: "idle",
       error: null,
     },
+    showSelectFiles: false,
     showSelectFile: false,
     transforming: false,
     uploading: false,
@@ -202,6 +205,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       images: { ...state.images, showSelectFile: newShowSelectFileImage },
+    })),
+  setShowSelectFilesImages: (newShowSelectFilesImages) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, showSelectFiles: newShowSelectFilesImages },
     })),
   setLoadingImage: (newLoadingImage) =>
     set((state) => ({

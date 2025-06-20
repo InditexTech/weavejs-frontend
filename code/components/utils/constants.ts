@@ -55,6 +55,7 @@ import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
+import { ImagesToolAction } from "../actions/images-tool/images-tool";
 
 const FONTS = [
   {
@@ -226,6 +227,7 @@ const ACTIONS = () => [
   new AlignElementsToolAction(),
   new WeaveExportNodesToolAction(),
   new WeaveExportStageToolAction(),
+  new ImagesToolAction(),
 ];
 
 export { FONTS, NODES, ACTIONS, PLUGINS };
