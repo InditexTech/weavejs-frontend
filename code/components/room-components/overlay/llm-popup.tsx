@@ -37,12 +37,14 @@ export function LLMGenerationPopup() {
   const instance = useWeave((state) => state.instance);
 
   const [prompt, setPrompt] = React.useState<string>("");
+  const [negativePrompt, setNegativePrompt] = React.useState<string>("");
   const [aspectRatio, setAspectRatio] = React.useState<string>("1:1");
   const [personGeneration, setPersonGeneration] =
     React.useState<string>("allow_all");
   const [mimeType, setMimeType] = React.useState<string>("image/png");
-  const [styleType, setStyleType] = React.useState<string>("STYLE_TRANSFER");
-  const [styleStrength, setStyleStrength] = React.useState<string>("80");
+  const [strength, setStrength] = React.useState<string>("0.3");
+  const [guidanceStrength, setGuidanceStrength] =
+    React.useState<string>("12.0");
   const [compressionQuality, setCompressionQuality] =
     React.useState<string>("75");
 
@@ -171,34 +173,23 @@ export function LLMGenerationPopup() {
   const mutationEdit = useMutation({
     mutationFn: async ({
       prompt,
-      style,
-      styleStrength,
+      strength,
+      guidanceStrength,
       imageBase64,
     }: {
       prompt: string;
-      style: string;
-      styleStrength: string;
+      strength: string;
+      guidanceStrength: string;
       imageBase64: string;
     }) => {
       setImagesLLMPopupState("generating");
-      return await postEditImage(
-        {
-          roomId: room ?? "",
-          model: LLM_MODEL,
-          prompt,
-          image: imageBase64.split(",")[1],
-          style,
-          styleStrength: parseInt(styleStrength),
-        },
-        {
-          aspectRatio,
-          personGeneration,
-          outputOptions: {
-            mimeType,
-            compressionQuality: Number(compressionQuality),
-          },
-        }
-      );
+      return await postEditImage({
+        roomId: room ?? "",
+        prompt,
+        image: imageBase64.split(",")[1],
+        strength: parseFloat(strength),
+        guidance_strength: parseFloat(guidanceStrength),
+      });
     },
     onSettled: () => {
       setImagesLLMPopupState("idle");
@@ -248,9 +239,16 @@ export function LLMGenerationPopup() {
     }
   }, [imagesLLMPopupVisible, setImagesLLMPopupError, setImagesLLMPopupState]);
 
-  const handleTextAreaChange = React.useCallback(
+  const handlePromptChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setPrompt(event.target.value);
+    },
+    []
+  );
+
+  const handleNegativePromptChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setNegativePrompt(event.target.value);
     },
     []
   );
@@ -302,9 +300,8 @@ export function LLMGenerationPopup() {
             className={cn(
               "grid gap-5 p-5 bg-white text-black border border-[#c9c9c9] pointer-events-auto",
               {
-                ["grid-cols-1 min-w-[600px] max-w-[700px]"]:
-                  imagesLLMPopupType === "create",
-                ["grid-cols-[auto_1fr] min-w-[820px] max-w-[820px]"]:
+                ["grid-cols-1 min-w-[600px]"]: imagesLLMPopupType === "create",
+                ["grid-cols-[auto_1fr] min-w-[820px]"]:
                   imagesLLMPopupType === "edit",
               }
             )}
@@ -324,6 +321,7 @@ export function LLMGenerationPopup() {
                 {imagesLLMPopupType === "create" && "Create an Image"}
                 {imagesLLMPopupType === "edit" && "Edit Image"}
               </div>
+              <div className="font-inter text-sm">Prompt:</div>
               <Textarea
                 className="rounded-none !border-black !shadow-none"
                 value={prompt}
@@ -334,57 +332,73 @@ export function LLMGenerationPopup() {
                 onBlurCapture={() => {
                   window.weaveOnFieldFocus = false;
                 }}
-                onChange={handleTextAreaChange}
+                onChange={handlePromptChange}
                 placeholder="Example: generate a model with a kaki dress."
               />
+              {imagesLLMPopupType === "edit" && (
+                <>
+                  <div className="font-inter text-sm">Negative prompt:</div>
+                  <Textarea
+                    className="rounded-none !border-black !shadow-none"
+                    value={negativePrompt}
+                    disabled={mutationGenerate.isPending}
+                    onFocus={() => {
+                      window.weaveOnFieldFocus = true;
+                    }}
+                    onBlurCapture={() => {
+                      window.weaveOnFieldFocus = false;
+                    }}
+                    onChange={handleNegativePromptChange}
+                    placeholder="Example: don't change the color of the shirt."
+                  />
+                </>
+              )}
               <div className="w-full flex gap-3 justify-end items-center mb-4">
                 <div className="flex gap-1 justify-end items-center font-inter text-xs">
                   {imagesLLMPopupType === "edit" && (
                     <>
-                      <Select value={styleType} onValueChange={setStyleType}>
-                        <SelectTrigger className="font-inter rounded-none !h-[30px] !border-black !shadow-none">
-                          <SelectValue placeholder="Edit Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="STYLE_TRANSFER">
-                              Transfer style
-                            </SelectItem>
-                            <SelectItem value="STRUCTURE_PRESERVATION">
-                              Preserve composition
-                            </SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <div className="font-inter text-xs">Style Strength</div>
+                      <div className="font-inter text-xs">Guidance Scale</div>
                       <div className="w-[60px]">
                         <InputNumber
                           className="!h-[30px] !border-black"
-                          max={100}
+                          max={20}
                           min={0}
-                          value={parseInt(styleStrength)}
+                          value={parseFloat(guidanceStrength)}
                           onChange={(value) => {
-                            setStyleStrength(`${value}`);
+                            setGuidanceStrength(`${value}`);
                           }}
                         />
                       </div>
-                      <div className="font-inter text-xs">%</div>
+                      <div className="font-inter text-xs">Strength</div>
+                      <div className="w-[60px]">
+                        <InputNumber
+                          className="!h-[30px] !border-black"
+                          max={1}
+                          min={0}
+                          value={parseFloat(strength)}
+                          onChange={(value) => {
+                            setStrength(`${value}`);
+                          }}
+                        />
+                      </div>
                     </>
                   )}
-                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                    <SelectTrigger className="font-inter rounded-none !h-[30px] !border-black !shadow-none">
-                      <SelectValue placeholder="Size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="4:3">Landscape (4:3)</SelectItem>
-                        <SelectItem value="3:4">Portrait (3:4)</SelectItem>
-                        <SelectItem value="16:9">Landscape (16:9)</SelectItem>
-                        <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-                        <SelectItem value="1:1">Squared (1:1)</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  {imagesLLMPopupType === "create" && (
+                    <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                      <SelectTrigger className="font-inter rounded-none !h-[30px] !border-black !shadow-none">
+                        <SelectValue placeholder="Size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="4:3">Landscape (4:3)</SelectItem>
+                          <SelectItem value="3:4">Portrait (3:4)</SelectItem>
+                          <SelectItem value="16:9">Landscape (16:9)</SelectItem>
+                          <SelectItem value="9:16">Portrait (9:16)</SelectItem>
+                          <SelectItem value="1:1">Squared (1:1)</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
                 {/* <div className="flex gap-1 justify-end items-center font-inter text-xs">
                   <Select
@@ -467,8 +481,8 @@ export function LLMGenerationPopup() {
                     if (imagesLLMPopupType === "edit") {
                       mutationEdit.mutate({
                         prompt,
-                        style: styleType,
-                        styleStrength,
+                        strength,
+                        guidanceStrength,
                         imageBase64: imagesLLMPopupImageBase64 ?? "",
                       });
                     }

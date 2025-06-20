@@ -33,39 +33,33 @@ export function UploadFile() {
 
   const handleUploadFile = React.useCallback(
     (file: File) => {
-      if (!["image/jpeg", "image/png"].includes(file.type)) {
-        return;
-      }
+      setUploadingImage(true);
+      mutationUpload.mutate(file, {
+        onSuccess: (data) => {
+          if (instance) {
+            inputFileRef.current.value = null;
+            const room = data.fileName.split("/")[0];
+            const imageId = data.fileName.split("/")[1];
 
-      if (file) {
-        setUploadingImage(true);
-        mutationUpload.mutate(file, {
-          onSuccess: (data) => {
-            if (instance) {
-              inputFileRef.current.value = null;
-              const room = data.fileName.split("/")[0];
-              const imageId = data.fileName.split("/")[1];
+            const { finishUploadCallback } = instance.triggerAction(
+              "imageTool"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ) as any;
 
-              const { finishUploadCallback } = instance.triggerAction(
-                "imageTool"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ) as any;
+            instance.updatePropsAction("imageTool", { imageId });
 
-              instance.updatePropsAction("imageTool", { imageId });
-
-              finishUploadCallback?.(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-              );
-            }
-          },
-          onError: () => {
-            console.error("Error uploading image");
-          },
-          onSettled: () => {
-            setUploadingImage(false);
-          },
-        });
-      }
+            finishUploadCallback?.(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+            );
+          }
+        },
+        onError: () => {
+          console.error("Error uploading image");
+        },
+        onSettled: () => {
+          setUploadingImage(false);
+        },
+      });
     },
     [instance, mutationUpload, setUploadingImage]
   );
@@ -124,7 +118,7 @@ export function UploadFile() {
   return (
     <input
       type="file"
-      accept="image/png,image/gif,image/jpeg"
+      accept="image/png,image/jpeg"
       name="image"
       ref={inputFileRef}
       className="hidden"

@@ -2,21 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const postEditImage = async (
-  params: {
-    roomId: string;
-    model: string;
-    prompt: string;
-    image: string;
-    style: string;
-    styleStrength: number;
-  },
-  options: {
-    aspectRatio: string;
-    personGeneration: string;
-    outputOptions: { mimeType: string; compressionQuality: number };
-  }
-) => {
+export const postEditImage = async (params: {
+  roomId: string;
+  prompt: string;
+  image: string;
+  strength: number;
+  guidance_strength: number;
+}) => {
   const password = sessionStorage.getItem("weave_ai_password");
   const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
   const response = await fetch(endpoint, {
@@ -25,14 +17,10 @@ export const postEditImage = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: params.model,
       prompt: params.prompt,
       image: params.image,
-      style: params.style,
-      styleStrength: params.styleStrength,
-      aspectRatio: options.aspectRatio,
-      personGeneration: options.personGeneration,
-      outputOptions: options.outputOptions,
+      strength: params.strength,
+      guidance_strength: params.guidance_strength,
     }),
   });
 
