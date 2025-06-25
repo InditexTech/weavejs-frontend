@@ -88,7 +88,7 @@ export const ElementsTree = () => {
     [],
   );
   const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
-    initialSelectedNodes.map((node) => node.node.key),
+    initialSelectedNodes.map((node) => node.node?.key).filter((key) => typeof key !== 'undefined'),
   );
 
   React.useEffect(() => {
@@ -114,7 +114,7 @@ export const ElementsTree = () => {
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
-      setSelectedNodes(nodes.map((node) => node.node.key));
+      setSelectedNodes(nodes.map((node) => node.node?.key).filter((key) => typeof key !== 'undefined'));
     }
 
     if (instance) {

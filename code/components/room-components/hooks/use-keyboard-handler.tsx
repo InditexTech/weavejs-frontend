@@ -193,7 +193,8 @@ export function useKeyboardHandler() {
           instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
         if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
           usersPointersPlugin.disable();
-        } else {
+        }
+        if (usersPointersPlugin && !usersPointersPlugin.isEnabled()) {
           usersPointersPlugin.enable();
         }
       }
@@ -241,13 +242,16 @@ export function useKeyboardHandler() {
   useKeyDown(
     () => {
       if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodesActionParams>("exportNodeTool", {
-          nodes: selectedNodes.map((node) => node.instance),
-          options: {
-            padding: 20,
-            pixelRatio: 2,
-          },
-        });
+        instance.triggerAction<WeaveExportNodesActionParams, void>(
+          "exportNodeTool",
+          {
+            nodes: selectedNodes.map((node) => node.instance),
+            options: {
+              padding: 20,
+              pixelRatio: 2,
+            },
+          }
+        );
       }
     },
     ["KeyE"],
@@ -259,7 +263,7 @@ export function useKeyboardHandler() {
   useKeyDown(
     () => {
       if (instance) {
-        instance.triggerAction<WeaveExportStageActionParams>(
+        instance.triggerAction<WeaveExportStageActionParams, void>(
           "exportStageTool",
           {
             options: {
@@ -321,7 +325,11 @@ export function useKeyboardHandler() {
   useKeyDown(
     () => {
       if (instance && selectedNodes.length > 1) {
-        instance.group(selectedNodes.map((n) => n.node));
+        instance.group(
+          selectedNodes
+            .map((n) => n?.node)
+            .filter((node) => typeof node !== "undefined")
+        );
       }
     },
     ["KeyG"],
@@ -335,7 +343,7 @@ export function useKeyboardHandler() {
       if (
         instance &&
         selectedNodes.length === 1 &&
-        selectedNodes[0].node.type === "group"
+        selectedNodes[0].node?.type === "group"
       ) {
         instance.unGroup(selectedNodes[0].node);
       }

@@ -86,7 +86,7 @@ export const FramesLibrary = () => {
   const selectedNodesAllFrame = React.useMemo(() => {
     let allFrame = true;
     for (const node of selectedNodes) {
-      if (node.node.type !== "frame") {
+      if (node.node?.type !== "frame") {
         allFrame = false;
         break;
       }
@@ -99,7 +99,7 @@ export const FramesLibrary = () => {
       return;
     }
 
-    instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }>(
+    instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }, void>(
       "alignElementsTool",
       {
         gap: 20,
