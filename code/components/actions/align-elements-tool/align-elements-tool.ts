@@ -51,23 +51,26 @@ export class AlignElementsToolAction extends WeaveAction {
         const handler = this.instance.getNodeHandler<WeaveNode>(
           instance.getAttrs().nodeType,
         );
-        const node = handler.serialize(instance as WeaveElementInstance);
 
-        const newNode = {
-          ...node,
-          props: {
-            ...node.props,
+        if (handler) {
+          const node = handler.serialize(instance as WeaveElementInstance);
+
+          const newNode = {
+            ...node,
+            props: {
+              ...node.props,
+              x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
+              y,
+            },
+          };
+
+          instance.setAttrs({
             x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
             y,
-          },
-        };
+          });
 
-        instance.setAttrs({
-          x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
-          y,
-        });
-
-        this.instance.updateNode(newNode);
+          this.instance.updateNode(newNode);
+        }
 
         prevInstance = instance;
       }
