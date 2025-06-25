@@ -22,7 +22,7 @@ export class AlignElementsToolAction extends WeaveAction {
     }
 
     const instances: Konva.Node[] = [];
-    let actualType: string | undefined = nodes[0].node.type;
+    let actualType: string | undefined = nodes[0].node?.type;
     for (const node of nodes) {
       if (node.instance.getAttrs().nodeType === actualType) {
         instances.push(node.instance);
