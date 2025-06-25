@@ -52,7 +52,7 @@ export function UploadFiles() {
           }
 
           if (instance && imagesURLs.length > 0) {
-            instance.triggerAction<ImagesToolActionTriggerParams>(
+            instance.triggerAction<ImagesToolActionTriggerParams, void>(
               "imagesTool",
               {
                 imagesURLs,

@@ -187,25 +187,27 @@ export class ImagesToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>("image");
 
-      const node = nodeHandler.create(imageId, {
-        ...this.props,
-        x: imagePoint.x,
-        y: imagePoint.y,
-        opacity: 1,
-        adding: false,
-        imageURL: imageInfo.imageURL,
-        stroke: "#000000ff",
-        strokeWidth: 0,
-        strokeScaleEnabled: true,
-        imageWidth: imageInfo.info.width,
-        imageHeight: imageInfo.info.height,
-        imageInfo: {
-          width: imageInfo.info.width,
-          height: imageInfo.info.height,
-        },
-      });
+      if (nodeHandler) {
+        const node = nodeHandler.create(imageId, {
+          ...this.props,
+          x: imagePoint.x,
+          y: imagePoint.y,
+          opacity: 1,
+          adding: false,
+          imageURL: imageInfo.imageURL,
+          stroke: "#000000ff",
+          strokeWidth: 0,
+          strokeScaleEnabled: true,
+          imageWidth: imageInfo.info.width,
+          imageHeight: imageInfo.info.height,
+          imageInfo: {
+            width: imageInfo.info.width,
+            height: imageInfo.info.height,
+          },
+        });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+        this.instance.addNode(node, this.container?.getAttrs().id);
+      }
 
       imagePoint.x += imageInfo.info.width + this.padding;
     }
