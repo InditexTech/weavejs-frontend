@@ -153,12 +153,15 @@ export function RoomHeader() {
 
   const handleExportToImage = React.useCallback(() => {
     if (instance) {
-      instance.triggerAction<WeaveExportStageActionParams>("exportStageTool", {
-        options: {
-          padding: 20,
-          pixelRatio: 2,
-        },
-      });
+      instance.triggerAction<WeaveExportStageActionParams, void>(
+        "exportStageTool",
+        {
+          options: {
+            padding: 20,
+            pixelRatio: 2,
+          },
+        }
+      );
     }
   }, [instance]);
 
