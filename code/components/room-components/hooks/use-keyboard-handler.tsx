@@ -129,6 +129,15 @@ export function useKeyboardHandler() {
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
+  useKeyDown(
+    () => {
+      triggerTool("imagesTool");
+      setShowSelectFileImage(true);
+    },
+    ["KeyO"],
+    (e) => !(e.ctrlKey || e.metaKey)
+  );
+
   useKeyDown(() => {
     triggerTool("starTool");
   }, ["KeyJ"]);

@@ -18,6 +18,7 @@ import useGetAzureWebPubSubProvider from "../room-components/hooks/use-get-azure
 // import useGetWebsocketsProvider from "../room-components/hooks/use-get-websockets-provider";
 import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
 import { UploadFile } from "../room-components/upload-file";
+import { UploadFiles } from "../room-components/upload-files";
 import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
 
@@ -187,6 +188,7 @@ export const Room = () => {
           actions={ACTIONS()}
         >
           <UploadFile />
+          <UploadFiles />
           <RoomLayout />
           <HelpDrawer />
         </WeaveProvider>
