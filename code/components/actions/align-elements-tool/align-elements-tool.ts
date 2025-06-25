@@ -22,7 +22,7 @@ export class AlignElementsToolAction extends WeaveAction {
     }
 
     const instances: Konva.Node[] = [];
-    let actualType: string | undefined = nodes[0].node.type;
+    let actualType: string | undefined = nodes[0].node?.type;
     for (const node of nodes) {
       if (node.instance.getAttrs().nodeType === actualType) {
         instances.push(node.instance);
@@ -51,23 +51,26 @@ export class AlignElementsToolAction extends WeaveAction {
         const handler = this.instance.getNodeHandler<WeaveNode>(
           instance.getAttrs().nodeType,
         );
-        const node = handler.serialize(instance as WeaveElementInstance);
 
-        const newNode = {
-          ...node,
-          props: {
-            ...node.props,
+        if (handler) {
+          const node = handler.serialize(instance as WeaveElementInstance);
+
+          const newNode = {
+            ...node,
+            props: {
+              ...node.props,
+              x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
+              y,
+            },
+          };
+
+          instance.setAttrs({
             x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
             y,
-          },
-        };
+          });
 
-        instance.setAttrs({
-          x: (prevInstance.x() ?? 0) + (prevInstance.width() ?? 0) + gap,
-          y,
-        });
-
-        this.instance.updateNode(newNode);
+          this.instance.updateNode(newNode);
+        }
 
         prevInstance = instance;
       }

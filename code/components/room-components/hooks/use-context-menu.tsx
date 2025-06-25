@@ -104,7 +104,7 @@ function useContextMenu() {
           icon: <ImageDown size={16} />,
           disabled: nodes.length <= 0,
           onClick: () => {
-            instance.triggerAction<WeaveExportNodesActionParams>(
+            instance.triggerAction<WeaveExportNodesActionParams, void>(
               "exportNodesTool",
               {
                 nodes: nodes.map((n) => n.instance),
@@ -298,7 +298,11 @@ function useContextMenu() {
           icon: <Group size={16} />,
           disabled: !canGroup,
           onClick: () => {
-            instance.group(nodes.map((n) => n.node));
+            instance.group(
+              nodes
+                .map((n) => n?.node)
+                .filter((node) => typeof node !== "undefined")
+            );
             setContextMenuShow(false);
           },
         });
@@ -320,8 +324,10 @@ function useContextMenu() {
           icon: <Ungroup size={16} />,
           disabled: !canUnGroup,
           onClick: () => {
-            instance.unGroup(nodes[0].node);
-            setContextMenuShow(false);
+            if (nodes[0].node) {
+              instance.unGroup(nodes[0].node);
+              setContextMenuShow(false);
+            }
           },
         });
       }
@@ -351,7 +357,9 @@ function useContextMenu() {
           icon: <Trash size={16} />,
           onClick: () => {
             for (const node of nodes) {
-              instance.removeNode(node.node);
+              if (node.node) {
+                instance.removeNode(node.node);
+              }
             }
 
             setContextMenuShow(false);
@@ -361,7 +369,7 @@ function useContextMenu() {
 
       if (
         nodes.length === 1 &&
-        ["image", "group"].includes(nodes[0].node.type)
+        ["image", "group"].includes(nodes[0].node?.type ?? "")
       ) {
         options.unshift({
           id: "div-image",
@@ -374,18 +382,17 @@ function useContextMenu() {
           label: "Edit image with a prompt",
           icon: <Bot size={16} />,
           onClick: async () => {
-            const base64URL: unknown =
-              await instance.triggerAction<WeaveExportNodesActionParams>(
-                "exportNodesTool",
-                {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 0,
-                    pixelRatio: 1,
-                  },
-                  download: false,
-                }
-              );
+            const base64URL: unknown = await instance.triggerAction<
+              WeaveExportNodesActionParams,
+              void
+            >("exportNodesTool", {
+              nodes: nodes.map((n) => n.instance),
+              options: {
+                padding: 0,
+                pixelRatio: 1,
+              },
+              download: false,
+            });
 
             setImagesLLMPopupType("edit");
             setImagesLLMPopupImage(base64URL as string);
@@ -393,7 +400,10 @@ function useContextMenu() {
             setContextMenuShow(false);
           },
         });
-        if (nodes.length === 1 && ["image"].includes(nodes[0].node.type)) {
+        if (
+          nodes.length === 1 &&
+          ["image"].includes(nodes[0].node?.type ?? "")
+        ) {
           options.unshift({
             id: "removeBackground",
             type: "button",
@@ -468,7 +478,7 @@ function useContextMenu() {
 
       const canGroup = selection.length > 1;
       const canUnGroup =
-        selection.length === 1 && selection[0].node.type === "group";
+        selection.length === 1 && (selection[0]?.node?.type ?? "") === "group";
 
       const actActionActive = instance.getActiveAction();
 
