@@ -86,7 +86,7 @@ export class FuzzyMaskNode extends WeaveNode {
       id: `${id}-mask`,
       fill: fill,
       circles,
-      sceneFunc: (ctx: CanvasRenderingContext2D, shape: Konva.Shape) => {
+      sceneFunc: (ctx: Konva.Context, shape: Konva.Shape) => {
         ctx.beginPath();
         (shape.getAttrs().circles as FuzzyMaskCircle[]).forEach((circle) => {
           ctx.moveTo(circle.x + circle.radius, circle.y);
@@ -94,7 +94,7 @@ export class FuzzyMaskNode extends WeaveNode {
         });
         ctx.closePath();
 
-        ctx.fillStyle = shape.getAttrs().fill;
+        ctx.fillStyle = shape.getAttrs().fill ?? "#000000";
         ctx.fill();
       },
       draggable: false,
