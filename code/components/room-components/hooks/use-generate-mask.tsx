@@ -147,7 +147,7 @@ async function generateMask(
     width: selectionBox.width,
     height: selectionBox.height,
     fill: forUI ? "black" : "white",
-    stroke: 0,
+    stroke: "0",
     zIndex: minorZIndex - 1,
     opacity: 1,
     id: "mask",
@@ -162,7 +162,7 @@ async function generateMask(
   if (!forUI) {
     finalMaskElements.push(rect);
   } else {
-    finalMaskElements.push(selectedNode);
+    finalMaskElements.push(selectedNode as WeaveElementInstance);
   }
 
   finalMaskElements.push(...(masks as WeaveElementInstance[]));
