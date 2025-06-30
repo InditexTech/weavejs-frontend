@@ -1,9 +1,13 @@
-"use client"
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
+"use client";
 
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+
+import { cn } from "@/lib/utils";
 
 function Slider({
   className,
@@ -21,7 +25,7 @@ function Slider({
           ? defaultValue
           : [min, max],
     [value, defaultValue, min, max]
-  )
+  );
 
   return (
     <SliderPrimitive.Root
@@ -57,7 +61,7 @@ function Slider({
         />
       ))}
     </SliderPrimitive.Root>
-  )
+  );
 }
 
-export { Slider }
+export { Slider };
