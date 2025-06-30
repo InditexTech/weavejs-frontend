@@ -62,6 +62,7 @@ export const NodeProperties = () => {
         "colorTokenTool",
         "frameTool",
         "textTool",
+        "fuzzyMaskTool",
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
@@ -102,6 +103,10 @@ export const NodeProperties = () => {
         return "Color Token";
       case "frame":
         return "Frame";
+      case "mask":
+        return "Mask";
+      case "fuzzy-mask":
+        return "Mask";
       default:
         return "Unknown";
     }
@@ -131,6 +136,10 @@ export const NodeProperties = () => {
         return "Frame";
       case "textTool":
         return "Text";
+      case "maskTool":
+        return "Mask";
+      case "fuzzyMaskTool":
+        return "Mask";
       default:
         return "Unknown";
     }
@@ -172,27 +181,6 @@ export const NodeProperties = () => {
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
             onClick={() => {
-              if (!instance) return;
-              if (
-                actualAction &&
-                [
-                  "rectangleTool",
-                  "ellipseTool",
-                  "regularPolygonTool",
-                  "brushTool",
-                  "penTool",
-                  "imageTool",
-                  "starTool",
-                  "arrowTool",
-                  "colorTokenTool",
-                  "frameTool",
-                  "textTool",
-                ].includes(actualAction)
-              ) {
-                instance.cancelAction(actualAction);
-              }
-              instance.selectNodesByKey([]);
-              setNodePropertiesAction(undefined);
               setSidebarActive(null, "right");
             }}
           >

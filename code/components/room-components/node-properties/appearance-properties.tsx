@@ -55,6 +55,10 @@ export function AppearanceProperties() {
 
   if (!instance || !actualAction || !actualNode) return null;
 
+  if (["mask", "fuzzy-mask"].includes(node?.type ?? "")) {
+    return null;
+  }
+
   if (!actualAction && !actualNode) return null;
 
   if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;

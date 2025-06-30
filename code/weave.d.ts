@@ -11,6 +11,21 @@ declare module "konva/lib/Node" {
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
     updatePosition(position: Vector2d): void;
+    getRealClientRect(
+      config?:
+        | {
+            skipTransform?: boolean;
+            skipShadow?: boolean;
+            skipStroke?: boolean;
+            relativeTo?: Container;
+          }
+        | undefined
+    ): {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
   }
 }
 

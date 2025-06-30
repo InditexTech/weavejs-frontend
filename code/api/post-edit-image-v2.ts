@@ -2,24 +2,30 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import {
+  ImageModeration,
+  ImageQuality,
+  ImageSampleCount,
+  ImageSize,
+} from "./types";
+
 export const postEditImage = async (
   params: {
     roomId: string;
     prompt: string;
     image: string;
+    reference_images?: string[];
     imageMask?: string;
   },
   options: {
-    seed: number;
-    editMode: string;
-    sampleCount: number;
-    baseSteps?: number;
-    guidanceStrength: number;
-    negativePrompt?: string;
+    quality: ImageQuality;
+    moderation: ImageModeration;
+    sampleCount: ImageSampleCount;
+    size: ImageSize;
   }
 ) => {
   const password = sessionStorage.getItem("weave_ai_password");
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
+  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
 
   const response = await fetch(endpoint, {
     method: "POST",
@@ -29,13 +35,12 @@ export const postEditImage = async (
     body: JSON.stringify({
       prompt: params.prompt,
       image: params.image,
+      reference_images: params.reference_images,
       imageMask: params.imageMask,
       sample_count: options.sampleCount,
-      edit_mode: options.editMode,
-      seed: options.seed,
-      base_steps: options.baseSteps,
-      guidance_strength: options.guidanceStrength,
-      negative_prompt: options.negativePrompt,
+      size: options.size,
+      moderation: options.moderation,
+      quality: options.quality,
     }),
   });
 

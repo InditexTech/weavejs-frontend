@@ -63,7 +63,7 @@ export function FillProperties() {
   if (
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
-    ["text", "frame"].includes(actualNode.type)
+    ["mask", "fuzzy-mask", "text", "frame"].includes(actualNode.type)
   ) {
     return null;
   }

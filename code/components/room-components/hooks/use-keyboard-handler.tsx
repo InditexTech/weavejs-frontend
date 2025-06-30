@@ -17,6 +17,7 @@ import {
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useIACapabilities } from "@/store/ia";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -32,6 +33,17 @@ export function useKeyboardHandler() {
   );
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
+  );
+
+  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
+  const imagesLLMPopupVisible = useIACapabilities(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupType = useIACapabilities(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisible = useIACapabilities(
+    (state) => state.setImagesLLMPopupVisible
   );
 
   const triggerTool = React.useCallback(
@@ -443,4 +455,23 @@ export function useKeyboardHandler() {
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
+
+  /* IA Utilities */
+
+  useKeyDown(() => {
+    setImagesLLMPopupType("create");
+    if (imagesLLMPopupType === "create") {
+      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+    } else {
+      setImagesLLMPopupVisible(true);
+    }
+  }, ["KeyG"]);
+
+  useKeyDown(() => {
+    triggerTool("fuzzyMaskTool");
+  }, ["KeyQ"]);
+
+  useKeyDown(() => {
+    triggerTool("maskTool");
+  }, ["KeyW"]);
 }

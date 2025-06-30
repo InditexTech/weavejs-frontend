@@ -27,7 +27,9 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
-  Bot,
+  ImagePlus,
+  CircleSlash2,
+  SprayCan,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -66,6 +68,7 @@ export function ToolsOverlay() {
     (state) => state.setUploadingImage
   );
   const aiEnabled = useIACapabilities((state) => state.enabled);
+  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
   );
@@ -427,6 +430,28 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Frame className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "frameTool"}
+          onClick={() => triggerTool("frameTool", nodeCreateProps)}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a frame</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "F",
+                  [SYSTEM_OS.OTHER]: "F",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
@@ -478,17 +503,22 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
-          icon={<Bot className="px-2" size={40} strokeWidth={1} />}
-          active={imagesLLMPopupVisible}
+          icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
+          active={imagesLLMPopupVisible && imagesLLMPopupType === "create"}
           disabled={
             !aiEnabled ||
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
           onClick={() => {
             setImagesLLMPopupType("create");
-            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+            if (imagesLLMPopupType === "create") {
+              setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+            } else {
+              setImagesLLMPopupVisible(true);
+            }
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
@@ -504,22 +534,49 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
-          icon={<Frame className="px-2" size={40} strokeWidth={1} />}
+          icon={<SprayCan className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "fuzzyMaskTool"}
           disabled={
+            !aiEnabled ||
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
-          active={actualAction === "frameTool"}
-          onClick={() => triggerTool("frameTool", nodeCreateProps)}
+          onClick={() => {
+            triggerTool("fuzzyMaskTool");
+          }}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add a frame</p>
+              <p>Create a fuzzy mask</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "F",
-                  [SYSTEM_OS.OTHER]: "F",
+                  [SYSTEM_OS.MAC]: "Q",
+                  [SYSTEM_OS.OTHER]: "Q",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<CircleSlash2 className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "maskTool"}
+          disabled={
+            !aiEnabled ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            triggerTool("maskTool");
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Create a mask</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "W",
+                  [SYSTEM_OS.OTHER]: "W",
                 }}
               />
             </div>

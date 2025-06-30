@@ -243,7 +243,7 @@ export class ImagesToolAction extends WeaveAction {
       }
     });
 
-    this.padding = params.padding ?? 20;
+    this.padding = params?.padding ?? 20;
 
     for (const imageURL of params.imagesURLs) {
       this.loadImage(imageURL);
