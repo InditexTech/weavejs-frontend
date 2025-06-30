@@ -223,7 +223,7 @@ export const useGenerateMask = () => {
 
   React.useEffect(() => {
     setSelectedMask(null);
-  }, [imagesLLMPopupImageBase64]);
+  }, [imagesLLMPopupImageBase64, setSelectedMask]);
 
   React.useEffect(() => {
     setSelectedMask(null);

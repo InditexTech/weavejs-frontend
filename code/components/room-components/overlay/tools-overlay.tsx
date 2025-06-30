@@ -455,6 +455,7 @@ export function ToolsOverlay() {
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
+          // eslint-disable-next-line jsx-a11y/alt-text
           icon={<Image className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED

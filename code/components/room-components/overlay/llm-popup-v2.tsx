@@ -265,13 +265,15 @@ export function LLMGenerationV2Popup() {
                 imagesLLMPopupImageBase64 && (
                   <div className="w-full grid grid-cols-1 gap-1 justify-between items-center">
                     <div className="relative w-full h-[400px] bg-white aspect-square border border-[#c9c9c9] mb-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       {!actualMaskBase64UI && (
-                        <img
-                          src={imagesLLMPopupImageBase64}
-                          alt="Image to edit miniature feedback"
-                          className="w-full h-full bg-transparent object-contain"
-                        />
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imagesLLMPopupImageBase64}
+                            alt="Image to edit miniature feedback"
+                            className="w-full h-full bg-transparent object-contain"
+                          />
+                        </>
                       )}
                       {actualMaskBase64UI && (
                         <>
