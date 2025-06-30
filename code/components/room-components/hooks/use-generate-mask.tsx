@@ -152,6 +152,7 @@ async function generateMask(
     height: selectionBox.height,
     fill: forUI ? "black" : "white",
     stroke: "black",
+    strokeWidth: 0,
     zIndex: minorZIndex - 1,
     opacity: 1,
     id: "mask",
@@ -263,8 +264,6 @@ export const useGenerateMask = () => {
 
       setActualMaskBase64(apiMask as string);
 
-      console.log("apiMask", apiMask);
-
       const uiMask = await generateMask(
         instance,
         stage,
@@ -275,8 +274,6 @@ export const useGenerateMask = () => {
       );
 
       setActualMaskBase64UI(uiMask as string);
-
-      console.log("uiMask", uiMask);
     };
 
     generateMasks();
