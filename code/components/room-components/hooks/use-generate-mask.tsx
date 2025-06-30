@@ -147,7 +147,7 @@ async function generateMask(
     width: selectionBox.width,
     height: selectionBox.height,
     fill: forUI ? "black" : "white",
-    stroke: "0",
+    stroke: "black",
     zIndex: minorZIndex - 1,
     opacity: 1,
     id: "mask",
