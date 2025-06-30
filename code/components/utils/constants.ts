@@ -52,9 +52,14 @@ import {
 import { type WeaveUser } from "@inditextech/weave-types";
 import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
+import { MaskNode } from "@/components/nodes/mask/mask";
+import { FuzzyMaskNode } from "@/components/nodes/fuzzy-mask/fuzzy-mask";
 import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
+import { ImagesToolAction } from "../actions/images-tool/images-tool";
+import { MaskToolAction } from "../actions/mask-tool/mask-tool";
+import { FuzzyMaskToolAction } from "../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 
 const FONTS = [
   {
@@ -170,6 +175,28 @@ const NODES = () => [
     },
   }),
   new ColorTokenNode(),
+  new MaskNode({
+    config: {
+      transform: {
+        rotateEnabled: false,
+        resizeEnabled: false,
+        enabledAnchors: [] as string[],
+        borderStrokeWidth: 3,
+        padding: 0,
+      },
+    },
+  }),
+  new FuzzyMaskNode({
+    config: {
+      transform: {
+        rotateEnabled: false,
+        resizeEnabled: false,
+        enabledAnchors: [] as string[],
+        borderStrokeWidth: 3,
+        padding: 0,
+      },
+    },
+  }),
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
@@ -226,6 +253,9 @@ const ACTIONS = () => [
   new AlignElementsToolAction(),
   new WeaveExportNodesToolAction(),
   new WeaveExportStageToolAction(),
+  new ImagesToolAction(),
+  new MaskToolAction(),
+  new FuzzyMaskToolAction(),
 ];
 
 export { FONTS, NODES, ACTIONS, PLUGINS };

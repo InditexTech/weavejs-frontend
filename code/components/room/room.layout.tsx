@@ -29,7 +29,12 @@ import {
 } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
-import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
+// import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
+// import { LLMPredictionsSelectionPopup } from "../room-components/overlay/llm-predictions-selection";
+import { LLMGenerationV2Popup } from "../room-components/overlay/llm-popup-v2";
+import { LLMPredictionsSelectionV2Popup } from "../room-components/overlay/llm-predictions-selection-v2";
+import { MaskSlider } from "../room-components/overlay/mask-slider";
+// import { SelectedMaskPopup } from "../room-components/overlay/selected-mask-popup";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -269,7 +274,12 @@ export const RoomLayout = () => {
             </div>
           )}
         </section>
-        <LLMGenerationPopup />
+        {/* <LLMGenerationPopup /> */}
+        <MaskSlider />
+        <LLMGenerationV2Popup />
+        {/* <LLMPredictionsSelectionPopup /> */}
+        <LLMPredictionsSelectionV2Popup />
+        {/* <SelectedMaskPopup /> */}
       </motion.div>
     </AnimatePresence>
   );

@@ -17,7 +17,7 @@ export function PositionProperties() {
   const node = useWeave((state) => state.selection.node);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+    (state) => state.nodeProperties.action
   );
 
   const updateElement = React.useCallback(
@@ -28,7 +28,7 @@ export function PositionProperties() {
         return;
       }
     },
-    [instance, nodePropertiesAction],
+    [instance, nodePropertiesAction]
   );
 
   const onRotationChange = React.useCallback(
@@ -56,18 +56,18 @@ export function PositionProperties() {
       function rotateAroundPoint(
         shape: WeaveStateElement,
         deltaDeg: number,
-        point: { x: number; y: number },
+        point: { x: number; y: number }
       ) {
         const angleRad = degToRad(deltaDeg);
         const x = Math.round(
           point.x +
             ((shape.props.x || 0) - point.x) * Math.cos(angleRad) -
-            ((shape.props.y || 0) - point.y) * Math.sin(angleRad),
+            ((shape.props.y || 0) - point.y) * Math.sin(angleRad)
         );
         const y = Math.round(
           point.y +
             ((shape.props.x || 0) - point.x) * Math.sin(angleRad) +
-            ((shape.props.y || 0) - point.y) * Math.cos(angleRad),
+            ((shape.props.y || 0) - point.y) * Math.cos(angleRad)
         );
         return {
           ...shape,
@@ -92,14 +92,18 @@ export function PositionProperties() {
       };
       updatedNode = rotateAroundCenter(
         updatedNode,
-        value - (updatedNode.props.rotation || 0),
+        value - (updatedNode.props.rotation || 0)
       );
       updateElement(updatedNode);
     },
-    [instance, node, updateElement],
+    [instance, node, updateElement]
   );
 
   if (nodePropertiesAction === "create") {
+    return null;
+  }
+
+  if (["mask", "fuzzy-mask"].includes(node?.type ?? "")) {
     return null;
   }
 

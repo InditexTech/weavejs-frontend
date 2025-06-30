@@ -11,7 +11,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import {
   Brush,
-  ImagePlus,
+  Image,
+  Images,
   PenTool,
   Square,
   Type,
@@ -26,7 +27,9 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
-  Bot,
+  ImagePlus,
+  CircleSlash2,
+  SprayCan,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
@@ -65,6 +68,7 @@ export function ToolsOverlay() {
     (state) => state.setUploadingImage
   );
   const aiEnabled = useIACapabilities((state) => state.enabled);
+  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
   );
@@ -85,6 +89,9 @@ export function ToolsOverlay() {
 
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
+  );
+  const setShowSelectFilesImages = useCollaborationRoom(
+    (state) => state.setShowSelectFilesImages
   );
 
   const triggerTool = React.useCallback(
@@ -379,59 +386,6 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          active={actualAction === "imageTool"}
-          onClick={() => {
-            triggerTool("imageTool");
-            setShowSelectFileImage(true);
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Add an image</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "I",
-                  [SYSTEM_OS.OTHER]: "I",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<Bot className="px-2" size={40} strokeWidth={1} />}
-          active={imagesLLMPopupVisible}
-          disabled={
-            !aiEnabled ||
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          onClick={() => {
-            setImagesLLMPopupType("create");
-            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Generate an image from prompt</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "G",
-                  [SYSTEM_OS.OTHER]: "G",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
-        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Star className="px-2" size={40} strokeWidth={1} />}
@@ -491,6 +445,139 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "F",
                   [SYSTEM_OS.OTHER]: "F",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          // eslint-disable-next-line jsx-a11y/alt-text
+          icon={<Image className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTool"}
+          onClick={() => {
+            triggerTool("imageTool");
+            setShowSelectFileImage(true);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add an image</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "I",
+                  [SYSTEM_OS.OTHER]: "I",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Images className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imagesTool"}
+          onClick={() => {
+            // triggerTool("imagesTool");
+            setShowSelectFilesImages(true);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add images</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "O",
+                  [SYSTEM_OS.OTHER]: "O",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
+          active={imagesLLMPopupVisible && imagesLLMPopupType === "create"}
+          disabled={
+            !aiEnabled ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            setImagesLLMPopupType("create");
+            if (imagesLLMPopupType === "create") {
+              setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+            } else {
+              setImagesLLMPopupVisible(true);
+            }
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Generate an image from prompt</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "G",
+                  [SYSTEM_OS.OTHER]: "G",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<SprayCan className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "fuzzyMaskTool"}
+          disabled={
+            !aiEnabled ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            triggerTool("fuzzyMaskTool");
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Create a fuzzy mask</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "Q",
+                  [SYSTEM_OS.OTHER]: "Q",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<CircleSlash2 className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === "maskTool"}
+          disabled={
+            !aiEnabled ||
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          onClick={() => {
+            triggerTool("maskTool");
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Create a mask</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "W",
+                  [SYSTEM_OS.OTHER]: "W",
                 }}
               />
             </div>

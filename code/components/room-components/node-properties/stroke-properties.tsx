@@ -74,7 +74,11 @@ export function StrokeProperties() {
   if (["colorTokenTool", "frameTool", "textTool"].includes(actualAction))
     return null;
 
-  if (["text", "color-token", "frame"].includes(actualNode.type)) {
+  if (
+    ["mask", "fuzzy-mask", "text", "color-token", "frame"].includes(
+      actualNode.type
+    )
+  ) {
     return null;
   }
 

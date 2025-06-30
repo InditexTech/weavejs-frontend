@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { toast } from "sonner";
 import {
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodesActionParams,
@@ -27,11 +28,12 @@ import {
   ArrowUp,
   ArrowDown,
   ImageDown,
-  ImageMinus,
+  Layers2,
+  Link,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
-import { useIACapabilities } from "@/store/ia";
+import { ImageReference, useIACapabilities } from "@/store/ia";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -53,6 +55,9 @@ function useContextMenu() {
     (state) => state.setTransformingImage
   );
   const aiEnabled = useIACapabilities((state) => state.enabled);
+  const setImagesLLMPopupSelectedNodes = useIACapabilities(
+    (state) => state.setImagesLLMPopupSelectedNodes
+  );
   const setImagesLLMPopupType = useIACapabilities(
     (state) => state.setImagesLLMPopupType
   );
@@ -62,6 +67,13 @@ function useContextMenu() {
   const setImagesLLMPopupImage = useIACapabilities(
     (state) => state.setImagesLLMPopupImage
   );
+  const imageReferences = useIACapabilities(
+    (state) => state.llmPopup.references
+  );
+  const setImagesLLMReferences = useIACapabilities(
+    (state) => state.setImagesLLMReferences
+  );
+  const setSelectedMask = useIACapabilities((state) => state.setSelectedMask);
 
   const mutationUpload = useMutation({
     mutationFn: async (imageId: string) => {
@@ -86,6 +98,191 @@ function useContextMenu() {
       const options: ContextMenuOption[] = [];
 
       if (nodes.length > 0) {
+        // SET NODE AS REFERENCE IMAGE
+        options.push({
+          id: "nodeReferenceImage",
+          type: "button",
+          disabled: !aiEnabled,
+          label: "Set as reference image",
+          icon: <Link size={16} />,
+          onClick: async () => {
+            let newReferences: ImageReference[] = [];
+            if (imageReferences) {
+              newReferences = [...imageReferences];
+            }
+
+            if (imageReferences?.length === 4) {
+              toast.error("You can only set 4 reference images");
+              return;
+            }
+
+            const base64URL: unknown = await instance.triggerAction<
+              WeaveExportNodesActionParams,
+              void
+            >("exportNodesTool", {
+              nodes: nodes.map((n) => n.instance),
+              options: {
+                padding: 0,
+                pixelRatio: 1,
+              },
+              download: false,
+            });
+
+            newReferences.push({
+              base64Image: base64URL as string,
+              description: "",
+            });
+
+            setImagesLLMReferences(newReferences);
+          },
+        });
+        if (
+          (nodes.length === 1 &&
+            nodes[0].node?.type === "line" &&
+            nodes[0].instance?.getAttrs().closed) ||
+          (nodes.length === 1 &&
+            nodes[0].node?.type === "group" &&
+            (nodes[0].instance as Konva.Group)
+              ?.getChildren()
+              .every(
+                (n: Konva.Node) =>
+                  n.getAttrs().nodeType === "line" && n.getAttrs().closed
+              )) ||
+          (nodes.length === 1 && nodes[0].node?.type === "fuzzy-mask")
+        ) {
+          // EDIT IMAGE WITH A MASK
+          options.push({
+            id: "setIAImageMask",
+            type: "button",
+            disabled: !aiEnabled,
+            label: "Use as mask",
+            icon: <Layers2 size={16} />,
+            onClick: async () => {
+              setSelectedMask(
+                nodes
+                  .map((n) => n.instance.getAttrs().id ?? null)
+                  .filter((n) => n !== null) as string[]
+              );
+              toast.success("Node selected as mask");
+              setContextMenuShow(false);
+            },
+          });
+        }
+
+        options.push({
+          id: "div--2",
+          type: "divider",
+        });
+
+        if (
+          nodes.length === 1 &&
+          ["image"].includes(nodes[0].node?.type ?? "")
+        ) {
+          options.push({
+            id: "removeBackground",
+            type: "button",
+            label: "Remove image background",
+            icon: <Bot size={16} />,
+            onClick: () => {
+              if (instance) {
+                const nodeImage = nodes[0].instance as Konva.Group | undefined;
+                if (nodeImage) {
+                  const nodeImageInternal = nodeImage?.findOne(
+                    `#${nodeImage.getAttrs().id}-image`
+                  );
+                  const imageTokens = nodeImageInternal
+                    ?.getAttr("image")
+                    .src.split("/");
+                  const imageId = imageTokens[imageTokens.length - 1];
+                  setTransformingImage(true);
+                  mutationUpload.mutate(imageId, {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onSuccess: (data: any) => {
+                      const room = data.fileName.split("/")[0];
+                      const imageId = data.fileName.split("/")[1];
+
+                      const { finishUploadCallback } = instance.triggerAction(
+                        "imageTool"
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      ) as any;
+
+                      instance.updatePropsAction("imageTool", { imageId });
+
+                      finishUploadCallback(
+                        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                      );
+                    },
+                    onError: () => {
+                      console.error("Error uploading image");
+                    },
+                    onSettled: () => {
+                      setTransformingImage(false);
+                    },
+                  });
+                }
+              }
+              setContextMenuShow(false);
+            },
+          });
+        }
+        // EDIT IMAGE WITH A PROMPT
+        options.push({
+          id: "editIAImage",
+          type: "button",
+          disabled: !aiEnabled,
+          label: "Edit with a prompt",
+          icon: <Bot size={16} />,
+          onClick: async () => {
+            const base64URL: unknown = await instance.triggerAction<
+              WeaveExportNodesActionParams,
+              void
+            >("exportNodesTool", {
+              nodes: nodes.map((n) => n.instance),
+              options: {
+                padding: 0,
+                pixelRatio: 1,
+              },
+              download: false,
+            });
+
+            setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+            setImagesLLMPopupType("edit-prompt");
+            setImagesLLMPopupImage(base64URL as string);
+            setImagesLLMPopupVisible(true);
+            setContextMenuShow(false);
+          },
+        });
+        // EDIT IMAGE WITH A MASK
+        options.push({
+          id: "editIAImageMask",
+          type: "button",
+          disabled: !aiEnabled,
+          label: "Edit with a mask",
+          icon: <Bot size={16} />,
+          onClick: async () => {
+            const base64URL: unknown = await instance.triggerAction<
+              WeaveExportNodesActionParams,
+              void
+            >("exportNodesTool", {
+              nodes: nodes.map((n) => n.instance),
+              options: {
+                padding: 0,
+                pixelRatio: 1,
+              },
+              download: false,
+            });
+
+            setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+            setImagesLLMPopupType("edit-mask");
+            setImagesLLMPopupImage(base64URL as string);
+            setImagesLLMPopupVisible(true);
+            setContextMenuShow(false);
+          },
+        });
+        options.push({
+          id: "div--1",
+          type: "divider",
+        });
         // EXPORT
         options.push({
           id: "export",
@@ -367,92 +564,6 @@ function useContextMenu() {
         });
       }
 
-      if (
-        nodes.length === 1 &&
-        ["image", "group"].includes(nodes[0].node?.type ?? "")
-      ) {
-        options.unshift({
-          id: "div-image",
-          type: "divider",
-        });
-        options.unshift({
-          id: "editIAImage",
-          type: "button",
-          disabled: !aiEnabled,
-          label: "Edit image with a prompt",
-          icon: <Bot size={16} />,
-          onClick: async () => {
-            const base64URL: unknown = await instance.triggerAction<
-              WeaveExportNodesActionParams,
-              void
-            >("exportNodesTool", {
-              nodes: nodes.map((n) => n.instance),
-              options: {
-                padding: 0,
-                pixelRatio: 1,
-              },
-              download: false,
-            });
-
-            setImagesLLMPopupType("edit");
-            setImagesLLMPopupImage(base64URL as string);
-            setImagesLLMPopupVisible(true);
-            setContextMenuShow(false);
-          },
-        });
-        if (
-          nodes.length === 1 &&
-          ["image"].includes(nodes[0].node?.type ?? "")
-        ) {
-          options.unshift({
-            id: "removeBackground",
-            type: "button",
-            label: "Remove background",
-            icon: <ImageMinus size={16} />,
-            onClick: () => {
-              if (instance) {
-                const nodeImage = nodes[0].instance as Konva.Group | undefined;
-                if (nodeImage) {
-                  const nodeImageInternal = nodeImage?.findOne(
-                    `#${nodeImage.getAttrs().id}-image`
-                  );
-                  const imageTokens = nodeImageInternal
-                    ?.getAttr("image")
-                    .src.split("/");
-                  const imageId = imageTokens[imageTokens.length - 1];
-                  setTransformingImage(true);
-                  mutationUpload.mutate(imageId, {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onSuccess: (data: any) => {
-                      const room = data.fileName.split("/")[0];
-                      const imageId = data.fileName.split("/")[1];
-
-                      const { finishUploadCallback } = instance.triggerAction(
-                        "imageTool"
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      ) as any;
-
-                      instance.updatePropsAction("imageTool", { imageId });
-
-                      finishUploadCallback(
-                        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                      );
-                    },
-                    onError: () => {
-                      console.error("Error uploading image");
-                    },
-                    onSettled: () => {
-                      setTransformingImage(false);
-                    },
-                  });
-                }
-              }
-              setContextMenuShow(false);
-            },
-          });
-        }
-      }
-
       return options;
     },
     [
@@ -460,6 +571,10 @@ function useContextMenu() {
       contextMenuPosition,
       mutationUpload,
       aiEnabled,
+      imageReferences,
+      setSelectedMask,
+      setImagesLLMPopupSelectedNodes,
+      setImagesLLMReferences,
       setImagesLLMPopupType,
       setImagesLLMPopupVisible,
       setImagesLLMPopupImage,
