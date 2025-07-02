@@ -47,9 +47,7 @@ export function LLMGenerationPopup() {
   const setImagesLLMPopupError = useIACapabilities(
     (state) => state.setImagesLLMPopupError
   );
-  const imageReferences = useIACapabilities(
-    (state) => state.llmPopup.references
-  );
+  const imageReferences = useIACapabilities((state) => state.references.images);
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -303,7 +301,7 @@ export function LLMGenerationPopup() {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={imageReference.base64Image}
-                            alt={imageReference.description}
+                            alt={`Image reference ${index + 1}`}
                             className="w-full h-full bg-transparent object-contain"
                           />
                           <div className="font-inter text-xs mt-1">
