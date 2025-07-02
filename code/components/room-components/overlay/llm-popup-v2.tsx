@@ -520,7 +520,7 @@ export function LLMGenerationV2Popup() {
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={imageReference.base64Image}
-                                alt={`Reference image ${index + 1}`}
+                                alt={`Reference ${index + 1}`}
                                 className="w-[160px] h-[160px] bg-transparent object-contain"
                               />
                               <div className="w-[160px] font-inter text-center text-xs py-3">

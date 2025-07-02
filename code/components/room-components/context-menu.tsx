@@ -101,22 +101,9 @@ export const ContextMenuRender = ({
       }
     }
 
-    // function checkIfTouchOutside(e: TouchEvent) {
-    //   if (
-    //     ref.current &&
-    //     e.target !== ref.current &&
-    //     !ref.current.contains(e.target as Node)
-    //   ) {
-    //     ref.current.style.display = `none`;
-    //     onChanged(false);
-    //   }
-    // }
-
-    // window.addEventListener("pointerclick", checkIfClickedOutside);
     window.addEventListener("pointerdown", checkIfClickedOutside);
 
     return () => {
-      // window.removeEventListener("click", checkIfClickedOutside);
       window.removeEventListener("pointerdown", checkIfClickedOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

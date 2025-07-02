@@ -191,7 +191,7 @@ export const LLMReferenceSelectionV2Popup = () => {
                           setSelectedImages(unique);
                         }}
                         src={imageUrl}
-                        alt="An image"
+                        alt={`Reference ${image}`}
                       />
                     </div>
                   );

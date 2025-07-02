@@ -35,9 +35,8 @@ export class MaskEraserToolAction extends WeaveAction {
 
   pointIntersectsElement(point?: Konva.Vector2d): Konva.Node | null {
     const stage = this.instance.getStage();
-    const relativeMousePointer = point
-      ? point
-      : (stage.getPointerPosition() ?? { x: 0, y: 0 });
+    const relativeMousePointer = point ??
+      stage.getPointerPosition() ?? { x: 0, y: 0 };
 
     const utilityLayer = this.instance.getUtilityLayer();
 
@@ -69,7 +68,6 @@ export class MaskEraserToolAction extends WeaveAction {
           }
           maskTransformer.forceUpdate();
         }
-        return;
       }
     });
   }
@@ -142,7 +140,6 @@ export class MaskEraserToolAction extends WeaveAction {
         this.instance.getActiveAction() === MASK_ERASER_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
