@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogClose,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -19,6 +20,7 @@ import { useIACapabilities } from "@/store/ia";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import { postValidatePassword } from "@/api/post-validate-password";
+import { X } from "lucide-react";
 
 export function LlmSetupDialog() {
   const [password, setPassword] = React.useState<string>("");
@@ -55,17 +57,29 @@ export function LlmSetupDialog() {
       <form>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="font-inter text-2xl">
-              Setup IA Capabilities
-            </DialogTitle>
-            <DialogDescription className="font-inter text-sm">
-              Enable the IA capabilities to use the LLM generator and other
-              features.
+            <div className="w-full flex gap-5 justify-between items-center">
+              <DialogTitle className="font-inter text-2xl font-normal uppercase">
+                Setup AI Capabilities
+              </DialogTitle>
+              <DialogClose asChild>
+                <button
+                  className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+                  onClick={() => {
+                    setSetupVisible(false);
+                  }}
+                >
+                  <X size={16} strokeWidth={1} />
+                </button>
+              </DialogClose>
+            </div>
+            <DialogDescription className="font-inter text-sm mt-5">
+              Enable the AI capabilities to use image editing features.
             </DialogDescription>
+            <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="password font-inter ">Password</Label>
+              <Label htmlFor="password font-inter font-xs">Password:</Label>
               <Input
                 id="password"
                 name="password"
@@ -78,7 +92,7 @@ export function LlmSetupDialog() {
                   window.weaveOnFieldFocus = false;
                 }}
                 onChange={(e) => setPassword(e.target.value)}
-                className="font-inter font-light rounded-none border-black"
+                className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
               />
             </div>
             {error && (
@@ -87,6 +101,7 @@ export function LlmSetupDialog() {
               </div>
             )}
           </div>
+          <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           <DialogFooter>
             <Button
               type="submit"

@@ -5,20 +5,22 @@
 import { v4 as uuidv4 } from "uuid";
 import Konva from "konva";
 import { type Vector2d } from "konva/lib/types";
-import { type WeaveElementInstance } from "@inditextech/weave-types";
 import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { type MaskToolActionState } from "./types";
 import { MASK_TOOL_ACTION_NAME, MASK_TOOL_STATE } from "./constants";
-import { MaskNode } from "@/components/nodes/mask/mask";
+import { setupTransformer } from "../utils/utils";
 
 export class MaskToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: MaskToolActionState;
-  protected lineId: string | null;
+  protected maskId: string | null;
   protected tempLineId: string | null;
+  protected tempLine!: Konva.Line | null;
+  protected mask!: Konva.Line | undefined;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
+  protected maskTransformer!: Konva.Transformer | undefined;
   protected clickPoint: Vector2d | null;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
@@ -31,7 +33,7 @@ export class MaskToolAction extends WeaveAction {
 
     this.initialized = false;
     this.state = MASK_TOOL_STATE.IDLE;
-    this.lineId = null;
+    this.maskId = null;
     this.tempLineId = null;
     this.container = undefined;
     this.measureContainer = undefined;
@@ -57,6 +59,8 @@ export class MaskToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener("keydown", (e) => {
+      e.preventDefault();
+
       if (
         e.key === "Enter" &&
         this.instance.getActiveAction() === MASK_TOOL_ACTION_NAME
@@ -73,12 +77,12 @@ export class MaskToolAction extends WeaveAction {
       }
     });
 
-    stage.on("dblclick dbltap", (e) => {
+    stage.on("pointerdblclick", (e) => {
       e.evt.preventDefault();
       this.cancelAction();
     });
 
-    stage.on("click tap", (e) => {
+    stage.on("pointerclick", (e) => {
       e.evt.preventDefault();
 
       if (this.state === MASK_TOOL_STATE.IDLE) {
@@ -96,7 +100,7 @@ export class MaskToolAction extends WeaveAction {
       }
     });
 
-    stage.on("mousemove touchmove", (e) => {
+    stage.on("pointermove", (e) => {
       e.evt.preventDefault();
 
       this.handleMovement();
@@ -109,7 +113,7 @@ export class MaskToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private addLine() {
+  private addMask() {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = "crosshair";
@@ -117,106 +121,108 @@ export class MaskToolAction extends WeaveAction {
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.clickPoint = null;
+
     this.setState(MASK_TOOL_STATE.ADDING);
   }
 
   private handleAdding() {
     const stage = this.instance.getStage();
-    const { mousePoint, container, measureContainer } =
-      this.instance.getMousePointer();
+    const { mousePoint } = this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
-    this.container = container;
-    this.measureContainer = measureContainer;
 
-    this.lineId = uuidv4();
-    this.tempLineId = uuidv4();
+    if (!this.mask) {
+      this.maskId = uuidv4();
+      this.tempLineId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
+      const utilityLayer = this.instance.getUtilityLayer();
 
-    if (nodeHandler) {
-      const node = nodeHandler.create(this.lineId, {
+      this.mask = new Konva.Line({
         ...this.props,
+        id: this.maskId,
+        nodeType: "mask",
+        name: "node",
         strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         points: [0, 0],
+        selectable: true,
       });
-      this.instance.addNode(node, this.container?.getAttrs().id);
-    }
+      utilityLayer?.add(this.mask);
 
-    this.tempPoint = new Konva.Circle({
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      radius: 5 / stage.scaleX(),
-      strokeScaleEnabled: true,
-      stroke: "#cccccc",
-      strokeWidth: 0,
-      fill: "#cccccc",
-    });
-    this.measureContainer?.add(this.tempPoint);
+      let previousPointer: string | null = null;
 
-    if (nodeHandler) {
-      const tempLine = nodeHandler.create(this.tempLineId, {
+      this.mask.on("pointerenter", (e) => {
+        if (e.target.getAttrs().selectable) {
+          const stage = this.instance.getStage();
+          previousPointer = stage.container().style.cursor;
+          stage.container().style.cursor = "pointer";
+        }
+      });
+
+      this.mask.on("pointerleave", (e) => {
+        if (e.target.getAttrs().selectable) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = previousPointer ?? "default";
+          previousPointer = null;
+        }
+      });
+
+      this.tempPoint = new Konva.Circle({
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        radius: 5 / stage.scaleX(),
+        strokeScaleEnabled: true,
+        stroke: "#cccccc",
+        strokeWidth: 0,
+        fill: "#cccccc",
+      });
+      utilityLayer?.add(this.tempPoint);
+
+      this.tempLine = new Konva.Line({
         ...this.props,
+        id: this.tempLineId,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         strokeScaleEnabled: true,
         points: [0, 0],
       });
-      this.instance.addNode(tempLine, this.container?.getAttrs().id);
+      utilityLayer?.add(this.tempLine);
+
+      this.tempNextPoint = new Konva.Circle({
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        radius: 5 / stage.scaleX(),
+        strokeScaleEnabled: true,
+        stroke: "#cccccc",
+        strokeWidth: 0,
+        fill: "#cccccc",
+      });
+      utilityLayer?.add(this.tempNextPoint);
+
+      this.maskTransformer = setupTransformer(this.instance);
+
+      this.setState(MASK_TOOL_STATE.DEFINING_SIZE);
     }
-
-    this.tempNextPoint = new Konva.Circle({
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      radius: 5 / stage.scaleX(),
-      strokeScaleEnabled: true,
-      stroke: "#cccccc",
-      strokeWidth: 0,
-      fill: "#cccccc",
-    });
-    this.measureContainer?.add(this.tempNextPoint);
-
-    this.setState(MASK_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
-
-    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
-      | Konva.Line
-      | undefined;
-
     if (
-      this.lineId &&
+      this.mask &&
+      this.maskId &&
       this.tempPoint &&
       this.tempNextPoint &&
-      this.measureContainer &&
-      tempMainLine &&
-      tempLine
+      this.tempLine
     ) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-        this.measureContainer
-      );
+      const { mousePoint } = this.instance.getMousePointer();
 
-      const newPoints = [...tempMainLine.points()];
-      newPoints.push(mousePoint.x - tempMainLine.x());
-      newPoints.push(mousePoint.y - tempMainLine.y());
-      tempMainLine.setAttrs({
+      const newPoints = [...this.mask.points()];
+      newPoints.push(mousePoint.x - this.mask.x());
+      newPoints.push(mousePoint.y - this.mask.y());
+      this.mask.setAttrs({
         ...this.props,
         points: newPoints,
       });
-
-      const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
-      }
 
       this.tempPoint.setAttrs({
         x: mousePoint.x,
@@ -228,18 +234,12 @@ export class MaskToolAction extends WeaveAction {
         y: mousePoint.y,
       });
 
-      tempLine.setAttrs({
+      this.tempLine.setAttrs({
         ...this.props,
         x: mousePoint.x,
         y: mousePoint.y,
         points: [0, 0],
       });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
     }
 
     this.setState(MASK_TOOL_STATE.DEFINING_SIZE);
@@ -250,37 +250,18 @@ export class MaskToolAction extends WeaveAction {
       return;
     }
 
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
+    if (this.mask && this.tempNextPoint && this.tempLine) {
+      const { mousePoint } = this.instance.getMousePointer();
 
-    if (
-      this.lineId &&
-      this.measureContainer &&
-      this.tempNextPoint &&
-      tempLine
-    ) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-        this.measureContainer
-      );
-
-      tempLine.setAttrs({
+      this.tempLine.setAttrs({
         ...this.props,
         points: [
-          tempLine.points()[0],
-          tempLine.points()[1],
-          mousePoint.x - tempLine.x(),
-          mousePoint.y - tempLine.y(),
+          this.tempLine.points()[0],
+          this.tempLine.points()[1],
+          mousePoint.x - this.tempLine.x(),
+          mousePoint.y - this.tempLine.y(),
         ],
       });
-
-      const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
 
       this.tempNextPoint.setAttrs({
         x: mousePoint.x,
@@ -312,45 +293,23 @@ export class MaskToolAction extends WeaveAction {
     }
 
     this.props = this.initProps();
-    this.addLine();
+    this.addMask();
   }
 
   cleanup(): void {
     const stage = this.instance.getStage();
 
+    stage.container().style.cursor = "default";
+
+    stage.container().tabIndex = 1;
+    stage.container().focus();
+
     this.tempPoint?.destroy();
     this.tempNextPoint?.destroy();
+    this.tempLine?.destroy();
 
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
-
-    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
-      | Konva.Line
-      | undefined;
-
-    if (tempLine) {
-      const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
-      if (nodeHandler) {
-        this.instance.removeNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
-    }
-
-    if (this.lineId && tempMainLine && tempMainLine.points().length < 4) {
-      const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
-      if (nodeHandler) {
-        this.instance.removeNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
-      }
-    }
-
-    if (this.lineId && tempMainLine && tempMainLine.points().length >= 4) {
-      const nodeHandler = this.instance.getNodeHandler<MaskNode>("mask");
-
-      tempMainLine.setAttrs({
+    if (this.mask && this.maskId) {
+      this.mask.setAttrs({
         ...this.props,
         strokeWidth: 0,
         hitStrokeWidth: 16,
@@ -358,32 +317,22 @@ export class MaskToolAction extends WeaveAction {
         closed: true,
       });
 
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
-      }
+      this.instance.emitEvent("onMaskAdded", {
+        nodeId: this.maskId,
+      });
     }
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const node = stage.findOne(`#${this.lineId}`);
-      if (node) {
-        selectionPlugin.setSelectedNodes([node]);
-      }
-      this.instance.triggerAction("selectionTool");
+    if (this.mask && this.maskTransformer) {
+      this.maskTransformer.moveToTop();
+      const actualSelectedNodes = this.maskTransformer.nodes();
+      this.maskTransformer.nodes([...actualSelectedNodes, this.mask]);
+      this.maskTransformer.forceUpdate();
     }
-
-    stage.container().style.cursor = "default";
-
-    stage.container().tabIndex = 1;
-    stage.container().focus();
 
     this.initialCursor = null;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
-    this.lineId = null;
+    this.maskId = null;
     this.tempLineId = null;
     this.container = undefined;
     this.clickPoint = null;

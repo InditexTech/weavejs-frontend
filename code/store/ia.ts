@@ -5,14 +5,17 @@
 import { create } from "zustand";
 import Konva from "konva";
 
-type LLMGeneratorType = "create" | "edit-prompt" | "edit-mask";
+export type LLMGeneratorType =
+  | "create"
+  | "edit-prompt"
+  | "edit-variation"
+  | "edit-mask";
 
 type LLMSetupState = "idle" | "validating";
 type LLMServerState = "idle" | "generating" | "uploading";
 
 export type ImageReference = {
   base64Image: string;
-  description: string;
 };
 
 interface IACapabilitiesState {
@@ -28,13 +31,17 @@ interface IACapabilitiesState {
     imageBase64: string | null;
     state: LLMServerState;
     error: Error | null;
-    references: ImageReference[] | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     predictions: any;
   };
+  references: {
+    imagesIds: string[];
+    images: ImageReference[];
+    visible: boolean;
+  };
   mask: {
     selecting: boolean;
-    selected: string[] | null;
+    selected: string[];
   };
   setEnabled: (newEnabled: boolean) => void;
   setSetupVisible: (newSetupVisible: boolean) => void;
@@ -47,11 +54,15 @@ interface IACapabilitiesState {
   setImagesLLMPopupImage: (newImagesLLMPopupImage: string | null) => void;
   setImagesLLMPopupState: (newState: LLMServerState) => void;
   setImagesLLMPopupError: (newError: Error | null) => void;
-  setImagesLLMReferences: (newReferences: ImageReference[] | null) => void;
+  setImagesLLMReferencesVisible: (newReferencesVisible: boolean) => void;
+  setImagesLLMReferencesIds: (newReferencesIds: string[]) => void;
+  setImagesLLMReferences: (newReferences: ImageReference[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setImagesLLMPredictions: (newPredictions: any) => void;
-  setSelectingMask: (newSelectingMask: boolean) => void;
-  setSelectedMask: (newMask: string[] | null) => void;
+  setSelectingMasks: (newSelectingMask: boolean) => void;
+  setSelectedMasks: (
+    newMask: string[] | ((prev: string[]) => string[])
+  ) => void;
 }
 
 export const useIACapabilities = create<IACapabilitiesState>()((set) => ({
@@ -67,11 +78,15 @@ export const useIACapabilities = create<IACapabilitiesState>()((set) => ({
     imageBase64: null,
     state: "idle",
     error: null,
-    references: null,
     predictions: null,
   },
+  references: {
+    imagesIds: [],
+    images: [],
+    visible: false,
+  },
   mask: {
-    selected: null,
+    selected: [],
     selecting: false,
   },
   setEnabled: (newEnabled) =>
@@ -119,24 +134,42 @@ export const useIACapabilities = create<IACapabilitiesState>()((set) => ({
       ...state,
       llmPopup: { ...state.llmPopup, error: newError },
     })),
+  setImagesLLMReferencesVisible: (newReferencesVisible) =>
+    set((state) => ({
+      ...state,
+      references: { ...state.references, visible: newReferencesVisible },
+    })),
+  setImagesLLMReferencesIds: (newReferencesIds) =>
+    set((state) => ({
+      ...state,
+      references: { ...state.references, imagesIds: newReferencesIds },
+    })),
   setImagesLLMReferences: (newReferences) =>
     set((state) => ({
       ...state,
-      llmPopup: { ...state.llmPopup, references: newReferences },
+      references: { ...state.references, images: newReferences },
     })),
   setImagesLLMPredictions: (newPredictions) =>
     set((state) => ({
       ...state,
       llmPopup: { ...state.llmPopup, predictions: newPredictions },
     })),
-  setSelectingMask: (newSelecting) =>
+  setSelectingMasks: (newSelecting) =>
     set((state) => ({
       ...state,
       mask: { ...state.mask, selecting: newSelecting },
     })),
-  setSelectedMask: (newSelected) =>
-    set((state) => ({
-      ...state,
-      mask: { ...state.mask, selected: newSelected },
-    })),
+  setSelectedMasks: (newSelected) =>
+    set((state) => {
+      if (Array.isArray(newSelected)) {
+        return {
+          ...state,
+          mask: { ...state.mask, selected: newSelected },
+        };
+      }
+      return {
+        ...state,
+        mask: { ...state.mask, selected: newSelected(state.mask.selected) },
+      };
+    }),
 }));

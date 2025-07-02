@@ -47,9 +47,7 @@ export function LLMGenerationPopup() {
   const setImagesLLMPopupError = useIACapabilities(
     (state) => state.setImagesLLMPopupError
   );
-  const imageReferences = useIACapabilities(
-    (state) => state.llmPopup.references
-  );
+  const imageReferences = useIACapabilities((state) => state.references.images);
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -216,7 +214,7 @@ export function LLMGenerationPopup() {
   return (
     <>
       <div className="absolute bottom-[16px] top-[16px] left-[16px] min-w-[320px] pointer-events-none">
-        <div className="w-full h-full max-h-[calc(100vh-32px)] flex flex-col justify-center items-end bg-white text-black border border-[#c9c9c9] ">
+        <div className="w-full h-full max-h-[calc(100dvh-32px)] flex flex-col justify-center items-end bg-white text-black border border-[#c9c9c9] ">
           <div className="w-full p-5 font-inter text-xl border-b border-[#c9c9c9]">
             {imagesLLMPopupType === "create" && "Create an Image"}
             {imagesLLMPopupType === "edit-prompt" && "Edit Image with a Prompt"}
@@ -224,7 +222,7 @@ export function LLMGenerationPopup() {
           </div>
           <div
             className={cn(
-              "max-h-[calc(100vh-32px)] h-full flex flex-col gap-5 p-5 pointer-events-auto  overflow-scroll"
+              "max-h-[calc(100dvh-32px)] h-full flex flex-col gap-5 p-5 pointer-events-auto  overflow-scroll"
             )}
           >
             <div className="min-w-[420px] max-w-[420px] flex flex-col gap-2 justify-center items-start bg-white text-black">
@@ -303,7 +301,7 @@ export function LLMGenerationPopup() {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={imageReference.base64Image}
-                            alt={imageReference.description}
+                            alt={`Reference ${index + 1}`}
                             className="w-full h-full bg-transparent object-contain"
                           />
                           <div className="font-inter text-xs mt-1">

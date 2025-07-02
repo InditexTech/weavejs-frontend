@@ -50,7 +50,7 @@ function ContextMenuButton({
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
-        },
+        }
       )}
       disabled={disabled}
       onClick={onClick}
@@ -76,11 +76,11 @@ export const ContextMenuRender = ({
 
       X = Math.max(
         20,
-        Math.min(X, window.innerWidth - boundingRect.width - 20),
+        Math.min(X, window.innerWidth - boundingRect.width - 20)
       );
       Y = Math.max(
         20,
-        Math.min(Y, window.innerHeight - boundingRect.height - 20),
+        Math.min(Y, window.innerHeight - boundingRect.height - 20)
       );
 
       ref.current.style.top = `${Y}px`;
@@ -89,37 +89,25 @@ export const ContextMenuRender = ({
   }, [show]);
 
   React.useEffect(() => {
-    function checkIfClickedOutside(e: MouseEvent) {
+    function checkIfClickedOutside(e: PointerEvent) {
       if (
         ref.current &&
         e.target !== ref.current &&
-        !ref.current.contains(e.target as Node)
+        !ref.current.contains(e.target as Node) &&
+        show
       ) {
         ref.current.style.display = `none`;
         onChanged(false);
       }
     }
 
-    function checkIfTouchOutside(e: TouchEvent) {
-      if (
-        ref.current &&
-        e.target !== ref.current &&
-        !ref.current.contains(e.target as Node)
-      ) {
-        ref.current.style.display = `none`;
-        onChanged(false);
-      }
-    }
-
-    window.addEventListener("click", checkIfClickedOutside);
-    window.addEventListener("touchstart", checkIfTouchOutside);
+    window.addEventListener("pointerdown", checkIfClickedOutside);
 
     return () => {
-      window.removeEventListener("click", checkIfClickedOutside);
-      window.removeEventListener("touchstart", checkIfTouchOutside);
+      window.removeEventListener("pointerdown", checkIfClickedOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [show]);
 
   return (
     <div

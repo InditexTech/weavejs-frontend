@@ -67,49 +67,19 @@ async function generateMask(
   const masks = [];
   let minorZIndex = Infinity;
 
-  const maskElement = stage.findOne(`#${selectedMask[0]}`);
+  for (const maskId of selectedMask) {
+    const maskElement = stage.findOne(`#${maskId}`);
 
-  if (!maskElement) return;
+    if (!maskElement) return;
 
-  if (selectedMask.length === 1) {
-    if (
-      maskElement &&
-      maskElement.getAttrs().nodeType === "group" &&
-      (maskElement as Konva.Group)
-        .getChildren()
-        .every(
-          (child: Konva.Node) =>
-            child.getAttrs().nodeType === "line" && child.getAttrs().closed
-        )
-    ) {
-      for (const child of (maskElement as Konva.Group).getChildren()) {
-        if (child.zIndex() < minorZIndex) {
-          minorZIndex = child.zIndex();
-        }
-
-        child.setAttrs({
-          stroke: 0,
-          fill: forUI ? "#67BCF0FF" : "#ffffff",
-          opacity: 1,
-          globalCompositeOperation: forUI ? undefined : "destination-out",
-        });
-
-        masks.push(child);
-      }
-    }
-
-    if (
-      maskElement &&
-      maskElement.getAttrs().nodeType === "line" &&
-      maskElement.getAttrs().closed
-    ) {
+    if (maskElement && maskElement.getAttrs().nodeType === "mask") {
       if (maskElement.zIndex() < minorZIndex) {
         minorZIndex = maskElement.zIndex();
       }
 
       maskElement.setAttrs({
         stroke: 0,
-        fill: forUI ? "#67BCF0FF" : "#ffffff",
+        fill: forUI ? "#67BCF0FF" : "#FFFFFF",
         opacity: 1,
         globalCompositeOperation: forUI ? undefined : "destination-out",
       });
@@ -127,7 +97,9 @@ async function generateMask(
       if (!maskNode) return;
 
       maskNode.setAttrs({
-        fill: forUI ? "#67BCF0FF" : "#ffffff",
+        stroke: 0,
+        fill: forUI ? "#67BCF0FF" : "#FFFFFF",
+        opacity: 1,
         globalCompositeOperation: forUI ? undefined : "destination-out",
       });
 
@@ -139,10 +111,6 @@ async function generateMask(
     return;
   }
 
-  const selectedNode = stage.findOne(`#${selectedNodes[0].getAttrs().id}`);
-
-  if (!selectedNode) return;
-
   const selectionBox = getBoundingBox(stage, mainLayer, selectedNodes);
 
   const rect = new Konva.Rect({
@@ -150,16 +118,16 @@ async function generateMask(
     y: selectionBox.y,
     width: selectionBox.width,
     height: selectionBox.height,
-    fill: forUI ? "black" : "white",
-    stroke: "black",
+    fill: "white",
+    stroke: "white",
     strokeWidth: 0,
-    zIndex: minorZIndex - 1,
     opacity: 1,
-    id: "mask",
+    id: "generatedMask",
   });
 
   if (!forUI) {
     mainLayer.add(rect);
+    rect.zIndex(minorZIndex - 1);
   }
 
   const finalMaskElements: WeaveElementInstance[] = [];
@@ -167,7 +135,7 @@ async function generateMask(
   if (!forUI) {
     finalMaskElements.push(rect);
   } else {
-    finalMaskElements.push(selectedNode as WeaveElementInstance);
+    finalMaskElements.push(...(selectedNodes as WeaveElementInstance[]));
   }
 
   finalMaskElements.push(...(masks as WeaveElementInstance[]));
@@ -177,16 +145,20 @@ async function generateMask(
     void
   >("exportNodesTool", {
     nodes: finalMaskElements,
+    triggerSelectionTool: false,
     ...(forUI && {
       boundingNodes: (nodes) => {
-        return nodes.filter(
-          (node) => node.getAttrs().id === selectedNode.getAttrs().id
-        );
+        return nodes.filter((node) => {
+          const nodesIds = selectedNodes.map(
+            (actNode) => actNode.getAttrs().id
+          );
+          return nodesIds.includes(node.getAttrs().id);
+        });
       },
     }),
     ...(!forUI && {
       boundingNodes: (nodes) => {
-        return nodes.filter((node) => node.getAttrs().id === "mask");
+        return nodes.filter((node) => node.getAttrs().id === "generatedMask");
       },
     }),
     options: {
@@ -197,9 +169,24 @@ async function generateMask(
   });
 
   for (const maskElement of masks) {
-    maskElement.setAttrs({
-      fill: "#67BCF0FF",
-    });
+    if (maskElement && maskElement.getAttrs().nodeType === "mask") {
+      maskElement.setAttrs({
+        fill: "#67BCF0FF",
+        opacity: 1,
+        globalCompositeOperation: undefined,
+      });
+    }
+    if (maskElement && maskElement.getAttrs().nodeType === "fuzzy-mask") {
+      const maskNode = stage.findOne(`#${maskElement.getAttrs().id}-mask`);
+
+      if (!maskNode) return;
+
+      maskNode.setAttrs({
+        fill: "#67BCF0FF",
+        opacity: 1,
+        globalCompositeOperation: undefined,
+      });
+    }
   }
 
   rect.destroy();
@@ -223,16 +210,16 @@ export const useGenerateMask = () => {
 
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const selectedNodes = useIACapabilities((state) => state.llmPopup.selected);
-  const selectedMask = useIACapabilities((state) => state.mask.selected);
-  const setSelectedMask = useIACapabilities((state) => state.setSelectedMask);
+  const masksSelected = useIACapabilities((state) => state.mask.selected);
+  const setSelectedMasks = useIACapabilities((state) => state.setSelectedMasks);
 
   React.useEffect(() => {
-    setSelectedMask(null);
-  }, [imagesLLMPopupImageBase64, setSelectedMask]);
+    setSelectedMasks([]);
+  }, [imagesLLMPopupImageBase64, setSelectedMasks]);
 
   React.useEffect(() => {
-    setSelectedMask(null);
-  }, [imagesLLMPopupType, setSelectedMask]);
+    setSelectedMasks([]);
+  }, [imagesLLMPopupType, setSelectedMasks]);
 
   React.useEffect(() => {
     const generateMasks = async () => {
@@ -244,7 +231,7 @@ export const useGenerateMask = () => {
 
       if (selectedNodes.length === 0) return;
 
-      if (!selectedMask) return;
+      if (!masksSelected) return;
 
       const stage = instance.getStage();
 
@@ -259,7 +246,7 @@ export const useGenerateMask = () => {
         stage,
         mainLayer,
         selectedNodes,
-        selectedMask
+        masksSelected
       );
 
       setActualMaskBase64(apiMask as string);
@@ -269,7 +256,7 @@ export const useGenerateMask = () => {
         stage,
         mainLayer,
         selectedNodes,
-        selectedMask,
+        masksSelected,
         true
       );
 
@@ -277,7 +264,7 @@ export const useGenerateMask = () => {
     };
 
     generateMasks();
-  }, [instance, selectedNodes, selectedMask]);
+  }, [instance, selectedNodes, masksSelected]);
 
   return [actualMaskBase64, actualMaskBase64UI];
 };

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { toast } from "sonner";
 import {
+  WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodesActionParams,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
@@ -28,12 +28,10 @@ import {
   ArrowUp,
   ArrowDown,
   ImageDown,
-  Layers2,
-  Link,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
-import { ImageReference, useIACapabilities } from "@/store/ia";
+import { useIACapabilities } from "@/store/ia";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -41,6 +39,9 @@ function useContextMenu() {
   const room = useCollaborationRoom((state) => state.room);
   const contextMenuPosition = useCollaborationRoom(
     (state) => state.contextMenu.position
+  );
+  const contextMenuShow = useCollaborationRoom(
+    (state) => state.contextMenu.show
   );
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
@@ -67,19 +68,24 @@ function useContextMenu() {
   const setImagesLLMPopupImage = useIACapabilities(
     (state) => state.setImagesLLMPopupImage
   );
-  const imageReferences = useIACapabilities(
-    (state) => state.llmPopup.references
-  );
-  const setImagesLLMReferences = useIACapabilities(
-    (state) => state.setImagesLLMReferences
-  );
-  const setSelectedMask = useIACapabilities((state) => state.setSelectedMask);
 
   const mutationUpload = useMutation({
     mutationFn: async (imageId: string) => {
       return await postRemoveBackground(room ?? "", imageId);
     },
   });
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    if (!contextMenuShow) {
+      const contextMenuPlugin =
+        instance.getPlugin<WeaveContextMenuPlugin>("contextMenu");
+      if (contextMenuPlugin) {
+        contextMenuPlugin.closeContextMenu();
+      }
+    }
+  }, [instance, contextMenuShow]);
 
   const getContextMenu = React.useCallback(
     ({
@@ -98,82 +104,6 @@ function useContextMenu() {
       const options: ContextMenuOption[] = [];
 
       if (nodes.length > 0) {
-        // SET NODE AS REFERENCE IMAGE
-        options.push({
-          id: "nodeReferenceImage",
-          type: "button",
-          disabled: !aiEnabled,
-          label: "Set as reference image",
-          icon: <Link size={16} />,
-          onClick: async () => {
-            let newReferences: ImageReference[] = [];
-            if (imageReferences) {
-              newReferences = [...imageReferences];
-            }
-
-            if (imageReferences?.length === 4) {
-              toast.error("You can only set 4 reference images");
-              return;
-            }
-
-            const base64URL: unknown = await instance.triggerAction<
-              WeaveExportNodesActionParams,
-              void
-            >("exportNodesTool", {
-              nodes: nodes.map((n) => n.instance),
-              options: {
-                padding: 0,
-                pixelRatio: 1,
-              },
-              download: false,
-            });
-
-            newReferences.push({
-              base64Image: base64URL as string,
-              description: "",
-            });
-
-            setImagesLLMReferences(newReferences);
-          },
-        });
-        if (
-          (nodes.length === 1 &&
-            nodes[0].node?.type === "line" &&
-            nodes[0].instance?.getAttrs().closed) ||
-          (nodes.length === 1 &&
-            nodes[0].node?.type === "group" &&
-            (nodes[0].instance as Konva.Group)
-              ?.getChildren()
-              .every(
-                (n: Konva.Node) =>
-                  n.getAttrs().nodeType === "line" && n.getAttrs().closed
-              )) ||
-          (nodes.length === 1 && nodes[0].node?.type === "fuzzy-mask")
-        ) {
-          // EDIT IMAGE WITH A MASK
-          options.push({
-            id: "setIAImageMask",
-            type: "button",
-            disabled: !aiEnabled,
-            label: "Use as mask",
-            icon: <Layers2 size={16} />,
-            onClick: async () => {
-              setSelectedMask(
-                nodes
-                  .map((n) => n.instance.getAttrs().id ?? null)
-                  .filter((n) => n !== null) as string[]
-              );
-              toast.success("Node selected as mask");
-              setContextMenuShow(false);
-            },
-          });
-        }
-
-        options.push({
-          id: "div--2",
-          type: "divider",
-        });
-
         if (
           nodes.length === 1 &&
           ["image"].includes(nodes[0].node?.type ?? "")
@@ -230,7 +160,7 @@ function useContextMenu() {
           id: "editIAImage",
           type: "button",
           disabled: !aiEnabled,
-          label: "Edit with a prompt",
+          label: "Edit with AI",
           icon: <Bot size={16} />,
           onClick: async () => {
             const base64URL: unknown = await instance.triggerAction<
@@ -247,33 +177,6 @@ function useContextMenu() {
 
             setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
             setImagesLLMPopupType("edit-prompt");
-            setImagesLLMPopupImage(base64URL as string);
-            setImagesLLMPopupVisible(true);
-            setContextMenuShow(false);
-          },
-        });
-        // EDIT IMAGE WITH A MASK
-        options.push({
-          id: "editIAImageMask",
-          type: "button",
-          disabled: !aiEnabled,
-          label: "Edit with a mask",
-          icon: <Bot size={16} />,
-          onClick: async () => {
-            const base64URL: unknown = await instance.triggerAction<
-              WeaveExportNodesActionParams,
-              void
-            >("exportNodesTool", {
-              nodes: nodes.map((n) => n.instance),
-              options: {
-                padding: 0,
-                pixelRatio: 1,
-              },
-              download: false,
-            });
-
-            setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-            setImagesLLMPopupType("edit-mask");
             setImagesLLMPopupImage(base64URL as string);
             setImagesLLMPopupVisible(true);
             setContextMenuShow(false);
@@ -571,10 +474,7 @@ function useContextMenu() {
       contextMenuPosition,
       mutationUpload,
       aiEnabled,
-      imageReferences,
-      setSelectedMask,
       setImagesLLMPopupSelectedNodes,
-      setImagesLLMReferences,
       setImagesLLMPopupType,
       setImagesLLMPopupVisible,
       setImagesLLMPopupImage,

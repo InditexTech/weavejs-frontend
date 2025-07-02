@@ -16,7 +16,7 @@ export function MaskSlider() {
   if (actualAction !== "fuzzyMaskTool") return null;
 
   return (
-    <div className="absolute bottom-[80px] left-0 right-0 flex justify-center items-center flex justify-center items-center">
+    <div className="absolute bottom-[72px] left-0 right-0 flex justify-center items-center flex justify-center items-center">
       <div className="flex gap-2 w-[320px] bg-white px-3 py-3 border rounded-full border-[#c9c9c9]">
         <div className="whitespace-nowrap font-inter text-xs">Mask size</div>
         <Slider
