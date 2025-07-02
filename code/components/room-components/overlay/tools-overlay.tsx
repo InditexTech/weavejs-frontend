@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
+("use client");
 
 import React from "react";
 import { Vector2d } from "konva/lib/types";
@@ -194,28 +194,7 @@ export function ToolsOverlay() {
         className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
       >
         <Toolbar orientation="horizontal">
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<Hand className="px-2" size={40} strokeWidth={1} />}
-            disabled={
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            active={actualAction === "moveTool"}
-            onClick={() => triggerTool("moveTool")}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Move</p>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "M",
-                    [SYSTEM_OS.OTHER]: "M",
-                  }}
-                />
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="center"
-          />
+          <MoveToolTrigger />
           <ToolbarDivider />
           <ToolbarButton
             className="rounded-full !w-[40px]"
@@ -298,28 +277,7 @@ export function ToolsOverlay() {
       className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
     >
       <Toolbar orientation="horizontal">
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<Hand className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          active={actualAction === "moveTool"}
-          onClick={() => triggerTool("moveTool")}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Move</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "M",
-                  [SYSTEM_OS.OTHER]: "M",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
+        <MoveToolTrigger />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
@@ -727,3 +685,48 @@ export function ToolsOverlay() {
     </motion.div>
   );
 }
+
+const MoveToolTrigger = () => {
+  const instance = useWeave((state) => state.instance);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const actualAction = useWeave((state) => state.actions.actual);
+
+  const triggerTool = React.useCallback(
+    (toolName: string, params?: unknown) => {
+      if (instance && actualAction !== toolName) {
+        instance.triggerAction(toolName, params);
+        return;
+      }
+      if (instance && actualAction === toolName) {
+        instance.cancelAction(toolName);
+        return;
+      }
+    },
+    [instance, actualAction]
+  );
+
+  return (
+    <ToolbarButton
+      className="rounded-full !w-[40px]"
+      icon={<Hand className="px-2" size={40} strokeWidth={1} />}
+      disabled={
+        weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+      }
+      active={actualAction === "moveTool"}
+      onClick={() => triggerTool("moveTool")}
+      label={
+        <div className="flex gap-3 justify-start items-center">
+          <p>Move</p>
+          <ShortcutElement
+            shortcuts={{
+              [SYSTEM_OS.MAC]: "M",
+              [SYSTEM_OS.OTHER]: "M",
+            }}
+          />
+        </div>
+      }
+      tooltipSide="top"
+      tooltipAlign="center"
+    />
+  );
+};
