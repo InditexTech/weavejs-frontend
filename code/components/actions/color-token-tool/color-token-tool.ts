@@ -69,7 +69,7 @@ export class ColorTokenToolAction extends WeaveAction {
       }
     });
 
-    stage.on("click tap", (e) => {
+    stage.on("pointerclick", (e) => {
       e.evt.preventDefault();
 
       if (this.state === COLOR_TOKEN_TOOL_STATE.IDLE) {

@@ -93,7 +93,7 @@ export class ImagesToolAction extends WeaveAction {
       }
     });
 
-    stage.on("click tap", (e) => {
+    stage.on("pointerclick", (e) => {
       e.evt.preventDefault();
 
       if (this.state === IMAGES_TOOL_STATE.IDLE) {

@@ -98,9 +98,11 @@ export function ToolsOverlay() {
     (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
         instance.triggerAction(toolName, params);
+        return;
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
+        return;
       }
     },
     [instance, actualAction]
@@ -176,6 +178,115 @@ export function ToolsOverlay() {
 
   if (!showUI) {
     return null;
+  }
+
+  if (imagesLLMPopupVisible && imagesLLMPopupType !== "edit-mask") {
+    return;
+  }
+
+  if (imagesLLMPopupVisible && imagesLLMPopupType === "edit-mask") {
+    return (
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        variants={topElementVariants}
+        className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
+      >
+        <Toolbar orientation="horizontal">
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<Hand className="px-2" size={40} strokeWidth={1} />}
+            disabled={
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            active={actualAction === "moveTool"}
+            onClick={() => triggerTool("moveTool")}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Move</p>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "M",
+                    [SYSTEM_OS.OTHER]: "M",
+                  }}
+                />
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+          <ToolbarDivider />
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<SprayCan className="px-2" size={40} strokeWidth={1} />}
+            active={actualAction === "fuzzyMaskTool"}
+            disabled={
+              !aiEnabled ||
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            onClick={() => {
+              triggerTool("fuzzyMaskTool");
+            }}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Free hand mask</p>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "Q",
+                    [SYSTEM_OS.OTHER]: "Q",
+                  }}
+                />
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<CircleSlash2 className="px-2" size={40} strokeWidth={1} />}
+            active={actualAction === "maskTool"}
+            disabled={
+              !aiEnabled ||
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            onClick={() => {
+              triggerTool("maskTool");
+            }}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Regular mask</p>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "W",
+                    [SYSTEM_OS.OTHER]: "W",
+                  }}
+                />
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+          <ToolbarDivider />
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
+            disabled={
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            active={actualAction === "maskEraserTool"}
+            onClick={() => triggerTool("maskEraserTool")}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Erase mask</p>
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+        </Toolbar>
+      </motion.div>
+    );
   }
 
   return (
@@ -504,7 +615,6 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
@@ -523,61 +633,11 @@ export function ToolsOverlay() {
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Generate an image from prompt</p>
+              <p>Generate image with AI</p>
               <ShortcutElement
                 shortcuts={{
                   [SYSTEM_OS.MAC]: "G",
                   [SYSTEM_OS.OTHER]: "G",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<SprayCan className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "fuzzyMaskTool"}
-          disabled={
-            !aiEnabled ||
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          onClick={() => {
-            triggerTool("fuzzyMaskTool");
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Create a fuzzy mask</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "Q",
-                  [SYSTEM_OS.OTHER]: "Q",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<CircleSlash2 className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "maskTool"}
-          disabled={
-            !aiEnabled ||
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          onClick={() => {
-            triggerTool("maskTool");
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Create a mask</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "W",
-                  [SYSTEM_OS.OTHER]: "W",
                 }}
               />
             </div>

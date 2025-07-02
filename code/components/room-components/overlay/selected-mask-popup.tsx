@@ -96,6 +96,7 @@ export function SelectedMaskPopup() {
         void
       >("exportNodesTool", {
         nodes: masks as WeaveElementInstance[],
+        triggerSelectionTool: false,
         options: {
           backgroundColor: "#ffffffff",
           padding: 40,

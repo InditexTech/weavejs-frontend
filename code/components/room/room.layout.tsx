@@ -29,12 +29,10 @@ import {
 } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
-// import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
-// import { LLMPredictionsSelectionPopup } from "../room-components/overlay/llm-predictions-selection";
 import { LLMGenerationV2Popup } from "../room-components/overlay/llm-popup-v2";
 import { LLMPredictionsSelectionV2Popup } from "../room-components/overlay/llm-predictions-selection-v2";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
-// import { SelectedMaskPopup } from "../room-components/overlay/selected-mask-popup";
+import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-reference-selection-v2";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -128,11 +126,6 @@ export const RoomLayout = () => {
   return (
     <AnimatePresence>
       <motion.div
-        // animate={{
-        //   filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-        //     ? "blur(10px)"
-        //     : "blur(0px)",
-        // }}
         transition={{
           duration: 0.5,
           delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
@@ -144,7 +137,7 @@ export const RoomLayout = () => {
         <section
           id="sidebar-left"
           className={cn(
-            "bg-white absolute top-0 left-0 bottom-0 border-r border-[#c9c9c9] z-1 overflow-hidden",
+            "bg-white absolute top-0 left-0 bottom-0 border-r border-[#c9c9c9] z-[10] overflow-hidden",
             {
               ["w-0"]: sidebarLeftActive === null,
               ["w-[370px]"]: sidebarLeftActive !== null,
@@ -218,12 +211,6 @@ export const RoomLayout = () => {
                 position={contextMenuPosition}
                 options={contextMenuOptions}
               />
-              {/* <div className="absolute top-[104px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
-                      <div className="max-w-[320px] text-center bg-transparent bg-white/50 p-1 font-inter font-light text-[10px] text-zinc-600">
-                        To pan the canvas, keep the mouse wheel or the space bar
-                        pressed while dragging or use the hand tool.
-                      </div>
-                    </div> */}
               <ToolsOverlay />
               {transformingImage && (
                 <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
@@ -259,7 +246,7 @@ export const RoomLayout = () => {
         <section
           id="sidebar-right"
           className={cn(
-            "bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-0 overflow-hidden",
+            "bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-[10] overflow-hidden",
             {
               ["w-0"]: sidebarRightActive === null,
               ["w-[370px]"]: sidebarRightActive !== null,
@@ -274,12 +261,15 @@ export const RoomLayout = () => {
             </div>
           )}
         </section>
-        {/* <LLMGenerationPopup /> */}
-        <MaskSlider />
-        <LLMGenerationV2Popup />
-        {/* <LLMPredictionsSelectionPopup /> */}
-        <LLMPredictionsSelectionV2Popup />
-        {/* <SelectedMaskPopup /> */}
+
+        {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+          <>
+            <MaskSlider />
+            <LLMGenerationV2Popup />
+            <LLMPredictionsSelectionV2Popup />
+            <LLMReferenceSelectionV2Popup />
+          </>
+        )}
       </motion.div>
     </AnimatePresence>
   );

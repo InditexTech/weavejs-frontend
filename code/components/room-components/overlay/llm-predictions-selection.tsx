@@ -167,6 +167,7 @@ export function LLMPredictionsSelectionPopup() {
             <Checkbox
               id="terms"
               value={index}
+              className="bg-white"
               checked={isChecked}
               onCheckedChange={(checked) => {
                 handleCheckboxChange(checked as boolean, index);

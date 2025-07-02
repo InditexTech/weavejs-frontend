@@ -25,7 +25,7 @@ import { EllipseProperties } from "../node-properties/ellipse-properties";
 import { StarProperties } from "../node-properties/star-properties";
 import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -70,12 +70,12 @@ export const NodeProperties = () => {
 
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
-      setSidebarActive(null, "right");
+      // setSidebarActive(null, "right");
     }
 
     if (node) {
       setNodePropertiesAction("update");
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+      // setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
     }
   }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
 
