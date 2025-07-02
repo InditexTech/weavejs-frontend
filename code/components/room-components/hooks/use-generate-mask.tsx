@@ -135,7 +135,7 @@ async function generateMask(
   if (!forUI) {
     finalMaskElements.push(rect);
   } else {
-    finalMaskElements.push(...selectedNodes);
+    finalMaskElements.push(...(selectedNodes as WeaveElementInstance[]));
   }
 
   finalMaskElements.push(...(masks as WeaveElementInstance[]));
