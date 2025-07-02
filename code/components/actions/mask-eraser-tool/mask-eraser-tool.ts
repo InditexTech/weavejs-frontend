@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import Konva, { Vector2d } from "konva";
+import Konva from "konva";
 import {
   WeaveAction,
   WeaveNodesSelectionPlugin,
@@ -33,7 +33,7 @@ export class MaskEraserToolAction extends WeaveAction {
     return MASK_ERASER_TOOL_ACTION_NAME;
   }
 
-  pointIntersectsElement(point?: Vector2d): Konva.Node | null {
+  pointIntersectsElement(point?: Konva.Vector2d): Konva.Node | null {
     const stage = this.instance.getStage();
     const relativeMousePointer = point
       ? point
