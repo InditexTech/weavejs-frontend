@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-("use client");
+"use client";
 
 import React from "react";
 import { Vector2d } from "konva/lib/types";
