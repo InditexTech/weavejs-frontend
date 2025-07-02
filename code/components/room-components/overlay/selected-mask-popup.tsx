@@ -19,7 +19,7 @@ export function SelectedMaskPopup() {
   const instance = useWeave((state) => state.instance);
 
   const selectedMask = useIACapabilities((state) => state.mask.selected);
-  const setSelectedMask = useIACapabilities((state) => state.setSelectedMask);
+  const setSelectedMasks = useIACapabilities((state) => state.setSelectedMasks);
   const [actualMaskBase64, setActualMaskBase64] = React.useState<string | null>(
     null
   );
@@ -122,7 +122,7 @@ export function SelectedMaskPopup() {
             <button
               className="cursor-pointer hover:text-[#666666]"
               onClick={() => {
-                setSelectedMask(null);
+                setSelectedMasks([]);
               }}
             >
               <X className="px-2" size={40} strokeWidth={1} />
