@@ -366,10 +366,10 @@ export function LLMGenerationV2Popup() {
               }}
               className="w-full flex pointer-events-auto pointer-events-auto"
             >
-              <TabsList className="relative w-full bg-white px-[20px] py-0 gap-1 flex justify-between items-center">
+              <TabsList className="relative w-full bg-white px-[20px] py-0 gap-0 flex justify-between items-center">
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-[#c9c9c9]"></div>
                 {/* <div className="font-inter text-black text-sm">Edition mode</div> */}
-                <div className="flex gap-1 justify-start items-center z-1">
+                <div className="flex gap-0 justify-start items-center z-1">
                   <TabsTrigger value="edit-prompt" asChild>
                     <button
                       className={cn(

@@ -164,6 +164,20 @@ export const LLMReferenceSelectionV2Popup = () => {
                         className="w-full h-full object-cover"
                         draggable="true"
                         id={image}
+                        onKeyUp={(e) => {
+                          if (e.key === "Space") {
+                            let newSelectedImages = [...selectedImages];
+                            if (newSelectedImages.includes(image)) {
+                              newSelectedImages = newSelectedImages.filter(
+                                (actImage) => actImage !== image
+                              );
+                            } else {
+                              newSelectedImages.push(image);
+                            }
+                            const unique = [...new Set(newSelectedImages)];
+                            setSelectedImages(unique);
+                          }
+                        }}
                         onClick={() => {
                           let newSelectedImages = [...selectedImages];
                           if (newSelectedImages.includes(image)) {
