@@ -17,7 +17,7 @@ import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { CropProperties } from "../node-properties/crop-properties";
-import { X } from "lucide-react";
+import { Lock, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { MetaProperties } from "../node-properties/meta-properties";
@@ -25,12 +25,14 @@ import { EllipseProperties } from "../node-properties/ellipse-properties";
 import { StarProperties } from "../node-properties/star-properties";
 import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
+import { AlignProperties } from "../node-properties/align-properties";
 // import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
   const setNode = useWeave((state) => state.setNode);
 
   const sidebarRightActive = useCollaborationRoom(
@@ -46,6 +48,12 @@ export const NodeProperties = () => {
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
   );
+
+  React.useEffect(() => {
+    if (!node || !nodes || (nodes && nodes.length === 0)) {
+      setSidebarActive(null, "right");
+    }
+  }, [node, nodes]);
 
   React.useEffect(() => {
     if (
@@ -70,12 +78,11 @@ export const NodeProperties = () => {
 
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
-      // setSidebarActive(null, "right");
+      setSidebarActive(null, "right");
     }
 
     if (node) {
       setNodePropertiesAction("update");
-      // setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
     }
   }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
 
@@ -161,11 +168,14 @@ export const NodeProperties = () => {
   }, [node, instance]);
 
   const title = React.useMemo(() => {
+    if (nodes && nodes.length > 1) {
+      return "Selection";
+    }
     if (nodePropertiesAction === "create") {
       return actionType;
     }
     return nodeType;
-  }, [nodeType, actionType, nodePropertiesAction]);
+  }, [nodes, nodeType, actionType, nodePropertiesAction]);
 
   if (sidebarRightActive !== "nodeProperties") {
     return null;
@@ -178,6 +188,27 @@ export const NodeProperties = () => {
           {title}
         </div>
         <div className="flex justify-end items-center gap-1">
+          <button
+            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+            onClick={() => {
+              if (!instance) return;
+
+              for (const node of nodes) {
+                const isLocked = instance.allNodesLocked([node.instance]);
+
+                if (!isLocked) {
+                  instance.lockNode(node.instance);
+                  continue;
+                }
+                if (isLocked) {
+                  instance.unlockNode(node.instance);
+                  continue;
+                }
+              }
+            }}
+          >
+            <Lock size={16} strokeWidth={1} />
+          </button>
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
             onClick={() => {
@@ -196,6 +227,7 @@ export const NodeProperties = () => {
           <FrameProperties />
           <PositionProperties />
           <SizeProperties />
+          <AlignProperties />
           <EllipseProperties />
           <ArrowProperties />
           <StarProperties />

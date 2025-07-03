@@ -26,6 +26,8 @@ export function useKeyboardHandler() {
   const selectedNodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
+  const aiEnabled = useIACapabilities((state) => state.enabled);
+
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
   const setSidebarActive = useCollaborationRoom(
@@ -459,19 +461,25 @@ export function useKeyboardHandler() {
   /* IA Utilities */
 
   useKeyDown(() => {
-    setImagesLLMPopupType("create");
-    if (imagesLLMPopupType === "create") {
-      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-    } else {
-      setImagesLLMPopupVisible(true);
+    if (aiEnabled) {
+      setImagesLLMPopupType("create");
+      if (imagesLLMPopupType === "create") {
+        setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+      } else {
+        setImagesLLMPopupVisible(true);
+      }
     }
   }, ["KeyG"]);
 
   useKeyDown(() => {
-    triggerTool("fuzzyMaskTool");
+    if (aiEnabled) {
+      triggerTool("fuzzyMaskTool");
+    }
   }, ["KeyQ"]);
 
   useKeyDown(() => {
-    triggerTool("maskTool");
+    if (aiEnabled) {
+      triggerTool("maskTool");
+    }
   }, ["KeyW"]);
 }

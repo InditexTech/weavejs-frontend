@@ -13,14 +13,15 @@ import { InputText } from "../inputs/input-text";
 export function MetaProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+    (state) => state.nodeProperties.action
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps,
+    (state) => state.nodeProperties.createProps
   );
 
   const actualNode = React.useMemo(() => {
@@ -49,8 +50,10 @@ export function MetaProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction],
+    [instance, actualAction, nodePropertiesAction]
   );
+
+  if (nodes && nodes.length > 1) return null;
 
   if (!instance || !actualNode) return null;
 
