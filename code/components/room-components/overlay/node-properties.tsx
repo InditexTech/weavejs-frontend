@@ -53,7 +53,7 @@ export const NodeProperties = () => {
     if (!node || !nodes || (nodes && nodes.length === 0)) {
       setSidebarActive(null, "right");
     }
-  }, [node, nodes]);
+  }, [node, nodes, setSidebarActive]);
 
   React.useEffect(() => {
     if (
