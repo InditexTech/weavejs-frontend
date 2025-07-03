@@ -242,29 +242,13 @@ export class FuzzyMaskToolAction extends WeaveAction {
         draggable: true,
       });
 
-      let previousPointer: string | null = null;
-
-      this.maskBg.on(
-        "pointerenter",
-        (e: Konva.Config<PointerEvent, Konva.Rect>) => {
-          if (e.target.getAttrs().selectable) {
-            const stage = this.instance.getStage();
-            previousPointer = stage.container().style.cursor;
-            stage.container().style.cursor = "pointer";
-          }
+      this.maskBg.on("pointerenter", (e) => {
+        if (e.target.getAttrs().selectable) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = "pointer";
+          e.cancelBubble = true;
         }
-      );
-
-      this.maskBg.on(
-        "pointerleave",
-        (e: Konva.Config<PointerEvent, Konva.Rect>) => {
-          if (e.target.getAttrs().selectable) {
-            const stage = this.instance.getStage();
-            stage.container().style.cursor = previousPointer ?? "default";
-            previousPointer = null;
-          }
-        }
-      );
+      });
 
       this.mask.add(this.maskShape);
 

@@ -145,16 +145,13 @@ export class MaskToolAction extends WeaveAction {
       });
       utilityLayer?.add(this.mask);
 
-      this.mask.on(
-        "pointerenter",
-        (e: Konva.Config<PointerEvent, Konva.Line>) => {
-          if (e.target.getAttrs().selectable) {
-            const stage = this.instance.getStage();
-            stage.container().style.cursor = "pointer";
-            e.cancelBubble = true;
-          }
+      this.mask.on("pointerenter", (e) => {
+        if (e.target.getAttrs().selectable) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = "pointer";
+          e.cancelBubble = true;
         }
-      );
+      });
 
       this.tempPoint = new Konva.Circle({
         x: this.clickPoint?.x ?? 0,
