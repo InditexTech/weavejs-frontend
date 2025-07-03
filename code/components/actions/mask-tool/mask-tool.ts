@@ -17,7 +17,7 @@ export class MaskToolAction extends WeaveAction {
   protected maskId: string | null;
   protected tempLineId: string | null;
   protected tempLine!: Konva.Line | null;
-  protected mask!: Konva.Line | null;
+  protected mask!: Konva.Line | undefined;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected maskTransformer!: Konva.Transformer | undefined;
@@ -317,7 +317,7 @@ export class MaskToolAction extends WeaveAction {
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.maskId = null;
-    this.mask = null;
+    this.mask = undefined;
     this.tempLineId = null;
     this.container = undefined;
     this.clickPoint = null;
