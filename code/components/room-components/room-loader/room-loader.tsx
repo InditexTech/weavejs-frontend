@@ -88,7 +88,7 @@ export function RoomLoader({
             )}
             <AnimatePresence>
               {description && (
-                <div className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] mt-[32px]">
+                <div className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] my-[32px]">
                   <motion.span
                     className="w-full"
                     variants={childVariants}

@@ -26,6 +26,7 @@ import InputSelect from "../inputs/input-select";
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
@@ -64,6 +65,8 @@ export function StrokeProperties() {
     },
     [instance, actualAction, nodePropertiesAction]
   );
+
+  if (nodes && nodes.length > 1) return null;
 
   if (!instance || !actualAction || !actualNode) {
     return null;

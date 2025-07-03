@@ -35,6 +35,7 @@ import { Tabs, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useWeave } from "@inditextech/weave-react";
 import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask-eraser-tool";
+import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 
 export function LLMGenerationV2Popup() {
   useKeyboardHandler();
@@ -124,7 +125,11 @@ export function LLMGenerationV2Popup() {
       return;
     }
 
-    if (selectedNodes) {
+    const selectionPlugin =
+      instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+
+    if (selectionPlugin && selectedNodes && selectedNodes.length > 0) {
+      selectionPlugin.setSelectedNodes(selectedNodes);
       instance.triggerAction("fitToSelectionTool", {
         previousAction: undefined,
       });

@@ -59,7 +59,19 @@ export class MaskEraserToolAction extends WeaveAction {
         );
 
         if (maskTransformer) {
-          const selectedNodes = maskTransformer.getNodes();
+          const selectedNodes: Konva.Node[] = maskTransformer.getNodes();
+          const selectedNodesIds: string[] = selectedNodes.map(
+            (node) => node.getAttrs().id ?? ""
+          );
+
+          maskTransformer.nodes([
+            ...maskTransformer
+              .nodes()
+              .filter(
+                (node: Konva.Node) =>
+                  !selectedNodesIds.includes(node.getAttrs().id ?? "")
+              ),
+          ]);
           for (const node of selectedNodes) {
             node.destroy();
             this.instance.emitEvent("onMaskRemoved", {

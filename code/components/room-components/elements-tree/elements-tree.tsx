@@ -16,6 +16,12 @@ import {
   Type,
   X,
   Trash,
+  LockOpen,
+  Lock,
+  Circle,
+  Hexagon,
+  Star,
+  MoveUpRight,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -30,21 +36,34 @@ const iconsMap: Record<string, any> = {
   frame: Frame,
   "color-token": Tag,
   line: Spline,
+  "regular-polygon": Hexagon,
+  ellipse: Circle,
+  star: Star,
+  arrow: MoveUpRight,
 };
 
 function mapElementsToTree(
   instance: Weave,
   elements: WeaveStateElement[],
-  selectedNodes: string[],
+  selectedNodes: string[]
 ) {
   const elementsMapped = elements.map((element) => {
     return {
       id: element.key,
       icon: iconsMap[element.props.nodeType ?? "rectangle"],
       name: element.props.nodeName ? element.props.nodeName : element.key,
+      status: [
+        <div key="trash" className="px-1">
+          <Trash stroke="transparent" size={16} strokeWidth={1} />
+        </div>,
+        <div key="locked" className="bg-white px-1 rounded-none">
+          {element.props.locked && <Lock size={16} strokeWidth={1} />}
+        </div>,
+      ],
       actions: [
         <div
           key="remove"
+          role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
             e.stopPropagation();
@@ -58,12 +77,41 @@ function mapElementsToTree(
         >
           <Trash size={16} strokeWidth={1} />
         </div>,
+        <div
+          key="lock-unlock"
+          role="button"
+          className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!instance) return;
+
+            const elementNode = instance.getStage().findOne(`#${element.key}`);
+
+            if (!elementNode) return;
+
+            const isLocked = instance.allNodesLocked([elementNode]);
+
+            if (!isLocked) {
+              instance.lockNode(elementNode);
+              return;
+            }
+            if (isLocked) {
+              instance.unlockNode(elementNode);
+            }
+          }}
+        >
+          {element.props.locked ? (
+            <LockOpen size={16} strokeWidth={1} />
+          ) : (
+            <Lock size={16} strokeWidth={1} />
+          )}
+        </div>,
       ],
       ...((element.props.children ?? []).length > 0 && {
         children: mapElementsToTree(
           instance,
           element.props.children ?? [],
-          selectedNodes,
+          selectedNodes
         ),
       }),
     } as TreeDataItem;
@@ -75,20 +123,21 @@ function mapElementsToTree(
 export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
-  const actualAction = useWeave((state) => state.actions.actual);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active,
+    (state) => state.sidebar.left.active
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
-    [],
+    []
   );
   const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
-    initialSelectedNodes.map((node) => node.node?.key).filter((key) => typeof key !== 'undefined'),
+    initialSelectedNodes
+      .map((node) => node.node?.key)
+      .filter((key) => typeof key !== "undefined")
   );
 
   React.useEffect(() => {
@@ -114,7 +163,11 @@ export const ElementsTree = () => {
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
-      setSelectedNodes(nodes.map((node) => node.node?.key).filter((key) => typeof key !== 'undefined'));
+      setSelectedNodes(
+        nodes
+          .map((node) => node.node?.key)
+          .filter((key) => typeof key !== "undefined")
+      );
     }
 
     if (instance) {
@@ -125,7 +178,7 @@ export const ElementsTree = () => {
       if (instance) {
         instance.removeEventListener(
           "onNodesChange",
-          handleOnNodesSelectedChange,
+          handleOnNodesSelectedChange
         );
       }
     };
@@ -159,7 +212,7 @@ export const ElementsTree = () => {
               setSidebarActive(null);
             }}
           >
-            <X size={16} />
+            <X size={20} strokeWidth={1} />
           </button>
         </div>
       </div>
@@ -178,10 +231,12 @@ export const ElementsTree = () => {
               data={treeData}
               initialSelectedItems={selectedNodes}
               onSelectedItemsChange={(items: string[]) => {
-                instance.selectNodesByKey(items);
-                instance.triggerAction("fitToSelectionTool", {
-                  previousAction: actualAction,
-                });
+                const stage = instance.getStage();
+
+                const node = stage.findOne(`#${items[0]}`);
+                if (node && !instance.allNodesLocked([node])) {
+                  instance.selectNodesByKey(items);
+                }
               }}
             />
           )}

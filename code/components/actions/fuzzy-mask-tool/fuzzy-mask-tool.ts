@@ -242,21 +242,11 @@ export class FuzzyMaskToolAction extends WeaveAction {
         draggable: true,
       });
 
-      let previousPointer: string | null = null;
-
       this.maskBg.on("pointerenter", (e) => {
         if (e.target.getAttrs().selectable) {
           const stage = this.instance.getStage();
-          previousPointer = stage.container().style.cursor;
           stage.container().style.cursor = "pointer";
-        }
-      });
-
-      this.maskBg.on("pointerleave", (e) => {
-        if (e.target.getAttrs().selectable) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = previousPointer ?? "default";
-          previousPointer = null;
+          e.cancelBubble = true;
         }
       });
 
@@ -341,8 +331,7 @@ export class FuzzyMaskToolAction extends WeaveAction {
 
     if (this.mask && this.maskTransformer) {
       this.maskTransformer.moveToTop();
-      const actualSelectedNodes = this.maskTransformer.nodes();
-      this.maskTransformer.nodes([...actualSelectedNodes, this.mask]);
+      this.maskTransformer.nodes([...this.maskTransformer.nodes(), this.mask]);
       this.maskTransformer.forceUpdate();
     }
 

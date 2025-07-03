@@ -14,6 +14,7 @@ import { InputNumber } from "../inputs/input-number";
 export function FrameProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
@@ -52,6 +53,8 @@ export function FrameProperties() {
     },
     [instance, actualAction, nodePropertiesAction]
   );
+
+  if (nodes && nodes.length > 1) return null;
 
   if (!instance || !actualNode) return null;
 

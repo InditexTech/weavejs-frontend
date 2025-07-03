@@ -15,6 +15,7 @@ import { InputNumber } from "../inputs/input-number";
 export function PositionProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
 
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
@@ -98,6 +99,8 @@ export function PositionProperties() {
     },
     [instance, node, updateElement]
   );
+
+  if (nodes && nodes.length > 1) return null;
 
   if (nodePropertiesAction === "create") {
     return null;

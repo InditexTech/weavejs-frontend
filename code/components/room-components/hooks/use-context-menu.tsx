@@ -28,6 +28,7 @@ import {
   ArrowUp,
   ArrowDown,
   ImageDown,
+  Lock,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
@@ -103,10 +104,14 @@ function useContextMenu() {
 
       const options: ContextMenuOption[] = [];
 
+      const singleLocked =
+        nodes.length === 1 && nodes[0].instance.getAttrs().locked;
+
       if (nodes.length > 0) {
         if (
           nodes.length === 1 &&
-          ["image"].includes(nodes[0].node?.type ?? "")
+          ["image"].includes(nodes[0].node?.type ?? "") &&
+          !singleLocked
         ) {
           options.push({
             id: "removeBackground",
@@ -156,99 +161,105 @@ function useContextMenu() {
           });
         }
         // EDIT IMAGE WITH A PROMPT
-        options.push({
-          id: "editIAImage",
-          type: "button",
-          disabled: !aiEnabled,
-          label: "Edit with AI",
-          icon: <Bot size={16} />,
-          onClick: async () => {
-            const base64URL: unknown = await instance.triggerAction<
-              WeaveExportNodesActionParams,
-              void
-            >("exportNodesTool", {
-              nodes: nodes.map((n) => n.instance),
-              options: {
-                padding: 0,
-                pixelRatio: 1,
-              },
-              download: false,
-            });
-
-            setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-            setImagesLLMPopupType("edit-prompt");
-            setImagesLLMPopupImage(base64URL as string);
-            setImagesLLMPopupVisible(true);
-            setContextMenuShow(false);
-          },
-        });
-        options.push({
-          id: "div--1",
-          type: "divider",
-        });
-        // EXPORT
-        options.push({
-          id: "export",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Export as image</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ E",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
-                }}
-              />
-            </div>
-          ),
-          icon: <ImageDown size={16} />,
-          disabled: nodes.length <= 0,
-          onClick: () => {
-            instance.triggerAction<WeaveExportNodesActionParams, void>(
-              "exportNodesTool",
-              {
+        if (!singleLocked) {
+          options.push({
+            id: "editIAImage",
+            type: "button",
+            disabled: !aiEnabled,
+            label: "Edit with AI",
+            icon: <Bot size={16} />,
+            onClick: async () => {
+              const base64URL: unknown = await instance.triggerAction<
+                WeaveExportNodesActionParams,
+                void
+              >("exportNodesTool", {
                 nodes: nodes.map((n) => n.instance),
                 options: {
-                  padding: 20,
-                  pixelRatio: 2,
+                  padding: 0,
+                  pixelRatio: 1,
                 },
-              }
-            );
-            setContextMenuShow(false);
-          },
-        });
-        // SEPARATOR
-        options.push({
-          id: "div-0",
-          type: "divider",
-        });
+                download: false,
+              });
 
-        // COPY
-        options.push({
-          id: "copy",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Copy</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ C",
-                  [SYSTEM_OS.OTHER]: "Ctrl C",
-                }}
-              />
-            </div>
-          ),
-          icon: <ClipboardCopy size={16} />,
-          disabled: !["selectionTool"].includes(actActionActive ?? ""),
-          onClick: async () => {
-            const weaveCopyPasteNodesPlugin =
-              instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-            if (weaveCopyPasteNodesPlugin) {
-              await weaveCopyPasteNodesPlugin.copy();
-            }
-            setContextMenuShow(false);
-          },
-        });
+              setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+              setImagesLLMPopupType("edit-prompt");
+              setImagesLLMPopupImage(base64URL as string);
+              setImagesLLMPopupVisible(true);
+              setContextMenuShow(false);
+            },
+          });
+          options.push({
+            id: "div--1",
+            type: "divider",
+          });
+        }
+        if (!singleLocked) {
+          // EXPORT
+          options.push({
+            id: "export",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Export as image</div>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "⇧ ⌘ E",
+                    [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
+                  }}
+                />
+              </div>
+            ),
+            icon: <ImageDown size={16} />,
+            disabled: nodes.length <= 0,
+            onClick: () => {
+              instance.triggerAction<WeaveExportNodesActionParams, void>(
+                "exportNodesTool",
+                {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 20,
+                    pixelRatio: 2,
+                  },
+                }
+              );
+              setContextMenuShow(false);
+            },
+          });
+          // SEPARATOR
+          options.push({
+            id: "div-0",
+            type: "divider",
+          });
+        }
+
+        if (!singleLocked) {
+          // COPY
+          options.push({
+            id: "copy",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Copy</div>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "⌘ C",
+                    [SYSTEM_OS.OTHER]: "Ctrl C",
+                  }}
+                />
+              </div>
+            ),
+            icon: <ClipboardCopy size={16} />,
+            disabled: !["selectionTool"].includes(actActionActive ?? ""),
+            onClick: async () => {
+              const weaveCopyPasteNodesPlugin =
+                instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+              if (weaveCopyPasteNodesPlugin) {
+                await weaveCopyPasteNodesPlugin.copy();
+              }
+              setContextMenuShow(false);
+            },
+          });
+        }
       }
       // PASTE
       options.push({
@@ -276,14 +287,14 @@ function useContextMenu() {
           }
         },
       });
-      if (nodes.length > 0) {
+      if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
         options.push({
           id: "div-1",
           type: "divider",
         });
       }
-      if (nodes.length > 0) {
+      if (!singleLocked && nodes.length > 0) {
         // BRING TO FRONT
         options.push({
           id: "bring-to-front",
@@ -373,13 +384,13 @@ function useContextMenu() {
           },
         });
       }
-      if (nodes.length > 0) {
+      if (!singleLocked && nodes.length > 0) {
         options.push({
           id: "div-2",
           type: "divider",
         });
       }
-      if (nodes.length > 0) {
+      if (!singleLocked && nodes.length > 0) {
         // GROUP
         options.push({
           id: "group",
@@ -439,6 +450,49 @@ function useContextMenu() {
         });
       }
       if (nodes.length > 0) {
+        // LOCK / UNLOCK
+        options.push({
+          id: "lock-unlock",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Lock / Unlock</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "L",
+                  [SYSTEM_OS.OTHER]: "L",
+                }}
+              />
+            </div>
+          ),
+          icon: <Lock size={16} />,
+          onClick: () => {
+            if (!instance) return;
+
+            for (const node of nodes) {
+              const isLocked = instance.allNodesLocked([node.instance]);
+
+              if (!isLocked) {
+                instance.lockNode(node.instance);
+                continue;
+              }
+              if (isLocked) {
+                instance.unlockNode(node.instance);
+              }
+            }
+
+            setContextMenuShow(false);
+          },
+        });
+      }
+      if (!singleLocked && nodes.length > 0) {
+        // SEPARATOR
+        options.push({
+          id: "div-4",
+          type: "divider",
+        });
+      }
+      if (!singleLocked && nodes.length > 0) {
         // DELETE
         options.push({
           id: "delete",

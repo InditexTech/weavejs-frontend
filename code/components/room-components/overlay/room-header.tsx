@@ -83,6 +83,7 @@ export function RoomHeader() {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
@@ -392,12 +393,13 @@ export function RoomHeader() {
                 <DropdownMenuItem
                   className="text-foreground cursor-pointer hover:rounded-none"
                   disabled={
+                    instance?.isEmpty() ||
                     weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                   }
                   onClick={handleExportToImage}
                 >
-                  <ImageIcon /> Stage to image
+                  <ImageIcon /> Export room as image
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -593,10 +595,16 @@ export function RoomHeader() {
                   "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
                   {
                     ["disabled:cursor-default disabled:opacity-50"]:
-                      !actualAction || !node,
+                      !actualAction ||
+                      !node ||
+                      (!node && nodes && nodes.length < 2),
                   }
                 )}
-                disabled={!actualAction || !node}
+                disabled={
+                  !actualAction ||
+                  (!node && !nodes) ||
+                  (!node && nodes && nodes.length < 2)
+                }
                 onClick={() => {
                   setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
                 }}

@@ -77,11 +77,6 @@ export class MaskToolAction extends WeaveAction {
       }
     });
 
-    stage.on("pointerdblclick", (e) => {
-      e.evt.preventDefault();
-      this.cancelAction();
-    });
-
     stage.on("pointerclick", (e) => {
       e.evt.preventDefault();
 
@@ -150,21 +145,11 @@ export class MaskToolAction extends WeaveAction {
       });
       utilityLayer?.add(this.mask);
 
-      let previousPointer: string | null = null;
-
       this.mask.on("pointerenter", (e) => {
         if (e.target.getAttrs().selectable) {
           const stage = this.instance.getStage();
-          previousPointer = stage.container().style.cursor;
           stage.container().style.cursor = "pointer";
-        }
-      });
-
-      this.mask.on("pointerleave", (e) => {
-        if (e.target.getAttrs().selectable) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = previousPointer ?? "default";
-          previousPointer = null;
+          e.cancelBubble = true;
         }
       });
 
@@ -324,8 +309,7 @@ export class MaskToolAction extends WeaveAction {
 
     if (this.mask && this.maskTransformer) {
       this.maskTransformer.moveToTop();
-      const actualSelectedNodes = this.maskTransformer.nodes();
-      this.maskTransformer.nodes([...actualSelectedNodes, this.mask]);
+      this.maskTransformer.nodes([...this.maskTransformer.nodes(), this.mask]);
       this.maskTransformer.forceUpdate();
     }
 
@@ -333,6 +317,7 @@ export class MaskToolAction extends WeaveAction {
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.maskId = null;
+    this.mask = undefined;
     this.tempLineId = null;
     this.container = undefined;
     this.clickPoint = null;

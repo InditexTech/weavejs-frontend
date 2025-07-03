@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
@@ -65,6 +66,8 @@ export function SizeProperties() {
       setMaintainAspectRatio(actualNode.props.keepAspectRatio);
     }
   }, [actualNode]);
+
+  if (nodes && nodes.length > 1) return null;
 
   if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
