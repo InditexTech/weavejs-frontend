@@ -202,7 +202,6 @@ export const NodeProperties = () => {
                 }
                 if (isLocked) {
                   instance.unlockNode(node.instance);
-                  continue;
                 }
               }
             }}

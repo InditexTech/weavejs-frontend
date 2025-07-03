@@ -63,6 +63,7 @@ function mapElementsToTree(
       actions: [
         <div
           key="remove"
+          role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
             e.stopPropagation();
@@ -78,6 +79,7 @@ function mapElementsToTree(
         </div>,
         <div
           key="lock-unlock"
+          role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
             e.stopPropagation();
@@ -95,7 +97,6 @@ function mapElementsToTree(
             }
             if (isLocked) {
               instance.unlockNode(elementNode);
-              return;
             }
           }}
         >

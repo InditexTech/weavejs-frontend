@@ -478,7 +478,6 @@ function useContextMenu() {
               }
               if (isLocked) {
                 instance.unlockNode(node.instance);
-                continue;
               }
             }
 
