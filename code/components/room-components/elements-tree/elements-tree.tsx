@@ -81,6 +81,7 @@ function mapElementsToTree(
       actions: [
         <div
           key="remove"
+          tabIndex={0}
           role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
@@ -97,6 +98,7 @@ function mapElementsToTree(
         </div>,
         <div
           key="show-hidden"
+          tabIndex={0}
           role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
@@ -127,6 +129,7 @@ function mapElementsToTree(
         </div>,
         <div
           key="lock-unlock"
+          tabIndex={0}
           role="button"
           className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
           onClick={(e) => {
