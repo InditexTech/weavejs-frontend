@@ -17,7 +17,7 @@ import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { CropProperties } from "../node-properties/crop-properties";
-import { Lock, X } from "lucide-react";
+import { EyeOff, Lock, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { MetaProperties } from "../node-properties/meta-properties";
@@ -188,6 +188,26 @@ export const NodeProperties = () => {
           {title}
         </div>
         <div className="flex justify-end items-center gap-1">
+          <button
+            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+            onClick={() => {
+              if (!instance) return;
+
+              for (const node of nodes) {
+                const isVisible = instance.allNodesVisible([node.instance]);
+
+                if (!isVisible) {
+                  instance.showNode(node.instance);
+                  continue;
+                }
+                if (isVisible) {
+                  instance.hideNode(node.instance);
+                }
+              }
+            }}
+          >
+            <EyeOff size={16} strokeWidth={1} />
+          </button>
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
             onClick={() => {

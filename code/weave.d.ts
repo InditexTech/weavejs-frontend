@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import "konva/lib/Node";
+import "konva/lib/Stage";
 
 declare module "konva/lib/Node" {
   interface Node {
@@ -26,6 +27,17 @@ declare module "konva/lib/Node" {
       width: number;
       height: number;
     };
+  }
+}
+
+declare module "konva/lib/Stage" {
+  interface Stage {
+    _allowActions: string[];
+    _allowSelectNodeTypes: string[];
+    _allowSelection: boolean;
+    allowActions(actions?: string[]): string[];
+    allowSelectNodes(nodeTypes?: string[]): string[];
+    allowSelection(allowSelection?: boolean): boolean;
   }
 }
 

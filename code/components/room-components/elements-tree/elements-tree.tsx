@@ -22,6 +22,8 @@ import {
   Hexagon,
   Star,
   MoveUpRight,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -56,8 +58,24 @@ function mapElementsToTree(
         <div key="trash" className="px-1">
           <Trash stroke="transparent" size={16} strokeWidth={1} />
         </div>,
+        <div key="visibility" className="bg-white px-1 rounded-none">
+          <Eye
+            stroke={
+              typeof element.props.visible === "undefined" ||
+              element.props.visible
+                ? "transparent"
+                : "black"
+            }
+            size={16}
+            strokeWidth={1}
+          />
+        </div>,
         <div key="locked" className="bg-white px-1 rounded-none">
-          {element.props.locked && <Lock size={16} strokeWidth={1} />}
+          <Lock
+            stroke={element.props.locked ? "black" : "transparent"}
+            size={16}
+            strokeWidth={1}
+          />
         </div>,
       ],
       actions: [
@@ -76,6 +94,36 @@ function mapElementsToTree(
           }}
         >
           <Trash size={16} strokeWidth={1} />
+        </div>,
+        <div
+          key="show-hidden"
+          role="button"
+          className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!instance) return;
+
+            const elementNode = instance.getStage().findOne(`#${element.key}`);
+
+            if (!elementNode) return;
+
+            const isVisible = instance.allNodesVisible([elementNode]);
+
+            if (!isVisible) {
+              instance.showNode(elementNode);
+              return;
+            }
+            if (isVisible) {
+              instance.hideNode(elementNode);
+            }
+          }}
+        >
+          {typeof element.props.visible === "undefined" ||
+          element.props.visible ? (
+            <EyeOff size={16} strokeWidth={1} />
+          ) : (
+            <Eye size={16} strokeWidth={1} />
+          )}
         </div>,
         <div
           key="lock-unlock"

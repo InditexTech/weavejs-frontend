@@ -180,6 +180,9 @@ export class FuzzyMaskToolAction extends WeaveAction {
   private handleAddCircle() {
     const { mousePoint } = this.instance.getMousePointer();
 
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = "crosshair";
+
     this.clickPoint = mousePoint;
 
     if (!this.mask) {
@@ -216,8 +219,6 @@ export class FuzzyMaskToolAction extends WeaveAction {
         selectable: true,
       });
 
-      this.mask.add(this.maskBg);
-
       this.maskShape = new Konva.Shape({
         id: `${this.maskId}-mask`,
         fill: this.props.fill,
@@ -251,6 +252,7 @@ export class FuzzyMaskToolAction extends WeaveAction {
       });
 
       this.mask.add(this.maskShape);
+      this.mask.add(this.maskBg);
 
       if (utilityLayer) {
         utilityLayer.add(this.mask);
@@ -277,6 +279,14 @@ export class FuzzyMaskToolAction extends WeaveAction {
         y: boundingBox.y,
         width: boundingBox.width,
         height: boundingBox.height,
+      });
+
+      this.maskBg.on("pointerenter", (e) => {
+        if (e.target.getAttrs().selectable) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = "pointer";
+          e.cancelBubble = true;
+        }
       });
 
       this.maskShape.setAttrs({
