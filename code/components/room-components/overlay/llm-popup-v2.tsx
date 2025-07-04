@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import Konva from "konva";
 import { useMutation } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -233,13 +234,31 @@ export function LLMGenerationV2Popup() {
   }, [imagesLLMPopupType, setImagesLLMPopupError, setImagesLLMPopupState]);
 
   React.useEffect(() => {
+    if (!instance) {
+      return;
+    }
+
+    const stage: Konva.Stage = instance.getStage();
+
     if (imagesLLMPopupVisible) {
+      stage.allowActions(["maskTool", "fuzzyMaskTool"]);
+      stage.allowSelectNodes(["mask", "fuzzy-mask"]);
+      stage.allowSelection(true);
       setPrompt("");
       setSize("1024x1024");
       setImagesLLMPopupError(null);
       setImagesLLMPopupState("idle");
+    } else {
+      stage.allowActions([]);
+      stage.allowSelectNodes([]);
+      stage.allowSelection(false);
     }
-  }, [imagesLLMPopupVisible, setImagesLLMPopupError, setImagesLLMPopupState]);
+  }, [
+    instance,
+    imagesLLMPopupVisible,
+    setImagesLLMPopupError,
+    setImagesLLMPopupState,
+  ]);
 
   const handlePromptChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {

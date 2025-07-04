@@ -29,6 +29,7 @@ import {
   ArrowDown,
   ImageDown,
   Lock,
+  Eye,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
@@ -478,6 +479,40 @@ function useContextMenu() {
               }
               if (isLocked) {
                 instance.unlockNode(node.instance);
+              }
+            }
+
+            setContextMenuShow(false);
+          },
+        });
+        // LOCK / UNLOCK
+        options.push({
+          id: "show-hide",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Show / Hide</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "L",
+                  [SYSTEM_OS.OTHER]: "L",
+                }}
+              />
+            </div>
+          ),
+          icon: <Eye size={16} />,
+          onClick: () => {
+            if (!instance) return;
+
+            for (const node of nodes) {
+              const isVisible = instance.allNodesVisible([node.instance]);
+
+              if (!isVisible) {
+                instance.showNode(node.instance);
+                continue;
+              }
+              if (isVisible) {
+                instance.hideNode(node.instance);
               }
             }
 

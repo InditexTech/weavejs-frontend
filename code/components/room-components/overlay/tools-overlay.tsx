@@ -691,6 +691,10 @@ const MoveToolTrigger = () => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);
 
+  const imagesLLMPopupVisible = useIACapabilities(
+    (state) => state.llmPopup.visible
+  );
+
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
@@ -713,7 +717,15 @@ const MoveToolTrigger = () => {
         weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
       }
       active={actualAction === "moveTool"}
-      onClick={() => triggerTool("moveTool")}
+      onClick={() => {
+        if (imagesLLMPopupVisible) {
+          triggerTool("moveTool", {
+            triggerSelectionTool: false,
+          });
+        } else {
+          triggerTool("moveTool");
+        }
+      }}
       label={
         <div className="flex gap-3 justify-start items-center">
           <p>Move</p>
