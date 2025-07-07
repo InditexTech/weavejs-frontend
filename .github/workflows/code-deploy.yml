@@ -104,8 +104,8 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
         with:
-          inlineScript: |
           azcliversion: latest
+          inlineScript: |
             az containerapp update \
             --name $AZURE_CONTAINER_NAME \
             --resource-group $AZURE_RESOURCE_GROUP \
