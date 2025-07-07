@@ -306,7 +306,7 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
                     disabled={
-                      instance?.isEmpty() ||
+                      instance?.isEmpty() ??
                       weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
@@ -394,7 +394,7 @@ export function RoomHeader() {
                 <DropdownMenuItem
                   className="text-foreground cursor-pointer hover:rounded-none"
                   disabled={
-                    instance?.isEmpty() ||
+                    instance?.isEmpty() ??
                     weaveConnectionStatus !==
                       WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                   }
