@@ -550,6 +550,33 @@ export function ToolsOverlay() {
         />
         <ToolbarButton
           className="rounded-full !w-[40px]"
+          // eslint-disable-next-line jsx-a11y/alt-text
+          icon={<Image className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTool"}
+          onClick={() => {
+            triggerTool("imageTool", {
+              imageURL: "http://localhost:8081/assets/model.jpg",
+            });
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add an image (cross-origin)</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "I",
+                  [SYSTEM_OS.OTHER]: "I",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
           icon={<Images className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED

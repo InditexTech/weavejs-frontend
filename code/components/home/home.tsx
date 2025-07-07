@@ -8,26 +8,28 @@ import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { motion } from "motion/react";
 import { Logo } from "@/components/utils/logo";
-import LoginForm from "../home-components/login-form";
+import LoginForm from "./login-form";
 import { Button } from "../ui/button";
-import { Github, Book } from "lucide-react";
+import { Info, Eye, EyeOff, ExternalLink, X } from "lucide-react";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import weavePackage from "../../node_modules/@inditextech/weave-sdk/package.json";
 import weaveReactHelperPackage from "../../node_modules/@inditextech/weave-react/package.json";
 import weaveStorePackage from "../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 
 export const Home = () => {
+  const [showDetails, setShowDetails] = React.useState(false);
+
   return (
     <>
-      <main className="w-full h-full flex justify-center items-center relative p-[40px]">
+      <main className="w-full h-full flex justify-center items-center relative">
         <motion.section
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative flex h-full w-full flex-col items-center justify-center"
+          className="relative flex h-full w-full flex-col items-center justify-start md:justify-center overflow-scroll"
         >
-          <div className="max-w-[520px] w-full flex flex-col items-center justify-between gap-0">
-            <div className="w-full flex justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 py-8 border border-[#c9c9c9]">
+          <div className="max-w-[600px] w-full flex flex-col items-center justify-between gap-0 p-3 md:p-8">
+            <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 border border-[#c9c9c9]">
               <Logo kind="landscape" variant="no-text" />
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -35,7 +37,7 @@ export const Home = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="flex flex-col items-end justify-center"
               >
-                <h1 className="text-1xl font-inter font-light text-muted-foreground uppercase">
+                <h1 className="text-3xl font-inter font-light text-muted-foreground uppercase">
                   SHOWCASE
                 </h1>
               </motion.div>
@@ -43,8 +45,8 @@ export const Home = () => {
             <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-[32px] border border-[#c9c9c9] mt-[32px]">
               <LoginForm />
             </div>
-            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-4 border border-[#c9c9c9]">
-              <div className="flex gap-2 justify-center-items-center">
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-[32px] border border-[#c9c9c9]">
+              <div className="flex flex-col md:flex-row gap-0 md:gap-2 justify-center-items-center">
                 <Button
                   variant="link"
                   onClick={() => {
@@ -52,7 +54,7 @@ export const Home = () => {
                   }}
                   className="cursor-pointer font-inter font-light"
                 >
-                  <Github strokeWidth={1} /> GITHUB
+                  <ExternalLink strokeWidth={1} /> GITHUB
                 </Button>
                 <Button
                   variant="link"
@@ -65,38 +67,69 @@ export const Home = () => {
                   }}
                   className="cursor-pointer font-inter font-light"
                 >
-                  <Book strokeWidth={1} /> DOCUMENTATION
+                  <ExternalLink strokeWidth={1} /> DOCUMENTATION
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    setShowDetails((prev) => !prev);
+                  }}
+                  className="cursor-pointer font-inter font-light"
+                >
+                  {!showDetails ? (
+                    <Eye strokeWidth={1} />
+                  ) : (
+                    <EyeOff strokeWidth={1} />
+                  )}{" "}
+                  DEPENDENCIES
                 </Button>
               </div>
             </div>
-            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-4 border border-[#c9c9c9]">
-              <div className="w-full grid grid-cols-[1fr_auto] gap-1 justify-center-items-center font-light text-[12px] py-3">
-                <div className="flex gap-1 justify-start items-center">
-                  <code>@inditextech/weave-sdk</code>
+            {showDetails && (
+              <div className="w-[calc(100dvw-24px)] md:w-auto absolute bottom-3 right-3 md:bottom-8 md:right-8 flex flex-col items-start justify-center bg-background p-5 pt-3 border border-[#c9c9c9]">
+                <div className="w-full flex gap-2 justify-between items-center mb-5 uppercase">
+                  <div className="flex gap-2 justify-start items-center font-inter font-light text-sm">
+                    <Info strokeWidth={1} size={16} />
+                    Dependencies Used
+                  </div>
+                  <Button
+                    variant="link"
+                    onClick={() => {
+                      setShowDetails(false);
+                    }}
+                    className="cursor-pointer font-inter font-light"
+                  >
+                    <X strokeWidth={1} />
+                  </Button>
                 </div>
-                <div className="flex gap-1 justify-center items-center">
-                  <code className="bg-[#e9e9e9] px-2 py-1">
-                    v{weavePackage.version}
-                  </code>
-                </div>
-                <div className="flex gap-1 justify-start items-center">
-                  <code>@inditextech/weave-react</code>
-                </div>
-                <div className="flex gap-1 justify-center items-center">
-                  <code className="bg-[#e9e9e9] px-2 py-1">
-                    v{weaveReactHelperPackage.version}
-                  </code>
-                </div>
-                <div className="flex gap-1 justify-start items-center">
-                  <code>@inditextech/weave-store-azure-web-pubsub</code>
-                </div>
-                <div className="flex gap-1 justify-center items-center">
-                  <code className="bg-[#e9e9e9] px-2 py-1">
-                    v{weaveStorePackage.version}
-                  </code>
+                <div className="w-full grid grid-cols-[1fr_auto] gap-x-5 gap-y-1 justify-center-items-center font-light text-[12px]">
+                  <div className="flex gap-1 justify-start items-center">
+                    <code>@inditextech/weave-sdk</code>
+                  </div>
+                  <div className="flex gap-1 justify-center items-center">
+                    <code className="bg-[#e9e9e9] px-2 py-1">
+                      v{weavePackage.version}
+                    </code>
+                  </div>
+                  <div className="flex gap-1 justify-start items-center">
+                    <code>@inditextech/weave-react</code>
+                  </div>
+                  <div className="flex gap-1 justify-center items-center">
+                    <code className="bg-[#e9e9e9] px-2 py-1">
+                      v{weaveReactHelperPackage.version}
+                    </code>
+                  </div>
+                  <div className="flex gap-1 justify-start items-center">
+                    <code>@inditextech/weave-store-azure-web-pubsub</code>
+                  </div>
+                  <div className="flex gap-1 justify-center items-center">
+                    <code className="bg-[#e9e9e9] px-2 py-1">
+                      v{weaveStorePackage.version}
+                    </code>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </motion.section>
       </main>

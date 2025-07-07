@@ -39,13 +39,20 @@ const formSchema = z
   .required();
 
 function LoginForm() {
+  const roomRef = React.useRef<HTMLInputElement>(null);
+
   const router = useRouter();
 
   const setRoom = useCollaborationRoom((state) => state.setRoom);
   const setUser = useCollaborationRoom((state) => state.setUser);
 
+  React.useEffect(() => {
+    roomRef.current?.focus();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+
     defaultValues: {
       username: "",
       roomId: "",
@@ -72,7 +79,7 @@ function LoginForm() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="w-full max-w-md"
+      className="w-full max-w-md flex justify-center items-start"
     >
       <Form {...form}>
         <form
@@ -84,14 +91,15 @@ function LoginForm() {
             name="roomId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#757575] font-inter font-light">
+                <FormLabel className="text-[#757575] text-sm font-inter font-light">
                   Room name
                 </FormLabel>
                 <FormControl>
                   <Input
+                    {...field}
+                    ref={roomRef}
                     placeholder="room name to join"
                     className="font-inter font-light rounded-none border-black"
-                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -103,7 +111,7 @@ function LoginForm() {
             name="username"
             render={({ field }) => (
               <FormItem className="mb-0">
-                <FormLabel className="text-[#757575] font-inter font-light">
+                <FormLabel className="text-[#757575] text-sm font-inter font-light">
                   Username
                 </FormLabel>
                 <FormControl>
@@ -120,7 +128,7 @@ function LoginForm() {
           <div className="w-full flex justify-center items-center">
             <Button
               type="submit"
-              className="cursor-pointer font-inter rounded-none mt-[32px]"
+              className="cursor-pointer font-inter rounded-none mt-[32px] w-full"
             >
               ENTER
             </Button>

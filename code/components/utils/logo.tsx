@@ -42,6 +42,7 @@ export function Logo({
         src={src}
         width={width}
         height={height}
+        priority
         className={cn(`object-cover`, {
           ["w-[calc(345px*0.6)] h-[calc(40px*0.6)]"]: kind === "landscape",
           ["w-11 h-11"]: kind === "large",

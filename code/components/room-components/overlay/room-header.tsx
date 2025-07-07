@@ -29,14 +29,11 @@ import {
 import { Logo } from "@/components/utils/logo";
 import {
   Image as ImageIcon,
-  LogOut,
   ChevronDown,
   ChevronUp,
   Grid3X3Icon,
   GripIcon,
   Braces,
-  Github,
-  Book,
   MousePointer2,
   Check,
   Grid2X2Check,
@@ -48,7 +45,9 @@ import {
   PencilRuler,
   PanelRight,
   ShieldCheck,
-  ShieldX,
+  ExternalLink,
+  LogOut,
+  MonitorCog,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -68,14 +67,13 @@ import {
   GITHUB_URL,
   SIDEBAR_ELEMENTS,
 } from "@/lib/constants";
-import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.json";
-import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json";
-import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
+import { useGetOs } from "../hooks/use-get-os";
 
 export function RoomHeader() {
+  const os = useGetOs();
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
@@ -215,7 +213,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] md:py-[5px] md:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
               onOpenChange={(open: boolean) => {
@@ -232,7 +230,7 @@ export function RoomHeader() {
                 )}
               >
                 <div className="flex gap-1 justify-start items-center">
-                  <div className="h-[60px] flex justify-start items-center">
+                  <div className="h-auto md:h-[60px] flex justify-start items-center">
                     <Logo kind="only-logo" variant="no-text" />
                   </div>
                   {menuOpen ? (
@@ -252,21 +250,6 @@ export function RoomHeader() {
                 sideOffset={9}
                 className="font-inter rounded-none"
               >
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Debug
-                </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none w-full"
-                    onClick={handlePrintToConsoleState}
-                  >
-                    <Braces /> Print state to console
-                    <DropdownMenuShortcut>
-                      {SYSTEM_OS.MAC ? "⌥ ⌘ C" : "Alt Ctrl C"}
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                   IA Capabilities
                 </DropdownMenuLabel>
@@ -288,19 +271,19 @@ export function RoomHeader() {
                         )}
                         {!iaEnabled && (
                           <>
-                            <ShieldX size={16} />
-                            Disabled
+                            <MonitorCog size={16} />
+                            Setup
                           </>
                         )}
                       </div>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                   Interface
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  <HelpDrawerTrigger />
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
                     disabled={
@@ -319,6 +302,24 @@ export function RoomHeader() {
                       )}
                     </div>
                   </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none"
+                    disabled={
+                      instance?.isEmpty() ||
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={handleExportToImage}
+                  >
+                    <ImageIcon /> Export as image
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  Grid
+                </DropdownMenuLabel>
+                <DropdownMenuGroup>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
                     disabled={
@@ -332,12 +333,12 @@ export function RoomHeader() {
                         {gridEnabled ? (
                           <>
                             <Grid2X2X size={16} />
-                            Hide grid
+                            Hide
                           </>
                         ) : (
                           <>
                             <Grid2X2Check size={16} />
-                            Show grid
+                            Show
                           </>
                         )}
                       </div>
@@ -357,7 +358,7 @@ export function RoomHeader() {
                   >
                     <div className="w-full flex justify-between items-center">
                       <div className="w-full flex justify-start items-center gap-2">
-                        <GripIcon size={16} /> Grid as dots
+                        <GripIcon size={16} /> Dots
                       </div>
                       {gridType === WEAVE_GRID_TYPES.DOTS && (
                         <Check size={16} />
@@ -378,7 +379,7 @@ export function RoomHeader() {
                   >
                     <div className="w-full flex justify-between items-center">
                       <div className="w-full flex justify-start items-center gap-2">
-                        <Grid3X3Icon size={16} /> Grid as lines
+                        <Grid3X3Icon size={16} /> Lines
                       </div>
                       {gridType === WEAVE_GRID_TYPES.LINES && (
                         <Check size={16} />
@@ -399,64 +400,55 @@ export function RoomHeader() {
                   }
                   onClick={handleExportToImage}
                 >
-                  <ImageIcon /> Export room as image
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={() => {
-                    window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-                  }}
-                >
-                  <Github /> Code repository
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={() => {
-                    window.open(
-                      DOCUMENTATION_URL,
-                      "_blank",
-                      "noopener,noreferrer"
-                    );
-                  }}
-                >
-                  <Book /> Documentation
+                  <ImageIcon /> Export as image
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Weave.js dependencies versions
+                  Other
                 </DropdownMenuLabel>
-                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
-                  <div className="w-full flex gap-1 justify-between items-center">
-                    <code>@inditextech/weave-sdk</code>
-                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
-                      v{weavePackage.version}
-                    </code>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
-                  <div className="w-full flex gap-1 justify-between items-center">
-                    <code>@inditextech/weave-react</code>
-                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
-                      v{weaveReactHelperPackage.version}
-                    </code>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
-                  <div className="w-full flex gap-1 justify-between items-center">
-                    <code>@inditextech/weave-store-azure-web-pubsub</code>
-                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
-                      v{weaveStorePackage.version}
-                    </code>
-                  </div>
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none"
+                    onClick={() => {
+                      window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+                    }}
+                  >
+                    <ExternalLink /> GitHub
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none"
+                    onClick={() => {
+                      window.open(
+                        DOCUMENTATION_URL,
+                        "_blank",
+                        "noopener,noreferrer"
+                      );
+                    }}
+                  >
+                    <ExternalLink /> Documentation
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  onClick={handleExitRoom}
-                >
-                  <LogOut /> Exit room
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <HelpDrawerTrigger />
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onClick={handlePrintToConsoleState}
+                  >
+                    <Braces /> Print state to console
+                    <DropdownMenuShortcut>
+                      {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
+                      {[SYSTEM_OS.WINDOWS as string].includes(os) &&
+                        "Alt Ctrl C"}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-foreground cursor-pointer hover:rounded-none"
+                    onClick={handleExitRoom}
+                  >
+                    <LogOut /> Exit room
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
             <Divider />
@@ -481,7 +473,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="w-auto h-[72px] bg-white flex justify-between items-center gap-0 py-[5px] px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="w-auto h-[48px] md:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] md:py-[5px] md:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-end items-center gap-[24px]">
             <div className="flex justify-end items-center gap-[16px]">
               <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
@@ -489,34 +481,131 @@ export function RoomHeader() {
                 <ConnectedUsers />
               </div>
             </div>
-            <Divider />
-            <ZoomToolbar />
-            <div className="relative flex items-center gap-2">
-              <DropdownMenu
-                onOpenChange={(open: boolean) => {
-                  setSidebarsMenuOpen(open);
-                }}
-              >
-                <DropdownMenuTrigger
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
+            <div className="hidden md:flex md:justify-end md:items-center md:gap-[16px]">
+              <Divider />
+              <ZoomToolbar />
+              <div className="relative flex items-center gap-2">
+                <DropdownMenu
+                  onOpenChange={(open: boolean) => {
+                    setSidebarsMenuOpen(open);
+                  }}
+                >
+                  <DropdownMenuTrigger
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    className={cn(
+                      "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["font-normal"]: sidebarsMenuOpen,
+                        ["font-extralight"]: !sidebarsMenuOpen,
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      }
+                    )}
+                  >
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <PencilRuler size={20} strokeWidth={1} />
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="bottom"
+                          align="end"
+                          sideOffset={8}
+                          className="rounded-none"
+                        >
+                          Toolbars
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                    align="end"
+                    side="bottom"
+                    alignOffset={0}
+                    sideOffset={19}
+                    className="font-inter rounded-none"
+                  >
+                    <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                      Available Toolbars
+                    </DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onClick={() => {
+                          sidebarToggle(SIDEBAR_ELEMENTS.images);
+                        }}
+                      >
+                        <Images /> Images
+                        <DropdownMenuShortcut>
+                          {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onClick={() => {
+                          sidebarToggle(SIDEBAR_ELEMENTS.frames);
+                        }}
+                      >
+                        <Projector /> Frames
+                        <DropdownMenuShortcut>
+                          {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onClick={() => {
+                          sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
+                        }}
+                      >
+                        <SwatchBook /> Color tokens
+                        <DropdownMenuShortcut>
+                          {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onClick={() => {
+                          sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+                        }}
+                      >
+                        <ListTree /> Elements tree
+                        <DropdownMenuShortcut>
+                          {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <button
                   className={cn(
                     "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
                     {
-                      ["font-normal"]: sidebarsMenuOpen,
-                      ["font-extralight"]: !sidebarsMenuOpen,
                       ["disabled:cursor-default disabled:opacity-50"]:
-                        weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                        !actualAction ||
+                        !node ||
+                        (!node && nodes && nodes.length < 2),
                     }
                   )}
+                  disabled={
+                    !actualAction ||
+                    (!node && !nodes) ||
+                    (!node && nodes && nodes.length < 2)
+                  }
+                  onClick={() => {
+                    setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+                  }}
                 >
                   <TooltipProvider delayDuration={300}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <PencilRuler size={20} strokeWidth={1} />
+                        <PanelRight size={20} strokeWidth={1} />
                       </TooltipTrigger>
                       <TooltipContent
                         side="bottom"
@@ -524,107 +613,12 @@ export function RoomHeader() {
                         sideOffset={8}
                         className="rounded-none"
                       >
-                        Toolbars
+                        Node Properties
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  onCloseAutoFocus={(e) => {
-                    e.preventDefault();
-                  }}
-                  align="end"
-                  side="bottom"
-                  alignOffset={0}
-                  sideOffset={19}
-                  className="font-inter rounded-none"
-                >
-                  <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                    Available Toolbars
-                  </DropdownMenuLabel>
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      className="text-foreground cursor-pointer hover:rounded-none w-full"
-                      onClick={() => {
-                        sidebarToggle(SIDEBAR_ELEMENTS.images);
-                      }}
-                    >
-                      <Images /> Images
-                      <DropdownMenuShortcut>
-                        {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-foreground cursor-pointer hover:rounded-none w-full"
-                      onClick={() => {
-                        sidebarToggle(SIDEBAR_ELEMENTS.frames);
-                      }}
-                    >
-                      <Projector /> Frames
-                      <DropdownMenuShortcut>
-                        {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-foreground cursor-pointer hover:rounded-none w-full"
-                      onClick={() => {
-                        sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-                      }}
-                    >
-                      <SwatchBook /> Color tokens
-                      <DropdownMenuShortcut>
-                        {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-foreground cursor-pointer hover:rounded-none w-full"
-                      onClick={() => {
-                        sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-                      }}
-                    >
-                      <ListTree /> Elements tree
-                      <DropdownMenuShortcut>
-                        {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <button
-                className={cn(
-                  "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                  {
-                    ["disabled:cursor-default disabled:opacity-50"]:
-                      !actualAction ||
-                      !node ||
-                      (!node && nodes && nodes.length < 2),
-                  }
-                )}
-                disabled={
-                  !actualAction ||
-                  (!node && !nodes) ||
-                  (!node && nodes && nodes.length < 2)
-                }
-                onClick={() => {
-                  setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-                }}
-              >
-                <TooltipProvider delayDuration={300}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <PanelRight size={20} strokeWidth={1} />
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="bottom"
-                      align="end"
-                      sideOffset={8}
-                      className="rounded-none"
-                    >
-                      Node Properties
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </button>
+                </button>
+              </div>
             </div>
           </div>
         </div>
