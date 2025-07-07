@@ -16,7 +16,9 @@ on:
         required: true
         type: choice
         options:
+          - azure-develop
           - azure-development
+          - azure-pro
           - azure-production
         default: "azure-development"
 
@@ -28,7 +30,7 @@ jobs:
   deploy:
     name: Deploy to Container Apps
     runs-on: ubuntu-24.04
-    environment: ${{ github.event.inputs.ENVIRONMENT && github.event.inputs.ENVIRONMENT || 'azure-development' }}
+    environment: ${{ github.event.inputs.ENVIRONMENT && github.event.inputs.ENVIRONMENT || 'azure-develop' }}
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -38,8 +40,8 @@ jobs:
       AZURE_ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
       AZURE_CONTAINER_ENVIRONMENT_NAME: ${{ vars.AZURE_CONTAINER_ENVIRONMENT_NAME }}
       AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-      AZURE_CONTAINER_NAME: "weavejs-frontend"
-      AZURE_CONTAINER_NAME_BACKEND: "weavejs-backend"
+      AZURE_CONTAINER_NAME: "frontend"
+      AZURE_CONTAINER_NAME_BACKEND: "backend"
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_V2_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_V2_ENDPOINT }}
@@ -99,38 +101,14 @@ jobs:
 
       - name: Deploy
         uses: azure/cli@v2
+        env:
+          GITHUB_SHA: ${{ github.sha }}
         with:
-          azcliversion: latest
           inlineScript: |
-            az containerapp create \
-              --name $AZURE_CONTAINER_NAME \
-              --resource-group $AZURE_RESOURCE_GROUP \
-              --environment $AZURE_CONTAINER_ENVIRONMENT_NAME \
-              --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:${{ github.sha }} \
-              --target-port 8080 \
-              --ingress external \
-              --registry-server $AZURE_ACR_NAME.azurecr.io \
-              --user-assigned "$AZURE_IDENTITY_ID" \
-              --registry-identity "$AZURE_IDENTITY_ID" \
-              --min-replicas 1 \
-              --max-replicas 2 \
-              --scale-rule-name http-rule \
-              --scale-rule-type http \
-              --scale-rule-http-concurrency 10 \
-              --query properties.configuration.ingress.fqdn
-
-      - name: Add CDN IP Access Restrictions
-        run: |
-          echo "Adding CDN IP access restrictions..."
-          COUNT=1
-          for IP in $(echo "$CDN_IP_LIST" | tr ',' '\n'); do
-            echo "Adding IP rule $IP"
-            az containerapp ingress access-restriction set \
-              --name $AZURE_CONTAINER_NAME \
-              --resource-group $AZURE_RESOURCE_GROUP \
-              --rule-name "rule-$COUNT" \
-              --ip-address $IP \
-              --description "IP allow $COUNT" \
-              --action Allow
-            ((COUNT++))
-          done
+          azcliversion: latest
+            az containerapp update \
+            --name $AZURE_CONTAINER_NAME \
+            --resource-group $AZURE_RESOURCE_GROUP \
+            --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:$GITHUB_SHA \
+            --revision-suffix $GITHUB_SHA \
+            --query properties.configuration.ingress.fqdn
