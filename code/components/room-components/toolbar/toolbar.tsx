@@ -9,11 +9,13 @@ import { useWeave } from "@inditextech/weave-react";
 import React from "react";
 
 type ToolbarProps = {
+  className?: string;
   children: React.ReactNode;
   orientation?: "horizontal" | "vertical";
 };
 
 export const Toolbar = ({
+  className,
   children,
   orientation = "vertical",
 }: Readonly<ToolbarProps>) => {
@@ -26,9 +28,10 @@ export const Toolbar = ({
         {
           ["pointer-events-none"]: selectionActive,
           ["pointer-events-auto"]: !selectionActive,
-          ["flex"]: orientation === "horizontal",
+          ["flex flex-row"]: orientation === "horizontal",
           ["flex flex-col"]: orientation === "vertical",
         },
+        className
       )}
     >
       {children}

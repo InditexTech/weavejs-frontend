@@ -9,13 +9,7 @@ import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weave-react";
-import { SidebarActive, useCollaborationRoom } from "@/store/store";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useCollaborationRoom } from "@/store/store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,12 +32,6 @@ import {
   Check,
   Grid2X2Check,
   Grid2X2X,
-  SwatchBook,
-  ListTree,
-  Projector,
-  Images,
-  PencilRuler,
-  PanelRight,
   ShieldCheck,
   ExternalLink,
   LogOut,
@@ -57,16 +45,12 @@ import {
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
 import { ConnectionStatus } from "../connection-status";
-import { topElementVariants } from "./variants";
+import { bottomElementVariants, topElementVariants } from "./variants";
 import { ConnectedUsers } from "../connected-users";
 import { Divider } from "./divider";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
-import {
-  DOCUMENTATION_URL,
-  GITHUB_URL,
-  SIDEBAR_ELEMENTS,
-} from "@/lib/constants";
+import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
@@ -79,32 +63,18 @@ export function RoomHeader() {
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-  const actualAction = useWeave((state) => state.actions.actual);
-  const node = useWeave((state) => state.selection.node);
-  const nodes = useWeave((state) => state.selection.nodes);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
 
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [sidebarsMenuOpen, setSidebarsMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
     WEAVE_GRID_TYPES.LINES
-  );
-
-  const sidebarToggle = React.useCallback(
-    (element: SidebarActive) => {
-      setSidebarActive(element);
-    },
-    [setSidebarActive]
   );
 
   const handleToggleUsersPointers = React.useCallback(() => {
@@ -204,6 +174,23 @@ export function RoomHeader() {
         initial="hidden"
         animate="visible"
         exit="hidden"
+        variants={bottomElementVariants}
+        className={cn(
+          "w-auto z-1 flex 2xl:hidden gap-1 justify-center items-center absolute bottom-[16px] left-[16px] right-[16px]",
+          {
+            ["pointer-events-none"]: selectionActive,
+            ["pointer-events-auto"]: !selectionActive,
+          }
+        )}
+      >
+        <div className="bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
+          <ZoomToolbar />
+        </div>
+      </motion.div>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
         variants={topElementVariants}
         className={cn(
           "w-auto z-1 flex gap-1 justify-center items-center absolute top-[16px] left-[16px]",
@@ -213,7 +200,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] md:py-[5px] md:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="bg-white flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
               onOpenChange={(open: boolean) => {
@@ -230,7 +217,7 @@ export function RoomHeader() {
                 )}
               >
                 <div className="flex gap-1 justify-start items-center">
-                  <div className="h-auto md:h-[60px] flex justify-start items-center">
+                  <div className="h-[40px] 2xl:h-[60px] flex justify-start items-center">
                     <Logo kind="only-logo" variant="no-text" />
                   </div>
                   {menuOpen ? (
@@ -246,10 +233,20 @@ export function RoomHeader() {
                 }}
                 align="start"
                 side="bottom"
-                alignOffset={0}
+                alignOffset={-12}
                 sideOffset={9}
                 className="font-inter rounded-none"
               >
+                <DropdownMenuLabel className="block md:hidden px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  Room
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={iaEnabled}
+                  className="block md:hidden text-foreground cursor-pointer hover:rounded-none"
+                >
+                  {room}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="block md:hidden " />
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                   IA Capabilities
                 </DropdownMenuLabel>
@@ -451,8 +448,8 @@ export function RoomHeader() {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Divider />
-            <div className="flex justify-start items-center gap-1">
+            <Divider className="hidden lg:block" />
+            <div className="hidden lg:block flex justify-start items-center gap-1">
               <div className="flex justify-start items-center gap-2 font-inter text-foreground !normal-case min-h-[32px]">
                 <div className="font-inter text-[24px] font-light">{room}</div>
               </div>
@@ -473,7 +470,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="w-auto h-[48px] md:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] md:py-[5px] md:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-end items-center gap-[24px]">
             <div className="flex justify-end items-center gap-[16px]">
               <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
@@ -481,144 +478,9 @@ export function RoomHeader() {
                 <ConnectedUsers />
               </div>
             </div>
-            <div className="hidden md:flex md:justify-end md:items-center md:gap-[16px]">
+            <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
               <Divider />
               <ZoomToolbar />
-              <div className="relative flex items-center gap-2">
-                <DropdownMenu
-                  onOpenChange={(open: boolean) => {
-                    setSidebarsMenuOpen(open);
-                  }}
-                >
-                  <DropdownMenuTrigger
-                    disabled={
-                      weaveConnectionStatus !==
-                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    className={cn(
-                      "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                      {
-                        ["font-normal"]: sidebarsMenuOpen,
-                        ["font-extralight"]: !sidebarsMenuOpen,
-                        ["disabled:cursor-default disabled:opacity-50"]:
-                          weaveConnectionStatus !==
-                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
-                    )}
-                  >
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <PencilRuler size={20} strokeWidth={1} />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="bottom"
-                          align="end"
-                          sideOffset={8}
-                          className="rounded-none"
-                        >
-                          Toolbars
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    onCloseAutoFocus={(e) => {
-                      e.preventDefault();
-                    }}
-                    align="end"
-                    side="bottom"
-                    alignOffset={0}
-                    sideOffset={19}
-                    className="font-inter rounded-none"
-                  >
-                    <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                      Available Toolbars
-                    </DropdownMenuLabel>
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
-                        onClick={() => {
-                          sidebarToggle(SIDEBAR_ELEMENTS.images);
-                        }}
-                      >
-                        <Images /> Images
-                        <DropdownMenuShortcut>
-                          {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
-                        onClick={() => {
-                          sidebarToggle(SIDEBAR_ELEMENTS.frames);
-                        }}
-                      >
-                        <Projector /> Frames
-                        <DropdownMenuShortcut>
-                          {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
-                        onClick={() => {
-                          sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-                        }}
-                      >
-                        <SwatchBook /> Color tokens
-                        <DropdownMenuShortcut>
-                          {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
-                        onClick={() => {
-                          sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-                        }}
-                      >
-                        <ListTree /> Elements tree
-                        <DropdownMenuShortcut>
-                          {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <button
-                  className={cn(
-                    "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                    {
-                      ["disabled:cursor-default disabled:opacity-50"]:
-                        !actualAction ||
-                        !node ||
-                        (!node && nodes && nodes.length < 2),
-                    }
-                  )}
-                  disabled={
-                    !actualAction ||
-                    (!node && !nodes) ||
-                    (!node && nodes && nodes.length < 2)
-                  }
-                  onClick={() => {
-                    setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-                  }}
-                >
-                  <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <PanelRight size={20} strokeWidth={1} />
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="bottom"
-                        align="end"
-                        sideOffset={8}
-                        className="rounded-none"
-                      >
-                        Node Properties
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </button>
-              </div>
             </div>
           </div>
         </div>

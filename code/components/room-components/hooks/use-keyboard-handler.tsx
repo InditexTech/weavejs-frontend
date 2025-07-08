@@ -164,7 +164,7 @@ export function useKeyboardHandler() {
     () => {
       triggerTool("colorTokenTool");
     },
-    ["KeyP"],
+    ["KeyK"],
     (e) => !(e.ctrlKey || e.metaKey)
   );
 

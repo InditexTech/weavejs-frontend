@@ -190,6 +190,21 @@ export const NodeProperties = () => {
         <div className="flex justify-end items-center gap-1">
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+            onPointerDown={() => {
+              if (!instance) return;
+
+              for (const node of nodes) {
+                const isVisible = instance.allNodesVisible([node.instance]);
+
+                if (!isVisible) {
+                  instance.showNode(node.instance);
+                  continue;
+                }
+                if (isVisible) {
+                  instance.hideNode(node.instance);
+                }
+              }
+            }}
             onClick={() => {
               if (!instance) return;
 
@@ -230,6 +245,9 @@ export const NodeProperties = () => {
           </button>
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+            onPointerDown={() => {
+              setSidebarActive(null, "right");
+            }}
             onClick={() => {
               setSidebarActive(null, "right");
             }}

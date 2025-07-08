@@ -20,7 +20,7 @@ export const ConnectionStatus = ({
     <div className="flex">
       <div
         className={cn(
-          "bg-light-background-1 h-[20px] px-1 flex justify-center items-center",
+          "bg-light-background-1 w-[32px] h-[32px] rounded-full 2xl:rounded-none 2xl:w-auto 2xl:h-[20px] px-1 flex justify-center items-center",
           {
             ["bg-[#C2F0E8] text-black"]:
               weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
@@ -37,13 +37,15 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
           <>
             <Cloud size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">connected</span>
+            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
+              connected
+            </span>
           </>
         )}
         {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTING && (
           <>
             <CloudCog size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">
+            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
               connecting
             </span>
           </>
@@ -51,14 +53,16 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
           <>
             <CloudOff size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">error</span>
+            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
+              error
+            </span>
           </>
         )}
         {weaveConnectionStatus ===
           WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED && (
           <>
             <CloudOff size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">
+            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
               disconnected
             </span>
           </>

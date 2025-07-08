@@ -26,10 +26,10 @@ export const Home = () => {
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative flex h-full w-full flex-col items-center justify-start md:justify-center overflow-scroll"
+          className="relative flex h-full w-full flex-col items-center justify-start lg:justify-center overflow-scroll"
         >
-          <div className="max-w-[600px] w-full flex flex-col items-center justify-between gap-0 p-3 md:p-8">
-            <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 border border-[#c9c9c9]">
+          <div className="max-w-full lg:max-w-[500px] w-[calc(100dvw-24px)] h-dvh lg:h-auto flex flex-col items-center justify-between gap-3 lg:gap-6 m-3">
+            <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-2 lg:left-8 lg:top-8 bg-background p-8 border border-[#c9c9c9]">
               <Logo kind="landscape" variant="no-text" />
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -42,11 +42,11 @@ export const Home = () => {
                 </h1>
               </motion.div>
             </div>
-            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-[32px] border border-[#c9c9c9] mt-[32px]">
+            <div className="w-full h-full lg:h-auto flex flex-col gap-2 items-center justify-center bg-background p-8 border border-[#c9c9c9]">
               <LoginForm />
             </div>
-            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-[32px] border border-[#c9c9c9]">
-              <div className="flex flex-col md:flex-row gap-0 md:gap-2 justify-center-items-center">
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 border border-[#c9c9c9]">
+              <div className="flex flex-col lg:flex-row gap-0 lg:gap-2 justify-center-items-center">
                 <Button
                   variant="link"
                   onClick={() => {
@@ -86,7 +86,7 @@ export const Home = () => {
               </div>
             </div>
             {showDetails && (
-              <div className="w-[calc(100dvw-24px)] md:w-auto absolute bottom-3 right-3 md:bottom-8 md:right-8 flex flex-col items-start justify-center bg-background p-5 pt-3 border border-[#c9c9c9]">
+              <div className="w-[calc(100dvw-24px)] lg:w-auto absolute bottom-3 right-3 lg:bottom-8 lg:right-8 flex flex-col items-start justify-center bg-background p-5 pt-3 border border-[#c9c9c9]">
                 <div className="w-full flex gap-2 justify-between items-center mb-5 uppercase">
                   <div className="flex gap-2 justify-start items-center font-inter font-light text-sm">
                     <Info strokeWidth={1} size={16} />

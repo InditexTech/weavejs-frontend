@@ -8,11 +8,13 @@ type DividerSize = "normal" | "small";
 type DividerColor = "normal" | "black";
 
 type DividerProps = {
+  className?: string;
   size?: DividerSize;
   color?: DividerColor;
 };
 
 export function Divider({
+  className,
   size = "normal",
   color = "normal",
 }: Readonly<DividerProps>) {
@@ -28,6 +30,7 @@ export function Divider({
           ["bg-[#c9c9c9]"]: color === "normal",
           ["bg-black"]: color === "black",
         },
+        className
       )}
     ></div>
   );
