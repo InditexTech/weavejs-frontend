@@ -130,7 +130,6 @@ export function ToolsOverlayTouch() {
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
-        return;
       }
     },
     [instance, actualAction]
@@ -562,22 +561,17 @@ export function ToolsOverlayTouch() {
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image size={20} strokeWidth={1} /> Image tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "I" : "I"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>I</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
                   setActualImagesTool("imagesTool");
                   setShowSelectFilesImages(true);
-                  // triggerTool("imagesTool");
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "O" : "O"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>O</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -593,9 +587,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "G" : "G"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>G</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -687,9 +679,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "L" : "L"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>L</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -703,9 +693,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "B" : "B"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>B</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -719,9 +707,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "A" : "A"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>A</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -813,9 +799,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Square size={20} strokeWidth={1} /> Rectangle tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "R" : "R"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>R</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -829,9 +813,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "E" : "E"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>E</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -845,9 +827,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "P" : "P"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>P</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -861,9 +841,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "J" : "J"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>J</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -877,9 +855,7 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Tags size={20} strokeWidth={1} /> Color Token Reference tool
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "K" : "K"}
-                </DropdownMenuShortcut>
+                <DropdownMenuShortcut>K</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

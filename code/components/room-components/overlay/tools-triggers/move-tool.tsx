@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { useIACapabilities } from "@/store/ia";
@@ -32,7 +36,6 @@ export const MoveToolTrigger = ({
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
-        return;
       }
     },
     [instance, actualAction]

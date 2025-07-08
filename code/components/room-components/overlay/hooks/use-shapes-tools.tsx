@@ -20,7 +20,6 @@ export const useShapesTools = () => {
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
-        return;
       }
     },
     [instance, actualAction]
