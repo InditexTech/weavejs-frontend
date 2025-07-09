@@ -285,7 +285,11 @@ export const ElementsTree = () => {
                 const stage = instance.getStage();
 
                 const node = stage.findOne(`#${items[0]}`);
-                if (node && !instance.allNodesLocked([node])) {
+                if (
+                  node &&
+                  !instance.allNodesLocked([node]) &&
+                  instance.allNodesVisible([node])
+                ) {
                   instance.selectNodesByKey(items);
                 }
               }}

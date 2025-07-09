@@ -42,3 +42,6 @@ next-env.d.ts
 
 .npmrc
 certificates
+
+server.cert
+server.key

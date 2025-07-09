@@ -332,10 +332,10 @@ export function LLMGenerationV2Popup() {
         <div className="w-full h-full max-h-[calc(100dvh)] flex flex-col justify-center items-end bg-white text-black border-l-0 border-r border-[#c9c9c9] ">
           <div className="flex justify-between items-center w-full px-[24px] py-[29px] font-inter font-light text-[24px] uppercase border-b border-[#c9c9c9] pointer-events-auto">
             <div>
-              {imagesLLMPopupType === "create" && "Create an Image with AI"}
-              {imagesLLMPopupType === "edit-prompt" && "Edit with AI"}
-              {imagesLLMPopupType === "edit-mask" && "Edit with AI"}
-              {imagesLLMPopupType === "edit-variation" && "Edit with AI"}
+              {imagesLLMPopupType === "create" && "Generate an Image"}
+              {imagesLLMPopupType === "edit-prompt" && "Edit an Image"}
+              {imagesLLMPopupType === "edit-mask" && "Edit an Image"}
+              {imagesLLMPopupType === "edit-variation" && "Edit an Image"}
             </div>
             <button
               className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"

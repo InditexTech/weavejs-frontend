@@ -126,6 +126,7 @@ export class ImagesToolAction extends WeaveAction {
     };
 
     this.preloadImgs[imageId] = new Image();
+    this.preloadImgs[imageId].crossOrigin = "anonymous";
     this.preloadImgs[imageId].onerror = () => {
       this.instance.emitEvent<ImagesToolActionOnEndLoadImageEvent>(
         "onImageLoadEnd",
@@ -147,6 +148,8 @@ export class ImagesToolAction extends WeaveAction {
 
       this.instance.emitEvent("imageLoaded");
     };
+
+    console.log("Loading image", this.preloadImgs[imageId]);
 
     this.preloadImgs[imageId].src = imageURL;
   }

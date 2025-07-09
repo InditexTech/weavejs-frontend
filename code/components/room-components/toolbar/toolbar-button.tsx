@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { LongPressEventType, useLongPress } from "use-long-press";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -22,6 +23,7 @@ type ToolbarButtonProps = {
   active?: boolean;
   disabled?: boolean;
   label?: React.ReactNode;
+  tooltipSideOffset?: number;
   tooltipSide?: "top" | "bottom" | "left" | "right";
   tooltipAlign?: "start" | "center" | "end";
 };
@@ -39,12 +41,22 @@ export const ToolbarButton = React.forwardRef<
       onClick,
       disabled = false,
       active = false,
+      tooltipSideOffset = 8,
       tooltipSide = "right",
       tooltipAlign = "center",
     },
-    forwardedRef,
+    forwardedRef
   ) => {
     const selectionActive = useWeave((state) => state.selection.active);
+
+    const bind = useLongPress(
+      () => {
+        alert("Long pressed!");
+      },
+      {
+        detect: "pointer" as LongPressEventType,
+      }
+    );
 
     return (
       <TooltipProvider delayDuration={300}>
@@ -63,10 +75,11 @@ export const ToolbarButton = React.forwardRef<
                   ["pointer-events-none cursor-default text-black opacity-50"]:
                     disabled,
                 },
-                className,
+                className
               )}
               disabled={disabled}
               onClick={onClick}
+              {...bind()}
             >
               {icon}
             </button>
@@ -74,7 +87,7 @@ export const ToolbarButton = React.forwardRef<
           <TooltipContent
             side={tooltipSide}
             align={tooltipAlign}
-            sideOffset={8}
+            sideOffset={tooltipSideOffset}
             className="rounded-none"
           >
             {label}
@@ -82,7 +95,7 @@ export const ToolbarButton = React.forwardRef<
         </Tooltip>
       </TooltipProvider>
     );
-  },
+  }
 );
 
 ToolbarButton.displayName = "ToolbarButton";
