@@ -370,7 +370,8 @@ export function ToolsNodeOverlay() {
     }
 
     if (
-      ["color-token"].includes(actualNode.type as string) ||
+      (nodes.length === 1 &&
+        ["color-token"].includes(actualNode.type as string)) ||
       ["colorTokenTool"].includes(actualAction as string)
     ) {
       actualNodeTools.push(
@@ -473,6 +474,7 @@ export function ToolsNodeOverlay() {
 
     return actualNodeTools;
   }, [
+    nodes,
     actualNode,
     actualAction,
     colorTokenColorMenuOpen,
@@ -489,7 +491,7 @@ export function ToolsNodeOverlay() {
     }
 
     if (
-      ["text"].includes(actualNode.type as string) ||
+      (nodes.length === 1 && ["text"].includes(actualNode.type as string)) ||
       ["textTool"].includes(actualAction as string)
     ) {
       actualNodeTools.push(
@@ -592,6 +594,7 @@ export function ToolsNodeOverlay() {
     return actualNodeTools;
   }, [
     actualNode,
+    nodes,
     actualAction,
     nodeTextColorMenuOpen,
     weaveConnectionStatus,
@@ -606,7 +609,7 @@ export function ToolsNodeOverlay() {
       return [];
     }
 
-    if (nodePropertiesAction === "update") {
+    if (nodePropertiesAction === "update" && nodes.length === 1) {
       actualNodeTools.push(
         <React.Fragment key="common-tools">
           {isGroup && (
@@ -1002,6 +1005,7 @@ export function ToolsNodeOverlay() {
     }
 
     if (
+      nodes.length === 1 &&
       !isGroup &&
       !["mask", "fuzzy-mask", "text", "frame", "color-token"].includes(
         actualNode.type as string
@@ -1718,6 +1722,7 @@ export function ToolsNodeOverlay() {
 
     return actualNodeTools;
   }, [
+    nodes,
     actualNode,
     isGroup,
     actualAction,
@@ -1733,87 +1738,95 @@ export function ToolsNodeOverlay() {
   const commonUpdateNodeTools = React.useMemo(() => {
     const actualNodeTools = [];
 
-    if (nodePropertiesAction === "update" && !imageCroppingNode) {
-      actualNodeTools.push(
-        <React.Fragment key="update-node-common-tools">
-          {(imageEditionTools.length > 0 ||
-            colorTokenTools.length > 0 ||
-            textTools.length > 0 ||
-            commonShapeTools.length > 0) && (
+    if (
+      nodePropertiesAction === "update" &&
+      typeof imageCroppingNode === "undefined"
+    ) {
+      if (
+        imageEditionTools.length > 0 ||
+        colorTokenTools.length > 0 ||
+        textTools.length > 0 ||
+        commonShapeTools.length > 0
+      ) {
+        actualNodeTools.push(
+          <ToolbarDivider
+            orientation="horizontal"
+            className="!w-full col-span-1"
+          />
+        );
+      }
+
+      if (nodes.length === 1 && node?.type === "image") {
+        actualNodeTools.push(
+          <React.Fragment key="update-node-image-tools">
+            <ToolbarButton
+              className="rounded-full !w-[40px]"
+              icon={<Crop className="px-2" size={40} strokeWidth={1} />}
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
+              onClick={() => {
+                if (!instance || !node) {
+                  return;
+                }
+
+                const nodeInstance = instance
+                  .getStage()
+                  .findOne(`#${node.key}`) as Konva.Group | undefined;
+
+                if (nodeInstance) {
+                  nodeInstance.triggerCrop();
+                }
+              }}
+              label={
+                <div className="flex gap-3 justify-start items-center">
+                  <p>Crop image</p>
+                </div>
+              }
+              tooltipSide="left"
+              tooltipAlign="center"
+            />
             <ToolbarDivider
               orientation="horizontal"
               className="!w-full col-span-1"
             />
-          )}
-          {node?.type === "image" && (
-            <React.Fragment key="update-node-image-tools">
-              <ToolbarButton
-                className="rounded-full !w-[40px]"
-                icon={<Crop className="px-2" size={40} strokeWidth={1} />}
-                disabled={
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                }
-                onClick={() => {
-                  if (!instance || !node) {
-                    return;
-                  }
+          </React.Fragment>
+        );
+      }
 
-                  const nodeInstance = instance
-                    .getStage()
-                    .findOne(`#${node.key}`) as Konva.Group | undefined;
-
-                  if (nodeInstance) {
-                    nodeInstance.triggerCrop();
-                  }
+      actualNodeTools.push(
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<PanelRight className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+            typeof nodePropertiesAction === "undefined" ||
+            typeof actualNode === "undefined" ||
+            (typeof actualNode === "undefined" && nodes.length < 2)
+          }
+          onClick={() => {
+            setNodeLayeringMenuOpen(false);
+            setNodeFillMenuOpen(false);
+            setNodeStrokeMenuOpen(false);
+            setNodeStrokeWidthMenuOpen(false);
+            setNodeStrokeStyleMenuOpen(false);
+            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Node Properties</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "⌘ Z",
+                  [SYSTEM_OS.OTHER]: "Ctrl Z",
                 }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>Crop image</p>
-                  </div>
-                }
-                tooltipSide="left"
-                tooltipAlign="center"
               />
-              <ToolbarDivider
-                orientation="horizontal"
-                className="!w-full col-span-1"
-              />
-            </React.Fragment>
-          )}
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<PanelRight className="px-2" size={40} strokeWidth={1} />}
-            disabled={
-              weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-              typeof nodePropertiesAction === "undefined" ||
-              typeof actualNode === "undefined" ||
-              (typeof actualNode === "undefined" && nodes.length < 2)
-            }
-            onClick={() => {
-              setNodeLayeringMenuOpen(false);
-              setNodeFillMenuOpen(false);
-              setNodeStrokeMenuOpen(false);
-              setNodeStrokeWidthMenuOpen(false);
-              setNodeStrokeStyleMenuOpen(false);
-              setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Node Properties</p>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⌘ Z",
-                    [SYSTEM_OS.OTHER]: "Ctrl Z",
-                  }}
-                />
-              </div>
-            }
-            tooltipSide="left"
-            tooltipAlign="center"
-          />
-        </React.Fragment>
+            </div>
+          }
+          tooltipSide="left"
+          tooltipAlign="center"
+        />
       );
     }
 
