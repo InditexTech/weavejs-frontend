@@ -12,14 +12,14 @@ import { useCollaborationRoom } from "@/store/store";
 import { InputNumber } from "../inputs/input-number";
 import Konva from "konva";
 import { ToggleIconButton } from "../toggle-icon-button";
-import { WeaveImageOnCropStartEvent } from "@inditextech/weave-sdk";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
 
-  const [isCropping, setIsCropping] = React.useState(false);
-
+  const isCropping = useCollaborationRoom(
+    (state) => state.images.cropping.enabled
+  );
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
   );
@@ -56,33 +56,6 @@ export function CropProperties() {
 
     return node;
   }, [actualNode, instance]);
-
-  React.useEffect(() => {
-    if (!instance || !actualNodeInstance) return;
-
-    const handleCropStart = ({
-      instance: imageInstance,
-    }: WeaveImageOnCropStartEvent) => {
-      if (imageInstance.getAttrs().id === actualNodeInstance.getAttrs().id) {
-        setIsCropping(true);
-      }
-    };
-    const handleCropEnd = ({
-      instance: imageInstance,
-    }: WeaveImageOnCropStartEvent) => {
-      if (imageInstance.getAttrs().id === actualNodeInstance.getAttrs().id) {
-        setIsCropping(false);
-      }
-    };
-
-    instance.addEventListener("onImageCropStart", handleCropStart);
-    instance.addEventListener("onImageCropEnd", handleCropEnd);
-
-    return () => {
-      instance.removeEventListener("onImageCropStart", handleCropStart);
-      instance.removeEventListener("onImageCropEnd", handleCropEnd);
-    };
-  }, [instance, actualNodeInstance]);
 
   if (!instance || !actualNode) return null;
 

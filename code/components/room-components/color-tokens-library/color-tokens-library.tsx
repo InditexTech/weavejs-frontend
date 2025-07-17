@@ -69,8 +69,13 @@ export const ColorTokensLibrary = () => {
       <ScrollArea className="w-full h-[calc(100%-95px)]">
         <div className="flex flex-col gap-2 w-full h-full p-[24px]">
           <div
-            className="grid grid-cols-2 gap-2 w-full weaveDraggable"
+            className="grid grid-cols-2 gap-2 w-full weaveDraggable select-none"
+            draggable="true"
             onDragStart={(e) => {
+              // Safari won't start drag without this!
+              e.dataTransfer.setData("text/plain", "dummy");
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.dropEffect = "move";
               if (e.target instanceof HTMLDivElement) {
                 window.colorTokenDragColor = e.target.dataset.colortoken;
               }

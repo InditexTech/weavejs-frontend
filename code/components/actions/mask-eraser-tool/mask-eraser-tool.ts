@@ -3,11 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from "konva";
-import {
-  WeaveAction,
-  WeaveNodesSelectionPlugin,
-  SELECTION_TOOL_ACTION_NAME,
-} from "@inditextech/weave-sdk";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { type MaskEraserToolActionState } from "./types";
 import {
   MASK_ERASER_TOOL_ACTION_NAME,
@@ -202,13 +198,6 @@ export class MaskEraserToolAction extends WeaveAction {
 
     stage.container().style.cursor = "default";
     this.erasing = false;
-
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      selectionPlugin.enable();
-      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
-    }
 
     this.setState(MASK_ERASER_TOOL_STATE.IDLE);
   }

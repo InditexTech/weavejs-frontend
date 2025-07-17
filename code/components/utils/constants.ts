@@ -37,6 +37,7 @@ import {
   WeaveArrowNode,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
+  WeaveStrokeNode,
   WeaveStageGridPlugin,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
@@ -53,7 +54,6 @@ import {
 import { type WeaveUser } from "@inditextech/weave-types";
 import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
-import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
 import { ImagesToolAction } from "../actions/images-tool/images-tool";
@@ -137,10 +137,18 @@ const inter = Inter({
 const NODES = () => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
-  new WeaveGroupNode(),
+  new WeaveGroupNode({
+    config: {
+      transform: {
+        enabledAnchors: [],
+        keepRatio: true,
+      },
+    },
+  }),
   new WeaveRectangleNode(),
   new WeaveEllipseNode(),
   new WeaveLineNode(),
+  new WeaveStrokeNode(),
   new WeaveTextNode(),
   new WeaveImageNode({
     config: {
@@ -181,7 +189,14 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageGridPlugin(),
   new WeaveStagePanningPlugin(),
   new WeaveStageResizePlugin(),
-  new WeaveStageZoomPlugin(),
+  new WeaveStageZoomPlugin({
+    config: {
+      zoomInertia: {
+        friction: 0.9,
+        mouseWheelStep: 0.01,
+      },
+    },
+  }),
   new WeaveNodesSelectionPlugin(),
   new WeaveNodesSnappingPlugin(),
   new WeaveStageDropAreaPlugin(),
@@ -229,7 +244,6 @@ const ACTIONS = () => [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new WeaveAlignNodesToolAction(),
-  new AlignElementsToolAction(),
   new WeaveExportNodesToolAction(),
   new WeaveExportStageToolAction(),
   new ImagesToolAction(),

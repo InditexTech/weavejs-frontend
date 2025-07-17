@@ -7,19 +7,11 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import {
-  ColorPicker,
-  ColorPickerAlpha,
-  ColorPickerEyeDropper,
-  ColorPickerFormatEditor,
-  ColorPickerHue,
-  ColorPickerFormatSelector,
-  ColorPickerSaturation,
-} from "@/components/ui/color-picker";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ColorPickerInput } from "./color-picker";
 
 type InputColorProps = {
   label?: string;
@@ -74,42 +66,23 @@ export const InputColor = ({
         <Popover>
           <PopoverTrigger asChild>
             <div
-              className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-black rounded-none"
+              className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-[#c9c9c9] rounded-none"
               style={{ background: value }}
             />
           </PopoverTrigger>
           <PopoverContent
-            align="start"
-            side="top"
+            align="end"
+            side="left"
             alignOffset={0}
             sideOffset={9}
-            className="rounded-none border-black"
+            className="rounded-none border-[#c9c9c9] w-[300px]"
           >
-            <ColorPicker
+            <ColorPickerInput
               value={value}
               onChange={(color) => {
                 onChange(color as string);
               }}
-              onFocus={() => {
-                window.weaveOnFieldFocus = true;
-              }}
-              onBlurCapture={() => {
-                window.weaveOnFieldFocus = false;
-              }}
-            >
-              <ColorPickerSaturation />
-              <div className="flex items-center gap-4">
-                <ColorPickerEyeDropper />
-                <div className="w-full grid gap-1">
-                  <ColorPickerHue />
-                  <ColorPickerAlpha />
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <ColorPickerFormatSelector />
-                <ColorPickerFormatEditor />
-              </div>
-            </ColorPicker>
+            />
           </PopoverContent>
         </Popover>
         {!editing && (

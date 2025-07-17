@@ -27,7 +27,13 @@ import { HelpArrange } from "./help-arrange";
 import { useCollaborationRoom } from "@/store/store";
 import { DRAWER_ELEMENTS } from "@/lib/constants";
 
-export const HelpDrawerTrigger = () => {
+type HelpDrawerTriggerProps = {
+  onClick?: () => void;
+};
+
+export const HelpDrawerTrigger = ({
+  onClick = () => {},
+}: Readonly<HelpDrawerTriggerProps>) => {
   const os = useGetOs();
 
   const keyboardShortcutsVisible = useCollaborationRoom(
@@ -37,11 +43,19 @@ export const HelpDrawerTrigger = () => {
 
   return (
     <DropdownMenuItem
+      onPointerDown={() => {
+        setShowDrawer(
+          DRAWER_ELEMENTS.keyboardShortcuts,
+          !keyboardShortcutsVisible
+        );
+        onClick?.();
+      }}
       onClick={() => {
         setShowDrawer(
           DRAWER_ELEMENTS.keyboardShortcuts,
           !keyboardShortcutsVisible
         );
+        onClick?.();
       }}
       className="w-full text-foreground cursor-pointer hover:rounded-none"
     >

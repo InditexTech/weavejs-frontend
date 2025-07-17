@@ -18,7 +18,7 @@ import {
   Type,
   Frame,
   MousePointer,
-  Tags,
+  Tag,
   Undo,
   Redo,
   Eraser,
@@ -33,22 +33,19 @@ import {
   ListTree,
   SwatchBook,
   Projector,
-  PanelRight,
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
 import { leftElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
-import { ShortcutElement } from "../help/shortcut-element";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
@@ -75,11 +72,12 @@ export function ToolsOverlayTouch() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-  const node = useWeave((state) => state.selection.node);
-  const nodes = useWeave((state) => state.selection.nodes);
 
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
+  );
+  const imageCroppingEnabled = useCollaborationRoom(
+    (state) => state.images.cropping.enabled
   );
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
@@ -89,6 +87,8 @@ export function ToolsOverlayTouch() {
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
   );
+
+  const aiEnabled = useIACapabilities((state) => state.enabled);
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -110,9 +110,6 @@ export function ToolsOverlayTouch() {
 
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
-  );
-  const setShowSelectFilesImages = useCollaborationRoom(
-    (state) => state.setShowSelectFilesImages
   );
 
   const sidebarToggle = React.useCallback(
@@ -207,7 +204,7 @@ export function ToolsOverlayTouch() {
   const STROKES_TOOLS = useStrokesTools();
   const IMAGES_TOOLS = useImagesTools();
 
-  if (!showUI) {
+  if (!showUI || imageCroppingEnabled) {
     return null;
   }
 
@@ -236,12 +233,6 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Redo latest changes</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ Y",
-                  [SYSTEM_OS.OTHER]: "Ctrl Y",
-                }}
-              />
             </div>
           }
           tooltipSide="right"
@@ -263,27 +254,13 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Undo latest changes</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ Z",
-                  [SYSTEM_OS.OTHER]: "Ctrl Z",
-                }}
-              />
             </div>
           }
           tooltipSide="right"
           tooltipAlign="center"
         />
         <ToolbarDivider orientation="horizontal" />
-        <DropdownMenu
-          open={sidebarsMenuOpen}
-          onOpenChange={(open: boolean) => {
-            setShapesMenuOpen(false);
-            setStrokesMenuOpen(false);
-            setImagesMenuOpen(false);
-            setSidebarsMenuOpen(open);
-          }}
-        >
+        <DropdownMenu modal={false} open={sidebarsMenuOpen}>
           <DropdownMenuTrigger
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -316,12 +293,6 @@ export function ToolsOverlayTouch() {
               label={
                 <div className="flex gap-3 justify-start items-center">
                   <p>Toolbars</p>
-                  <ShortcutElement
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌘ Z",
-                      [SYSTEM_OS.OTHER]: "Ctrl Z",
-                    }}
-                  />
                 </div>
               }
               tooltipSide="right"
@@ -332,6 +303,9 @@ export function ToolsOverlayTouch() {
             onCloseAutoFocus={(e) => {
               e.preventDefault();
             }}
+            onFocusOutside={() => {
+              setSidebarsMenuOpen(false);
+            }}
             align="start"
             side="left"
             alignOffset={0}
@@ -341,96 +315,53 @@ export function ToolsOverlayTouch() {
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
                 setSidebarsMenuOpen(false);
-              }}
-              onClick={() => {
                 sidebarToggle(SIDEBAR_ELEMENTS.images);
-                setSidebarsMenuOpen(false);
               }}
             >
               <Images /> Images
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
-              </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.frames);
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
                 setSidebarsMenuOpen(false);
-              }}
-              onClick={() => {
                 sidebarToggle(SIDEBAR_ELEMENTS.frames);
-                setSidebarsMenuOpen(false);
               }}
             >
               <Projector /> Frames
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
-              </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
                 setSidebarsMenuOpen(false);
-              }}
-              onClick={() => {
                 sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-                setSidebarsMenuOpen(false);
               }}
             >
               <SwatchBook /> Color tokens
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
-              </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
                 setSidebarsMenuOpen(false);
-              }}
-              onClick={() => {
                 sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-                setSidebarsMenuOpen(false);
               }}
             >
               <ListTree /> Elements tree
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-              </DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<PanelRight className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-            !actualAction ||
-            (!node && !nodes) ||
-            (!node && nodes && nodes.length < 2)
-          }
-          onClick={() => {
-            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Node Properties</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ Z",
-                  [SYSTEM_OS.OTHER]: "Ctrl Z",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="right"
-          tooltipAlign="center"
-        />
-        <ToolbarDivider orientation="horizontal" />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Frame className="px-2" size={40} strokeWidth={1} />}
@@ -442,12 +373,6 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a frame</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "F",
-                  [SYSTEM_OS.OTHER]: "F",
-                }}
-              />
             </div>
           }
           tooltipSide="right"
@@ -464,12 +389,6 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add text</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "T",
-                  [SYSTEM_OS.OTHER]: "T",
-                }}
-              />
             </div>
           }
           tooltipSide="right"
@@ -489,15 +408,7 @@ export function ToolsOverlayTouch() {
             tooltipSide="right"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={imagesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(false);
-              setStrokesMenuOpen(false);
-              setImagesMenuOpen(open);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={imagesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -514,7 +425,7 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-full left-[48px] top-0"
+                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
                 icon={
                   imagesMenuOpen ? (
                     <ChevronLeft className="px-0" size={20} strokeWidth={1} />
@@ -545,6 +456,9 @@ export function ToolsOverlayTouch() {
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
+              onFocusOutside={() => {
+                setImagesMenuOpen(false);
+              }}
               align="start"
               side="right"
               alignOffset={0}
@@ -553,31 +467,38 @@ export function ToolsOverlayTouch() {
             >
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imageTool");
-                  triggerTool("imageTool");
-                  setShowSelectFileImage(true);
                 }}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image size={20} strokeWidth={1} /> Image tool
-                <DropdownMenuShortcut>I</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imagesTool");
-                  setShowSelectFilesImages(true);
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
-                <DropdownMenuShortcut>O</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
-                  setActualImagesTool("generateImageTool");
+                disabled={!aiEnabled}
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
+                  setActualImagesTool("generateImageTool");
                   setImagesLLMPopupType("create");
                   if (imagesLLMPopupType === "create") {
                     setImagesLLMPopupVisible(!imagesLLMPopupVisible);
@@ -587,7 +508,6 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
-                <DropdownMenuShortcut>G</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -605,15 +525,7 @@ export function ToolsOverlayTouch() {
             tooltipSide="right"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={strokesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(false);
-              setStrokesMenuOpen(open);
-              setImagesMenuOpen(false);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={strokesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -630,7 +542,7 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-full left-[48px] top-0"
+                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
                 icon={
                   strokesMenuOpen ? (
                     <ChevronLeft className="px-0" size={20} strokeWidth={1} />
@@ -661,6 +573,9 @@ export function ToolsOverlayTouch() {
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
+              onFocusOutside={() => {
+                setStrokesMenuOpen(false);
+              }}
               align="start"
               side="right"
               alignOffset={0}
@@ -670,44 +585,38 @@ export function ToolsOverlayTouch() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
-                  triggerTool("penTool");
-                }}
-                onClick={() => {
-                  setActualStrokesTool("penTool");
-                  triggerTool("penTool");
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
-                <DropdownMenuShortcut>L</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("brushTool");
-                  triggerTool("penTool");
-                }}
-                onClick={() => {
-                  setActualStrokesTool("brushTool");
-                  triggerTool("brushTool");
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
-                <DropdownMenuShortcut>B</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("arrowTool");
-                  triggerTool("arrowTool");
-                }}
-                onClick={() => {
-                  setActualStrokesTool("arrowTool");
-                  triggerTool("arrowTool");
                 }}
               >
                 <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
-                <DropdownMenuShortcut>A</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -725,15 +634,7 @@ export function ToolsOverlayTouch() {
             tooltipSide="right"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={shapesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(open);
-              setStrokesMenuOpen(false);
-              setImagesMenuOpen(false);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={shapesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -750,7 +651,7 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-full left-[48px] top-0"
+                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
                 icon={
                   shapesMenuOpen ? (
                     <ChevronLeft className="px-0" size={20} strokeWidth={1} />
@@ -762,7 +663,8 @@ export function ToolsOverlayTouch() {
                   weaveConnectionStatus !==
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                 }
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setShapesMenuOpen((prev) => !prev);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
@@ -781,6 +683,9 @@ export function ToolsOverlayTouch() {
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
+              onFocusOutside={() => {
+                setShapesMenuOpen(false);
+              }}
               align="start"
               side="right"
               alignOffset={0}
@@ -790,72 +695,62 @@ export function ToolsOverlayTouch() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("rectangleTool");
-                  triggerTool("rectangleTool");
-                }}
-                onClick={() => {
-                  setActualShapeTool("rectangleTool");
-                  triggerTool("rectangleTool");
                 }}
               >
                 <Square size={20} strokeWidth={1} /> Rectangle tool
-                <DropdownMenuShortcut>R</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("ellipseTool");
-                  triggerTool("ellipseTool");
-                }}
-                onClick={() => {
-                  setActualShapeTool("ellipseTool");
-                  triggerTool("ellipseTool");
                 }}
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
-                <DropdownMenuShortcut>E</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("regularPolygonTool");
-                  triggerTool("regularPolygonTool");
-                }}
-                onClick={() => {
-                  setActualShapeTool("regularPolygonTool");
-                  triggerTool("regularPolygonTool");
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
-                <DropdownMenuShortcut>P</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("starTool");
-                  triggerTool("starTool");
-                }}
-                onClick={() => {
-                  setActualShapeTool("starTool");
-                  triggerTool("starTool");
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
-                <DropdownMenuShortcut>J</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("colorTokenTool");
-                  triggerTool("colorTokenTool");
-                }}
-                onClick={() => {
-                  setActualShapeTool("colorTokenTool");
-                  triggerTool("colorTokenTool");
                 }}
               >
-                <Tags size={20} strokeWidth={1} /> Color Token Reference tool
-                <DropdownMenuShortcut>K</DropdownMenuShortcut>
+                <Tag size={20} strokeWidth={1} /> Color Token Reference tool
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -872,12 +767,6 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Erase</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "D",
-                  [SYSTEM_OS.OTHER]: "D",
-                }}
-              />
             </div>
           }
           tooltipSide="right"
@@ -894,12 +783,6 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Selection</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "S",
-                  [SYSTEM_OS.OTHER]: "S",
-                }}
-              />
             </div>
           }
           tooltipSide="right"

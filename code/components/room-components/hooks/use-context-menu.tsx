@@ -29,7 +29,7 @@ import {
   ArrowDown,
   ImageDown,
   Lock,
-  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
@@ -39,9 +39,6 @@ function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
-  const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position
-  );
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
   );
@@ -283,7 +280,7 @@ function useContextMenu() {
           const weaveCopyPasteNodesPlugin =
             instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste(contextMenuPosition);
+            await weaveCopyPasteNodesPlugin.paste();
             setContextMenuShow(false);
           }
         },
@@ -312,9 +309,8 @@ function useContextMenu() {
             </div>
           ),
           icon: <BringToFront size={16} />,
-          disabled: nodes.length !== 1,
           onClick: () => {
-            instance.bringToFront(nodes[0].instance);
+            instance.bringToFront(nodes.map((n) => n.instance));
             setContextMenuShow(false);
           },
         });
@@ -378,9 +374,8 @@ function useContextMenu() {
             </div>
           ),
           icon: <SendToBack size={16} />,
-          disabled: nodes.length !== 1,
           onClick: () => {
-            instance.sendToBack(nodes[0].instance);
+            instance.sendToBack(nodes.map((n) => n.instance));
             setContextMenuShow(false);
           },
         });
@@ -458,12 +453,6 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Lock / Unlock</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "L",
-                  [SYSTEM_OS.OTHER]: "L",
-                }}
-              />
             </div>
           ),
           icon: <Lock size={16} />,
@@ -485,32 +474,22 @@ function useContextMenu() {
             setContextMenuShow(false);
           },
         });
-        // LOCK / UNLOCK
+        // HIDE
         options.push({
           id: "show-hide",
           type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
-              <div>Show / Hide</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "L",
-                  [SYSTEM_OS.OTHER]: "L",
-                }}
-              />
+              <div>Hide</div>
             </div>
           ),
-          icon: <Eye size={16} />,
+          icon: <EyeOff size={16} />,
           onClick: () => {
             if (!instance) return;
 
             for (const node of nodes) {
               const isVisible = instance.allNodesVisible([node.instance]);
 
-              if (!isVisible) {
-                instance.showNode(node.instance);
-                continue;
-              }
               if (isVisible) {
                 instance.hideNode(node.instance);
               }
@@ -560,7 +539,6 @@ function useContextMenu() {
     },
     [
       instance,
-      contextMenuPosition,
       mutationUpload,
       aiEnabled,
       setImagesLLMPopupSelectedNodes,

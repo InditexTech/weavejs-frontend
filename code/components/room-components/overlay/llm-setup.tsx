@@ -23,6 +23,7 @@ import { postValidatePassword } from "@/api/post-validate-password";
 import { X } from "lucide-react";
 
 export function LlmSetupDialog() {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [password, setPassword] = React.useState<string>("");
   const [error, setError] = React.useState<Error | null>(null);
 
@@ -30,6 +31,14 @@ export function LlmSetupDialog() {
   const setAIEnabled = useIACapabilities((state) => state.setEnabled);
   const setSetupVisible = useIACapabilities((state) => state.setSetupVisible);
   const setSetupState = useIACapabilities((state) => state.setSetupState);
+
+  React.useEffect(() => {
+    if (setupVisible) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [setupVisible]);
 
   const mutationGenerate = useMutation({
     mutationFn: async (password: string) => {
@@ -81,6 +90,7 @@ export function LlmSetupDialog() {
             <div className="grid gap-3">
               <Label htmlFor="password font-inter font-xs">Password:</Label>
               <Input
+                ref={inputRef}
                 id="password"
                 name="password"
                 type="password"
@@ -104,7 +114,7 @@ export function LlmSetupDialog() {
           <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           <DialogFooter>
             <Button
-              type="submit"
+              type="button"
               className="cursor-pointer font-inter rounded-none"
               onClick={() => mutationGenerate.mutate(password)}
             >

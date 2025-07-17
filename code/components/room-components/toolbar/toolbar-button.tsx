@@ -14,12 +14,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useWeave } from "@inditextech/weave-react";
+import { useIsTouchDevice } from "../hooks/use-is-touch-device";
 
 type ToolbarButtonProps = {
   className?: string;
   variant?: "rounded" | "squared";
   icon: React.ReactNode;
-  onClick: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onClick: (e: any) => void;
   active?: boolean;
   disabled?: boolean;
   label?: React.ReactNode;
@@ -49,6 +51,8 @@ export const ToolbarButton = React.forwardRef<
   ) => {
     const selectionActive = useWeave((state) => state.selection.active);
 
+    const isTouchDevice = useIsTouchDevice();
+
     const bind = useLongPress(
       () => {
         alert("Long pressed!");
@@ -58,32 +62,50 @@ export const ToolbarButton = React.forwardRef<
       }
     );
 
+    const ButtonElement = React.useMemo(() => {
+      return (
+        <button
+          ref={forwardedRef}
+          className={cn(
+            "!pointer-events-none relative cursor-pointer h-[40px] flex justify-center items-center",
+            {
+              ["hover:bg-[#f0f0f0]"]: variant === "rounded",
+              ["hover:text-[#666666]"]: variant === "squared",
+              ["!pointer-events-auto"]: !selectionActive,
+              ["!pointer-events-none"]: selectionActive,
+              ["bg-[#2e2e2e] text-white hover:text-[#666666]"]: active,
+              ["pointer-events-none cursor-default text-black opacity-50"]:
+                disabled,
+            },
+            className
+          )}
+          disabled={disabled}
+          onClick={(e) => onClick(e)}
+          {...bind()}
+        >
+          {icon}
+        </button>
+      );
+    }, [
+      forwardedRef,
+      variant,
+      active,
+      disabled,
+      className,
+      icon,
+      onClick,
+      bind,
+      selectionActive,
+    ]);
+
+    if (isTouchDevice) {
+      return ButtonElement;
+    }
+
     return (
       <TooltipProvider delayDuration={300}>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              ref={forwardedRef}
-              className={cn(
-                "!pointer-events-none relative cursor-pointer h-[40px] flex justify-center items-center",
-                {
-                  ["hover:bg-[#f0f0f0]"]: variant === "rounded",
-                  ["hover:text-[#666666]"]: variant === "squared",
-                  ["!pointer-events-auto"]: !selectionActive,
-                  ["!pointer-events-none"]: selectionActive,
-                  ["bg-[#2e2e2e] text-white hover:text-[#666666]"]: active,
-                  ["pointer-events-none cursor-default text-black opacity-50"]:
-                    disabled,
-                },
-                className
-              )}
-              disabled={disabled}
-              onClick={onClick}
-              {...bind()}
-            >
-              {icon}
-            </button>
-          </TooltipTrigger>
+          <TooltipTrigger asChild>{ButtonElement}</TooltipTrigger>
           <TooltipContent
             side={tooltipSide}
             align={tooltipAlign}

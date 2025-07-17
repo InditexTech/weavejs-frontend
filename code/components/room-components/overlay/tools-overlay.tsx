@@ -5,40 +5,39 @@
 "use client";
 
 import React from "react";
+import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
-import { ToolbarButton } from "../toolbar/toolbar-button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
-import { Eraser, CircleSlash2, SprayCan } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
-import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
-import { topElementVariants } from "./variants";
+import { bottomElementVariants } from "./variants";
 import { useCollaborationRoom } from "@/store/store";
-import { ShortcutElement } from "../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
-import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { ToolsOverlayTouch } from "./tools-overlay.touch";
-import { MoveToolTrigger } from "./tools-triggers/move-tool";
-import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { ToolsOverlayMouse } from "./tools-overlay.mouse";
+import { ToolsNodeOverlay } from "./tools-node-overlay";
+import { ToolsNodesOverlay } from "./tools-nodes-overlay";
+import { useNodeActionName } from "./hooks/use-node-action-name";
+import { ToolsMaskingOverlay } from "./tools-masking-overlay";
 
 export function ToolsOverlay() {
   useKeyboardHandler();
 
   const instance = useWeave((state) => state.instance);
-  const actualAction = useWeave((state) => state.actions.actual);
-  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
   );
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
+  const setCroppingImage = useCollaborationRoom(
+    (state) => state.setCroppingImage
+  );
+  const setCroppingNode = useCollaborationRoom(
+    (state) => state.setCroppingNode
+  );
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
   );
@@ -55,19 +54,28 @@ export function ToolsOverlay() {
     (state) => state.setShowSelectFileImage
   );
 
-  const triggerTool = React.useCallback(
-    (toolName: string, params?: unknown) => {
-      if (instance && actualAction !== toolName) {
-        instance.triggerAction(toolName, params);
-        return;
-      }
-      if (instance && actualAction === toolName) {
-        instance.cancelAction(toolName);
-        return;
-      }
-    },
-    [instance, actualAction]
-  );
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const handlerImageCropStart = ({ instance }: { instance: Konva.Group }) => {
+      setCroppingImage(true);
+      setCroppingNode(instance);
+    };
+
+    const handlerImageCropEnd = () => {
+      setCroppingImage(false);
+      setCroppingNode(undefined);
+    };
+
+    instance.addEventListener("onImageCropStart", handlerImageCropStart);
+
+    instance.addEventListener("onImageCropEnd", handlerImageCropEnd);
+
+    return () => {
+      instance.removeEventListener("onImageCropStart", handlerImageCropStart);
+      instance.removeEventListener("onImageCropEnd", handlerImageCropEnd);
+    };
+  }, [instance, setCroppingImage, setCroppingNode]);
 
   React.useEffect(() => {
     const onPasteExternalImage = async ({
@@ -137,102 +145,36 @@ export function ToolsOverlay() {
     setUploadingImage,
   ]);
 
+  const title = useNodeActionName();
+
   if (!showUI) {
     return null;
   }
 
-  if (imagesLLMPopupVisible && imagesLLMPopupType !== "edit-mask") {
-    return;
-  }
-
-  if (imagesLLMPopupVisible && imagesLLMPopupType === "edit-mask") {
-    return (
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        variants={topElementVariants}
-        className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
-      >
-        <Toolbar orientation="horizontal">
-          <MoveToolTrigger />
-          <ToolbarDivider />
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<SprayCan className="px-2" size={40} strokeWidth={1} />}
-            active={actualAction === "fuzzyMaskTool"}
-            disabled={
-              !aiEnabled ||
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            onClick={() => {
-              triggerTool("fuzzyMaskTool");
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Free Hand Mask tool</p>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "Q",
-                    [SYSTEM_OS.OTHER]: "Q",
-                  }}
-                />
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="center"
-          />
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<CircleSlash2 className="px-2" size={40} strokeWidth={1} />}
-            active={actualAction === "maskTool"}
-            disabled={
-              !aiEnabled ||
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            onClick={() => {
-              triggerTool("maskTool");
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Regular Mask tool</p>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "W",
-                    [SYSTEM_OS.OTHER]: "W",
-                  }}
-                />
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="center"
-          />
-          <ToolbarDivider />
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
-            disabled={
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            active={actualAction === "maskEraserTool"}
-            onClick={() => triggerTool("maskEraserTool")}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Erase Mask tool</p>
-              </div>
-            }
-            tooltipSide="top"
-            tooltipAlign="center"
-          />
-        </Toolbar>
-      </motion.div>
-    );
-  }
-
   return (
     <>
-      <ToolsOverlayTouch />
-      <ToolsOverlayMouse />
+      {title !== "Unknown" && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={bottomElementVariants}
+          className="pointer-events-none absolute left-[16px] right-[16px] top-[16px] flex flex-col gap-2 justify-center items-center"
+        >
+          <div className="px-3 py-2 rounded-full font-inter text-xs uppercase bg-white border border-[#c9c9c9]">
+            {title}
+          </div>
+        </motion.div>
+      )}
+      {!imagesLLMPopupVisible && (
+        <>
+          <ToolsOverlayTouch />
+          <ToolsOverlayMouse />
+          <ToolsNodeOverlay />
+          <ToolsNodesOverlay />
+        </>
+      )}
+      {imagesLLMPopupVisible && <ToolsMaskingOverlay />}
     </>
   );
 }

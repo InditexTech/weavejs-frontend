@@ -49,7 +49,7 @@ export class ColorTokenToolAction extends WeaveAction {
     this.instance.addEventListener("onStageDrop", (e) => {
       if (window.colorTokenDragColor) {
         this.instance.getStage().setPointersPositions(e);
-        const position = this.instance.getStage().getPointerPosition();
+        const position = this.instance.getStage().getRelativePointerPosition();
         this.instance.triggerAction("colorTokenTool", {
           color: window.colorTokenDragColor,
           position,
@@ -111,7 +111,7 @@ export class ColorTokenToolAction extends WeaveAction {
     const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
-    this.container = container;
+    this.container = container as Konva.Layer | Konva.Group;
 
     this.colorTokenId = uuidv4();
 

@@ -44,8 +44,8 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
             width={320}
             height={225}
             alt="A frame image"
-            className="object-fit w-full h-full"
-          />,
+            className="object-fit w-full h-auto"
+          />
         );
       } catch (ex) {
         console.error(ex);

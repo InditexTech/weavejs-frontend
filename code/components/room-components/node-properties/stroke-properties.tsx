@@ -78,7 +78,7 @@ export function StrokeProperties() {
     return null;
 
   if (
-    ["mask", "fuzzy-mask", "text", "color-token", "frame"].includes(
+    ["group", "mask", "fuzzy-mask", "text", "color-token", "frame"].includes(
       actualNode.type
     )
   ) {
@@ -126,54 +126,59 @@ export function StrokeProperties() {
             updateElement(updatedNode);
           }}
         />
-        <InputNumber
-          label="Width (px)"
-          value={actualNode.props.strokeWidth ?? 1}
-          onChange={(value) => {
-            const updatedNode: WeaveStateElement = {
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                strokeWidth: value,
-              },
-            };
-            updateElement(updatedNode);
-          }}
-        />
-        <div className="col-span-2">
-          <InputSelect
-            hideSearch
-            label="Style"
-            options={[
-              { label: "Normal", value: "" },
-              { label: "Short dashed", value: "5,5" },
-              { label: "Long dashed", value: "10,10" },
-            ]}
-            value={
-              actualNode.props.dash && actualNode.props.dash.length > 0
-                ? actualNode.props.dash.map((e: number) => `${e}`).join(",")
-                : ""
-            }
-            onChange={(value) => {
-              const dashArray: number[] = [];
-              const tokens = value.split(",");
-              for (const token of tokens) {
-                dashArray.push(parseInt(token));
-              }
-
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  dash: value ? dashArray : [],
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-        </div>
         {(["line"].includes(actualNode.type) ||
-          ["brushTool", "penTool"].includes(actualAction)) && (
+          ["penTool"].includes(actualAction)) && (
+          <>
+            <InputNumber
+              label="Width (px)"
+              value={actualNode.props.strokeWidth ?? 1}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    strokeWidth: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <div className="col-span-2">
+              <InputSelect
+                hideSearch
+                label="Style"
+                options={[
+                  { label: "Normal", value: "" },
+                  { label: "Short dashed", value: "5,5" },
+                  { label: "Long dashed", value: "10,10" },
+                ]}
+                value={
+                  actualNode.props.dash && actualNode.props.dash.length > 0
+                    ? actualNode.props.dash.map((e: number) => `${e}`).join(",")
+                    : ""
+                }
+                onChange={(value) => {
+                  const dashArray: number[] = [];
+                  const tokens = value.split(",");
+                  for (const token of tokens) {
+                    dashArray.push(parseInt(token));
+                  }
+
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      dash: value ? dashArray : [],
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+            </div>
+          </>
+        )}
+        {(["line"].includes(actualNode.type) ||
+          ["penTool"].includes(actualAction)) && (
           <>
             <div className="col-span-2">
               <InputNumber

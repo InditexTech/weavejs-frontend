@@ -4,7 +4,7 @@
 
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import { type ImagesToolActionTriggerParams } from "@/components/actions/images-tool/types";
@@ -26,6 +26,8 @@ export function UploadFiles() {
     (state) => state.setShowSelectFilesImages
   );
 
+  const queryClient = useQueryClient();
+
   const mutationUploadMulti = useMutation({
     mutationFn: async (files: FileList) => {
       const promises = Array.from(files).map((file) =>
@@ -40,6 +42,9 @@ export function UploadFiles() {
       setUploadingImage(true);
       mutationUploadMulti.mutate(files, {
         onSuccess: (data) => {
+          const queryKey = ["getImages", room];
+          queryClient.invalidateQueries({ queryKey });
+
           const imagesURLs = [];
           for (const uploadInfo of data) {
             if (uploadInfo.status === "fulfilled") {
@@ -70,7 +75,7 @@ export function UploadFiles() {
         },
       });
     },
-    [instance, mutationUploadMulti, setUploadingImage]
+    [instance, queryClient, room, mutationUploadMulti, setUploadingImage]
   );
 
   React.useEffect(() => {

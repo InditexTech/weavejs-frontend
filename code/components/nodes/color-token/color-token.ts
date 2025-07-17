@@ -93,6 +93,15 @@ export class ColorTokenNode extends WeaveNode {
 
     colorTokenNode.add(internalText);
 
+    colorTokenNode.getTransformerProperties = () => {
+      return {
+        resizeEnabled: false,
+        enabledAnchors: [] as string[],
+        borderStrokeWidth: 3,
+        padding: 0,
+      };
+    };
+
     this.setupDefaultNodeEvents(colorTokenNode);
 
     return colorTokenNode;

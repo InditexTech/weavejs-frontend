@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Circle, Hexagon, Square, Star } from "lucide-react";
+import { Circle, Hexagon, Square, Star, Tag } from "lucide-react";
 import React from "react";
 import { ShortcutElement } from "../../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
@@ -100,7 +100,7 @@ export const useShapesTools = () => {
         active: () => actualAction === "starTool",
       },
       colorTokenTool: {
-        icon: <Star className="px-2" size={40} strokeWidth={1} />,
+        icon: <Tag className="px-2" size={40} strokeWidth={1} />,
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Color Token Reference tool</p>

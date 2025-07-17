@@ -86,12 +86,13 @@ export function RoomHeader() {
     if (userPointersPlugin && userPointersPlugin.isEnabled()) {
       userPointersPlugin.disable();
       setPointersEnabled(false);
+      setMenuOpen(false);
       return;
     }
     if (userPointersPlugin && !userPointersPlugin.isEnabled()) {
       userPointersPlugin.enable();
       setPointersEnabled(true);
-      return;
+      setMenuOpen(false);
     }
   }, [instance]);
 
@@ -99,12 +100,13 @@ export function RoomHeader() {
     if (instance && instance.isPluginEnabled("stageGrid")) {
       instance.disablePlugin("stageGrid");
       setGridEnabled(instance.isPluginEnabled("stageGrid"));
+      setMenuOpen(false);
       return;
     }
     if (instance && !instance.isPluginEnabled("stageGrid")) {
       instance.enablePlugin("stageGrid");
       setGridEnabled(instance.isPluginEnabled("stageGrid"));
-      return;
+      setMenuOpen(false);
     }
   }, [instance]);
 
@@ -116,6 +118,7 @@ export function RoomHeader() {
         );
         setGridType(type);
       }
+      setMenuOpen(false);
     },
     [instance]
   );
@@ -132,6 +135,7 @@ export function RoomHeader() {
         }
       );
     }
+    setMenuOpen(false);
   }, [instance]);
 
   React.useEffect(() => {
@@ -153,6 +157,7 @@ export function RoomHeader() {
     sessionStorage.removeItem(`weave.js_${room}`);
     instance?.getStore().disconnect();
     router.push("/");
+    setMenuOpen(false);
   }, [instance, room, router]);
 
   const handlePrintToConsoleState = React.useCallback(() => {
@@ -162,6 +167,7 @@ export function RoomHeader() {
         appState: JSON.parse(JSON.stringify(instance.getStore().getState())),
       });
     }
+    setMenuOpen(false);
   }, [instance]);
 
   if (!showUI) {
@@ -175,15 +181,17 @@ export function RoomHeader() {
         animate="visible"
         exit="hidden"
         variants={bottomElementVariants}
-        className={cn(
-          "w-auto z-1 flex 2xl:hidden gap-1 justify-center items-center absolute bottom-[16px] left-[16px] right-[16px]",
-          {
-            ["pointer-events-none"]: selectionActive,
-            ["pointer-events-auto"]: !selectionActive,
-          }
-        )}
+        className="w-auto z-1 flex 2xl:hidden gap-1 justify-center items-center absolute bottom-[16px] left-[16px] right-[16px] pointer-events-none"
       >
-        <div className="bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div
+          className={cn(
+            "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]",
+            {
+              ["pointer-events-none"]: selectionActive,
+              ["pointer-events-auto"]: !selectionActive,
+            }
+          )}
+        >
           <ZoomToolbar />
         </div>
       </motion.div>
@@ -203,6 +211,7 @@ export function RoomHeader() {
         <div className="bg-white flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
+              open={menuOpen}
               onOpenChange={(open: boolean) => {
                 setMenuOpen(open);
               }}
@@ -254,8 +263,13 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     disabled={iaEnabled}
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={() => {
+                      setIASetupVisible(true);
+                      setMenuOpen(false);
+                    }}
                     onClick={() => {
                       setIASetupVisible(true);
+                      setMenuOpen(false);
                     }}
                   >
                     <div className="w-full flex justify-between items-center">
@@ -287,6 +301,7 @@ export function RoomHeader() {
                       weaveConnectionStatus !==
                       WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
+                    onPointerDown={handleToggleUsersPointers}
                     onClick={handleToggleUsersPointers}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -307,6 +322,7 @@ export function RoomHeader() {
                       weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
+                    onPointerDown={handleExportToImage}
                     onClick={handleExportToImage}
                   >
                     <ImageIcon /> Export as image
@@ -323,6 +339,7 @@ export function RoomHeader() {
                       weaveConnectionStatus !==
                       WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
+                    onPointerDown={handleToggleGrid}
                     onClick={handleToggleGrid}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -349,8 +366,13 @@ export function RoomHeader() {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={() => {
+                      handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                      setMenuOpen(false);
+                    }}
                     onClick={() => {
                       handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                      setMenuOpen(false);
                     }}
                   >
                     <div className="w-full flex justify-between items-center">
@@ -370,8 +392,13 @@ export function RoomHeader() {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={() => {
+                      handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                      setMenuOpen(false);
+                    }}
                     onClick={() => {
                       handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                      setMenuOpen(false);
                     }}
                   >
                     <div className="w-full flex justify-between items-center">
@@ -386,26 +413,14 @@ export function RoomHeader() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Exporting
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
-                  disabled={
-                    instance?.isEmpty() ??
-                    weaveConnectionStatus !==
-                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={handleExportToImage}
-                >
-                  <ImageIcon /> Export as image
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                   Other
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={() => {
+                      window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+                    }}
                     onClick={() => {
                       window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
                     }}
@@ -414,6 +429,13 @@ export function RoomHeader() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={() => {
+                      window.open(
+                        DOCUMENTATION_URL,
+                        "_blank",
+                        "noopener,noreferrer"
+                      );
+                    }}
                     onClick={() => {
                       window.open(
                         DOCUMENTATION_URL,
@@ -427,9 +449,14 @@ export function RoomHeader() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <HelpDrawerTrigger />
+                  <HelpDrawerTrigger
+                    onClick={() => {
+                      setMenuOpen(false);
+                    }}
+                  />
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none w-full"
+                    onPointerDown={handlePrintToConsoleState}
                     onClick={handlePrintToConsoleState}
                   >
                     <Braces /> Print state to console
@@ -441,6 +468,7 @@ export function RoomHeader() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    onPointerDown={handleExitRoom}
                     onClick={handleExitRoom}
                   >
                     <LogOut /> Exit room
@@ -471,7 +499,7 @@ export function RoomHeader() {
         )}
       >
         <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
-          <div className="flex justify-end items-center gap-[24px]">
+          <div className="flex justify-end items-center gap-[16px]">
             <div className="flex justify-end items-center gap-[16px]">
               <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
               <div className="max-w-[320px]">

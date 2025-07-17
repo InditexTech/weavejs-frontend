@@ -70,7 +70,7 @@ export class ImagesToolAction extends WeaveAction {
     this.instance.addEventListener("onStageDrop", (e) => {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
-        const position = this.instance.getStage().getPointerPosition();
+        const position = this.instance.getStage().getRelativePointerPosition();
         this.instance.triggerAction("imageTool", {
           imageURL: window.weaveDragImageURL,
           position,
@@ -149,8 +149,6 @@ export class ImagesToolAction extends WeaveAction {
       this.instance.emitEvent("imageLoaded");
     };
 
-    console.log("Loading image", this.preloadImgs[imageId]);
-
     this.preloadImgs[imageId].src = imageURL;
   }
 
@@ -178,7 +176,7 @@ export class ImagesToolAction extends WeaveAction {
     const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
-    this.container = container;
+    this.container = container as Konva.Layer | Konva.Group;
 
     const imagePoint = {
       x: this.clickPoint?.x ?? 0,

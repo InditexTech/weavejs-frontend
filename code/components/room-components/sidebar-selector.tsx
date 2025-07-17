@@ -34,14 +34,14 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive],
+    [setSidebarActive]
   );
 
   return (
@@ -52,7 +52,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
-          },
+          }
         )}
       >
         <span>{title}</span>
@@ -75,7 +75,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onClick={() => {
+            onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
@@ -86,7 +86,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onClick={() => {
+            onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
@@ -97,7 +97,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onClick={() => {
+            onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
@@ -108,7 +108,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onClick={() => {
+            onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
             }}
           >

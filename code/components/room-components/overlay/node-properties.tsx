@@ -26,7 +26,7 @@ import { StarProperties } from "../node-properties/star-properties";
 import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
 import { AlignProperties } from "../node-properties/align-properties";
-// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useNodeActionName } from "./hooks/use-node-action-name";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -74,83 +74,19 @@ export const NodeProperties = () => {
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
+      return;
     }
 
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
       setSidebarActive(null, "right");
+      return;
     }
 
     if (node) {
       setNodePropertiesAction("update");
     }
   }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
-
-  const nodeType = React.useMemo(() => {
-    switch (node?.type) {
-      case "group":
-        return "Group";
-      case "rectangle":
-        return "Rectangle";
-      case "ellipse":
-        return "Ellipse";
-      case "regular-polygon":
-        return "Regular Polygon";
-      case "line":
-        return "Vector path";
-      case "text":
-        return "Text";
-      case "image":
-        return "Image";
-      case "star":
-        return "Star";
-      case "arrow":
-        return "Arrow";
-      case "color-token":
-        return "Color Token";
-      case "frame":
-        return "Frame";
-      case "mask":
-        return "Mask";
-      case "fuzzy-mask":
-        return "Mask";
-      default:
-        return "Unknown";
-    }
-  }, [node]);
-
-  const actionType = React.useMemo(() => {
-    switch (actualAction) {
-      case "rectangleTool":
-        return "Rectangle";
-      case "ellipseTool":
-        return "Ellipse";
-      case "regularPolygonTool":
-        return "RegularPolygon";
-      case "brushTool":
-        return "Vector path";
-      case "penTool":
-        return "Vector path";
-      case "imageTool":
-        return "Image";
-      case "starTool":
-        return "Star";
-      case "arrowTool":
-        return "Arrow";
-      case "colorTokenTool":
-        return "Color Token";
-      case "frameTool":
-        return "Frame";
-      case "textTool":
-        return "Text";
-      case "maskTool":
-        return "Mask";
-      case "fuzzyMaskTool":
-        return "Mask";
-      default:
-        return "Unknown";
-    }
-  }, [actualAction]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -167,15 +103,7 @@ export const NodeProperties = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [node, instance]);
 
-  const title = React.useMemo(() => {
-    if (nodes && nodes.length > 1) {
-      return "Selection";
-    }
-    if (nodePropertiesAction === "create") {
-      return actionType;
-    }
-    return nodeType;
-  }, [nodes, nodeType, actionType, nodePropertiesAction]);
+  const title = useNodeActionName();
 
   if (sidebarRightActive !== "nodeProperties") {
     return null;
@@ -188,61 +116,65 @@ export const NodeProperties = () => {
           {title}
         </div>
         <div className="flex justify-end items-center gap-1">
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-            onPointerDown={() => {
-              if (!instance) return;
+          {nodePropertiesAction === "update" && (
+            <>
+              <button
+                className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+                onPointerDown={() => {
+                  if (!instance) return;
 
-              for (const node of nodes) {
-                const isVisible = instance.allNodesVisible([node.instance]);
+                  for (const node of nodes) {
+                    const isVisible = instance.allNodesVisible([node.instance]);
 
-                if (!isVisible) {
-                  instance.showNode(node.instance);
-                  continue;
-                }
-                if (isVisible) {
-                  instance.hideNode(node.instance);
-                }
-              }
-            }}
-            onClick={() => {
-              if (!instance) return;
+                    if (!isVisible) {
+                      instance.showNode(node.instance);
+                      continue;
+                    }
+                    if (isVisible) {
+                      instance.hideNode(node.instance);
+                    }
+                  }
+                }}
+                onClick={() => {
+                  if (!instance) return;
 
-              for (const node of nodes) {
-                const isVisible = instance.allNodesVisible([node.instance]);
+                  for (const node of nodes) {
+                    const isVisible = instance.allNodesVisible([node.instance]);
 
-                if (!isVisible) {
-                  instance.showNode(node.instance);
-                  continue;
-                }
-                if (isVisible) {
-                  instance.hideNode(node.instance);
-                }
-              }
-            }}
-          >
-            <EyeOff size={16} strokeWidth={1} />
-          </button>
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-            onClick={() => {
-              if (!instance) return;
+                    if (!isVisible) {
+                      instance.showNode(node.instance);
+                      continue;
+                    }
+                    if (isVisible) {
+                      instance.hideNode(node.instance);
+                    }
+                  }
+                }}
+              >
+                <EyeOff size={16} strokeWidth={1} />
+              </button>
+              <button
+                className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+                onClick={() => {
+                  if (!instance) return;
 
-              for (const node of nodes) {
-                const isLocked = instance.allNodesLocked([node.instance]);
+                  for (const node of nodes) {
+                    const isLocked = instance.allNodesLocked([node.instance]);
 
-                if (!isLocked) {
-                  instance.lockNode(node.instance);
-                  continue;
-                }
-                if (isLocked) {
-                  instance.unlockNode(node.instance);
-                }
-              }
-            }}
-          >
-            <Lock size={16} strokeWidth={1} />
-          </button>
+                    if (!isLocked) {
+                      instance.lockNode(node.instance);
+                      continue;
+                    }
+                    if (isLocked) {
+                      instance.unlockNode(node.instance);
+                    }
+                  }
+                }}
+              >
+                <Lock size={16} strokeWidth={1} />
+              </button>
+            </>
+          )}
           <button
             className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
             onPointerDown={() => {

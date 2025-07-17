@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
@@ -59,6 +60,10 @@ interface CollaborationRoomState {
     showSelectFiles: boolean;
     showSelectFile: boolean;
     transforming: boolean;
+    cropping: {
+      enabled: boolean;
+      node: Konva.Node | undefined;
+    };
     uploading: boolean;
     loading: boolean;
     finishUploadCallback: FinishUploadCallback | null;
@@ -74,6 +79,8 @@ interface CollaborationRoomState {
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (newTransformingImage: boolean) => void;
+  setCroppingImage: (newCroppingImage: boolean) => void;
+  setCroppingNode: (newCroppingNode: Konva.Node | undefined) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFilesImages: (newShowSelectFilesImages: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
@@ -128,20 +135,16 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     createProps: undefined,
   },
   images: {
-    llmPopup: {
-      visible: false,
-      state: "idle",
-      error: null,
-    },
     showSelectFiles: false,
     showSelectFile: false,
     transforming: false,
+    cropping: {
+      enabled: false,
+      node: undefined,
+    },
     uploading: false,
     loading: false,
     finishUploadCallback: null,
-    library: {
-      visible: false,
-    },
   },
   frames: {
     library: {
@@ -195,6 +198,22 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       images: { ...state.images, transforming: newTransformingImage },
+    })),
+  setCroppingImage: (newCroppingImage) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        cropping: { ...state.images.cropping, enabled: newCroppingImage },
+      },
+    })),
+  setCroppingNode: (newCroppingNode) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        cropping: { ...state.images.cropping, node: newCroppingNode },
+      },
     })),
   setUploadingImage: (newUploadingImage) =>
     set((state) => ({

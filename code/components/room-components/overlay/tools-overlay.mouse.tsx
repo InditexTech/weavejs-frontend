@@ -18,7 +18,7 @@ import {
   Type,
   Frame,
   MousePointer,
-  Tags,
+  Tag,
   Undo,
   Redo,
   Eraser,
@@ -31,7 +31,6 @@ import {
   ListTree,
   SwatchBook,
   Projector,
-  PanelRight,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -75,11 +74,12 @@ export function ToolsOverlayMouse() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-  const node = useWeave((state) => state.selection.node);
-  const nodes = useWeave((state) => state.selection.nodes);
 
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
+  );
+  const imageCroppingEnabled = useCollaborationRoom(
+    (state) => state.images.cropping.enabled
   );
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
@@ -89,6 +89,8 @@ export function ToolsOverlayMouse() {
   const setUploadingImage = useCollaborationRoom(
     (state) => state.setUploadingImage
   );
+
+  const aiEnabled = useIACapabilities((state) => state.enabled);
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -110,9 +112,6 @@ export function ToolsOverlayMouse() {
 
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
-  );
-  const setShowSelectFilesImages = useCollaborationRoom(
-    (state) => state.setShowSelectFilesImages
   );
 
   const sidebarToggle = React.useCallback(
@@ -207,7 +206,7 @@ export function ToolsOverlayMouse() {
   const STROKES_TOOLS = useStrokesTools();
   const IMAGES_TOOLS = useImagesTools();
 
-  if (!showUI) {
+  if (!showUI || imageCroppingEnabled) {
     return null;
   }
 
@@ -279,15 +278,7 @@ export function ToolsOverlayMouse() {
             tooltipSide="top"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={shapesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(open);
-              setStrokesMenuOpen(false);
-              setImagesMenuOpen(false);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={shapesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -304,7 +295,7 @@ export function ToolsOverlayMouse() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-full left-0 top-[-28px]"
+                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-t-lg rounded-br-none rounded-bl-none left-0 top-[-24px]"
                 icon={
                   shapesMenuOpen ? (
                     <ChevronDown className="px-0" size={20} strokeWidth={1} />
@@ -316,7 +307,8 @@ export function ToolsOverlayMouse() {
                   weaveConnectionStatus !==
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                 }
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setShapesMenuOpen((prev) => !prev);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
@@ -333,6 +325,9 @@ export function ToolsOverlayMouse() {
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent
+              onFocusOutside={() => {
+                setShapesMenuOpen(false);
+              }}
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
@@ -345,8 +340,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("rectangleTool");
-                  triggerTool("rectangleTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Square size={20} strokeWidth={1} /> Rectangle tool
@@ -355,8 +357,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("ellipseTool");
-                  triggerTool("ellipseTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
@@ -365,8 +374,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("regularPolygonTool");
-                  triggerTool("regularPolygonTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
@@ -375,8 +391,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("starTool");
-                  triggerTool("starTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
@@ -385,11 +408,18 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualShapeTool("colorTokenTool");
-                  triggerTool("colorTokenTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
-                <Tags size={20} strokeWidth={1} /> Color Token Reference tool
+                <Tag size={20} strokeWidth={1} /> Color Token Reference tool
                 <DropdownMenuShortcut>K</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -408,15 +438,7 @@ export function ToolsOverlayMouse() {
             tooltipSide="top"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={strokesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(false);
-              setStrokesMenuOpen(open);
-              setImagesMenuOpen(false);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={strokesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -433,7 +455,7 @@ export function ToolsOverlayMouse() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-full left-0 top-[-28px]"
+                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-t-lg rounded-br-none rounded-bl-none left-0 top-[-24px]"
                 icon={
                   strokesMenuOpen ? (
                     <ChevronDown className="px-0" size={20} strokeWidth={1} />
@@ -465,6 +487,9 @@ export function ToolsOverlayMouse() {
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
+              onFocusOutside={() => {
+                setStrokesMenuOpen(false);
+              }}
               align="start"
               side="bottom"
               alignOffset={0}
@@ -474,8 +499,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
-                  triggerTool("penTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
@@ -484,8 +516,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("brushTool");
-                  triggerTool("brushTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
@@ -494,8 +533,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("arrowTool");
-                  triggerTool("arrowTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
@@ -517,15 +563,7 @@ export function ToolsOverlayMouse() {
             tooltipSide="top"
             tooltipAlign="center"
           />
-          <DropdownMenu
-            open={imagesMenuOpen}
-            onOpenChange={(open: boolean) => {
-              setShapesMenuOpen(false);
-              setStrokesMenuOpen(false);
-              setImagesMenuOpen(open);
-              setSidebarsMenuOpen(false);
-            }}
-          >
+          <DropdownMenu modal={false} open={imagesMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -542,7 +580,7 @@ export function ToolsOverlayMouse() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-full left-0 top-[-28px]"
+                className="rounded-full !w-[40px] !h-[20px] absolute bg-white !w-[40px] border border-[#c9c9c9] rounded-t-lg rounded-br-none rounded-bl-none left-0 top-[-24px]"
                 icon={
                   imagesMenuOpen ? (
                     <ChevronDown className="px-0" size={20} strokeWidth={1} />
@@ -574,6 +612,9 @@ export function ToolsOverlayMouse() {
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
               }}
+              onFocusOutside={() => {
+                setImagesMenuOpen(false);
+              }}
               align="start"
               side="bottom"
               alignOffset={0}
@@ -583,9 +624,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imageTool");
-                  triggerTool("imageTool");
-                  setShowSelectFileImage(true);
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -595,9 +642,15 @@ export function ToolsOverlayMouse() {
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imagesTool");
-                  setShowSelectFilesImages(true);
-                  // triggerTool("imagesTool");
+                  instance.triggerAction("selectionTool");
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
@@ -605,9 +658,14 @@ export function ToolsOverlayMouse() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
+                disabled={!aiEnabled}
                 onClick={() => {
-                  setActualImagesTool("generateImageTool");
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
+
+                  setActualImagesTool("generateImageTool");
                   setImagesLLMPopupType("create");
                   if (imagesLLMPopupType === "create") {
                     setImagesLLMPopupVisible(!imagesLLMPopupVisible);
@@ -666,16 +724,7 @@ export function ToolsOverlayMouse() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider />
-        <DropdownMenu
-          open={sidebarsMenuOpen}
-          onOpenChange={(open: boolean) => {
-            setShapesMenuOpen(false);
-            setStrokesMenuOpen(false);
-            setImagesMenuOpen(false);
-            setSidebarsMenuOpen(open);
-          }}
-        >
+        <DropdownMenu modal={false} open={sidebarsMenuOpen}>
           <DropdownMenuTrigger
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -724,6 +773,9 @@ export function ToolsOverlayMouse() {
             onCloseAutoFocus={(e) => {
               e.preventDefault();
             }}
+            onFocusOutside={() => {
+              setSidebarsMenuOpen(false);
+            }}
             align="start"
             side="bottom"
             alignOffset={0}
@@ -733,6 +785,10 @@ export function ToolsOverlayMouse() {
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.images);
               }}
             >
@@ -744,6 +800,10 @@ export function ToolsOverlayMouse() {
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.frames);
               }}
             >
@@ -755,6 +815,10 @@ export function ToolsOverlayMouse() {
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
               }}
             >
@@ -766,6 +830,10 @@ export function ToolsOverlayMouse() {
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
               }}
             >
@@ -776,32 +844,6 @@ export function ToolsOverlayMouse() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<PanelRight className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-            !actualAction ||
-            (!node && !nodes) ||
-            (!node && nodes && nodes.length < 2)
-          }
-          onClick={() => {
-            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Node Properties</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ Z",
-                  [SYSTEM_OS.OTHER]: "Ctrl Z",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"

@@ -146,7 +146,7 @@ export function ZoomToolbar() {
               tooltipAlign="end"
             />
           </div>
-          <div className="w-[75px] px-4 font-inter flex justify-center items-center text-muted-foreground">
+          <div className="w-[75px] px-4 pr-0 font-inter flex justify-center items-center text-muted-foreground">
             {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
           </div>
         </div>

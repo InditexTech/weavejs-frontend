@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BlendMode, PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
+import { WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import Konva from "konva";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,7 +11,6 @@ import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
 import {
   Loader2Icon,
-  AlignStartHorizontal,
   Download,
   Presentation,
   SkipBack,
@@ -38,13 +37,12 @@ import { SidebarSelector } from "../sidebar-selector";
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
-  const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active,
+    (state) => state.sidebar.left.active
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive,
+    (state) => state.setSidebarActive
   );
 
   const [presentationMode, setPresentationMode] =
@@ -70,7 +68,7 @@ export const FramesLibrary = () => {
 
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      "frame",
+      "frame"
     );
 
     const frames: Konva.Node[] = [];
@@ -82,32 +80,6 @@ export const FramesLibrary = () => {
     }
     return frames;
   }, [instance, appState]);
-
-  const selectedNodesAllFrame = React.useMemo(() => {
-    let allFrame = true;
-    for (const node of selectedNodes) {
-      if (node.node?.type !== "frame") {
-        allFrame = false;
-        break;
-      }
-    }
-    return allFrame;
-  }, [selectedNodes]);
-
-  const alignItemsHandler = React.useCallback(() => {
-    if (!instance) {
-      return;
-    }
-
-    instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }, void>(
-      "alignElementsTool",
-      {
-        gap: 20,
-        nodes: selectedNodes,
-      },
-    );
-    instance.triggerAction("selectionTool");
-  }, [instance, selectedNodes]);
 
   const exportFramesHandler = React.useCallback(async () => {
     if (!instance) {
@@ -223,28 +195,6 @@ export const FramesLibrary = () => {
                   className="rounded-none"
                 >
                   Presentation mode
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-                    disabled={
-                      selectedNodes.length <= 1 || !selectedNodesAllFrame
-                    }
-                    onClick={alignItemsHandler}
-                  >
-                    <AlignStartHorizontal size={20} strokeWidth={1} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="rounded-none"
-                >
-                  Align horizontally
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
