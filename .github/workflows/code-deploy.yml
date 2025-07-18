@@ -17,9 +17,7 @@ on:
         type: choice
         options:
           - azure-develop
-          - azure-development
           - azure-pro
-          - azure-production
         default: "azure-development"
 
 permissions:
