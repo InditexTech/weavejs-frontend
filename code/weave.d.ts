@@ -36,7 +36,7 @@ declare module "konva/lib/Stage" {
     _allowActions: string[];
     _allowSelectNodeTypes: string[];
     _allowSelection: boolean;
-    mode(mode: string): string;
+    mode(mode?: WeaveStageMode): string;
     allowActions(actions?: string[]): string[];
     allowSelectNodes(nodeTypes?: string[]): string[];
     allowSelection(allowSelection?: boolean): boolean;

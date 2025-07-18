@@ -145,7 +145,7 @@ export class MaskToolAction extends WeaveAction {
       });
       utilityLayer?.add(this.mask);
 
-      this.mask.on("pointerenter", (e) => {
+      this.mask.on("pointerover", (e) => {
         if (e.target.getAttrs().selectable) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = "pointer";

@@ -243,7 +243,7 @@ export class FuzzyMaskToolAction extends WeaveAction {
         draggable: true,
       });
 
-      this.maskBg.on("pointerenter", (e) => {
+      this.maskBg.on("pointerover", (e) => {
         if (e.target.getAttrs().selectable) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = "pointer";
@@ -281,7 +281,7 @@ export class FuzzyMaskToolAction extends WeaveAction {
         height: boundingBox.height,
       });
 
-      this.maskBg.on("pointerenter", (e) => {
+      this.maskBg.on("pointerover", (e) => {
         if (e.target.getAttrs().selectable) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = "pointer";

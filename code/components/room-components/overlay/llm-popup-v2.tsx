@@ -36,7 +36,10 @@ import { Tabs, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useWeave } from "@inditextech/weave-react";
 import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask-eraser-tool";
-import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import {
+  WEAVE_STAGE_DEFAULT_MODE,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weave-sdk";
 
 export function LLMGenerationV2Popup() {
   useKeyboardHandler();
@@ -89,6 +92,18 @@ export function LLMGenerationV2Popup() {
   const setSelectedMasks = useIACapabilities((state) => state.setSelectedMasks);
 
   const [actualMaskBase64, actualMaskBase64UI] = useGenerateMask();
+
+  React.useEffect(() => {
+    if (!instance) {
+      return;
+    }
+
+    if (imagesLLMPopupVisible) {
+      (instance.getStage() as Konva.Stage).mode("llmPopup");
+    } else {
+      (instance.getStage() as Konva.Stage).mode(WEAVE_STAGE_DEFAULT_MODE);
+    }
+  }, [instance, imagesLLMPopupVisible]);
 
   React.useEffect(() => {
     if (!instance) {
