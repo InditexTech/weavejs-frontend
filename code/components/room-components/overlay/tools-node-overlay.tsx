@@ -611,7 +611,7 @@ export function ToolsNodeOverlay() {
 
     if (nodePropertiesAction === "update" && nodes.length === 1) {
       actualNodeTools.push(
-        <React.Fragment key="common-tools">
+        <React.Fragment key="common-shape-management-tools">
           {isGroup && (
             <ToolbarButton
               className="rounded-full !w-[40px]"
@@ -1005,7 +1005,6 @@ export function ToolsNodeOverlay() {
     }
 
     if (
-      nodes.length === 1 &&
       !isGroup &&
       !["mask", "fuzzy-mask", "text", "frame", "color-token"].includes(
         actualNode.type as string
@@ -1013,7 +1012,7 @@ export function ToolsNodeOverlay() {
       !["colorTokenTool"].includes(actualAction as string)
     ) {
       actualNodeTools.push(
-        <React.Fragment key="common-tools">
+        <React.Fragment key="common-shape-tools">
           {!["image"].includes(actualNode.type) && (
             <>
               <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-3">
@@ -1722,7 +1721,6 @@ export function ToolsNodeOverlay() {
 
     return actualNodeTools;
   }, [
-    nodes,
     actualNode,
     isGroup,
     actualAction,
@@ -1751,6 +1749,7 @@ export function ToolsNodeOverlay() {
         actualNodeTools.push(
           <ToolbarDivider
             orientation="horizontal"
+            key="divider-1"
             className="!w-full col-span-1"
           />
         );
@@ -1797,6 +1796,7 @@ export function ToolsNodeOverlay() {
 
       actualNodeTools.push(
         <ToolbarButton
+          key="update-node-properties"
           className="rounded-full !w-[40px]"
           icon={<PanelRight className="px-2" size={40} strokeWidth={1} />}
           disabled={
@@ -1900,7 +1900,7 @@ export function ToolsNodeOverlay() {
     const actualNodeTools = [];
     if (imageCroppingEnabled && imageCroppingNode) {
       actualNodeTools.push(
-        <React.Fragment key="create-node-common-tools">
+        <React.Fragment key="image-cropping-tools">
           <ToolbarButton
             className="rounded-full !w-[40px]"
             icon={<Check className="px-2" size={40} strokeWidth={1} />}

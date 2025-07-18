@@ -5,30 +5,32 @@
 "use client";
 
 import React from "react";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Trash, X } from "lucide-react";
+import { Trash, X } from "lucide-react";
+import {
+  WeaveStateElement,
+  WeaveElementAttributes,
+  WeaveElementInstance,
+} from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { getImages } from "@/api/get-images";
-import { postImage } from "@/api/post-image";
-import { delImage } from "@/api/del-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
+import { WeaveImageNode } from "@inditextech/weave-sdk";
+
+function isRelativeUrl(url: string) {
+  try {
+    new URL(url);
+    return false;
+  } catch {
+    return true;
+  }
+}
 
 export const ImagesLibrary = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const inputFileRef = React.useRef<any>(null);
-
   const instance = useWeave((state) => state.instance);
+  const appState = useWeave((state) => state.appState);
 
-  const room = useCollaborationRoom((state) => state.room);
   const sidebarLeftActive = useCollaborationRoom(
     (state) => state.sidebar.left.active
   );
@@ -36,33 +38,41 @@ export const ImagesLibrary = () => {
     (state) => state.setSidebarActive
   );
 
-  const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
-    },
-  });
-
-  const mutationDelete = useMutation({
-    mutationFn: async (imageId: string) => {
-      return await delImage(room ?? "", imageId);
-    },
-  });
-
-  const query = useInfiniteQuery({
-    queryKey: ["getImages", room],
-    queryFn: async ({ pageParam }) => {
-      if (!room) {
-        return [];
+  const appImages = React.useMemo(() => {
+    function extractImages(
+      images: WeaveStateElement[],
+      node: WeaveStateElement
+    ) {
+      if (node.props && node.props.nodeType === "image" && node.props.imageId) {
+        images.push(node);
       }
-      return await getImages(room ?? "", 20, pageParam);
-    },
-    initialPageParam: "",
-    getNextPageParam: (lastPage) => lastPage.continuationToken,
-  });
+      if (node.props && node.props.children) {
+        for (const child of node.props.children) {
+          extractImages(images, child);
+        }
+      }
+    }
 
-  const linearData = React.useMemo(() => {
-    return query.data?.pages.flatMap((page) => page.images) ?? [];
-  }, [query.data]);
+    const mainStateProps: WeaveElementAttributes = appState.weave
+      .props as WeaveElementAttributes;
+
+    const mainStateChildren: WeaveStateElement[] | undefined =
+      mainStateProps?.children;
+    const mainLayerElement: WeaveStateElement | undefined =
+      mainStateChildren?.find((child: WeaveStateElement) => {
+        return child.key === "mainLayer";
+      });
+
+    const images: WeaveStateElement[] = [];
+
+    if (typeof mainLayerElement === "undefined") {
+      return images;
+    }
+
+    extractImages(images, mainLayerElement);
+
+    return images;
+  }, [appState]);
 
   if (!instance) {
     return null;
@@ -79,47 +89,6 @@ export const ImagesLibrary = () => {
           <SidebarSelector title="Images" />
         </div>
         <div className="flex justify-end items-center gap-4">
-          <input
-            type="file"
-            accept="image/png,image/gif,image/jpeg"
-            name="image"
-            ref={inputFileRef}
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                mutationUpload.mutate(file, {
-                  onSuccess: () => {
-                    query.refetch();
-                  },
-                });
-              }
-            }}
-          />
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-                  onClick={() => {
-                    if (inputFileRef.current) {
-                      inputFileRef.current.click();
-                      // instance.triggerAction("imageTool");
-                    }
-                  }}
-                >
-                  <Plus size={20} strokeWidth={1} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                align="center"
-                className="rounded-none"
-              >
-                Add an image to the library
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
           <button
             className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
             onClick={() => {
@@ -140,21 +109,30 @@ export const ImagesLibrary = () => {
               }
             }}
           >
-            {linearData.length === 0 && (
+            {appImages.length === 0 && (
               <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-                <b className="font-normal text-[18px]">No images uploaded</b>
+                <b className="font-normal text-[18px]">No images added</b>
                 <span className="text-[14px]">
-                  Upload an image to the library
+                  Add an image to the room to start using the library.
                 </span>
               </div>
             )}
-            {linearData.length > 0 &&
-              linearData.map((image) => {
-                const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/images/${image}`;
+            {appImages.length > 0 &&
+              appImages.map((image) => {
+                const imageId = image.key;
+
+                let imageUrl = "";
+
+                if (isRelativeUrl(image.props.imageURL)) {
+                  const baseUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}`;
+                  imageUrl = `${baseUrl}${image.props.imageURL}`;
+                } else {
+                  imageUrl = image.props.imageURL;
+                }
 
                 return (
                   <div
-                    key={image}
+                    key={imageId}
                     className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border border-zinc-200 relative"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -167,11 +145,25 @@ export const ImagesLibrary = () => {
                     <button
                       className="absolute bottom-[8px] right-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer"
                       onClick={() => {
-                        mutationDelete.mutate(image, {
-                          onSuccess: () => {
-                            query.refetch();
-                          },
-                        });
+                        if (!instance) {
+                          return;
+                        }
+
+                        const node = instance.getStage().findOne(`#${imageId}`);
+
+                        if (node) {
+                          const nodeHandler =
+                            instance.getNodeHandler<WeaveImageNode>(
+                              node.getAttrs().nodeType
+                            );
+                          if (!nodeHandler) {
+                            return;
+                          }
+
+                          instance.removeNode(
+                            nodeHandler.serialize(node as WeaveElementInstance)
+                          );
+                        }
                       }}
                     >
                       <Trash size={16} />
