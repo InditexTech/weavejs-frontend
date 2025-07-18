@@ -12,8 +12,13 @@ export type ImagesToolActionState =
 export type ImagesToolActionOnStartLoadImageEvent = undefined;
 export type ImagesToolActionOnEndLoadImageEvent = Error | undefined;
 
+export type ImageInfo = {
+  imageId: string;
+  url: string;
+};
+
 export type ImagesToolActionTriggerParams = {
-  imagesURLs: string[];
+  images: ImageInfo[];
   padding?: number;
   position?: Vector2d;
 };

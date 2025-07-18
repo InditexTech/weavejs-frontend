@@ -7,7 +7,10 @@ import { useCollaborationRoom } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import { useWeave } from "@inditextech/weave-react";
-import { type ImagesToolActionTriggerParams } from "@/components/actions/images-tool/types";
+import {
+  ImageInfo,
+  type ImagesToolActionTriggerParams,
+} from "@/components/actions/images-tool/types";
 
 export function UploadFiles() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,22 +48,23 @@ export function UploadFiles() {
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
 
-          const imagesURLs = [];
+          const images: ImageInfo[] = [];
           for (const uploadInfo of data) {
             if (uploadInfo.status === "fulfilled") {
               const room = uploadInfo.value.fileName.split("/")[0];
               const imageId = uploadInfo.value.fileName.split("/")[1];
-              imagesURLs.push(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-              );
+              images.push({
+                imageId,
+                url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+              });
             }
           }
 
-          if (instance && imagesURLs.length > 0) {
+          if (instance && images.length > 0) {
             instance.triggerAction<ImagesToolActionTriggerParams, void>(
               "imagesTool",
               {
-                imagesURLs,
+                images,
                 padding: 20,
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

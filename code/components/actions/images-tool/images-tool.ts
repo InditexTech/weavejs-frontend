@@ -13,6 +13,7 @@ import {
   type ImagesToolActionTriggerParams,
   type ImagesToolActionState,
   type ImagesToolActionOnEndLoadImageEvent,
+  ImageInfo,
 } from "./types";
 import { IMAGES_TOOL_ACTION_NAME, IMAGES_TOOL_STATE } from "./constants";
 import Konva from "konva";
@@ -26,6 +27,7 @@ export class ImagesToolAction extends WeaveAction {
     string,
     {
       loaded: boolean;
+      imageId: string;
       imageURL: string;
       info: { width: number; height: number };
     }
@@ -117,11 +119,12 @@ export class ImagesToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadImage(imageURL: string) {
+  private loadImage(imageInfo: ImageInfo) {
     const imageId = uuidv4();
     this.images[imageId] = {
       loaded: false,
-      imageURL,
+      imageId: imageInfo.imageId,
+      imageURL: imageInfo.url,
       info: { width: 0, height: 0 },
     };
 
@@ -149,7 +152,7 @@ export class ImagesToolAction extends WeaveAction {
       this.instance.emitEvent("imageLoaded");
     };
 
-    this.preloadImgs[imageId].src = imageURL;
+    this.preloadImgs[imageId].src = imageInfo.url;
   }
 
   private allImagesLoaded(): boolean {
@@ -199,6 +202,7 @@ export class ImagesToolAction extends WeaveAction {
           stroke: "#000000ff",
           strokeWidth: 0,
           strokeScaleEnabled: true,
+          imageId: imageInfo.imageId,
           imageWidth: imageInfo.info.width,
           imageHeight: imageInfo.info.height,
           imageInfo: {
@@ -246,8 +250,8 @@ export class ImagesToolAction extends WeaveAction {
 
     this.padding = params?.padding ?? 20;
 
-    for (const imageURL of params.imagesURLs) {
-      this.loadImage(imageURL);
+    for (const imageInfo of params.images) {
+      this.loadImage(imageInfo);
     }
   }
 

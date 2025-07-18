@@ -25,7 +25,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ImagesToolActionTriggerParams } from "@/components/actions/images-tool/types";
+import {
+  ImageInfo,
+  ImagesToolActionTriggerParams,
+} from "@/components/actions/images-tool/types";
 import { Logo } from "@/components/utils/logo";
 import { CheckCheck, X } from "lucide-react";
 import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask-eraser-tool";
@@ -94,14 +97,17 @@ export function LLMPredictionsSelectionV2Popup() {
     const uploadResult = await Promise.allSettled(uploadPromises);
 
     if (instance && uploadResult.length > 0) {
-      const imagesURLs = [];
+      const images: ImageInfo[] = [];
       for (const uploadInfo of uploadResult) {
         if (uploadInfo.status === "fulfilled") {
           const room = uploadInfo.value.fileName.split("/")[0];
           const imageId = uploadInfo.value.fileName.split("/")[1];
 
           const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
-          imagesURLs.push(imageURL);
+          images.push({
+            imageId,
+            url: imageURL,
+          });
         }
       }
 
@@ -111,7 +117,7 @@ export function LLMPredictionsSelectionV2Popup() {
       instance.triggerAction<ImagesToolActionTriggerParams, void>(
         "imagesTool",
         {
-          imagesURLs,
+          images,
           padding: 20,
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
