@@ -10,6 +10,7 @@ import { WeaveElementAttributes } from "@inditextech/weave-types";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 type ShowcaseUser = {
+  id: string;
   name: string;
   email: string;
 };

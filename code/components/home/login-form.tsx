@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import * as changeCase from "change-case";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
@@ -62,6 +63,7 @@ function LoginForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const roomIdMapped = changeCase.kebabCase(values.roomId);
     const userMapped = {
+      id: `${values.username}-${uuidv4()}`,
       name: values.username,
       email: `${values.username}@weavejs.com`,
     };

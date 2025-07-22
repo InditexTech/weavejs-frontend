@@ -51,7 +51,15 @@ export const ConnectedUsers = () => {
   }
 
   return (
-    <div className="w-full min-h-[40px] flex gap-1 justify-between items-center">
+    <div
+      className="min-h-[40px] flex gap-1 justify-between items-center"
+      style={{
+        width:
+          showUsers.length > 0
+            ? `calc(${(showUsers.length - 1) * 16 + 32}px + ${restUsers.length > 0 ? "16px" : "0px"})`
+            : "32px",
+      }}
+    >
       {/* <div className="flex justify-start items-center gap-1">
           <div className="w-full flex justify-start gap-2 items-center text-center font-inter font-light text-xs px-2 pl-0">
             <div>{Object.keys(connectedUsers).length}</div>
@@ -62,9 +70,9 @@ export const ConnectedUsers = () => {
         <DropdownMenuTrigger asChild>
           <div
             className="relative w-full h-[32px] flex gap-1 justify-start items-center"
-            style={{
-              width: `calc(${connectedUserKey ? "32px" : "0px"} + ${showUsers.length > 0 ? `${showUsers.length * 16}px` : "0px"} + ${restUsers.length > 0 ? "16px" : "0px"})`,
-            }}
+            // style={{
+            //   width: `calc(${connectedUserKey ? "32px" : "0px"} + ${showUsers.length > 0 ? `${(showUsers.length - 1) * 16}px` : "0px"} + ${restUsers.length > 0 ? "16px" : "0px"})`,
+            // }}
             role="button"
           >
             {connectedUserKey && (
@@ -99,7 +107,7 @@ export const ConnectedUsers = () => {
                 <button
                   key={user}
                   className="cursor-pointer absolute top-0"
-                  style={{ left: `${(index + 1) * 16}px` }}
+                  style={{ left: `${index * 16}px` }}
                 >
                   <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
                     <AvatarFallback className="bg-transparent uppercase">
@@ -125,7 +133,7 @@ export const ConnectedUsers = () => {
             {restUsers.length > 0 && (
               <button
                 className="cursor-pointer absolute top-0"
-                style={{ left: `${(showUsers.length + 1) * 16}px` }}
+                style={{ left: `${showUsers.length * 16}px` }}
               >
                 <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
                   <AvatarFallback className="bg-transparent uppercase">
@@ -213,7 +221,7 @@ export const ConnectedUsers = () => {
                     <div
                       className="w-[16px] h-[16px]"
                       style={{
-                        background: stringToColor(userInfo?.name ?? ""),
+                        background: stringToColor(userInfo?.id ?? ""),
                       }}
                     ></div>
                     <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9] px-3">

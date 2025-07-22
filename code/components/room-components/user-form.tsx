@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { motion } from "motion/react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +44,7 @@ function UserForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const userMapped = {
+      id: `${values.username}-${uuidv4()}`,
       name: values.username,
       email: `${values.username}@weavejs.com`,
     };
