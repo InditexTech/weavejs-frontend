@@ -253,7 +253,7 @@ export function RoomHeader() {
                   <span className="text-xs font-inter font-light">
                     {(
                       instance?.getStore() as WeaveStoreAzureWebPubsub
-                    ).getClientId()}
+                    )?.getClientId()}
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
