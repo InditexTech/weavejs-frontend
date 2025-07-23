@@ -26,7 +26,7 @@ export const Home = () => {
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative flex h-full w-full flex-col items-center justify-start lg:justify-center overflow-scroll"
+          className="relative flex h-full w-full flex-col items-center justify-start lg:justify-center overflow-auto"
         >
           <div className="max-w-full lg:max-w-[500px] w-[calc(100dvw-24px)] h-dvh lg:h-auto flex flex-col items-center justify-between gap-3 lg:gap-6 m-3">
             <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-2 lg:left-8 lg:top-8 bg-background p-8 border border-[#c9c9c9]">
