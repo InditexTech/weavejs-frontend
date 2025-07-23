@@ -36,6 +36,7 @@ import {
   ExternalLink,
   LogOut,
   MonitorCog,
+  IdCard,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -55,6 +56,7 @@ import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 
 export function RoomHeader() {
   const os = useGetOs();
@@ -246,6 +248,15 @@ export function RoomHeader() {
                 sideOffset={9}
                 className="font-inter rounded-none"
               >
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none w-full">
+                  <IdCard />
+                  <span className="text-xs font-inter font-light">
+                    {(
+                      instance?.getStore() as WeaveStoreAzureWebPubsub
+                    ).getClientId()}
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel className="block md:hidden px-2 py-1 pt-2 text-zinc-600 text-xs">
                   Room
                 </DropdownMenuLabel>
