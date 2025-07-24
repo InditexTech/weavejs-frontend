@@ -89,6 +89,17 @@ export function useKeyboardHandler() {
     }
   }, [instance]);
 
+  const isZoomingAllowed = React.useMemo(() => {
+    const allowedZoomActions = ["selectionTool", "moveTool", "eraserTool"];
+    if (typeof actualAction === "undefined") {
+      return true;
+    }
+    if (allowedZoomActions.includes(actualAction)) {
+      return true;
+    }
+    return false;
+  }, [actualAction]);
+
   /* Keyboard shortcuts toolbar */
   useKeyDown(() => {
     triggerTool("moveTool");
@@ -417,7 +428,9 @@ export function useKeyboardHandler() {
       handleTriggerAction("zoomInTool", { previousAction: actualAction });
     },
     ["BracketRight"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    (e) =>
+      isZoomingAllowed &&
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -425,15 +438,19 @@ export function useKeyboardHandler() {
       handleTriggerAction("zoomOutTool", { previousAction: actualAction });
     },
     ["Slash"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    (e) =>
+      isZoomingAllowed &&
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction("fitToScreenTool", { previousAction: actualAction });
+      handleTriggerAction("fitToScreenTool", {
+        previousAction: actualAction,
+      });
     },
     ["Digit1"],
-    (e) => e.shiftKey
+    (e) => isZoomingAllowed && e.shiftKey
   );
 
   useKeyDown(
@@ -443,7 +460,7 @@ export function useKeyboardHandler() {
       });
     },
     ["Digit2"],
-    (e) => e.shiftKey
+    (e) => isZoomingAllowed && e.shiftKey
   );
 
   /* Keyboard shortcuts utility */

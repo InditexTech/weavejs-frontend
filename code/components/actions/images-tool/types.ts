@@ -11,6 +11,8 @@ export type ImagesToolActionState =
 
 export type ImagesToolActionOnStartLoadImageEvent = undefined;
 export type ImagesToolActionOnEndLoadImageEvent = Error | undefined;
+export type ImagesToolActionOnAddingImageEvent = { imagesURL: string[] };
+export type ImagesToolActionOnAddedImageEvent = { imagesURL: string[] };
 
 export type ImageInfo = {
   imageId: string;

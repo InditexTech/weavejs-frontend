@@ -34,6 +34,17 @@ export function ZoomToolbar() {
     [instance, actualAction]
   );
 
+  const isZoomingAllowed = React.useMemo(() => {
+    const allowedZoomActions = ["selectionTool", "moveTool", "eraserTool"];
+    if (typeof actualAction === "undefined") {
+      return true;
+    }
+    if (allowedZoomActions.includes(actualAction)) {
+      return true;
+    }
+    return false;
+  }, [actualAction]);
+
   return (
     <div className="flex justify-end gap-2 items-center">
       <div className="gap-1 flex justify-end items-center">
@@ -44,7 +55,8 @@ export function ZoomToolbar() {
               disabled={
                 !canZoomIn ||
                 weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                !isZoomingAllowed
               }
               onClick={() => {
                 handleTriggerActionWithParams("zoomInTool", {
@@ -71,7 +83,8 @@ export function ZoomToolbar() {
               disabled={
                 !canZoomOut ||
                 weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                !isZoomingAllowed
               }
               onClick={() => {
                 handleTriggerActionWithParams("zoomOutTool", {
@@ -97,7 +110,7 @@ export function ZoomToolbar() {
               icon={<Maximize size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !isZoomingAllowed
               }
               onClick={() => {
                 handleTriggerActionWithParams("fitToScreenTool", {
@@ -123,7 +136,7 @@ export function ZoomToolbar() {
               icon={<Fullscreen size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !isZoomingAllowed
               }
               onClick={() => {
                 handleTriggerActionWithParams("fitToSelectionTool", {

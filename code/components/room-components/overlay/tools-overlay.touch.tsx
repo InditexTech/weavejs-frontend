@@ -473,6 +473,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualImagesTool("imageTool");
+                  IMAGES_TOOLS["imageTool"].onClick();
                 }}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -486,6 +487,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualImagesTool("imagesTool");
+                  IMAGES_TOOLS["imagesTool"].onClick();
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
@@ -590,6 +592,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
+                  STROKES_TOOLS["penTool"].onClick();
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
@@ -602,6 +605,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("brushTool");
+                  STROKES_TOOLS["brushTool"].onClick();
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
@@ -614,6 +618,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("arrowTool");
+                  STROKES_TOOLS["arrowTool"].onClick();
                 }}
               >
                 <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
@@ -700,6 +705,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("rectangleTool");
+                  SHAPES_TOOLS["rectangleTool"].onClick();
                 }}
               >
                 <Square size={20} strokeWidth={1} /> Rectangle tool
@@ -712,6 +718,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("ellipseTool");
+                  SHAPES_TOOLS["ellipseTool"].onClick();
                 }}
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
@@ -724,6 +731,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("regularPolygonTool");
+                  SHAPES_TOOLS["regularPolygonTool"].onClick();
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
@@ -736,6 +744,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("starTool");
+                  SHAPES_TOOLS["starTool"].onClick();
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
@@ -748,6 +757,7 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("colorTokenTool");
+                  SHAPES_TOOLS["colorTokenTool"].onClick();
                 }}
               >
                 <Tag size={20} strokeWidth={1} /> Color Token Reference tool

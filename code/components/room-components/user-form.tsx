@@ -32,6 +32,7 @@ const formSchema = z
   .required();
 
 function UserForm() {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const room = useCollaborationRoom((state) => state.room);
   const setUser = useCollaborationRoom((state) => state.setUser);
 
@@ -41,6 +42,12 @@ function UserForm() {
       username: "",
     },
   });
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  }, []);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const userMapped = {
@@ -68,9 +75,11 @@ function UserForm() {
               <FormItem>
                 <FormControl>
                   <Input
+                    {...field}
+                    ref={inputRef}
+                    type="text"
                     placeholder="username"
                     className="font-inter font-light rounded-none text-black border-black w-full"
-                    {...field}
                   />
                 </FormControl>
                 <FormMessage />

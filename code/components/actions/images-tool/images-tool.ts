@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from "uuid";
+import Konva from "konva";
 import { type Vector2d } from "konva/lib/types";
 import {
   WeaveAction,
@@ -14,14 +15,19 @@ import {
   type ImagesToolActionState,
   type ImagesToolActionOnEndLoadImageEvent,
   ImageInfo,
+  ImagesToolActionOnAddedImageEvent,
+  ImagesToolActionOnAddingImageEvent,
 } from "./types";
 import { IMAGES_TOOL_ACTION_NAME, IMAGES_TOOL_STATE } from "./constants";
-import Konva from "konva";
 
 export class ImagesToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
+  protected cursorPadding: number = 5;
   protected state: ImagesToolActionState;
+  protected tempImageId: string | null;
+  protected tempImageNode: Konva.Group | null;
+  protected pointers: Map<number, Vector2d>;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected images: Record<
     string,
@@ -42,10 +48,13 @@ export class ImagesToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.padding = 20;
     this.state = IMAGES_TOOL_STATE.IDLE;
     this.images = {};
+    this.tempImageId = null;
+    this.tempImageNode = null;
     this.container = undefined;
     this.preloadImgs = {};
     this.clickPoint = null;
@@ -95,20 +104,61 @@ export class ImagesToolAction extends WeaveAction {
       }
     });
 
-    stage.on("pointerclick", (e) => {
-      e.evt.preventDefault();
+    stage.on("pointerdown", (e) => {
+      this.setTapStart(e);
 
-      if (this.state === IMAGES_TOOL_STATE.IDLE) {
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === IMAGES_TOOL_ACTION_NAME
+      ) {
+        this.state = IMAGES_TOOL_STATE.DEFINING_POSITION;
         return;
       }
 
-      if (this.state === IMAGES_TOOL_STATE.UPLOADING) {
+      if (this.state === IMAGES_TOOL_STATE.DEFINING_POSITION) {
+        this.state = IMAGES_TOOL_STATE.SELECTED_POSITION;
+      }
+    });
+
+    stage.on("pointermove", (e) => {
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === IMAGES_TOOL_ACTION_NAME
+      ) {
+        this.state = IMAGES_TOOL_STATE.DEFINING_POSITION;
         return;
       }
 
-      if (this.state === IMAGES_TOOL_STATE.ADDING) {
+      if (
+        [
+          IMAGES_TOOL_STATE.DEFINING_POSITION as string,
+          IMAGES_TOOL_STATE.SELECTED_POSITION as string,
+        ].includes(this.state) &&
+        this.instance.getActiveAction() === IMAGES_TOOL_ACTION_NAME &&
+        e.evt.pointerType === "mouse"
+      ) {
+        stage.container().style.cursor = "crosshair";
+        stage.container().focus();
+
+        const mousePos = stage.getRelativePointerPosition();
+
+        this.tempImageNode.setAttrs({
+          x: (mousePos?.x ?? 0) + this.cursorPadding,
+          y: (mousePos?.y ?? 0) + this.cursorPadding,
+        });
+      }
+    });
+
+    stage.on("pointerup", (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
+      if (this.state === IMAGES_TOOL_STATE.SELECTED_POSITION) {
         this.handleAdding();
-        return;
       }
     });
 
@@ -166,13 +216,70 @@ export class ImagesToolAction extends WeaveAction {
     stage.container().focus();
 
     if (position) {
+      this.setState(IMAGES_TOOL_STATE.SELECTED_POSITION);
       this.handleAdding(position);
-      this.setState(IMAGES_TOOL_STATE.ADDING);
       return;
     }
 
+    const images = [];
+    for (const imageId of Object.keys(this.images)) {
+      images.push(this.images[imageId].imageURL);
+    }
+
+    if (!this.tempImageNode && !this.isTouchDevice()) {
+      const mousePos = stage.getRelativePointerPosition();
+
+      this.tempImageId = uuidv4();
+
+      this.tempImageNode = new Konva.Group({
+        id: this.tempImageId,
+        x: (mousePos?.x ?? 0) + this.cursorPadding,
+        y: (mousePos?.y ?? 0) + this.cursorPadding,
+        opacity: 1,
+        listening: false,
+      });
+
+      const bgNode = new Konva.Circle({
+        radius: 10 * (1 / stage.scaleX()),
+        x: 10 * (1 / stage.scaleX()),
+        y: 10 * (1 / stage.scaleX()),
+        fill: "#c9c9c9",
+        stroke: "#000000",
+        strokeWidth: 0,
+        strokeScaleEnabled: false,
+      });
+
+      this.tempImageNode.add(bgNode);
+
+      const textNode = new Konva.Text({
+        x: 0,
+        y: 0,
+        width: 20 * (1 / stage.scaleX()),
+        height: 20 * (1 / stage.scaleY()),
+        align: "center",
+        verticalAlign: "middle",
+        fill: "#000000",
+        fontSize: 12 * (1 / stage.scaleX()),
+        fontFamily: "Arial",
+        text: images.length,
+      });
+
+      this.tempImageNode.add(textNode);
+
+      this.instance.getMainLayer()?.add(this.tempImageNode);
+    }
+
+    this.instance.emitEvent<ImagesToolActionOnAddingImageEvent>(
+      "onAddingImages",
+      { imagesURL: images }
+    );
+
     this.clickPoint = null;
-    this.setState(IMAGES_TOOL_STATE.ADDING);
+    this.setState(IMAGES_TOOL_STATE.DEFINING_POSITION);
+  }
+
+  private isTouchDevice() {
+    return window.matchMedia("(pointer: coarse)").matches;
   }
 
   private handleAdding(position?: Vector2d) {
@@ -186,6 +293,7 @@ export class ImagesToolAction extends WeaveAction {
       y: this.clickPoint?.y ?? 0,
     };
 
+    const images = [];
     for (const imageId of Object.keys(this.images)) {
       const imageInfo = this.images[imageId];
 
@@ -212,10 +320,17 @@ export class ImagesToolAction extends WeaveAction {
         });
 
         this.instance.addNode(node, this.container?.getAttrs().id);
+
+        images.push(imageInfo.imageURL);
       }
 
       imagePoint.x += imageInfo.info.width + this.padding;
     }
+
+    this.instance.emitEvent<ImagesToolActionOnAddedImageEvent>(
+      "onAddedImages",
+      { imagesURL: images }
+    );
 
     this.setState(IMAGES_TOOL_STATE.FINISHED);
 
@@ -250,7 +365,7 @@ export class ImagesToolAction extends WeaveAction {
 
     this.padding = params?.padding ?? 20;
 
-    for (const imageInfo of params.images) {
+    for (const imageInfo of params?.images ?? []) {
       this.loadImage(imageInfo);
     }
   }
@@ -262,13 +377,22 @@ export class ImagesToolAction extends WeaveAction {
       delete this.preloadImgs[imageId];
     }
 
+    if (this.tempImageNode) {
+      this.tempImageNode.destroy();
+    }
+
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin && Object.keys(this.images).length > 0) {
-      const imageKey = Object.keys(this.images)[0];
-      const node = stage.findOne(`#${imageKey}`);
-      if (node) {
-        selectionPlugin.setSelectedNodes([node]);
+      const nodes: Konva.Node[] = [];
+      for (const imageKey of Object.keys(this.images)) {
+        const node = stage.findOne(`#${imageKey}`);
+        if (node) {
+          nodes.push(node);
+        }
+      }
+      if (nodes.length > 0) {
+        selectionPlugin.setSelectedNodes(nodes);
       }
       this.instance.triggerAction("selectionTool");
     }
@@ -277,6 +401,8 @@ export class ImagesToolAction extends WeaveAction {
 
     this.initialCursor = null;
     this.images = {};
+    this.tempImageId = null;
+    this.tempImageNode = null;
     this.container = undefined;
     this.clickPoint = null;
     this.setState(IMAGES_TOOL_STATE.IDLE);

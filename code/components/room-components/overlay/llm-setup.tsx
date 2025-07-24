@@ -5,6 +5,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,6 @@ import { X } from "lucide-react";
 export function LlmSetupDialog() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [password, setPassword] = React.useState<string>("");
-  const [error, setError] = React.useState<Error | null>(null);
 
   const setupVisible = useIACapabilities((state) => state.setup.visible);
   const setAIEnabled = useIACapabilities((state) => state.setEnabled);
@@ -49,14 +49,20 @@ export function LlmSetupDialog() {
       setSetupState("idle");
     },
     onSuccess: () => {
+      toast.success("Setup AI capabilities", {
+        description: "You have successfully enabled AI capabilities.",
+      });
       sessionStorage.setItem("weave_ai_enabled", "true");
       sessionStorage.setItem("weave_ai_password", password);
       setSetupVisible(false);
       setAIEnabled(true);
     },
-    onError(error) {
+    onError() {
+      toast.error("Setup AI capabilities", {
+        description:
+          "Failed to enable AI capabilities. Please check and try again.",
+      });
       sessionStorage.setItem("weave_ai_enabled", "false");
-      setError(error);
       setAIEnabled(false);
     },
   });
@@ -105,11 +111,6 @@ export function LlmSetupDialog() {
                 className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
               />
             </div>
-            {error && (
-              <div className="font-inter text-base text-[#FDB4BB]">
-                Invalid password, please try again
-              </div>
-            )}
           </div>
           <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           <DialogFooter>

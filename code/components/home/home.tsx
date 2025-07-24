@@ -133,7 +133,21 @@ export const Home = () => {
           </div>
         </motion.section>
       </main>
-      <Toaster />
+      <Toaster
+        offset={16}
+        mobileOffset={16}
+        toastOptions={{
+          classNames: {
+            toast: "font-inter font-light text-xs",
+            title: "font-inter font-semibold text-sm",
+            description: "font-inter font-light text-xs",
+          },
+          style: {
+            borderRadius: "0px",
+            boxShadow: "none",
+          },
+        }}
+      />
     </>
   );
 };

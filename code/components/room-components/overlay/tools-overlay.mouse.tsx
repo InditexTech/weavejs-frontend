@@ -348,7 +348,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("rectangleTool");
-                  instance.triggerAction("selectionTool");
+                  SHAPES_TOOLS["rectangleTool"].onClick();
                 }}
               >
                 <Square size={20} strokeWidth={1} /> Rectangle tool
@@ -365,7 +365,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("ellipseTool");
-                  instance.triggerAction("selectionTool");
+                  SHAPES_TOOLS["ellipseTool"].onClick();
                 }}
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
@@ -382,7 +382,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("regularPolygonTool");
-                  instance.triggerAction("selectionTool");
+                  SHAPES_TOOLS["regularPolygonTool"].onClick();
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
@@ -399,7 +399,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("starTool");
-                  instance.triggerAction("selectionTool");
+                  SHAPES_TOOLS["starTool"].onClick();
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
@@ -416,7 +416,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualShapeTool("colorTokenTool");
-                  instance.triggerAction("selectionTool");
+                  SHAPES_TOOLS["colorTokenTool"].onClick();
                 }}
               >
                 <Tag size={20} strokeWidth={1} /> Color Token Reference tool
@@ -507,7 +507,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
-                  instance.triggerAction("selectionTool");
+                  STROKES_TOOLS["penTool"].onClick();
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
@@ -524,7 +524,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("brushTool");
-                  instance.triggerAction("selectionTool");
+                  STROKES_TOOLS["brushTool"].onClick();
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
@@ -541,7 +541,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualStrokesTool("arrowTool");
-                  instance.triggerAction("selectionTool");
+                  STROKES_TOOLS["arrowTool"].onClick();
                 }}
               >
                 <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
@@ -632,7 +632,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualImagesTool("imageTool");
-                  instance.triggerAction("selectionTool");
+                  IMAGES_TOOLS["imageTool"].onClick();
                 }}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -650,7 +650,7 @@ export function ToolsOverlayMouse() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualImagesTool("imagesTool");
-                  instance.triggerAction("selectionTool");
+                  IMAGES_TOOLS["imagesTool"].onClick();
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool

@@ -1006,10 +1006,12 @@ export function ToolsNodeOverlay() {
 
     if (
       !isGroup &&
-      !["mask", "fuzzy-mask", "text", "frame", "color-token"].includes(
+      !["mask", "fuzzy-mask", "text", "image", "frame", "color-token"].includes(
         actualNode.type as string
       ) &&
-      !["colorTokenTool"].includes(actualAction as string)
+      !["colorTokenTool", "imageTool", "imagesTool"].includes(
+        actualAction as string
+      )
     ) {
       actualNodeTools.push(
         <React.Fragment key="common-shape-tools">
@@ -1961,6 +1963,19 @@ export function ToolsNodeOverlay() {
   }
 
   if (!showUI) {
+    return null;
+  }
+
+  if (
+    imageEditionTools.length === 0 &&
+    colorTokenTools.length === 0 &&
+    textTools.length === 0 &&
+    commonShapeTools.length === 0 &&
+    commonUpdateNodeTools.length === 0 &&
+    commonShapeManagementTools.length === 0 &&
+    commonCreateNodeTools.length === 0 &&
+    croppingTools.length === 0
+  ) {
     return null;
   }
 

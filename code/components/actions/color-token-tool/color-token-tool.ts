@@ -5,10 +5,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { Vector2d } from "konva/lib/types";
 import {
+  ColorTokenToolActionOnAddedEvent,
+  ColorTokenToolActionOnAddingEvent,
   ColorTokenToolActionState,
   ColorTokenToolActionTriggerParams,
 } from "./types";
-import { COLOR_TOKEN_TOOL_STATE } from "./constants";
+import { COLOR_TOKEN_ACTION_NAME, COLOR_TOKEN_TOOL_STATE } from "./constants";
 import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import Konva from "konva";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
@@ -16,6 +18,7 @@ import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 export class ColorTokenToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: ColorTokenToolActionState;
+  protected pointers: Map<number, Vector2d>;
   protected colorTokenId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
@@ -25,6 +28,7 @@ export class ColorTokenToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = COLOR_TOKEN_TOOL_STATE.IDLE;
     this.colorTokenId = null;
@@ -33,7 +37,7 @@ export class ColorTokenToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "colorTokenTool";
+    return COLOR_TOKEN_ACTION_NAME;
   }
 
   initProps() {
@@ -69,16 +73,46 @@ export class ColorTokenToolAction extends WeaveAction {
       }
     });
 
-    stage.on("pointerclick", (e) => {
-      e.evt.preventDefault();
+    stage.on("pointerdown", (e) => {
+      this.setTapStart(e);
 
-      if (this.state === COLOR_TOKEN_TOOL_STATE.IDLE) {
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === COLOR_TOKEN_ACTION_NAME
+      ) {
+        this.state = COLOR_TOKEN_TOOL_STATE.ADDING;
         return;
       }
 
       if (this.state === COLOR_TOKEN_TOOL_STATE.ADDING) {
-        this.handleAdding();
+        this.state = COLOR_TOKEN_TOOL_STATE.DEFINING_SIZE;
+      }
+    });
+
+    stage.on("pointermove", (e) => {
+      if (!this.isPressed(e)) return;
+
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === COLOR_TOKEN_ACTION_NAME
+      ) {
+        this.state = COLOR_TOKEN_TOOL_STATE.ADDING;
         return;
+      }
+    });
+
+    stage.on("pointerup", (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
+      if (this.state === COLOR_TOKEN_TOOL_STATE.DEFINING_SIZE) {
+        this.handleAdding();
       }
     });
 
@@ -101,6 +135,10 @@ export class ColorTokenToolAction extends WeaveAction {
       this.setState(COLOR_TOKEN_TOOL_STATE.IDLE);
       return;
     }
+
+    this.instance.emitEvent<ColorTokenToolActionOnAddingEvent>(
+      "onAddingColorToken"
+    );
 
     this.colorTokenId = null;
     this.clickPoint = null;
@@ -126,9 +164,13 @@ export class ColorTokenToolAction extends WeaveAction {
       });
 
       this.instance.addNode(node, this.container?.getAttrs().id);
+
+      this.instance.emitEvent<ColorTokenToolActionOnAddedEvent>(
+        "onAddedColorToken"
+      );
     }
 
-    this.cancelAction?.();
+    this.cancelAction();
   }
 
   trigger(

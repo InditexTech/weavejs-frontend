@@ -23,16 +23,14 @@ import { ColorTokensLibrary } from "../room-components/color-tokens-library/colo
 import { ElementsTree } from "../room-components/elements-tree/elements-tree";
 import { NodeProperties } from "../room-components/overlay/node-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import {
-  WeaveActionPropsChangeEvent,
-  WeaveContextMenuPlugin,
-} from "@inditextech/weave-sdk";
+import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
 import { LLMGenerationV2Popup } from "../room-components/overlay/llm-popup-v2";
 import { LLMPredictionsSelectionV2Popup } from "../room-components/overlay/llm-predictions-selection-v2";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
 import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-reference-selection-v2";
+import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -69,12 +67,6 @@ export const RoomLayout = () => {
     (state) => state.images.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
-  const setLoadingImage = useCollaborationRoom(
-    (state) => state.setLoadingImage
-  );
-  const setNodePropertiesCreateProps = useCollaborationRoom(
-    (state) => state.setNodePropertiesCreateProps
-  );
 
   React.useEffect(() => {
     if (!instance) return;
@@ -95,33 +87,7 @@ export const RoomLayout = () => {
     }
   }, [instance, status, roomLoaded]);
 
-  React.useEffect(() => {
-    if (!instance) return;
-
-    const handlePropsChange = ({ props }: WeaveActionPropsChangeEvent) => {
-      setNodePropertiesCreateProps(props);
-    };
-
-    const handleImageLoadStart = () => {
-      setLoadingImage(true);
-    };
-
-    const handleImageLoadEnd = () => {
-      setLoadingImage(false);
-    };
-
-    instance.addEventListener("onPropsChange", handlePropsChange);
-    instance.addEventListener("onImageLoadStart", handleImageLoadStart);
-    instance.addEventListener("onImageLoadEnd", handleImageLoadEnd);
-
-    return () => {
-      if (instance) {
-        instance.removeEventListener("onPropsChange", handlePropsChange);
-        instance.removeEventListener("onImageLoadStart", handlePropsChange);
-        instance.removeEventListener("onImageLoadEnd", handlePropsChange);
-      }
-    };
-  }, [instance, setLoadingImage, setNodePropertiesCreateProps]);
+  useToolsEvents();
 
   return (
     <AnimatePresence>

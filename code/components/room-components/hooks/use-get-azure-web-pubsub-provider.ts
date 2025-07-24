@@ -19,7 +19,6 @@ function useGetAzureWebPubsubProvider({
 
   const wsProvider = React.useMemo(() => {
     if (loadedParams && room && user) {
-      console.log({ user });
       const store = new WeaveStoreAzureWebPubsub(
         {
           getUser,

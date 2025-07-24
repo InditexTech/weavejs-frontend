@@ -9,6 +9,9 @@ export type ColorTokenToolActionStateKeys = keyof typeof COLOR_TOKEN_TOOL_STATE;
 export type ColorTokenToolActionState =
   (typeof COLOR_TOKEN_TOOL_STATE)[ColorTokenToolActionStateKeys];
 
+export type ColorTokenToolActionOnAddingEvent = undefined;
+export type ColorTokenToolActionOnAddedEvent = undefined;
+
 export type ColorTokenToolActionTriggerParams = {
   color?: string;
   position?: Vector2d;
