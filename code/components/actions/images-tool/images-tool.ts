@@ -147,7 +147,7 @@ export class ImagesToolAction extends WeaveAction {
 
         const mousePos = stage.getRelativePointerPosition();
 
-        this.tempImageNode.setAttrs({
+        this.tempImageNode?.setAttrs({
           x: (mousePos?.x ?? 0) + this.cursorPadding,
           y: (mousePos?.y ?? 0) + this.cursorPadding,
         });
@@ -261,7 +261,7 @@ export class ImagesToolAction extends WeaveAction {
         fill: "#000000",
         fontSize: 12 * (1 / stage.scaleX()),
         fontFamily: "Arial",
-        text: images.length,
+        text: `${images.length}`,
       });
 
       this.tempImageNode.add(textNode);
