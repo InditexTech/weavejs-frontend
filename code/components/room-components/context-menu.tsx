@@ -6,6 +6,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useWeave } from "@inditextech/weave-react";
 
 type ContextMenuButtonProps = {
   label: React.ReactNode;
@@ -68,6 +69,8 @@ export const ContextMenuRender = ({
 }: Readonly<ContextMenuProps>) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
+  const instance = useWeave((state) => state.instance);
+
   React.useEffect(() => {
     if (ref.current && show) {
       const boundingRect = ref.current.getBoundingClientRect();
@@ -90,31 +93,47 @@ export const ContextMenuRender = ({
 
   React.useEffect(() => {
     function checkIfClickedOutside(e: PointerEvent) {
+      if (!ref.current) {
+        return;
+      }
+
       if (
         ref.current &&
         e.target !== ref.current &&
-        !ref.current.contains(e.target as Node) &&
-        show
+        !ref.current.contains(e.target as Node)
       ) {
+        ref.current.click();
         ref.current.style.display = `none`;
+        ref.current.style.pointerEvents = `none`;
         onChanged(false);
       }
     }
 
-    window.addEventListener("pointerdown", checkIfClickedOutside);
+    if (instance) {
+      instance
+        .getStage()
+        .container()
+        .addEventListener("pointerdown", checkIfClickedOutside);
+    }
 
     return () => {
-      window.removeEventListener("pointerdown", checkIfClickedOutside);
+      if (instance) {
+        instance
+          .getStage()
+          .container()
+          .removeEventListener("pointerdown", checkIfClickedOutside);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
+  }, [instance]);
 
   return (
     <div
       ref={ref}
       className="fixed w-[300px] bg-white flex flex-col border border-[#c9c9c9] shadow-none"
       style={{
-        display: show ? "block" : "none",
+        pointerEvents: show && options.length > 0 ? "auto" : "none",
+        display: show && options.length > 0 ? "block" : "none",
         top: `${position.y}px`,
         left: `${position.x}px`,
         zIndex: 10,
