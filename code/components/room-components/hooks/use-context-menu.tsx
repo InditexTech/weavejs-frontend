@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  PasteMode,
+  WeaveCopyPastePasteMode,
   WEAVE_COPY_PASTE_PASTE_MODES,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
@@ -286,11 +286,12 @@ function useContextMenu() {
 
       // PASTE
       if (
+        pastMode &&
         (
           [
             WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL,
             WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL,
-          ] as PasteMode[]
+          ] as WeaveCopyPastePasteMode[]
         ).includes(pastMode)
       )
         options.push({
