@@ -137,14 +137,7 @@ const inter = Inter({
 const NODES = () => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
-  new WeaveGroupNode({
-    config: {
-      transform: {
-        enabledAnchors: [],
-        keepRatio: true,
-      },
-    },
-  }),
+  new WeaveGroupNode(),
   new WeaveRectangleNode(),
   new WeaveEllipseNode(),
   new WeaveLineNode(),
@@ -170,15 +163,14 @@ const NODES = () => [
     config: {
       fontFamily: inter.style.fontFamily,
       fontStyle: "normal",
-      fontSize: 32,
-      fontColor: "#000000ff",
-      titleMargin: 10,
+      fontSize: 14,
+      borderColor: "#9E9994",
+      fontColor: "#757575",
+      titleMargin: 5,
       transform: {
         rotateEnabled: false,
         resizeEnabled: false,
         enabledAnchors: [] as string[],
-        borderStrokeWidth: 3,
-        padding: 0,
       },
     },
   }),
@@ -197,7 +189,36 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  new WeaveNodesSelectionPlugin(),
+  new WeaveNodesSelectionPlugin({
+    config: {
+      selection: {
+        ignoreStroke: true,
+        padding: 0,
+        borderStrokeWidth: 2,
+        borderStroke: "#1a1aff",
+      },
+      hover: {
+        ignoreStroke: true,
+        padding: 0,
+        borderStrokeWidth: 2,
+        borderStroke: "#1a1aff",
+      },
+      selectionArea: {
+        fill: "#1a1aff11",
+        strokeWidth: 2,
+        stroke: "#1a1aff",
+        dash: [12, 4],
+      },
+      behaviors: {
+        singleSelection: {
+          enabled: true,
+        },
+        multipleSelection: {
+          enabled: true,
+        },
+      },
+    },
+  }),
   new WeaveNodesSnappingPlugin(),
   new WeaveStageDropAreaPlugin(),
   new WeaveCopyPasteNodesPlugin(),

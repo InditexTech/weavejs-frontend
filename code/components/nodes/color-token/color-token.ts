@@ -49,7 +49,7 @@ export class ColorTokenNode extends WeaveNode {
       fill: "#FFFFFFFF",
       width: colorTokenParams.width,
       height: colorTokenParams.height,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       stroke: "black",
       strokeWidth: 2,
     });
@@ -60,10 +60,10 @@ export class ColorTokenNode extends WeaveNode {
       id: `${id}-colorToken-1`,
       groupId: id,
       nodeId: id,
-      x: 1,
-      y: 1,
+      x: 0,
+      y: 0,
       fill: colorTokenColor,
-      width: colorTokenParams.width - 2,
+      width: colorTokenParams.width,
       height: (colorTokenParams.height ?? 0) - 60,
       listening: false,
       draggable: false,
@@ -94,12 +94,18 @@ export class ColorTokenNode extends WeaveNode {
     colorTokenNode.add(internalText);
 
     colorTokenNode.getTransformerProperties = () => {
+      const baseConfig = this.defaultGetTransformerProperties({});
       return {
+        ...baseConfig,
         resizeEnabled: false,
         enabledAnchors: [] as string[],
-        borderStrokeWidth: 3,
+        borderStrokeWidth: 2,
         padding: 0,
       };
+    };
+
+    colorTokenNode.allowedAnchors = () => {
+      return [];
     };
 
     this.setupDefaultNodeEvents(colorTokenNode);

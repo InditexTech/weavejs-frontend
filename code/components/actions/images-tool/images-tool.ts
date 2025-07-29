@@ -309,7 +309,7 @@ export class ImagesToolAction extends WeaveAction {
           imageURL: imageInfo.imageURL,
           stroke: "#000000ff",
           strokeWidth: 0,
-          strokeScaleEnabled: true,
+          strokeScaleEnabled: false,
           imageId: imageInfo.imageId,
           imageWidth: imageInfo.info.width,
           imageHeight: imageInfo.info.height,

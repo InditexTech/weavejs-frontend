@@ -11,7 +11,7 @@ declare module "konva/lib/Node" {
     triggerCrop(): void;
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
-    updatePosition(position: Vector2d): void;
+    allowedAnchors(): string[];
     getRealClientRect(
       config?:
         | {
@@ -27,6 +27,10 @@ declare module "konva/lib/Node" {
       width: number;
       height: number;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updatePosition(position: Vector2d): void;
+    dblClick(): void;
+    movedToContainer(container: Konva.Layer | Konva.Group): void;
   }
 }
 
@@ -40,6 +44,8 @@ declare module "konva/lib/Stage" {
     allowActions(actions?: string[]): string[];
     allowSelectNodes(nodeTypes?: string[]): string[];
     allowSelection(allowSelection?: boolean): boolean;
+    isFocused(): boolean;
+    isMouseWheelPressed(): boolean;
   }
 }
 

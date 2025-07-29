@@ -391,6 +391,8 @@ export function ToolsNodesOverlay() {
               return;
             }
 
+            console.log({ nodes });
+
             instance.group(
               nodes
                 .map((n) => n?.node)

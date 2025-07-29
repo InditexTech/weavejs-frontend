@@ -20,14 +20,14 @@ export const setupTransformer = (instance: Weave) => {
       rotateEnabled: false,
       resizeEnabled: false,
       enabledAnchors: [],
-      borderStrokeWidth: 3,
+      borderStrokeWidth: 2,
       borderStroke: "#0074ffcc",
       padding: 0,
     });
 
     const selectionRectangle = new Konva.Rect({
-      fill: "rgba(147, 197, 253, 0.25)",
-      stroke: "#1E40AFFF",
+      fill: "#00000040",
+      stroke: "#000000",
       strokeWidth: 1 * stage.scaleX(),
       dash: [12 * stage.scaleX(), 4 * stage.scaleX()],
       visible: false,
