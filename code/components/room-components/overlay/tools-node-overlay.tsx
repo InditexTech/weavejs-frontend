@@ -1742,20 +1742,20 @@ export function ToolsNodeOverlay() {
       nodePropertiesAction === "update" &&
       typeof imageCroppingNode === "undefined"
     ) {
-      if (
-        imageEditionTools.length > 0 ||
-        colorTokenTools.length > 0 ||
-        textTools.length > 0 ||
-        commonShapeTools.length > 0
-      ) {
-        actualNodeTools.push(
-          <ToolbarDivider
-            orientation="horizontal"
-            key="divider-1"
-            className="!w-full col-span-1"
-          />
-        );
-      }
+      // if (
+      //   imageEditionTools.length > 0 ||
+      //   colorTokenTools.length > 0 ||
+      //   textTools.length > 0 ||
+      //   commonShapeTools.length > 0
+      // ) {
+      //   actualNodeTools.push(
+      //     <ToolbarDivider
+      //       orientation="horizontal"
+      //       key="divider-1"
+      //       className="!w-full col-span-1"
+      //     />
+      //   );
+      // }
 
       if (nodes.length === 1 && node?.type === "image") {
         actualNodeTools.push(

@@ -140,7 +140,7 @@ export const Home = () => {
           classNames: {
             toast: "font-inter font-light text-xs",
             title: "font-inter font-semibold text-sm",
-            description: "font-inter font-light text-xs",
+            description: "font-inter font-light text-xs !text-black",
           },
           style: {
             borderRadius: "0px",
