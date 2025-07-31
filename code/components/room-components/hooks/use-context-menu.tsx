@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { v4 as uuidv4 } from "uuid";
 import {
   WeaveCopyPastePasteMode,
   WEAVE_COPY_PASTE_PASTE_MODES,
@@ -187,17 +188,21 @@ function useContextMenu() {
             label: "Edit with AI",
             icon: <Bot size={16} />,
             onClick: async () => {
-              const base64URL: unknown = await instance.triggerAction<
+              const image = await instance.triggerAction<
                 WeaveExportNodesActionParams,
-                void
+                Promise<HTMLImageElement>
               >("exportNodesTool", {
                 nodes: nodes.map((n) => n.instance),
                 options: {
                   padding: 0,
                   pixelRatio: 1,
                 },
-                download: false,
               });
+
+              const base64URL: unknown = instance.imageToBase64(
+                image,
+                "image/png"
+              );
 
               setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
               setImagesLLMPopupType("edit-prompt");
@@ -229,17 +234,23 @@ function useContextMenu() {
             ),
             icon: <ImageDown size={16} />,
             disabled: nodes.length <= 0,
-            onClick: () => {
-              instance.triggerAction<WeaveExportNodesActionParams, void>(
-                "exportNodesTool",
-                {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 20,
-                    pixelRatio: 2,
-                  },
-                }
-              );
+            onClick: async () => {
+              const image = await instance.triggerAction<
+                WeaveExportNodesActionParams,
+                Promise<HTMLImageElement>
+              >("exportNodesTool", {
+                nodes: nodes.map((n) => n.instance),
+                options: {
+                  padding: 20,
+                  pixelRatio: 2,
+                },
+              });
+
+              const link = document.createElement("a");
+              link.href = image.src;
+              link.download = `${uuidv4()}image/png`;
+              link.click();
+
               setContextMenuShow(false);
             },
           });

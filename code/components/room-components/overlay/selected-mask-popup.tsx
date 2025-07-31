@@ -91,9 +91,9 @@ export function SelectedMaskPopup() {
         return;
       }
 
-      const base64URL: unknown = await instance.triggerAction<
+      const image: HTMLImageElement = await instance.triggerAction<
         WeaveExportNodesActionParams,
-        void
+        Promise<HTMLImageElement>
       >("exportNodesTool", {
         nodes: masks as WeaveElementInstance[],
         triggerSelectionTool: false,
@@ -102,8 +102,9 @@ export function SelectedMaskPopup() {
           padding: 40,
           pixelRatio: 2,
         },
-        download: false,
       });
+
+      const base64URL: unknown = instance.imageToBase64(image, "image/png");
 
       setActualMaskBase64(base64URL as string);
     };

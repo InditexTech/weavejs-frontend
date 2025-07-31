@@ -316,17 +316,21 @@ export function ToolsNodeOverlay() {
                 return;
               }
 
-              const base64URL: unknown = await instance.triggerAction<
+              const image = await instance.triggerAction<
                 WeaveExportNodesActionParams,
-                void
+                Promise<HTMLImageElement>
               >("exportNodesTool", {
                 nodes: nodes.map((n) => n.instance),
                 options: {
                   padding: 0,
                   pixelRatio: 1,
                 },
-                download: false,
               });
+
+              const base64URL: unknown = instance.imageToBase64(
+                image,
+                "image/png"
+              );
 
               setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
               setImagesLLMPopupType("edit-prompt");

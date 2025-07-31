@@ -4,6 +4,7 @@
 
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
@@ -286,17 +287,22 @@ export function useKeyboardHandler() {
   );
 
   useKeyDown(
-    () => {
+    async () => {
       if (instance) {
-        instance.triggerAction<WeaveExportStageActionParams, void>(
-          "exportStageTool",
-          {
-            options: {
-              padding: 20,
-              pixelRatio: 2,
-            },
-          }
-        );
+        const image = await instance.triggerAction<
+          WeaveExportStageActionParams,
+          Promise<HTMLImageElement>
+        >("exportStageTool", {
+          options: {
+            padding: 20,
+            pixelRatio: 2,
+          },
+        });
+
+        const link = document.createElement("a");
+        link.href = image.src;
+        link.download = `${uuidv4()}image/png`;
+        link.click();
       }
     },
     ["KeyV"],

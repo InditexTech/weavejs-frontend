@@ -140,9 +140,9 @@ async function generateMask(
 
   finalMaskElements.push(...(masks as WeaveElementInstance[]));
 
-  const base64URL: unknown = await instance.triggerAction<
+  const image: HTMLImageElement = await instance.triggerAction<
     WeaveExportNodesActionParams,
-    void
+    Promise<HTMLImageElement>
   >("exportNodesTool", {
     nodes: finalMaskElements,
     triggerSelectionTool: false,
@@ -165,8 +165,9 @@ async function generateMask(
       padding: 0,
       pixelRatio: 1,
     },
-    download: false,
   });
+
+  const base64URL: unknown = instance.imageToBase64(image, "image/png");
 
   for (const maskElement of masks) {
     if (maskElement && maskElement.getAttrs().nodeType === "mask") {

@@ -4,6 +4,7 @@
 
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -125,17 +126,24 @@ export function RoomHeader() {
     [instance]
   );
 
-  const handleExportToImage = React.useCallback(() => {
-    if (instance) {
-      instance.triggerAction<WeaveExportStageActionParams, void>(
-        "exportStageTool",
-        {
-          options: {
-            padding: 20,
-            pixelRatio: 2,
-          },
-        }
-      );
+  const handleExportToImage = React.useCallback(async () => {
+    if (instance && instance.getActiveAction() !== "exportStageTool") {
+      const image = await instance.triggerAction<
+        WeaveExportStageActionParams,
+        Promise<HTMLImageElement>
+      >("exportStageTool", {
+        options: {
+          padding: 20,
+          pixelRatio: 2,
+        },
+      });
+
+      if (image) {
+        const link = document.createElement("a");
+        link.href = image.src;
+        link.download = `${uuidv4()}image/png`;
+        link.click();
+      }
     }
     setMenuOpen(false);
   }, [instance]);
