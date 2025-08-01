@@ -45,3 +45,7 @@ export function detectOS() {
   }
   return SYSTEM_OS.OTHER;
 }
+
+export function isClipboardAPIAvailable() {
+  return !!navigator.clipboard;
+}

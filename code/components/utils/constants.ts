@@ -50,6 +50,8 @@ import {
   WeaveCopyPasteNodesPlugin,
   WeaveContextMenuPlugin,
   WeaveNodesSnappingPlugin,
+  // WeaveNodesEdgeSnappingPlugin,
+  // WeaveNodesDistanceSnappingPlugin,
 } from "@inditextech/weave-sdk";
 import { type WeaveUser } from "@inditextech/weave-types";
 import { Inter } from "next/font/google";
@@ -220,6 +222,8 @@ const PLUGINS = (getUser: () => WeaveUser) => [
     },
   }),
   new WeaveNodesSnappingPlugin(),
+  // new WeaveNodesEdgeSnappingPlugin(),
+  // new WeaveNodesDistanceSnappingPlugin(),
   new WeaveStageDropAreaPlugin(),
   new WeaveCopyPasteNodesPlugin(),
   new WeaveConnectedUsersPlugin({

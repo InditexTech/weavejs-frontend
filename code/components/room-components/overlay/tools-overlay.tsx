@@ -21,6 +21,7 @@ import { ToolsNodeOverlay } from "./tools-node-overlay";
 import { ToolsNodesOverlay } from "./tools-nodes-overlay";
 import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ToolsMaskingOverlay } from "./tools-masking-overlay";
+import { isClipboardAPIAvailable } from "@/lib/utils";
 
 export function ToolsOverlay() {
   useKeyboardHandler();
@@ -80,25 +81,46 @@ export function ToolsOverlay() {
   React.useEffect(() => {
     const onPasteExternalImage = async ({
       position,
-      item,
+      items,
+      dataList,
     }: {
       position: Vector2d;
-      item: ClipboardItem;
+      items?: ClipboardItems;
+      dataList?: DataTransferItemList;
     }) => {
+      if (items?.length === 0 && dataList?.length === 0) {
+        return;
+      }
+
       let blob: Blob | null = null;
-      if (item.types.includes("image/png")) {
-        blob = await item.getType("image/png");
+      if (isClipboardAPIAvailable() && items && items.length === 1) {
+        const item = items[0];
+
+        if (item.types.includes("image/png")) {
+          blob = await item.getType("image/png");
+        }
+        if (item.types.includes("image/jpeg")) {
+          blob = await item.getType("image/jpeg");
+        }
+        if (item.types.includes("image/gif")) {
+          blob = await item.getType("image/gif");
+        }
       }
-      if (item.types.includes("image/jpeg")) {
-        blob = await item.getType("image/jpeg");
-      }
-      if (item.types.includes("image/gif")) {
-        blob = await item.getType("image/gif");
+
+      if (!blob && dataList && dataList.length === 1) {
+        const item = dataList[0];
+        if (item.type === "image/png" || item.type === "image/jpeg") {
+          blob = await item.getAsFile();
+        }
       }
 
       if (!blob) {
         return;
       }
+
+      instance?.addEventListener("onAddedImage", () => {
+        setUploadingImage(false);
+      });
 
       setUploadingImage(true);
       const file = new File([blob], "external.image");
@@ -120,10 +142,8 @@ export function ToolsOverlay() {
           ) as any;
         },
         onError: () => {
-          console.error("Error uploading image");
-        },
-        onSettled: () => {
           setUploadingImage(false);
+          console.error("Error uploading image");
         },
       });
     };

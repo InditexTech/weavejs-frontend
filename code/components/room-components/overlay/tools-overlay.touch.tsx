@@ -5,10 +5,7 @@
 "use client";
 
 import React from "react";
-import { Vector2d } from "konva/lib/types";
 import { ToolbarButton } from "../toolbar/toolbar-button";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { postImage } from "@/api/post-image";
 import {
   Brush,
   Image,
@@ -82,11 +79,7 @@ export function ToolsOverlayTouch() {
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
-  const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
-  );
 
   const aiEnabled = useIACapabilities((state) => state.enabled);
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
@@ -98,18 +91,6 @@ export function ToolsOverlayTouch() {
   );
   const setImagesLLMPopupVisible = useIACapabilities(
     (state) => state.setImagesLLMPopupVisible
-  );
-
-  const queryClient = useQueryClient();
-
-  const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
-    },
-  });
-
-  const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
   );
 
   const sidebarToggle = React.useCallback(
@@ -131,74 +112,6 @@ export function ToolsOverlayTouch() {
     },
     [instance, actualAction]
   );
-
-  React.useEffect(() => {
-    const onPasteExternalImage = async ({
-      position,
-      item,
-    }: {
-      position: Vector2d;
-      item: ClipboardItem;
-    }) => {
-      let blob: Blob | null = null;
-      if (item.types.includes("image/png")) {
-        blob = await item.getType("image/png");
-      }
-      if (item.types.includes("image/jpeg")) {
-        blob = await item.getType("image/jpeg");
-      }
-      if (item.types.includes("image/gif")) {
-        blob = await item.getType("image/gif");
-      }
-
-      if (!blob) {
-        return;
-      }
-
-      setUploadingImage(true);
-      const file = new File([blob], "external.image");
-      mutationUpload.mutate(file, {
-        onSuccess: (data) => {
-          const room: string = data.fileName.split("/")[0];
-          const imageId = data.fileName.split("/")[1];
-
-          const queryKey = ["getImages", room];
-          queryClient.invalidateQueries({ queryKey });
-
-          instance?.triggerAction(
-            "imageTool",
-            {
-              position,
-              imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any;
-        },
-        onError: () => {
-          console.error("Error uploading image");
-        },
-        onSettled: () => {
-          setUploadingImage(false);
-        },
-      });
-    };
-
-    if (instance) {
-      instance.addEventListener("onPasteExternal", onPasteExternalImage);
-    }
-
-    return () => {
-      if (instance) {
-        instance.removeEventListener("onPasteExternal", onPasteExternalImage);
-      }
-    };
-  }, [
-    instance,
-    queryClient,
-    mutationUpload,
-    setShowSelectFileImage,
-    setUploadingImage,
-  ]);
 
   const SHAPES_TOOLS = useShapesTools();
   const STROKES_TOOLS = useStrokesTools();
