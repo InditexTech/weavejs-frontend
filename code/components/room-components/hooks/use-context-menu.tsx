@@ -274,20 +274,6 @@ function useContextMenu() {
         }
       }
 
-      // const pastMode = await copyPasteNodesPlugin?.getAvailablePasteMode(
-      //   canHandleExternalPaste
-      // );
-
-      // PASTE
-      // if (
-      //   pastMode &&
-      //   (
-      //     [
-      //       WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL,
-      //       WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL,
-      //     ] as WeaveCopyPastePasteMode[]
-      //   ).includes(pastMode)
-      // )
       options.push({
         id: "paste",
         type: "button",
