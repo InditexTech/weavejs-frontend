@@ -95,12 +95,14 @@ function useContextMenu() {
       nodes,
       canGroup,
       clickPoint,
+      stageClickPoint,
     }: {
       actActionActive: string | undefined;
       canUnGroup: boolean;
       canGroup: boolean;
       nodes: WeaveSelection[];
       clickPoint: Vector2d;
+      stageClickPoint: Vector2d;
     }): Promise<ContextMenuOption[]> => {
       if (!instance) return [];
 
@@ -294,7 +296,7 @@ function useContextMenu() {
           const weaveCopyPasteNodesPlugin =
             instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste(clickPoint);
+            await weaveCopyPasteNodesPlugin.paste(clickPoint, stageClickPoint);
             setContextMenuShow(false);
           }
         },
@@ -569,6 +571,7 @@ function useContextMenu() {
       selection,
       contextMenuPoint,
       clickPoint,
+      stageClickPoint,
       visible,
     }: WeaveStageContextMenuPluginOnNodeContextMenuEvent) => {
       if (!instance) return;
@@ -587,6 +590,7 @@ function useContextMenu() {
         nodes: selection,
         canGroup,
         clickPoint,
+        stageClickPoint,
       });
 
       if (contextMenu.length > 0) {

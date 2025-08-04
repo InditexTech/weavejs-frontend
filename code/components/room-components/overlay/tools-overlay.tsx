@@ -24,11 +24,15 @@ import { ToolsMaskingOverlay } from "./tools-masking-overlay";
 import { isClipboardAPIAvailable } from "@/lib/utils";
 import {
   WeaveImageToolActionOnAddedEvent,
+  WeaveNode,
   WeaveNodesSelectionPlugin,
 } from "@inditextech/weave-sdk";
+import { WeaveElementInstance } from "@inditextech/weave-types";
 
 export function ToolsOverlay() {
   useKeyboardHandler();
+
+  const addImageRef = React.useRef<string | null>(null);
 
   const instance = useWeave((state) => state.instance);
 
@@ -83,6 +87,53 @@ export function ToolsOverlay() {
   }, [instance, setCroppingImage, setCroppingNode]);
 
   React.useEffect(() => {
+    const onAddedImageHandler = ({ nodeId }: { nodeId: string }) => {
+      setUploadingImage(false);
+
+      if (!addImageRef.current) {
+        return;
+      }
+
+      const node = instance?.getStage().findOne(`#${nodeId}`);
+
+      if (node) {
+        node?.x(node.x() - node.width() / 2);
+        node?.y(node.y() - node.height() / 2);
+
+        const nodeHandle = instance?.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+
+        if (nodeHandle) {
+          instance?.updateNode(
+            nodeHandle.serialize(node as WeaveElementInstance)
+          );
+        }
+
+        const selectionPlugin =
+          instance?.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+        if (selectionPlugin) {
+          selectionPlugin.setSelectedNodes([node]);
+        }
+
+        instance?.triggerAction("fitToSelectionTool", {
+          previousAction: "selectionTool",
+          smartZoom: true,
+        });
+      }
+    };
+
+    instance?.addEventListener<WeaveImageToolActionOnAddedEvent>(
+      "onAddedImage",
+      onAddedImageHandler
+    );
+
+    return () => {
+      instance?.removeEventListener("onAddedImage", onAddedImageHandler);
+    };
+  }, [instance, setUploadingImage]);
+
+  React.useEffect(() => {
     const onPasteExternalImage = async ({
       position,
       items,
@@ -122,27 +173,6 @@ export function ToolsOverlay() {
         return;
       }
 
-      instance?.addEventListener<WeaveImageToolActionOnAddedEvent>(
-        "onAddedImage",
-        ({ nodeId }) => {
-          setUploadingImage(false);
-
-          const node = instance?.getStage().findOne(`#${nodeId}`);
-          if (node) {
-            const selectionPlugin =
-              instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-            if (selectionPlugin) {
-              selectionPlugin.setSelectedNodes([node]);
-            }
-
-            instance?.triggerAction("fitToSelectionTool", {
-              previousAction: "selectionTool",
-              smartZoom: true,
-            });
-          }
-        }
-      );
-
       setUploadingImage(true);
       const file = new File([blob], "external.image");
       mutationUpload.mutate(file, {
@@ -157,10 +187,13 @@ export function ToolsOverlay() {
             "imageTool",
             {
               position,
+              forceMainContainer: true,
               imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
+
+          addImageRef.current = imageId;
         },
         onError: () => {
           setUploadingImage(false);
