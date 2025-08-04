@@ -4,13 +4,12 @@
 
 import { v4 as uuidv4 } from "uuid";
 import {
-  WeaveCopyPastePasteMode,
-  WEAVE_COPY_PASTE_PASTE_MODES,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodesActionParams,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
 } from "@inditextech/weave-sdk";
+import { Vector2d } from "konva/lib/types";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
@@ -37,21 +36,6 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
-
-const EXTERNAL_PASTE_TYPES = ["image/png", "image/jpeg"];
-
-const canHandleExternalPaste = async (items: ClipboardItems) => {
-  let canHandleExternal = false;
-  for (const type of EXTERNAL_PASTE_TYPES) {
-    for (const item of items) {
-      if (item.types.includes(type)) {
-        canHandleExternal = true;
-        break;
-      }
-    }
-  }
-  return Promise.resolve(canHandleExternal);
-};
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -110,16 +94,15 @@ function useContextMenu() {
       canUnGroup,
       nodes,
       canGroup,
+      clickPoint,
     }: {
       actActionActive: string | undefined;
       canUnGroup: boolean;
       canGroup: boolean;
       nodes: WeaveSelection[];
+      clickPoint: Vector2d;
     }): Promise<ContextMenuOption[]> => {
       if (!instance) return [];
-
-      const copyPasteNodesPlugin =
-        instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
 
       const options: ContextMenuOption[] = [];
 
@@ -291,45 +274,45 @@ function useContextMenu() {
         }
       }
 
-      const pastMode = await copyPasteNodesPlugin?.getAvailablePasteMode(
-        canHandleExternalPaste
-      );
+      // const pastMode = await copyPasteNodesPlugin?.getAvailablePasteMode(
+      //   canHandleExternalPaste
+      // );
 
       // PASTE
-      if (
-        pastMode &&
-        (
-          [
-            WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL,
-            WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL,
-          ] as WeaveCopyPastePasteMode[]
-        ).includes(pastMode)
-      )
-        options.push({
-          id: "paste",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Paste</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ P",
-                  [SYSTEM_OS.OTHER]: "Ctrl P",
-                }}
-              />
-            </div>
-          ),
-          icon: <ClipboardPaste size={16} />,
-          disabled: !["selectionTool"].includes(actActionActive ?? ""),
-          onClick: async () => {
-            const weaveCopyPasteNodesPlugin =
-              instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
-            if (weaveCopyPasteNodesPlugin) {
-              await weaveCopyPasteNodesPlugin.paste();
-              setContextMenuShow(false);
-            }
-          },
-        });
+      // if (
+      //   pastMode &&
+      //   (
+      //     [
+      //       WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL,
+      //       WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL,
+      //     ] as WeaveCopyPastePasteMode[]
+      //   ).includes(pastMode)
+      // )
+      options.push({
+        id: "paste",
+        type: "button",
+        label: (
+          <div className="w-full flex justify-between items-center">
+            <div>Paste here</div>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "⌘ P",
+                [SYSTEM_OS.OTHER]: "Ctrl P",
+              }}
+            />
+          </div>
+        ),
+        icon: <ClipboardPaste size={16} />,
+        disabled: !["selectionTool"].includes(actActionActive ?? ""),
+        onClick: async () => {
+          const weaveCopyPasteNodesPlugin =
+            instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+          if (weaveCopyPasteNodesPlugin) {
+            await weaveCopyPasteNodesPlugin.paste(clickPoint);
+            setContextMenuShow(false);
+          }
+        },
+      });
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
         options.push({
@@ -598,7 +581,8 @@ function useContextMenu() {
   const onNodeContextMenuHandler = React.useCallback(
     async ({
       selection,
-      point,
+      contextMenuPoint,
+      clickPoint,
       visible,
     }: WeaveStageContextMenuPluginOnNodeContextMenuEvent) => {
       if (!instance) return;
@@ -616,11 +600,12 @@ function useContextMenu() {
         canUnGroup,
         nodes: selection,
         canGroup,
+        clickPoint,
       });
 
       if (contextMenu.length > 0) {
         setContextMenuShow(visible);
-        setContextMenuPosition(point);
+        setContextMenuPosition(contextMenuPoint);
         setContextMenuOptions(contextMenu);
       } else {
         const contextMenuPlugin =

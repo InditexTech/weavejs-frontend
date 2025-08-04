@@ -134,19 +134,7 @@ export const RoomLayout = () => {
           })}
         >
           <div
-            id="paste-catcher"
-            contentEditable="true"
-            tabIndex={0}
-            style={{
-              position: "absolute",
-              left: "-9999px",
-              width: "1px",
-              height: "1px",
-            }}
-          ></div>
-          <div
             id="weave"
-            // contentEditable="true"
             tabIndex={0}
             className={cn("w-full h-full relative overflow-hidden", {
               ["pointer-events-none"]:

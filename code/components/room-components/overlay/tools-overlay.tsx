@@ -22,6 +22,10 @@ import { ToolsNodesOverlay } from "./tools-nodes-overlay";
 import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ToolsMaskingOverlay } from "./tools-masking-overlay";
 import { isClipboardAPIAvailable } from "@/lib/utils";
+import {
+  WeaveImageToolActionOnAddedEvent,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weave-sdk";
 
 export function ToolsOverlay() {
   useKeyboardHandler();
@@ -118,9 +122,26 @@ export function ToolsOverlay() {
         return;
       }
 
-      instance?.addEventListener("onAddedImage", () => {
-        setUploadingImage(false);
-      });
+      instance?.addEventListener<WeaveImageToolActionOnAddedEvent>(
+        "onAddedImage",
+        ({ nodeId }) => {
+          setUploadingImage(false);
+
+          const node = instance?.getStage().findOne(`#${nodeId}`);
+          if (node) {
+            const selectionPlugin =
+              instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+            if (selectionPlugin) {
+              selectionPlugin.setSelectedNodes([node]);
+            }
+
+            instance?.triggerAction("fitToSelectionTool", {
+              previousAction: "selectionTool",
+              smartZoom: true,
+            });
+          }
+        }
+      );
 
       setUploadingImage(true);
       const file = new File([blob], "external.image");
