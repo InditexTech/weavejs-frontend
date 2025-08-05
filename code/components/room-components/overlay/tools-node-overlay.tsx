@@ -406,6 +406,11 @@ export function ToolsNodeOverlay() {
     setTransformingImage,
     singleLocked,
     weaveConnectionStatus,
+    setRemoveBackgroundPopupImageId,
+    setRemoveBackgroundPopupShow,
+    setRemoveBackgroundPopupImageURL,
+    setRemoveBackgroundPopupOriginImage,
+    setRemoveBackgroundPopupOriginNodeId,
   ]);
 
   const colorTokenTools = React.useMemo(() => {
