@@ -605,6 +605,11 @@ function useContextMenu() {
       setImagesLLMPopupImage,
       setTransformingImage,
       setContextMenuShow,
+      setRemoveBackgroundPopupImageId,
+      setRemoveBackgroundPopupImageURL,
+      setRemoveBackgroundPopupOriginNodeId,
+      setRemoveBackgroundPopupOriginImage,
+      setRemoveBackgroundPopupShow,
     ]
   );
 
