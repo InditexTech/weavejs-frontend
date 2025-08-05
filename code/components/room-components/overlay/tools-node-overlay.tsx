@@ -4,6 +4,7 @@
 
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import Konva from "konva";
 import { ToolbarButton } from "../toolbar/toolbar-button";
@@ -91,7 +92,21 @@ export function ToolsNodeOverlay() {
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
   );
-
+  const setRemoveBackgroundPopupShow = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupShow
+  );
+  const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupOriginNodeId
+  );
+  const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupOriginImage
+  );
+  const setRemoveBackgroundPopupImageId = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupImageId
+  );
+  const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupImageURL
+  );
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
   );
@@ -117,8 +132,14 @@ export function ToolsNodeOverlay() {
   );
 
   const mutationUpload = useMutation({
-    mutationFn: async (imageId: string) => {
-      return await postRemoveBackground(room ?? "", imageId);
+    mutationFn: async ({
+      imageId,
+      image,
+    }: {
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postRemoveBackground(room ?? "", imageId, image);
     },
   });
 
@@ -262,38 +283,60 @@ export function ToolsNodeOverlay() {
               if (nodeImage) {
                 nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
 
-                const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`
-                );
-                const imageTokens = nodeImageInternal
-                  ?.getAttr("image")
-                  .src.split("/");
-                const imageId = imageTokens[imageTokens.length - 1];
                 setTransformingImage(true);
-                mutationUpload.mutate(imageId, {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onSuccess: (data: any) => {
-                    const room = data.fileName.split("/")[0];
-                    const imageId = data.fileName.split("/")[1];
 
-                    const { finishUploadCallback } = instance.triggerAction(
-                      "imageTool"
+                setTimeout(async () => {
+                  const img = await instance.exportNodes(
+                    [nodeImage],
+                    (nodes) => nodes,
+                    {
+                      format: "image/png",
+                      padding: 0,
+                      pixelRatio: 1,
+                    }
+                  );
+
+                  const dataBase64Url = instance.imageToBase64(
+                    img,
+                    "image/png"
+                  );
+
+                  setRemoveBackgroundPopupOriginImage(dataBase64Url);
+
+                  const dataBase64 = dataBase64Url.split(",")[1];
+
+                  mutationUpload.mutate(
+                    {
+                      imageId: uuidv4(),
+                      image: {
+                        dataBase64,
+                        contentType: "image/png",
+                      },
+                    },
+                    {
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ) as any;
+                      onSuccess: (data: any) => {
+                        const room = data.fileName.split("/")[0];
+                        const imageId = data.fileName.split("/")[1];
 
-                    instance.updatePropsAction("imageTool", { imageId });
+                        const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
 
-                    finishUploadCallback(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                    );
-                  },
-                  onError: () => {
-                    console.error("Error uploading image");
-                  },
-                  onSettled: () => {
-                    setTransformingImage(false);
-                  },
-                });
+                        setRemoveBackgroundPopupOriginNodeId(
+                          nodeImage.getAttrs().id
+                        );
+                        setRemoveBackgroundPopupImageId(imageId);
+                        setRemoveBackgroundPopupImageURL(imageURL);
+                        setRemoveBackgroundPopupShow(true);
+                      },
+                      onError: () => {
+                        console.error("Error uploading image");
+                      },
+                      onSettled: () => {
+                        setTransformingImage(false);
+                      },
+                    }
+                  );
+                }, 10);
               }
             }}
             label={

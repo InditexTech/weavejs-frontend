@@ -40,9 +40,6 @@ export function RemoveBackgroundActionPopup() {
   const imageURL = useCollaborationRoom(
     (state) => state.images.removeBackgroundPopup.imageURL
   );
-  const action = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.action
-  );
   const showPopup = useCollaborationRoom(
     (state) => state.images.removeBackgroundPopup.show
   );
@@ -52,15 +49,6 @@ export function RemoveBackgroundActionPopup() {
   const setRemoveBackgroundPopupShow = useCollaborationRoom(
     (state) => state.setRemoveBackgroundPopupShow
   );
-
-  React.useEffect(() => {
-    if (instance && action === "new") {
-      console.log("Adding new image");
-    }
-    if (instance && action === "replace") {
-      console.log("Replacing original image");
-    }
-  }, [instance, action]);
 
   return (
     <>
