@@ -34,6 +34,9 @@ export function ToolsOverlay() {
 
   const addImageRef = React.useRef<string | null>(null);
 
+  const [positionCalculated, setPositionCalculated] =
+    React.useState<boolean>(false);
+
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
@@ -94,6 +97,10 @@ export function ToolsOverlay() {
         return;
       }
 
+      if (!positionCalculated) {
+        return;
+      }
+
       const node = instance?.getStage().findOne(`#${nodeId}`);
 
       if (node) {
@@ -131,14 +138,16 @@ export function ToolsOverlay() {
     return () => {
       instance?.removeEventListener("onAddedImage", onAddedImageHandler);
     };
-  }, [instance, setUploadingImage]);
+  }, [instance, positionCalculated, setUploadingImage]);
 
   React.useEffect(() => {
     const onPasteExternalImage = async ({
+      positionCalculated,
       position,
       items,
       dataList,
     }: {
+      positionCalculated: boolean;
       position: Vector2d;
       items?: ClipboardItems;
       dataList?: DataTransferItemList;
@@ -194,6 +203,8 @@ export function ToolsOverlay() {
           ) as any;
 
           addImageRef.current = imageId;
+
+          setPositionCalculated(positionCalculated);
         },
         onError: () => {
           setUploadingImage(false);

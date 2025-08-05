@@ -31,6 +31,7 @@ import { LLMPredictionsSelectionV2Popup } from "../room-components/overlay/llm-p
 import { MaskSlider } from "../room-components/overlay/mask-slider";
 import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-reference-selection-v2";
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
+import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -234,6 +235,7 @@ export const RoomLayout = () => {
             <LLMGenerationV2Popup />
             <LLMPredictionsSelectionV2Popup />
             <LLMReferenceSelectionV2Popup />
+            <RemoveBackgroundActionPopup />
           </>
         )}
       </motion.div>

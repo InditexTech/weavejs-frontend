@@ -68,6 +68,14 @@ interface CollaborationRoomState {
     uploading: boolean;
     loading: boolean;
     finishUploadCallback: FinishUploadCallback | null;
+    removeBackgroundPopup: {
+      originNodeId?: string;
+      originImage?: string;
+      imageId?: string;
+      imageURL?: string;
+      action: "replace" | "new" | undefined;
+      show: boolean;
+    };
   };
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
@@ -100,6 +108,18 @@ interface CollaborationRoomState {
     position?: "left" | "right"
   ) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
+  setRemoveBackgroundPopupAction: (
+    newAction: "replace" | "new" | undefined
+  ) => void;
+  setRemoveBackgroundPopupShow: (newShow: boolean) => void;
+  setRemoveBackgroundPopupOriginImage: (
+    newOriginImage: string | undefined
+  ) => void;
+  setRemoveBackgroundPopupOriginNodeId: (
+    newOriginNodeId: string | undefined
+  ) => void;
+  setRemoveBackgroundPopupImageId: (newImageId: string | undefined) => void;
+  setRemoveBackgroundPopupImageURL: (newImageURL: string | undefined) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -146,6 +166,13 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     uploading: false,
     loading: false,
     finishUploadCallback: null,
+    removeBackgroundPopup: {
+      originNodeId: undefined,
+      imageId: undefined,
+      imageURL: undefined,
+      action: undefined,
+      show: false,
+    },
   },
   frames: {
     library: {
@@ -279,6 +306,72 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         [drawerKey]: {
           ...state.drawer[drawerKey],
           visible: newOpen,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupAction: (newAction) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          action: newAction,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupShow: (newShow) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          show: newShow,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupOriginNodeId: (newOriginNodeId) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          originNodeId: newOriginNodeId,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupImageId: (newImageId) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          imageId: newImageId,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupImageURL: (newImageURL) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          imageURL: newImageURL,
+        },
+      },
+    })),
+  setRemoveBackgroundPopupOriginImage: (newOriginImage) =>
+    set((state) => ({
+      ...state,
+      images: {
+        ...state.images,
+        removeBackgroundPopup: {
+          ...state.images.removeBackgroundPopup,
+          originImage: newOriginImage,
         },
       },
     })),

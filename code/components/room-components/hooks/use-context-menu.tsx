@@ -56,6 +56,21 @@ function useContextMenu() {
   const setTransformingImage = useCollaborationRoom(
     (state) => state.setTransformingImage
   );
+  const setRemoveBackgroundPopupShow = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupShow
+  );
+  const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupOriginNodeId
+  );
+  const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupOriginImage
+  );
+  const setRemoveBackgroundPopupImageId = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupImageId
+  );
+  const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
+    (state) => state.setRemoveBackgroundPopupImageURL
+  );
   const aiEnabled = useIACapabilities((state) => state.enabled);
   const setImagesLLMPopupSelectedNodes = useIACapabilities(
     (state) => state.setImagesLLMPopupSelectedNodes
@@ -71,8 +86,14 @@ function useContextMenu() {
   );
 
   const mutationUpload = useMutation({
-    mutationFn: async (imageId: string) => {
-      return await postRemoveBackground(room ?? "", imageId);
+    mutationFn: async ({
+      imageId,
+      image,
+    }: {
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postRemoveBackground(room ?? "", imageId, image);
     },
   });
 
@@ -126,38 +147,60 @@ function useContextMenu() {
               if (instance) {
                 const nodeImage = nodes[0].instance as Konva.Group | undefined;
                 if (nodeImage) {
-                  const nodeImageInternal = nodeImage?.findOne(
-                    `#${nodeImage.getAttrs().id}-image`
-                  );
-                  const imageTokens = nodeImageInternal
-                    ?.getAttr("image")
-                    .src.split("/");
-                  const imageId = imageTokens[imageTokens.length - 1];
                   setTransformingImage(true);
-                  mutationUpload.mutate(imageId, {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onSuccess: (data: any) => {
-                      const room = data.fileName.split("/")[0];
-                      const imageId = data.fileName.split("/")[1];
 
-                      const { finishUploadCallback } = instance.triggerAction(
-                        "imageTool"
+                  setTimeout(async () => {
+                    const img = await instance.exportNodes(
+                      [nodeImage],
+                      (nodes) => nodes,
+                      {
+                        format: "image/png",
+                        padding: 0,
+                        pixelRatio: 1,
+                      }
+                    );
+
+                    const dataBase64Url = instance.imageToBase64(
+                      img,
+                      "image/png"
+                    );
+
+                    setRemoveBackgroundPopupOriginImage(dataBase64Url);
+
+                    const dataBase64 = dataBase64Url.split(",")[1];
+
+                    mutationUpload.mutate(
+                      {
+                        imageId: uuidv4(),
+                        image: {
+                          dataBase64,
+                          contentType: "image/png",
+                        },
+                      },
+                      {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      ) as any;
+                        onSuccess: (data: any) => {
+                          const room = data.fileName.split("/")[0];
+                          const imageId = data.fileName.split("/")[1];
 
-                      instance.updatePropsAction("imageTool", { imageId });
+                          const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
 
-                      finishUploadCallback(
-                        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-                      );
-                    },
-                    onError: () => {
-                      console.error("Error uploading image");
-                    },
-                    onSettled: () => {
-                      setTransformingImage(false);
-                    },
-                  });
+                          setRemoveBackgroundPopupOriginNodeId(
+                            nodeImage.getAttrs().id
+                          );
+                          setRemoveBackgroundPopupImageId(imageId);
+                          setRemoveBackgroundPopupImageURL(imageURL);
+                          setRemoveBackgroundPopupShow(true);
+                        },
+                        onError: () => {
+                          console.error("Error uploading image");
+                        },
+                        onSettled: () => {
+                          setTransformingImage(false);
+                        },
+                      }
+                    );
+                  }, 10);
                 }
               }
               setContextMenuShow(false);
@@ -275,7 +318,6 @@ function useContextMenu() {
           });
         }
       }
-
       options.push({
         id: "paste",
         type: "button",
@@ -292,11 +334,11 @@ function useContextMenu() {
         ),
         icon: <ClipboardPaste size={16} />,
         disabled: !["selectionTool"].includes(actActionActive ?? ""),
-        onClick: async () => {
+        onClick: () => {
           const weaveCopyPasteNodesPlugin =
             instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste(clickPoint, stageClickPoint);
+            weaveCopyPasteNodesPlugin.paste(clickPoint, stageClickPoint);
             setContextMenuShow(false);
           }
         },

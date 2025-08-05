@@ -12,7 +12,7 @@ type ContextMenuButtonProps = {
   label: React.ReactNode;
   icon?: React.ReactNode;
   disabled?: boolean;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export type ContextMenuOption = {
@@ -24,7 +24,9 @@ export type ContextMenuOption = {
       label: string | React.ReactNode;
       icon?: React.ReactNode;
       disabled?: boolean;
-      onClick: () => void;
+      onClick: (
+        e?: React.MouseEvent<HTMLButtonElement>
+      ) => void | Promise<void>;
     }
   | {
       type: "divider";
@@ -53,6 +55,11 @@ function ContextMenuButton({
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
         }
       )}
+      style={{
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        WebkitTouchCallout: "none",
+      }}
       disabled={disabled}
       onClick={onClick}
     >
