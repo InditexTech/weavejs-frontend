@@ -221,7 +221,16 @@ const PLUGINS = (getUser: () => WeaveUser) => [
     },
   }),
   new WeaveNodesEdgeSnappingPlugin(),
-  new WeaveNodesDistanceSnappingPlugin(),
+  new WeaveNodesDistanceSnappingPlugin({
+    config: {
+      ui: {
+        label: {
+          fontSize: 12,
+          fontFamily: inter.style.fontFamily,
+        },
+      },
+    },
+  }),
   new WeaveStageDropAreaPlugin(),
   new WeaveCopyPasteNodesPlugin(),
   new WeaveConnectedUsersPlugin({

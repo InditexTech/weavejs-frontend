@@ -6,7 +6,6 @@
 
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { useRouter } from "next/navigation";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import { ACTIONS, FONTS, NODES, PLUGINS } from "@/components/utils/constants";
@@ -16,11 +15,11 @@ import { RoomLoader } from "../room-components/room-loader/room-loader";
 import { AnimatePresence } from "framer-motion";
 import useGetAzureWebPubSubProvider from "../room-components/hooks/use-get-azure-web-pubsub-provider";
 // import useGetWebsocketsProvider from "../room-components/hooks/use-get-websockets-provider";
-import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
 import { UploadFile } from "../room-components/upload-file";
 import { UploadFiles } from "../room-components/upload-files";
 import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
+import { AppProviders } from "@/app/providers";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -32,9 +31,23 @@ const statusMap: any = {
   [WEAVE_INSTANCE_STATUS.RUNNING]: "Running",
 };
 
-export const Room = () => {
-  const router = useRouter();
+type RoomWrapperProps = {
+  children: React.ReactNode;
+};
 
+export function RoomWrapper({ children }: Readonly<RoomWrapperProps>) {
+  return <AppProviders>{children}</AppProviders>;
+}
+
+export const RoomShadowDom = () => {
+  return (
+    <RoomWrapper>
+      <Room />
+    </RoomWrapper>
+  );
+};
+
+export const Room = () => {
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
@@ -52,7 +65,7 @@ export const Room = () => {
   );
   const setUser = useCollaborationRoom((state) => state.setUser);
 
-  const { loadedParams } = useHandleRouteParams();
+  // const { loadedParams } = useHandleRouteParams();
 
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
@@ -73,9 +86,6 @@ export const Room = () => {
   }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
-    if (!loadedParams) {
-      return "Fetching room parameters...";
-    }
     if (loadingFetchConnectionUrl) {
       return "Connecting to the room...";
     }
@@ -84,10 +94,10 @@ export const Room = () => {
     }
 
     return "";
-  }, [loadedParams, loadingFetchConnectionUrl, status]);
+  }, [loadingFetchConnectionUrl, status]);
 
   const storeProvider = useGetAzureWebPubSubProvider({
-    loadedParams,
+    loadedParams: true,
     getUser,
   });
 
@@ -108,18 +118,22 @@ export const Room = () => {
   }, [instance, status, roomLoaded]);
 
   React.useEffect(() => {
-    if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
-      router.push("/error?errorCode=room-failed-connection");
-    }
-
-    if (!room && !user && loadedParams) {
-      router.push("/error?errorCode=room-required-parameters");
-    }
-
-    if (errorFetchConnectionUrl) {
-      router.push("/error?errorCode=room-failed-connection");
-    }
-  }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
+    // if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
+    //   router.push("/error?errorCode=room-failed-connection");
+    // }
+    // if (!room && !user && loadedParams) {
+    //   router.push("/error?errorCode=room-required-parameters");
+    // }
+    // if (errorFetchConnectionUrl) {
+    //   router.push("/error?errorCode=room-failed-connection");
+    // }
+  }, [
+    // router,
+    room,
+    user,
+    status,
+    errorFetchConnectionUrl,
+  ]);
 
   const isBrowser =
     typeof window !== "undefined" && typeof window.document !== "undefined";
@@ -132,7 +146,7 @@ export const Room = () => {
     return null;
   }
 
-  if (!room && !user && loadedParams) {
+  if (!room && !user) {
     return null;
   }
 
@@ -141,10 +155,9 @@ export const Room = () => {
   }
 
   return (
-    <>
+    <div className="w-full h-full">
       <AnimatePresence>
-        {(!loadedParams ||
-          loadingFetchConnectionUrl ||
+        {(loadingFetchConnectionUrl ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
           <>
@@ -152,7 +165,7 @@ export const Room = () => {
               key="loader"
               roomId={room ? room : "-"}
               content={
-                loadedParams && room && !user ? (
+                room && !user ? (
                   <div className="text-center">
                     <p>ENTER YOUR USERNAME</p>
                     <p>TO ACCESS THE ROOM</p>
@@ -163,7 +176,7 @@ export const Room = () => {
               }
               description={
                 <>
-                  {loadedParams && room && !user ? (
+                  {room && !user ? (
                     <div className="w-full">
                       <UserForm />
                     </div>
@@ -176,10 +189,13 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && storeProvider && (
+      {room && user && storeProvider && (
         <WeaveProvider
           getContainer={() => {
-            return document?.getElementById("weave") as HTMLDivElement;
+            const shadowHost = document.getElementById("shadow-host");
+            return shadowHost?.shadowRoot?.querySelector(
+              "#weave"
+            ) as HTMLDivElement;
           }}
           store={storeProvider}
           fonts={FONTS}
@@ -189,7 +205,7 @@ export const Room = () => {
         >
           <UploadFile />
           <UploadFiles />
-          <RoomLayout inShadowDom={false} />
+          <RoomLayout inShadowDom />
           <HelpDrawer />
         </WeaveProvider>
       )}
@@ -208,6 +224,6 @@ export const Room = () => {
           },
         }}
       />
-    </>
+    </div>
   );
 };

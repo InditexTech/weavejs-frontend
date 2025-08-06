@@ -32,8 +32,13 @@ import { MaskSlider } from "../room-components/overlay/mask-slider";
 import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-reference-selection-v2";
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
+import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
 
-export const RoomLayout = () => {
+type RoomLayoutProps = {
+  inShadowDom: boolean;
+};
+
+export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   useWeaveEvents();
   useContextMenu();
   useCopyPaste();
@@ -147,7 +152,7 @@ export const RoomLayout = () => {
                 status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
             })}
           ></div>
-          <RoomHeader />
+          {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
           {weaveConnectionStatus !==
             WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
