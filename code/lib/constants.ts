@@ -11,6 +11,7 @@ export const SIDEBAR_ELEMENTS = {
   colorTokens: "colorTokens",
   nodesTree: "nodesTree",
   nodeProperties: "nodeProperties",
+  aiTasks: "aiTasks",
 } as const;
 
 export const DRAWER_ELEMENTS = {

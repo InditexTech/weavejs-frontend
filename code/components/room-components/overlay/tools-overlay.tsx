@@ -157,7 +157,14 @@ export function ToolsOverlay() {
       }
 
       let blob: Blob | null = null;
-      if (isClipboardAPIAvailable() && items && items.length === 1) {
+      if (dataList && dataList.length === 1) {
+        const item = dataList[0];
+        if (item.type === "image/png" || item.type === "image/jpeg") {
+          blob = await item.getAsFile();
+        }
+      }
+
+      if (!blob && isClipboardAPIAvailable() && items?.length === 1) {
         const item = items[0];
 
         if (item.types.includes("image/png")) {
@@ -168,13 +175,6 @@ export function ToolsOverlay() {
         }
         if (item.types.includes("image/gif")) {
           blob = await item.getType("image/gif");
-        }
-      }
-
-      if (!blob && dataList && dataList.length === 1) {
-        const item = dataList[0];
-        if (item.type === "image/png" || item.type === "image/jpeg") {
-          blob = await item.getAsFile();
         }
       }
 

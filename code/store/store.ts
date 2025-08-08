@@ -25,7 +25,14 @@ export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
+export type TaskMetadata = {
+  jobId: string;
+  type: string;
+  status: "new" | "processing" | "completed" | "failed";
+};
+
 interface CollaborationRoomState {
+  asyncAPIActive: boolean;
   fetchConnectionUrl: {
     loading: boolean;
     error: Error | null;
@@ -46,6 +53,7 @@ interface CollaborationRoomState {
       active: SidebarActive;
     };
   };
+  clientId: string | undefined;
   user: ShowcaseUser | undefined;
   room: string | undefined;
   contextMenu: {
@@ -57,6 +65,10 @@ interface CollaborationRoomState {
     action: NodePropertiesAction;
     createProps: WeaveElementAttributes | undefined;
   };
+  sse: {
+    connected: boolean;
+  };
+  tasks: TaskMetadata[];
   images: {
     showSelectFiles: boolean;
     showSelectFile: boolean;
@@ -65,6 +77,7 @@ interface CollaborationRoomState {
       enabled: boolean;
       node: Konva.Node | undefined;
     };
+    exporting: boolean;
     uploading: boolean;
     loading: boolean;
     finishUploadCallback: FinishUploadCallback | null;
@@ -82,6 +95,7 @@ interface CollaborationRoomState {
   setFetchConnectionUrlError: (
     newFetchConnectionUrlError: Error | null
   ) => void;
+  setClientId: (newClientId: string | undefined) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
@@ -120,9 +134,14 @@ interface CollaborationRoomState {
   ) => void;
   setRemoveBackgroundPopupImageId: (newImageId: string | undefined) => void;
   setRemoveBackgroundPopupImageURL: (newImageURL: string | undefined) => void;
+  setSseConnected: (newConnected: boolean) => void;
+  setTask: (newTask: TaskMetadata) => void;
+  setTasks: (newTasks: TaskMetadata[]) => void;
+  setImageExporting: (newExportingImage: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
+  asyncAPIActive: false,
   ui: {
     show: true,
   },
@@ -130,6 +149,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     loading: false,
     error: null,
   },
+  clientId: undefined,
   user: undefined,
   room: undefined,
   sidebar: {
@@ -155,6 +175,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     visible: false,
     createProps: undefined,
   },
+  sse: {
+    connected: false,
+  },
+  tasks: [],
   images: {
     showSelectFiles: false,
     showSelectFile: false,
@@ -163,6 +187,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       enabled: false,
       node: undefined,
     },
+    exporting: false,
     uploading: false,
     loading: false,
     finishUploadCallback: null,
@@ -204,6 +229,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         ...state.fetchConnectionUrl,
         error: newFetchConnectionUrlError,
       },
+    })),
+  setClientId: (newClientId) =>
+    set((state) => ({
+      ...state,
+      clientId: newClientId,
     })),
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
@@ -375,4 +405,38 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         },
       },
     })),
+  setSseConnected: (newConnected) =>
+    set((state) => ({
+      ...state,
+      sse: { ...state.sse, connected: newConnected },
+    })),
+  setTask: (newTask) =>
+    set((state) => {
+      const newTasks = [...state.tasks];
+      const taskIndex = newTasks.findIndex(
+        (task) => task.jobId === newTask.jobId
+      );
+
+      if (taskIndex !== -1) {
+        newTasks[taskIndex] = newTask;
+      } else {
+        newTasks.push(newTask);
+      }
+
+      return {
+        ...state,
+        tasks: newTasks,
+      };
+    }),
+  setTasks: (newTasks) =>
+    set((state) => ({
+      ...state,
+      tasks: newTasks,
+    })),
+  setImageExporting(newExportingImage) {
+    set((state) => ({
+      ...state,
+      images: { ...state.images, exporting: newExportingImage },
+    }));
+  },
 }));

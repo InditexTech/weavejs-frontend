@@ -22,6 +22,7 @@ import {
   Images,
   ChevronDown,
   ChevronUp,
+  ListTodo,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -115,6 +116,17 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             <ListTree /> Elements tree
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            onPointerDown={() => {
+              sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
+            }}
+          >
+            <ListTodo /> Tasks
+            <DropdownMenuShortcut>
+              {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>

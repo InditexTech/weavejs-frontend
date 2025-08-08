@@ -33,6 +33,7 @@ import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-ref
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
 import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
+import { AITasks } from "../room-components/ai-tasks/ai-tasks";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -65,6 +66,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   );
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
+  );
+  const exportingToImage = useCollaborationRoom(
+    (state) => state.images.exporting
   );
   const transformingImage = useCollaborationRoom(
     (state) => state.images.transforming
@@ -121,6 +125,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
             <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
             <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
+            <AITasks key={SIDEBAR_ELEMENTS.aiTasks} />
             {weaveConnectionStatus !==
               WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
               <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -233,6 +238,16 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           )}
         </section>
+        {exportingToImage && (
+          <div className="bg-white flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">
+                Exporting to image, please wait...
+              </div>
+            </div>
+          </div>
+        )}
 
         {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
           <>

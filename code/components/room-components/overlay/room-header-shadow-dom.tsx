@@ -162,7 +162,6 @@ export function RoomHeaderShadowDom() {
   }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
-    console.log("Exiting room", room);
     sessionStorage.removeItem(`weave.js_${room}`);
     instance?.getStore().disconnect();
     setMenuOpen(false);

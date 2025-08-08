@@ -61,6 +61,7 @@ import { ImagesToolAction } from "../actions/images-tool/images-tool";
 import { MaskToolAction } from "../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 import { MaskEraserToolAction } from "../actions/mask-eraser-tool/mask-eraser-tool";
+import { getContrastTextColor, stringToColor } from "@/lib/utils";
 
 const FONTS = [
   {
@@ -232,7 +233,15 @@ const PLUGINS = (getUser: () => WeaveUser) => [
     },
   }),
   new WeaveStageDropAreaPlugin(),
-  new WeaveCopyPasteNodesPlugin(),
+  new WeaveCopyPasteNodesPlugin({
+    config: {
+      paddingOnPaste: {
+        enabled: true,
+        paddingX: 20,
+        paddingY: 20,
+      },
+    },
+  }),
   new WeaveConnectedUsersPlugin({
     config: {
       getUser,
@@ -241,11 +250,18 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveUsersPointersPlugin({
     config: {
       getUser,
+      getUserBackgroundColor: (user: WeaveUser) =>
+        stringToColor(user?.name ?? "#000000"),
+      getUserForegroundColor: (user: WeaveUser) => {
+        const bgColor = stringToColor(user?.name ?? "#ffffff");
+        return getContrastTextColor(bgColor);
+      },
     },
   }),
   new WeaveUsersSelectionPlugin({
     config: {
       getUser,
+      getUserColor: (user: WeaveUser) => stringToColor(user?.name ?? "#000000"),
     },
   }),
   new WeaveContextMenuPlugin({

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import {
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
@@ -36,13 +37,24 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
+import { postRemoveBackgroundV2 } from "@/api/post-remove-background-v2";
 
 function useContextMenu() {
+  const [doExportingImage, setDoExportingImage] = React.useState(false);
+  const [nodesToExport, setNodesToExport] = React.useState<WeaveSelection[]>(
+    []
+  );
+
   const instance = useWeave((state) => state.instance);
 
+  const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
+  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
+  );
+  const setImageExporting = useCollaborationRoom(
+    (state) => state.setImageExporting
   );
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
@@ -96,6 +108,58 @@ function useContextMenu() {
       return await postRemoveBackground(room ?? "", imageId, image);
     },
   });
+
+  const mutationUploadV2 = useMutation({
+    mutationFn: async ({
+      clientId,
+      imageId,
+      image,
+    }: {
+      clientId: string;
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postRemoveBackgroundV2(clientId, room ?? "", imageId, image);
+    },
+  });
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function doExportingImageHandler() {
+      if (!instance) return;
+
+      setTimeout(async () => {
+        const image = await instance.triggerAction<
+          WeaveExportNodesActionParams,
+          Promise<HTMLImageElement>
+        >("exportNodesTool", {
+          nodes: nodesToExport.map((n) => n.instance),
+          options: {
+            padding: 20,
+            pixelRatio: 1,
+          },
+        });
+
+        setImageExporting(false);
+
+        const link = document.createElement("a");
+        link.href = image.src;
+        link.download = `${uuidv4()}image/png`;
+        link.click();
+
+        setNodesToExport([]);
+        setImageExporting(false);
+        setDoExportingImage(false);
+      }, 100);
+    }
+
+    if (doExportingImage) {
+      setImageExporting(true);
+      doExportingImageHandler();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance, nodesToExport, doExportingImage, setImageExporting]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -152,7 +216,7 @@ function useContextMenu() {
                   setTimeout(async () => {
                     const img = await instance.exportNodes(
                       [nodeImage],
-                      (nodes) => nodes,
+                      (nodes: Konva.Node) => nodes,
                       {
                         format: "image/png",
                         padding: 0,
@@ -206,6 +270,78 @@ function useContextMenu() {
               setContextMenuShow(false);
             },
           });
+          if (asyncAPIActive) {
+            options.push({
+              id: "removeBackgroundAsync",
+              type: "button",
+              label: "Remove image background (v2)",
+              icon: <Bot size={16} />,
+              onClick: () => {
+                if (instance) {
+                  const nodeImage = nodes[0].instance as
+                    | Konva.Group
+                    | undefined;
+                  if (nodeImage) {
+                    setTransformingImage(true);
+
+                    setTimeout(async () => {
+                      const img = await instance.exportNodes(
+                        [nodeImage],
+                        (nodes: Konva.Node) => nodes,
+                        {
+                          format: "image/png",
+                          padding: 0,
+                          pixelRatio: 1,
+                        }
+                      );
+
+                      const dataBase64Url = instance.imageToBase64(
+                        img,
+                        "image/png"
+                      );
+
+                      setRemoveBackgroundPopupOriginImage(dataBase64Url);
+                      setRemoveBackgroundPopupOriginNodeId(
+                        nodeImage.getAttrs().id
+                      );
+
+                      const dataBase64 = dataBase64Url.split(",")[1];
+
+                      if (!clientId) {
+                        toast.error("Client ID is not available");
+                        return;
+                      }
+
+                      mutationUploadV2.mutate(
+                        {
+                          clientId,
+                          imageId: uuidv4(),
+                          image: {
+                            dataBase64,
+                            contentType: "image/png",
+                          },
+                        },
+                        {
+                          onSuccess: () => {
+                            toast.success(
+                              "Image background removed requested successfully"
+                            );
+                          },
+                          onError: () => {
+                            toast.error("Error uploading image");
+                          },
+                          onSettled: () => {
+                            setTransformingImage(false);
+                          },
+                        }
+                      );
+                    }, 10);
+                  }
+                }
+                setContextMenuShow(false);
+              },
+            });
+          }
         }
         // EDIT IMAGE WITH A PROMPT
         if (!singleLocked) {
@@ -263,21 +399,8 @@ function useContextMenu() {
             icon: <ImageDown size={16} />,
             disabled: nodes.length <= 0,
             onClick: async () => {
-              const image = await instance.triggerAction<
-                WeaveExportNodesActionParams,
-                Promise<HTMLImageElement>
-              >("exportNodesTool", {
-                nodes: nodes.map((n) => n.instance),
-                options: {
-                  padding: 20,
-                  pixelRatio: 2,
-                },
-              });
-
-              const link = document.createElement("a");
-              link.href = image.src;
-              link.download = `${uuidv4()}image/png`;
-              link.click();
+              setNodesToExport(nodes);
+              setDoExportingImage(true);
 
               setContextMenuShow(false);
             },
@@ -596,8 +719,11 @@ function useContextMenu() {
       return options;
     },
     [
+      asyncAPIActive,
       instance,
+      clientId,
       mutationUpload,
+      mutationUploadV2,
       aiEnabled,
       setImagesLLMPopupSelectedNodes,
       setImagesLLMPopupType,

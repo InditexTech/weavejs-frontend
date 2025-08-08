@@ -30,6 +30,7 @@ import {
   ListTree,
   SwatchBook,
   Projector,
+  ListTodo,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -272,6 +273,14 @@ export function ToolsOverlayTouch() {
               }}
             >
               <ListTree /> Elements tree
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
+              }}
+            >
+              <ListTodo /> Tasks
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

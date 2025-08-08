@@ -21,6 +21,7 @@ import { UploadFile } from "../room-components/upload-file";
 import { UploadFiles } from "../room-components/upload-files";
 import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
+import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -39,6 +40,7 @@ export const Room = () => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
+  const sseConnected = useCollaborationRoom((state) => state.sse.connected);
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const loadingFetchConnectionUrl = useCollaborationRoom(
@@ -73,6 +75,9 @@ export const Room = () => {
   }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
+    if (!sseConnected) {
+      return "Connecting to the server...";
+    }
     if (!loadedParams) {
       return "Fetching room parameters...";
     }
@@ -84,7 +89,7 @@ export const Room = () => {
     }
 
     return "";
-  }, [loadedParams, loadingFetchConnectionUrl, status]);
+  }, [loadedParams, loadingFetchConnectionUrl, status, sseConnected]);
 
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
@@ -121,6 +126,8 @@ export const Room = () => {
     }
   }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
 
+  useTasksEvents();
+
   const isBrowser =
     typeof window !== "undefined" && typeof window.document !== "undefined";
 
@@ -145,6 +152,7 @@ export const Room = () => {
       <AnimatePresence>
         {(!loadedParams ||
           loadingFetchConnectionUrl ||
+          !sseConnected ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
           <>
@@ -176,7 +184,7 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && storeProvider && (
+      {loadedParams && room && user && storeProvider && sseConnected && (
         <WeaveProvider
           getContainer={() => {
             return document?.getElementById("weave") as HTMLDivElement;

@@ -30,6 +30,7 @@ import {
   Projector,
   ChevronDown,
   ChevronUp,
+  ListTodo,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -753,6 +754,21 @@ export function ToolsOverlayMouse() {
               <ListTree /> Elements tree
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
+                sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
+              }}
+            >
+              <ListTodo /> Tasks
+              <DropdownMenuShortcut>
+                {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuContent>

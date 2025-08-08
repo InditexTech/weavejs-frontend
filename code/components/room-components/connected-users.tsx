@@ -221,7 +221,7 @@ export const ConnectedUsers = () => {
                     <div
                       className="w-[16px] h-[16px]"
                       style={{
-                        background: stringToColor(userInfo?.id ?? ""),
+                        background: stringToColor(userInfo?.name ?? ""),
                       }}
                     ></div>
                     <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9] px-3">

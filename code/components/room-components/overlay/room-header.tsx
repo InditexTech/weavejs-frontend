@@ -6,6 +6,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
+import { toast } from "sonner";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -58,10 +59,13 @@ import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+import { TasksMenu } from "../tasks-menu";
 
 export function RoomHeader() {
   const os = useGetOs();
   const router = useRouter();
+
+  const [doExportingImage, setDoExportingImage] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
@@ -69,6 +73,10 @@ export function RoomHeader() {
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
+  const setImageExporting = useCollaborationRoom(
+    (state) => state.setImageExporting
+  );
+  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
 
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
@@ -127,25 +135,10 @@ export function RoomHeader() {
   );
 
   const handleExportToImage = React.useCallback(async () => {
-    if (instance && instance.getActiveAction() !== "exportStageTool") {
-      const image = await instance.triggerAction<
-        WeaveExportStageActionParams,
-        Promise<HTMLImageElement>
-      >("exportStageTool", {
-        options: {
-          padding: 20,
-          pixelRatio: 2,
-        },
-      });
-
-      if (image) {
-        const link = document.createElement("a");
-        link.href = image.src;
-        link.download = `${uuidv4()}image/png`;
-        link.click();
-      }
-    }
     setMenuOpen(false);
+    if (instance && instance.getActiveAction() !== "exportStageTool") {
+      setDoExportingImage(true);
+    }
   }, [instance]);
 
   React.useEffect(() => {
@@ -162,6 +155,42 @@ export function RoomHeader() {
       setGridType(stageGridPlugin?.getType());
     }
   }, [instance]);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function doExportingImageHandler() {
+      if (!instance) return;
+
+      setTimeout(async () => {
+        const image = await instance.triggerAction<
+          WeaveExportStageActionParams,
+          Promise<HTMLImageElement>
+        >("exportStageTool", {
+          options: {
+            padding: 20,
+            pixelRatio: 1,
+          },
+        });
+
+        const link = document.createElement("a");
+        link.href = image.src;
+        link.download = `${uuidv4()}image/png`;
+        link.click();
+
+        toast.success("Image exported successfully");
+
+        setImageExporting(false);
+        setDoExportingImage(false);
+      }, 100);
+    }
+
+    if (doExportingImage) {
+      setImageExporting(true);
+      doExportingImageHandler();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance, doExportingImage, setImageExporting]);
 
   const handleExitRoom = React.useCallback(() => {
     sessionStorage.removeItem(`weave.js_${room}`);
@@ -526,6 +555,12 @@ export function RoomHeader() {
               </div>
             </div>
             <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
+              {asyncAPIActive && (
+                <>
+                  <Divider />
+                  <TasksMenu />
+                </>
+              )}
               <Divider />
               <ZoomToolbar />
             </div>
