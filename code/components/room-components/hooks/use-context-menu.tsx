@@ -288,7 +288,7 @@ function useContextMenu() {
                     setTimeout(async () => {
                       const img = await instance.exportNodes(
                         [nodeImage],
-                        (nodes: Konva.Node) => nodes,
+                        (nodes: Konva.Node[]) => nodes,
                         {
                           format: "image/png",
                           padding: 0,
