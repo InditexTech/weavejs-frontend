@@ -216,7 +216,8 @@ function useContextMenu() {
                   setTimeout(async () => {
                     const img = await instance.exportNodes(
                       [nodeImage],
-                      (nodes: Konva.Node) => nodes,
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (nodes: any) => nodes,
                       {
                         format: "image/png",
                         padding: 0,
