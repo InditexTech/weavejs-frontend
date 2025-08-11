@@ -34,6 +34,7 @@ type SidebarSelectorProps = {
 export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
+  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
@@ -118,6 +119,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+          {asyncAPIActive && (
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={() => {
@@ -129,6 +131,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -73,6 +73,7 @@ export function ToolsOverlayMouse() {
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
+  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
   );
@@ -756,6 +757,7 @@ export function ToolsOverlayMouse() {
                 {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
+            {asyncAPIActive && (
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
@@ -771,6 +773,7 @@ export function ToolsOverlayMouse() {
                 {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <ToolbarDivider />
