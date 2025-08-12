@@ -233,9 +233,9 @@ export function ToolsNodeOverlay() {
     switch ((actualNode.props.dash ?? []).join(",")) {
       case "":
         return actualNode.props.stroke;
-      case "5,5":
+      case "4,2":
         return `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 2px, transparent 2px, transparent 4px)`;
-      case "10,10":
+      case "8,4":
         return `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 4px, transparent 4px, transparent 8px)`;
 
       default:
@@ -1655,7 +1655,7 @@ export function ToolsNodeOverlay() {
                       ...actualNode,
                       props: {
                         ...actualNode.props,
-                        dash: [10, 10],
+                        dash: [8, 4],
                       },
                     };
 
@@ -1698,7 +1698,7 @@ export function ToolsNodeOverlay() {
                       ...actualNode,
                       props: {
                         ...actualNode.props,
-                        dash: [5, 5],
+                        dash: [4, 2],
                       },
                     };
 
