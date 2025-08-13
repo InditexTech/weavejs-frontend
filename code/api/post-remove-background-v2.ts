@@ -3,16 +3,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const postRemoveBackgroundV2 = async (
+  userId: string,
   clientId: string,
   roomId: string,
   imageId: string,
   image: { dataBase64: string; contentType: string }
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/images/${imageId}/remove-background?clientId=${clientId}`;
+  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/images/${imageId}/remove-background`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "x-weave-user-id": userId,
+      "x-weave-client-id": clientId,
     },
     body: JSON.stringify({ image }),
   });

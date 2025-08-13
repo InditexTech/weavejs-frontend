@@ -47,6 +47,7 @@ function useContextMenu() {
 
   const instance = useWeave((state) => state.instance);
 
+  const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
@@ -111,15 +112,23 @@ function useContextMenu() {
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
+      userId,
       clientId,
       imageId,
       image,
     }: {
+      userId: string;
       clientId: string;
       imageId: string;
       image: { dataBase64: string; contentType: string };
     }) => {
-      return await postRemoveBackgroundV2(clientId, room ?? "", imageId, image);
+      return await postRemoveBackgroundV2(
+        userId,
+        clientId,
+        room ?? "",
+        imageId,
+        image
+      );
     },
   });
 
@@ -313,8 +322,11 @@ function useContextMenu() {
                         return;
                       }
 
+                      const userId = user?.name ?? "";
+
                       mutationUploadV2.mutate(
                         {
+                          userId,
                           clientId,
                           imageId: uuidv4(),
                           image: {
