@@ -732,6 +732,7 @@ function useContextMenu() {
       return options;
     },
     [
+      user?.name,
       asyncAPIActive,
       instance,
       clientId,
