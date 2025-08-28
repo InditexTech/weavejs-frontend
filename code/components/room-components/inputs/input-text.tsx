@@ -33,14 +33,14 @@ export const InputText = ({
         setEnterPressed(true);
       }
     },
-    [],
+    []
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEditedValue(e.target.value);
     },
-    [],
+    []
   );
 
   React.useEffect(() => {

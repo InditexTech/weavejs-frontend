@@ -7,15 +7,12 @@ import {
   ImageQuality,
   ImageSampleCount,
   ImageSize,
-} from "./types";
+} from "../types";
 
-export const postEditImage = async (
+export const postGenerateImage = async (
   params: {
     roomId: string;
     prompt: string;
-    image: string;
-    reference_images?: string[];
-    imageMask?: string;
   },
   options: {
     quality: ImageQuality;
@@ -25,7 +22,7 @@ export const postEditImage = async (
   }
 ) => {
   const password = sessionStorage.getItem("weave_ai_password");
-  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
+  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/generate?password=${password}`;
 
   const response = await fetch(endpoint, {
     method: "POST",
@@ -34,9 +31,6 @@ export const postEditImage = async (
     },
     body: JSON.stringify({
       prompt: params.prompt,
-      image: params.image,
-      reference_images: params.reference_images,
-      imageMask: params.imageMask,
       sample_count: options.sampleCount,
       size: options.size,
       moderation: options.moderation,

@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
   DropdownMenuGroup,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import {
@@ -22,7 +21,7 @@ import {
   Images,
   ChevronDown,
   ChevronUp,
-  ListTodo,
+  MessageCircle,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -34,9 +33,11 @@ type SidebarSelectorProps = {
 export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
+  );
+  const threadsEnabled = useCollaborationRoom(
+    (state) => state.features.threads
   );
 
   const sidebarToggle = React.useCallback(
@@ -71,9 +72,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         sideOffset={9}
         className="font-inter rounded-none"
       >
-        <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-          Sidebars
-        </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -81,7 +79,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
-            <Images /> Images
+            <Images strokeWidth={1} /> Images
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
             </DropdownMenuShortcut>
@@ -92,7 +90,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
-            <Projector /> Frames
+            <Projector strokeWidth={1} /> Frames
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
             </DropdownMenuShortcut>
@@ -103,35 +101,35 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
-            <SwatchBook /> Color tokens
+            <SwatchBook strokeWidth={1} /> Color tokens
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+          {threadsEnabled && (
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                sidebarToggle(SIDEBAR_ELEMENTS.comments);
+              }}
+            >
+              <MessageCircle strokeWidth={1} /> Comments
+              <DropdownMenuShortcut>
+                {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
             }}
           >
-            <ListTree /> Elements tree
+            <ListTree strokeWidth={1} /> Elements tree
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          {asyncAPIActive && (
-          <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
-              sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
-            }}
-          >
-            <ListTodo /> Tasks
-            <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-          )}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

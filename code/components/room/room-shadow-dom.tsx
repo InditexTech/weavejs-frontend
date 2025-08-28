@@ -201,7 +201,7 @@ export const Room = () => {
           fonts={FONTS}
           nodes={NODES()}
           plugins={PLUGINS(getUser)}
-          actions={ACTIONS()}
+          actions={ACTIONS(getUser)}
         >
           <UploadFile />
           <UploadFiles />

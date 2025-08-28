@@ -1,15 +1,19 @@
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCollaborationRoom } from "@/store/store";
+import { eventBus } from "@/components/utils/events-bus";
 
 export const useTasksEvents = () => {
   const room = useCollaborationRoom((state) => state.room);
+  const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const setClientId = useCollaborationRoom((state) => state.setClientId);
-  const setTask = useCollaborationRoom((state) => state.setTask);
   const setSseConnected = useCollaborationRoom(
     (state) => state.setSseConnected
   );
+
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     if (typeof clientId === "undefined") {
@@ -18,7 +22,7 @@ export const useTasksEvents = () => {
     }
 
     const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/events?clientId=${clientId}`
+      `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/events?clientId=${clientId}&roomId=${room}`
     );
 
     eventSource.onopen = () => {
@@ -27,16 +31,30 @@ export const useTasksEvents = () => {
 
     eventSource.addEventListener("weaveWorkloads", ({ data }) => {
       const message = JSON.parse(data);
-      console.log("SSE message:", message);
-      setTask({
-        jobId: message.jobId,
-        type: message.type,
-        status: message.status,
-      });
+      const type = message.type;
+
+      if (type.startsWith("comment")) {
+        eventBus.emit("onCommentsChanged");
+      }
+
+      if (
+        [
+          "addImage",
+          "generateImages",
+          "editImage",
+          "editImageMask",
+          "editImageReferences",
+          "deleteImage",
+          "removeImageBackground",
+        ].includes(type)
+      ) {
+        const queryKey = ["getImages", room];
+        queryClient.invalidateQueries({ queryKey });
+      }
     });
 
     eventSource.onerror = () => {
       setSseConnected(false);
     };
-  }, [room, clientId, setClientId, setSseConnected, setTask]);
+  }, [room, user?.name, clientId, queryClient, setClientId, setSseConnected]);
 };

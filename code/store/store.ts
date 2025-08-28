@@ -17,6 +17,8 @@ type ShowcaseUser = {
 
 type NodePropertiesAction = "create" | "update" | undefined;
 
+type CommentsStatus = "pending" | "resolved" | "all";
+
 type FinishUploadCallback = (imageURL: string) => void;
 
 type DrawerKeyKeys = keyof typeof DRAWER_ELEMENTS;
@@ -25,14 +27,11 @@ export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
-export type TaskMetadata = {
-  jobId: string;
-  type: string;
-  status: "new" | "processing" | "completed" | "failed";
-};
-
 interface CollaborationRoomState {
-  asyncAPIActive: boolean;
+  features: {
+    workloads: boolean;
+    threads: boolean;
+  };
   fetchConnectionUrl: {
     loading: boolean;
     error: Error | null;
@@ -68,7 +67,9 @@ interface CollaborationRoomState {
   sse: {
     connected: boolean;
   };
-  tasks: TaskMetadata[];
+  comments: {
+    status: CommentsStatus;
+  };
   images: {
     showSelectFiles: boolean;
     showSelectFile: boolean;
@@ -135,13 +136,15 @@ interface CollaborationRoomState {
   setRemoveBackgroundPopupImageId: (newImageId: string | undefined) => void;
   setRemoveBackgroundPopupImageURL: (newImageURL: string | undefined) => void;
   setSseConnected: (newConnected: boolean) => void;
-  setTask: (newTask: TaskMetadata) => void;
-  setTasks: (newTasks: TaskMetadata[]) => void;
   setImageExporting: (newExportingImage: boolean) => void;
+  setCommentsStatus: (newStatus: CommentsStatus) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
-  asyncAPIActive: false,
+  features: {
+    workloads: true,
+    threads: true,
+  },
   ui: {
     show: true,
   },
@@ -178,7 +181,6 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   sse: {
     connected: false,
   },
-  tasks: [],
   images: {
     showSelectFiles: false,
     showSelectFile: false,
@@ -208,6 +210,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     library: {
       visible: false,
     },
+  },
+  comments: {
+    status: "pending",
   },
   nodesTree: {
     visible: false,
@@ -410,33 +415,18 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state,
       sse: { ...state.sse, connected: newConnected },
     })),
-  setTask: (newTask) =>
-    set((state) => {
-      const newTasks = [...state.tasks];
-      const taskIndex = newTasks.findIndex(
-        (task) => task.jobId === newTask.jobId
-      );
-
-      if (taskIndex !== -1) {
-        newTasks[taskIndex] = newTask;
-      } else {
-        newTasks.push(newTask);
-      }
-
-      return {
-        ...state,
-        tasks: newTasks,
-      };
-    }),
-  setTasks: (newTasks) =>
-    set((state) => ({
-      ...state,
-      tasks: newTasks,
-    })),
   setImageExporting(newExportingImage) {
     set((state) => ({
       ...state,
       images: { ...state.images, exporting: newExportingImage },
     }));
   },
+  setCommentsStatus: (newStatus: CommentsStatus) =>
+    set((state) => ({
+      ...state,
+      comments: {
+        ...state.comments,
+        status: newStatus,
+      },
+    })),
 }));

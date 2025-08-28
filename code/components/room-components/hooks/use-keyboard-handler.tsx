@@ -37,6 +37,9 @@ export function useKeyboardHandler() {
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
   );
+  const threadsEnabled = useCollaborationRoom(
+    (state) => state.features.threads
+  );
 
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
@@ -505,4 +508,11 @@ export function useKeyboardHandler() {
       triggerTool("maskTool");
     }
   }, ["KeyW"]);
+
+  useKeyDown(() => {
+    if (threadsEnabled) {
+      triggerTool("commentTool");
+      sidebarToggle(SIDEBAR_ELEMENTS.comments);
+    }
+  }, ["KeyH"]);
 }

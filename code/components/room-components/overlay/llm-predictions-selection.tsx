@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScaleLoader } from "react-spinners";
 import { useCollaborationRoom } from "@/store/store";
 import { postImage } from "@/api/post-image";
+import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { Button } from "@/components/ui/button";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
@@ -33,7 +34,7 @@ import { Logo } from "@/components/utils/logo";
 import { CheckCheck, X } from "lucide-react";
 import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask-eraser-tool";
 
-export function LLMPredictionsSelectionV2Popup() {
+export function LLMPredictionsSelectionPopup() {
   useKeyboardHandler();
 
   const instance = useWeave((state) => state.instance);
@@ -55,9 +56,15 @@ export function LLMPredictionsSelectionV2Popup() {
   const setImagesLLMPopupState = useIACapabilities(
     (state) => state.setImagesLLMPopupState
   );
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
+      if (workloadsEnabled) {
+        return await postImageV2(room ?? "", file);
+      }
       return await postImage(room ?? "", file);
     },
   });

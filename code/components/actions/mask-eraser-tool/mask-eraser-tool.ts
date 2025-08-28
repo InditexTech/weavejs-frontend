@@ -109,6 +109,12 @@ export class MaskEraserToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
+    stage.on("pointermove", () => {
+      if (this.state !== MASK_ERASER_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+    });
+
     stage.on("pointerclick", () => {
       if (!this.erasing) {
         return;
@@ -159,10 +165,7 @@ export class MaskEraserToolAction extends WeaveAction {
   }
 
   private setEraser() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = "crosshair";
-    stage.container().focus();
+    this.setCursor();
 
     this.erasing = true;
 
@@ -200,5 +203,10 @@ export class MaskEraserToolAction extends WeaveAction {
     this.erasing = false;
 
     this.setState(MASK_ERASER_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = "crosshair";
   }
 }

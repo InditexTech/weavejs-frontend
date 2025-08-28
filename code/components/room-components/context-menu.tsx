@@ -49,7 +49,7 @@ function ContextMenuButton({
   return (
     <button
       className={cn(
-        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-inter text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
+        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-inter text-xs uppercase text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
@@ -63,7 +63,13 @@ function ContextMenuButton({
       disabled={disabled}
       onClick={onClick}
     >
-      {icon} <div className="w-full">{label}</div>
+      {icon &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        React.cloneElement(icon as any, {
+          className: "mr-2",
+          strokeWidth: 1,
+        })}
+      <div className="w-full">{label}</div>
     </button>
   );
 }

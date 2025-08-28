@@ -30,7 +30,7 @@ import {
   ListTree,
   SwatchBook,
   Projector,
-  ListTodo,
+  MessageSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,6 +53,7 @@ import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { useShapesTools } from "./hooks/use-shapes-tools";
 import { useStrokesTools } from "./hooks/use-strokes-tools";
 import { useImagesTools } from "./hooks/use-images-tools";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function ToolsOverlayTouch() {
   useKeyboardHandler();
@@ -92,6 +93,22 @@ export function ToolsOverlayTouch() {
   );
   const setImagesLLMPopupVisible = useIACapabilities(
     (state) => state.setImagesLLMPopupVisible
+  );
+  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
+  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.type
+  );
+  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const threadsEnabled = useCollaborationRoom(
+    (state) => state.features.threads
   );
 
   const sidebarToggle = React.useCallback(
@@ -262,6 +279,20 @@ export function ToolsOverlayTouch() {
             >
               <SwatchBook /> Color tokens
             </DropdownMenuItem>
+            {threadsEnabled && (
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
+                  sidebarToggle(SIDEBAR_ELEMENTS.comments);
+                }}
+              >
+                <MessageSquare /> Comments
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {
@@ -274,16 +305,29 @@ export function ToolsOverlayTouch() {
             >
               <ListTree /> Elements tree
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
-              }}
-            >
-              <ListTodo /> Tasks
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {threadsEnabled && (
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<MessageSquare className="px-2" size={40} strokeWidth={1} />}
+            disabled={
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            active={actualAction === "commentTool"}
+            onClick={() => {
+              triggerTool("commentTool", nodeCreateProps);
+              sidebarToggle(SIDEBAR_ELEMENTS.comments);
+            }}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Comment tool</p>
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+        )}
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Frame className="px-2" size={40} strokeWidth={1} />}
@@ -316,7 +360,6 @@ export function ToolsOverlayTouch() {
           tooltipSide="right"
           tooltipAlign="center"
         />
-
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"
@@ -423,11 +466,23 @@ export function ToolsOverlayTouch() {
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
                   setActualImagesTool("generateImageTool");
-                  setImagesLLMPopupType("create");
-                  if (imagesLLMPopupType === "create") {
-                    setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-                  } else {
-                    setImagesLLMPopupVisible(true);
+
+                  if (aiEnabled) {
+                    setImagesLLMPopupType("create");
+                    if (imagesLLMPopupType === "create") {
+                      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+                    } else {
+                      setImagesLLMPopupVisible(true);
+                    }
+                  }
+
+                  if (aiEnabledV2) {
+                    setImagesLLMPopupTypeV2("create");
+                    if (imagesLLMPopupTypeV2 === "create") {
+                      setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
+                    } else {
+                      setImagesLLMPopupVisibleV2(true);
+                    }
                   }
                 }}
               >

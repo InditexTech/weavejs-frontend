@@ -26,14 +26,15 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
-import { LLMGenerationV2Popup } from "../room-components/overlay/llm-popup-v2";
-import { LLMPredictionsSelectionV2Popup } from "../room-components/overlay/llm-predictions-selection-v2";
+import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
+import { LLMPredictionsSelectionPopup } from "../room-components/overlay/llm-predictions-selection";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
-import { LLMReferenceSelectionV2Popup } from "../room-components/overlay/llm-reference-selection-v2";
+import { LLMReferenceSelectionPopup } from "../room-components/overlay/llm-reference-selection";
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
 import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
-import { AITasks } from "../room-components/ai-tasks/ai-tasks";
+import { LLMGenerationPopupV2 } from "../room-components/overlay/llm-popup-v2";
+import { Comments } from "../room-components/comment/comments";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -70,9 +71,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const exportingToImage = useCollaborationRoom(
     (state) => state.images.exporting
   );
-  const transformingImage = useCollaborationRoom(
-    (state) => state.images.transforming
-  );
+  // const transformingImage = useCollaborationRoom(
+  //   (state) => state.images.transforming
+  // );
   const uploadingImage = useCollaborationRoom(
     (state) => state.images.uploading
   );
@@ -113,9 +114,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         <section
           id="sidebar-left"
           className={cn(
-            "bg-white absolute top-0 left-0 bottom-0 border-r border-[#c9c9c9] z-[10] overflow-hidden",
+            "bg-white absolute top-[calc(72px+32px)] left-[16px] bottom-[16px] border-[0.5px] border-[#c9c9c9] z-[10] overflow-hidden",
             {
-              ["w-0"]: sidebarLeftActive === null,
+              ["w-0 h-0"]: sidebarLeftActive === null,
               ["w-[370px]"]: sidebarLeftActive !== null,
             }
           )}
@@ -124,8 +125,8 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
             <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
             <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
+            <Comments key={SIDEBAR_ELEMENTS.comments} />
             <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-            <AITasks key={SIDEBAR_ELEMENTS.aiTasks} />
             {weaveConnectionStatus !==
               WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
               <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -134,16 +135,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             )}
           </AnimatePresence>
         </section>
-        <section
-          className={cn("w-full h-full flex z-0 overflow-hidden", {
-            // ["left-[370px]"]: sidebarLeftActive !== null,
-            // ["right-[370px]"]: sidebarRightActive !== null,
-            // ["w-[calc(100%-370px)]"]:
-            //   sidebarLeftActive !== null || sidebarRightActive !== null,
-            // ["w-[calc(100%-740px)]"]:
-            //   sidebarLeftActive !== null && sidebarRightActive !== null,
-          })}
-        >
+        <section className="w-full h-full flex z-0 overflow-hidden">
           <div
             id="weave"
             tabIndex={0}
@@ -189,7 +181,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                 options={contextMenuOptions}
               />
               <ToolsOverlay />
-              {transformingImage && (
+              {/* {transformingImage && (
                 <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
                   <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
                     <Logo kind="large" variant="no-text" />
@@ -198,34 +190,16 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                     </div>
                   </div>
                 </div>
-              )}
-              {uploadingImage && (
-                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                    <Logo kind="large" variant="no-text" />
-                    <div className="font-inter text-base">
-                      Uploading image...
-                    </div>
-                  </div>
-                </div>
-              )}
-              {loadingImage && (
-                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                    <Logo kind="large" variant="no-text" />
-                    <div className="font-inter text-base">Loading image...</div>
-                  </div>
-                </div>
-              )}
+              )} */}
             </>
           )}
         </section>
         <section
           id="sidebar-right"
           className={cn(
-            "bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-[10] overflow-hidden",
+            "bg-white absolute top-[calc(72px+32px)] right-[16px] bottom-[16px] border-[0.5px] border-[#c9c9c9] z-[10] overflow-hidden",
             {
-              ["w-0"]: sidebarRightActive === null,
+              ["w-0 h-0"]: sidebarRightActive === null,
               ["w-[370px]"]: sidebarRightActive !== null,
             }
           )}
@@ -238,12 +212,33 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           )}
         </section>
-        {exportingToImage && (
-          <div className="bg-white flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+
+        {uploadingImage && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
               <Logo kind="large" variant="no-text" />
               <div className="font-inter text-base">
-                Exporting to image, please wait...
+                Uploading image, please wait...
+              </div>
+            </div>
+          </div>
+        )}
+        {loadingImage && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">
+                Loading image, please wait...
+              </div>
+            </div>
+          </div>
+        )}
+        {exportingToImage && (
+          <div className="bg-white flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">
+                Exporting, please wait...
               </div>
             </div>
           </div>
@@ -252,9 +247,10 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
           <>
             <MaskSlider />
-            <LLMGenerationV2Popup />
-            <LLMPredictionsSelectionV2Popup />
-            <LLMReferenceSelectionV2Popup />
+            <LLMGenerationPopup />
+            <LLMGenerationPopupV2 />
+            <LLMPredictionsSelectionPopup />
+            <LLMReferenceSelectionPopup />
             <RemoveBackgroundActionPopup />
           </>
         )}

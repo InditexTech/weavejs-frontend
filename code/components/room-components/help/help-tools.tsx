@@ -6,6 +6,8 @@ import {
   Brush,
   Frame,
   ImagePlus,
+  Images,
+  MessageSquare,
   MousePointer,
   PenTool,
   Square,
@@ -14,8 +16,13 @@ import {
 } from "lucide-react";
 import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
+import { useCollaborationRoom } from "@/store/store";
 
 export const HelpTools = () => {
+  const threadsEnabled = useCollaborationRoom(
+    (state) => state.features.threads
+  );
+
   return (
     <div className="w-full grid grid-cols-3 py-3 gap-x-5">
       <div className="flex flex-col gap-3">
@@ -69,6 +76,8 @@ export const HelpTools = () => {
             [SYSTEM_OS.OTHER]: "T",
           }}
         />
+      </div>
+      <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<ImagePlus />}
           label="Image tool"
@@ -77,8 +86,24 @@ export const HelpTools = () => {
             [SYSTEM_OS.OTHER]: "I",
           }}
         />
-      </div>
-      <div className="flex flex-col gap-3">
+        <HelpShortcutElement
+          icon={<Images />}
+          label="Images tool"
+          shortcuts={{
+            [SYSTEM_OS.MAC]: "O",
+            [SYSTEM_OS.OTHER]: "O",
+          }}
+        />
+        {threadsEnabled && (
+          <HelpShortcutElement
+            icon={<MessageSquare />}
+            label="Comment tool"
+            shortcuts={{
+              [SYSTEM_OS.MAC]: "H",
+              [SYSTEM_OS.OTHER]: "H",
+            }}
+          />
+        )}
         <HelpShortcutElement
           icon={<SwatchBook />}
           label="Color Token tool"

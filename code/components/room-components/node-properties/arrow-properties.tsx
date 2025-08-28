@@ -18,11 +18,11 @@ export function ArrowProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+    (state) => state.nodeProperties.action
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps,
+    (state) => state.nodeProperties.createProps
   );
 
   const actualNode = React.useMemo(() => {
@@ -51,7 +51,7 @@ export function ArrowProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction],
+    [instance, actualAction, nodePropertiesAction]
   );
 
   if (!instance || !actualNode || !nodePropertiesAction) {
@@ -73,7 +73,7 @@ export function ArrowProperties() {
   }
 
   return (
-    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+    <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
       <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">

@@ -6,6 +6,7 @@ import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
+import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import {
   ImageInfo,
@@ -28,14 +29,22 @@ export function UploadFiles() {
   const setShowSelectFilesImages = useCollaborationRoom(
     (state) => state.setShowSelectFilesImages
   );
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
 
   const queryClient = useQueryClient();
 
   const mutationUploadMulti = useMutation({
     mutationFn: async (files: FileList) => {
-      const promises = Array.from(files).map((file) =>
-        postImage(room ?? "", file)
-      );
+      let promises = [];
+      if (workloadsEnabled) {
+        promises = Array.from(files).map((file) =>
+          postImageV2(room ?? "", file)
+        );
+      } else {
+        promises = Array.from(files).map((file) => postImage(room ?? "", file));
+      }
       return await Promise.allSettled(promises);
     },
   });

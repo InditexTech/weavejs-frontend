@@ -15,30 +15,26 @@ import { useCollaborationRoom } from "@/store/store";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuShortcut,
-  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/utils/logo";
 import {
-  Image as ImageIcon,
   ChevronDown,
   ChevronUp,
-  Grid3X3Icon,
-  GripIcon,
-  Braces,
-  MousePointer2,
   Check,
-  Grid2X2Check,
-  Grid2X2X,
-  ShieldCheck,
   ExternalLink,
-  LogOut,
-  MonitorCog,
   IdCard,
+  ImageDown,
+  Bookmark,
+  Contact,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -59,7 +55,6 @@ import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
-import { TasksMenu } from "../tasks-menu";
 
 export function RoomHeader() {
   const os = useGetOs();
@@ -72,17 +67,18 @@ export function RoomHeader() {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
+  const user = useCollaborationRoom((state) => state.user);
   const room = useCollaborationRoom((state) => state.room);
   const setImageExporting = useCollaborationRoom(
     (state) => state.setImageExporting
   );
-  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
 
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
+  const [commentsEnabled, setCommentsEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
     WEAVE_GRID_TYPES.LINES
@@ -107,16 +103,38 @@ export function RoomHeader() {
     }
   }, [instance]);
 
-  const handleToggleGrid = React.useCallback(() => {
-    if (instance && instance.isPluginEnabled("stageGrid")) {
-      instance.disablePlugin("stageGrid");
-      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+  const handleToggleComments = React.useCallback(() => {
+    if (!instance) {
+      return;
+    }
+
+    if (instance.isPluginEnabled("commentsRenderer")) {
+      instance.disablePlugin("commentsRenderer");
+      setCommentsEnabled(false);
       setMenuOpen(false);
       return;
     }
-    if (instance && !instance.isPluginEnabled("stageGrid")) {
+    if (!instance.isPluginEnabled("commentsRenderer")) {
+      instance.enablePlugin("commentsRenderer");
+      setCommentsEnabled(true);
+      setMenuOpen(false);
+    }
+  }, [instance]);
+
+  const handleToggleGrid = React.useCallback(() => {
+    if (!instance) {
+      return;
+    }
+
+    if (instance.isPluginEnabled("stageGrid")) {
+      instance.disablePlugin("stageGrid");
+      setGridEnabled(false);
+      setMenuOpen(false);
+      return;
+    }
+    if (!instance.isPluginEnabled("stageGrid")) {
       instance.enablePlugin("stageGrid");
-      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+      setGridEnabled(true);
       setMenuOpen(false);
     }
   }, [instance]);
@@ -247,7 +265,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="bg-white flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
               open={menuOpen}
@@ -269,9 +287,9 @@ export function RoomHeader() {
                     <Logo kind="only-logo" variant="no-text" />
                   </div>
                   {menuOpen ? (
-                    <ChevronUp size={16} />
+                    <ChevronUp size={16} strokeWidth={1} />
                   ) : (
-                    <ChevronDown size={16} />
+                    <ChevronDown size={16} strokeWidth={1} />
                   )}
                 </div>
               </DropdownMenuTrigger>
@@ -285,243 +303,261 @@ export function RoomHeader() {
                 sideOffset={9}
                 className="font-inter rounded-none"
               >
-                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none w-full">
-                  <IdCard />
-                  <span className="text-xs font-inter font-light">
-                    {(
-                      instance?.getStore() as WeaveStoreAzureWebPubsub
-                    )?.getClientId()}
-                  </span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="block md:hidden px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Room
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  disabled={iaEnabled}
-                  className="block md:hidden text-foreground cursor-pointer hover:rounded-none"
-                >
-                  {room}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="block md:hidden " />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  IA Capabilities
-                </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    disabled={iaEnabled}
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={() => {
-                      setIASetupVisible(true);
-                      setMenuOpen(false);
-                    }}
-                    onClick={() => {
-                      setIASetupVisible(true);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    <div className="w-full flex justify-between items-center">
-                      <div className="w-full flex justify-start items-center gap-2">
-                        {iaEnabled && (
-                          <>
-                            <ShieldCheck size={16} />
-                            Enabled
-                          </>
-                        )}
-                        {!iaEnabled && (
-                          <>
-                            <MonitorCog size={16} />
-                            Setup
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Interface
-                </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    disabled={
-                      weaveConnectionStatus !==
-                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    onPointerDown={handleToggleUsersPointers}
-                    onClick={handleToggleUsersPointers}
-                  >
-                    <div className="w-full flex justify-between items-center gap-2">
-                      <div className="w-full flex justify-start items-center gap-2">
-                        <MousePointer2 size={16} />
-                        Show users pointers
-                      </div>
-                      {pointersEnabled && (
-                        <Check size={16} className="text-foreground" />
-                      )}
-                    </div>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    disabled={
-                      instance?.isEmpty() ??
-                      weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    onPointerDown={handleExportToImage}
-                    onClick={handleExportToImage}
-                  >
-                    <ImageIcon /> Export as image
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Grid
-                </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    disabled={
-                      weaveConnectionStatus !==
-                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    onPointerDown={handleToggleGrid}
-                    onClick={handleToggleGrid}
-                  >
-                    <div className="w-full flex justify-between items-center gap-2">
-                      <div className="w-full flex justify-start items-center gap-2">
-                        {gridEnabled ? (
-                          <>
-                            <Grid2X2X size={16} />
-                            Hide
-                          </>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-none">
+                    Details
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="rounded-none">
+                      <DropdownMenuItem
+                        disabled
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                      >
+                        <div className="flex flex gap-2 justify-start items-center">
+                          <Bookmark size={16} strokeWidth={1} />
+                          <div className="flex flex-col">
+                            <div className="text-xs font-inter font-bold">
+                              Room
+                            </div>
+                            <div className="text-sm font-inter font-light">
+                              {room}
+                            </div>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                      >
+                        <div className="flex flex gap-2 justify-start items-center">
+                          <IdCard size={16} strokeWidth={1} />
+                          <div className="flex flex-col">
+                            <div className="text-xs font-inter font-bold">
+                              Client Id
+                            </div>
+                            <div className="text-sm font-inter font-light">
+                              {(
+                                instance?.getStore() as WeaveStoreAzureWebPubsub
+                              )?.getClientId()}
+                            </div>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                      >
+                        <div className="flex flex gap-2 justify-start items-center">
+                          <Contact size={16} strokeWidth={1} />
+                          <div className="flex flex-col">
+                            <div className="text-xs font-inter font-bold">
+                              User Id
+                            </div>
+                            <div className="text-sm font-inter font-light">
+                              {user?.id ?? "anonymous"}
+                            </div>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-none">
+                    Tools
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="rounded-none">
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        disabled={
+                          instance?.isEmpty() ??
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onPointerDown={handleExportToImage}
+                      >
+                        <ImageDown size={16} strokeWidth={1} /> Export as image
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-none">
+                    View
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="rounded-none">
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer rounded-none hover:rounded-none"
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onPointerDown={handleToggleUsersPointers}
+                      >
+                        {pointersEnabled ? (
+                          <Check size={16} strokeWidth={1} />
                         ) : (
-                          <>
-                            <Grid2X2Check size={16} />
-                            Show
-                          </>
+                          <div className="w-[16px] h-[16px]" />
                         )}
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={
-                      !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS) ||
-                      weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={() => {
-                      handleSetGridType(WEAVE_GRID_TYPES.DOTS);
-                      setMenuOpen(false);
-                    }}
-                    onClick={() => {
-                      handleSetGridType(WEAVE_GRID_TYPES.DOTS);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    <div className="w-full flex justify-between items-center">
-                      <div className="w-full flex justify-start items-center gap-2">
-                        <GripIcon size={16} /> Dots
-                      </div>
-                      {gridType === WEAVE_GRID_TYPES.DOTS && (
-                        <Check size={16} />
-                      )}
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={
-                      !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES) ||
-                      weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                    }
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={() => {
-                      handleSetGridType(WEAVE_GRID_TYPES.LINES);
-                      setMenuOpen(false);
-                    }}
-                    onClick={() => {
-                      handleSetGridType(WEAVE_GRID_TYPES.LINES);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    <div className="w-full flex justify-between items-center">
-                      <div className="w-full flex justify-start items-center gap-2">
-                        <Grid3X3Icon size={16} /> Lines
-                      </div>
-                      {gridType === WEAVE_GRID_TYPES.LINES && (
-                        <Check size={16} />
-                      )}
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                        Users pointers
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={handleToggleComments}
+                      >
+                        {commentsEnabled ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        Comments
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onPointerDown={handleToggleGrid}
+                      >
+                        {gridEnabled ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        Reference grid
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                        Grid type
+                      </DropdownMenuLabel>
+                      <DropdownMenuItem
+                        disabled={
+                          !gridEnabled ||
+                          (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS) ||
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {gridType === WEAVE_GRID_TYPES.DOTS ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        Dots
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={
+                          !gridEnabled ||
+                          (gridEnabled &&
+                            gridType === WEAVE_GRID_TYPES.LINES) ||
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {gridType === WEAVE_GRID_TYPES.LINES ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        Lines
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-none">
+                    Help
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="rounded-none">
+                      <HelpDrawerTrigger
+                        onClick={() => {
+                          setMenuOpen(false);
+                        }}
+                      />
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          window.open(
+                            GITHUB_URL,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }}
+                      >
+                        <ExternalLink size={16} strokeWidth={1} /> GitHub
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          window.open(
+                            DOCUMENTATION_URL,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }}
+                      >
+                        <ExternalLink size={16} strokeWidth={1} /> Documentation
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="rounded-none">
+                    Extra
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="rounded-none">
+                      <DropdownMenuItem
+                        disabled={iaEnabled}
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          setIASetupVisible(true);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {iaEnabled ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        IA Capabilities
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onPointerDown={handlePrintToConsoleState}
+                      >
+                        <div className="w-[16px] h-[16px]" /> Print state to
+                        console
+                        <DropdownMenuShortcut>
+                          {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
+                          {[SYSTEM_OS.WINDOWS as string].includes(os) &&
+                            "Alt Ctrl C"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                  Other
-                </DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={() => {
-                      window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-                    }}
-                    onClick={() => {
-                      window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-                    }}
-                  >
-                    <ExternalLink /> GitHub
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={() => {
-                      window.open(
-                        DOCUMENTATION_URL,
-                        "_blank",
-                        "noopener,noreferrer"
-                      );
-                    }}
-                    onClick={() => {
-                      window.open(
-                        DOCUMENTATION_URL,
-                        "_blank",
-                        "noopener,noreferrer"
-                      );
-                    }}
-                  >
-                    <ExternalLink /> Documentation
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <HelpDrawerTrigger
-                    onClick={() => {
-                      setMenuOpen(false);
-                    }}
-                  />
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none w-full"
-                    onPointerDown={handlePrintToConsoleState}
-                    onClick={handlePrintToConsoleState}
-                  >
-                    <Braces /> Print state to console
-                    <DropdownMenuShortcut>
-                      {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
-                      {[SYSTEM_OS.WINDOWS as string].includes(os) &&
-                        "Alt Ctrl C"}
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer hover:rounded-none"
-                    onPointerDown={handleExitRoom}
-                    onClick={handleExitRoom}
-                  >
-                    <LogOut /> Exit room
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onPointerDown={handleExitRoom}
+                >
+                  Close
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Divider className="hidden lg:block" />
@@ -555,12 +591,6 @@ export function RoomHeader() {
               </div>
             </div>
             <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
-              {asyncAPIActive && (
-                <>
-                  <Divider />
-                  <TasksMenu />
-                </>
-              )}
               <Divider />
               <ZoomToolbar />
             </div>

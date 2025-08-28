@@ -1,18 +1,29 @@
 import React from "react";
 import { toast } from "sonner";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
 import { useIsTouchDevice } from "./use-is-touch-device";
 
 export const useToolsEvents = () => {
   const instance = useWeave((state) => state.instance);
+  const actualAction = useWeave((state) => state.actions.actual);
 
   const setLoadingImage = useCollaborationRoom(
     (state) => state.setLoadingImage
   );
   const setNodePropertiesCreateProps = useCollaborationRoom(
     (state) => state.setNodePropertiesCreateProps
+  );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
+    },
+    [setSidebarActive]
   );
 
   const isTouchDevice = useIsTouchDevice();
@@ -25,7 +36,10 @@ export const useToolsEvents = () => {
       setNodePropertiesCreateProps(props);
     };
 
-    const handleActiveActionChange = () => {
+    const handleActiveActionChange = (action: string | undefined) => {
+      if (actualAction === "commentTool" && action !== "commentTool") {
+        sidebarToggle(null);
+      }
       toast.dismiss();
     };
 
@@ -43,7 +57,49 @@ export const useToolsEvents = () => {
         instance.removeEventListener("onImageLoadEnd", handlePropsChange);
       }
     };
-  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
+  }, [
+    instance,
+    actualAction,
+    isTouchDevice,
+    sidebarToggle,
+    setLoadingImage,
+    setNodePropertiesCreateProps,
+  ]);
+
+  // Comment tool events
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const handleStartCommentAdding = () => {
+      toast("Add comments", {
+        description: `${isTouchDevice ? "Tap" : "Click"} to add a comment.`,
+        duration: Infinity,
+      });
+    };
+
+    const handleFinishCommentAdding = () => {
+      toast.dismiss();
+    };
+
+    instance.addEventListener("onStartAddingComment", handleStartCommentAdding);
+    instance.addEventListener(
+      "onFinishAddingComment",
+      handleFinishCommentAdding
+    );
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener(
+          "onStartAddingComment",
+          handleStartCommentAdding
+        );
+        instance.removeEventListener(
+          "onFinishAddingComment",
+          handleFinishCommentAdding
+        );
+      }
+    };
+  }, [instance, isTouchDevice]);
 
   // Rectangle tool events
   React.useEffect(() => {
@@ -64,15 +120,14 @@ export const useToolsEvents = () => {
     instance.addEventListener("onAddedRectangle", handleRectangleAdded);
 
     return () => {
-      if (instance) {
-        instance.removeEventListener(
-          "onAddingRectangle",
-          handleRectangleAdding
-        );
-        instance.removeEventListener("onAddedRectangle", handleRectangleAdded);
+      if (!instance) {
+        return;
       }
+
+      instance.removeEventListener("onAddingRectangle", handleRectangleAdding);
+      instance.removeEventListener("onAddedRectangle", handleRectangleAdded);
     };
-  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
+  }, [instance, isTouchDevice]);
 
   // Ellipse tool events
   React.useEffect(() => {

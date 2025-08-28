@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useIACapabilities } from "@/store/ia";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import { postValidatePassword } from "@/api/post-validate-password";
@@ -31,6 +32,7 @@ export function LlmSetupDialog() {
   const setAIEnabled = useIACapabilities((state) => state.setEnabled);
   const setSetupVisible = useIACapabilities((state) => state.setSetupVisible);
   const setSetupState = useIACapabilities((state) => state.setSetupState);
+  const setAIEnabledV2 = useIACapabilitiesV2((state) => state.setEnabled);
 
   React.useEffect(() => {
     if (setupVisible) {
@@ -56,6 +58,7 @@ export function LlmSetupDialog() {
       sessionStorage.setItem("weave_ai_password", password);
       setSetupVisible(false);
       setAIEnabled(true);
+      setAIEnabledV2(true);
     },
     onError() {
       toast.error("Setup AI capabilities", {
@@ -64,6 +67,7 @@ export function LlmSetupDialog() {
       });
       sessionStorage.setItem("weave_ai_enabled", "false");
       setAIEnabled(false);
+      setAIEnabledV2(false);
     },
   });
 

@@ -5,6 +5,7 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import React from "react";
 import Konva from "konva";
 import { ToolbarButton } from "../toolbar/toolbar-button";
@@ -35,7 +36,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
 import { rightElementVariants } from "./variants";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import {
@@ -54,8 +55,10 @@ import { Button } from "@/components/ui/button";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
+import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
 import { ColorPickerInput } from "../inputs/color-picker";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function ToolsNodeOverlay() {
   useKeyboardHandler();
@@ -78,7 +81,12 @@ export function ToolsNodeOverlay() {
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
 
+  const user = useCollaborationRoom((state) => state.user);
+  const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const imageCroppingEnabled = useCollaborationRoom(
@@ -131,6 +139,27 @@ export function ToolsNodeOverlay() {
     (state) => state.setImagesLLMPopupImage
   );
 
+  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
+  const setImagesLLMPopupSelectedNodesV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupSelectedNodes
+  );
+  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupImage
+  );
+
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
+    },
+    [setSidebarActive]
+  );
+
   const mutationUpload = useMutation({
     mutationFn: async ({
       imageId,
@@ -140,6 +169,28 @@ export function ToolsNodeOverlay() {
       image: { dataBase64: string; contentType: string };
     }) => {
       return await postRemoveBackground(room ?? "", imageId, image);
+    },
+  });
+
+  const mutationUploadV2 = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      imageId,
+      image,
+    }: {
+      userId: string;
+      clientId: string;
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postRemoveBackgroundV2(
+        userId,
+        clientId,
+        room ?? "",
+        imageId,
+        image
+      );
     },
   });
 
@@ -267,127 +318,255 @@ export function ToolsNodeOverlay() {
     ) {
       actualNodeTools.push(
         <React.Fragment key="image-edition-tools">
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<BrushCleaning className="px-2" size={40} strokeWidth={1} />}
-            disabled={
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            onClick={() => {
-              if (!instance) {
-                return;
+          {!workloadsEnabled && (
+            <ToolbarButton
+              className="rounded-full !w-[40px]"
+              icon={
+                <BrushCleaning className="px-2" size={40} strokeWidth={1} />
               }
-
-              const nodeImage = nodes[0].instance as Konva.Group | undefined;
-
-              if (nodeImage) {
-                nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
-
-                setTransformingImage(true);
-
-                setTimeout(async () => {
-                  const img = await instance.exportNodes(
-                    [nodeImage],
-                    (nodes) => nodes,
-                    {
-                      format: "image/png",
-                      padding: 0,
-                      pixelRatio: 1,
-                    }
-                  );
-
-                  const dataBase64Url = instance.imageToBase64(
-                    img,
-                    "image/png"
-                  );
-
-                  setRemoveBackgroundPopupOriginImage(dataBase64Url);
-
-                  const dataBase64 = dataBase64Url.split(",")[1];
-
-                  mutationUpload.mutate(
-                    {
-                      imageId: uuidv4(),
-                      image: {
-                        dataBase64,
-                        contentType: "image/png",
-                      },
-                    },
-                    {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      onSuccess: (data: any) => {
-                        const room = data.fileName.split("/")[0];
-                        const imageId = data.fileName.split("/")[1];
-
-                        const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
-
-                        setRemoveBackgroundPopupOriginNodeId(
-                          nodeImage.getAttrs().id
-                        );
-                        setRemoveBackgroundPopupImageId(imageId);
-                        setRemoveBackgroundPopupImageURL(imageURL);
-                        setRemoveBackgroundPopupShow(true);
-                      },
-                      onError: () => {
-                        console.error("Error uploading image");
-                      },
-                      onSettled: () => {
-                        setTransformingImage(false);
-                      },
-                    }
-                  );
-                }, 10);
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Remove background</p>
-              </div>
-            }
-            tooltipSide="left"
-            tooltipAlign="center"
-          />
-          <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<Bot className="px-2" size={40} strokeWidth={1} />}
-            disabled={
-              weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !aiEnabled
-            }
-            onClick={async () => {
-              if (!instance) {
-                return;
+              onClick={() => {
+                if (!instance) {
+                  return;
+                }
+
+                const nodeImage = nodes[0].instance as Konva.Group | undefined;
+
+                if (nodeImage) {
+                  nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                  setTransformingImage(true);
+
+                  setTimeout(async () => {
+                    const img = await instance.exportNodes(
+                      [nodeImage],
+                      (nodes) => nodes,
+                      {
+                        format: "image/png",
+                        padding: 0,
+                        pixelRatio: 1,
+                      }
+                    );
+
+                    const dataBase64Url = instance.imageToBase64(
+                      img,
+                      "image/png"
+                    );
+
+                    setRemoveBackgroundPopupOriginImage(dataBase64Url);
+
+                    const dataBase64 = dataBase64Url.split(",")[1];
+
+                    mutationUpload.mutate(
+                      {
+                        imageId: uuidv4(),
+                        image: {
+                          dataBase64,
+                          contentType: "image/png",
+                        },
+                      },
+                      {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        onSuccess: (data: any) => {
+                          const room = data.fileName.split("/")[0];
+                          const imageId = data.fileName.split("/")[1];
+
+                          const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+
+                          setRemoveBackgroundPopupOriginNodeId(
+                            nodeImage.getAttrs().id
+                          );
+                          setRemoveBackgroundPopupImageId(imageId);
+                          setRemoveBackgroundPopupImageURL(imageURL);
+                          setRemoveBackgroundPopupShow(true);
+                        },
+                        onError: () => {
+                          console.error("Error uploading image");
+                        },
+                        onSettled: () => {
+                          setTransformingImage(false);
+                        },
+                      }
+                    );
+                  }, 10);
+                }
+              }}
+              label={
+                <div className="flex gap-3 justify-start items-center">
+                  <p>Remove background</p>
+                </div>
               }
+              tooltipSide="left"
+              tooltipAlign="center"
+            />
+          )}
+          {workloadsEnabled && (
+            <ToolbarButton
+              className="rounded-full !w-[40px]"
+              icon={
+                <BrushCleaning className="px-2" size={40} strokeWidth={1} />
+              }
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
+              onClick={() => {
+                if (!instance) {
+                  return;
+                }
 
-              const image = await instance.triggerAction<
-                WeaveExportNodesActionParams,
-                Promise<HTMLImageElement>
-              >("exportNodesTool", {
-                nodes: nodes.map((n) => n.instance),
-                options: {
-                  padding: 0,
-                  pixelRatio: 1,
-                },
-              });
+                const nodeImage = nodes[0].instance as Konva.Group | undefined;
 
-              const base64URL: unknown = instance.imageToBase64(
-                image,
-                "image/png"
-              );
+                if (nodeImage) {
+                  nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
 
-              setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-              setImagesLLMPopupType("edit-prompt");
-              setImagesLLMPopupImage(base64URL as string);
-              setImagesLLMPopupVisible(true);
-            }}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Edit with AI</p>
-              </div>
-            }
-            tooltipSide="left"
-            tooltipAlign="center"
-          />
+                  setTransformingImage(true);
+
+                  setTimeout(async () => {
+                    const img = await instance.exportNodes(
+                      [nodeImage],
+                      (nodes) => nodes,
+                      {
+                        format: "image/png",
+                        padding: 0,
+                        pixelRatio: 1,
+                      }
+                    );
+
+                    const dataBase64Url = instance.imageToBase64(
+                      img,
+                      "image/png"
+                    );
+
+                    const dataBase64 = dataBase64Url.split(",")[1];
+
+                    mutationUploadV2.mutate(
+                      {
+                        userId: user?.name ?? "",
+                        clientId: clientId ?? "",
+                        imageId: uuidv4(),
+                        image: {
+                          dataBase64,
+                          contentType: "image/png",
+                        },
+                      },
+                      {
+                        onSuccess: () => {
+                          sidebarToggle(SIDEBAR_ELEMENTS.images);
+                        },
+                        onError: () => {
+                          toast.error(
+                            "Error requesting image background removal."
+                          );
+                        },
+                        onSettled: () => {
+                          setTransformingImage(false);
+                        },
+                      }
+                    );
+                  }, 10);
+                }
+              }}
+              label={
+                <div className="flex gap-3 justify-start items-center">
+                  <p>Remove background</p>
+                </div>
+              }
+              tooltipSide="left"
+              tooltipAlign="center"
+            />
+          )}
+          {aiEnabled && !aiEnabledV2 && (
+            <ToolbarButton
+              className="rounded-full !w-[40px]"
+              icon={<Bot className="px-2" size={40} strokeWidth={1} />}
+              disabled={
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !aiEnabled
+              }
+              onClick={async () => {
+                if (!instance) {
+                  return;
+                }
+
+                const image = await instance.triggerAction<
+                  WeaveExportNodesActionParams,
+                  Promise<HTMLImageElement>
+                >("exportNodesTool", {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 0,
+                    pixelRatio: 1,
+                  },
+                });
+
+                const base64URL: unknown = instance.imageToBase64(
+                  image,
+                  "image/png"
+                );
+
+                setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+                setImagesLLMPopupType("edit-prompt");
+                setImagesLLMPopupImage(base64URL as string);
+                setImagesLLMPopupVisible(true);
+              }}
+              label={
+                <div className="flex gap-3 justify-start items-center">
+                  <p>Edit with AI</p>
+                </div>
+              }
+              tooltipSide="left"
+              tooltipAlign="center"
+            />
+          )}
+          {aiEnabledV2 && (
+            <ToolbarButton
+              className="rounded-full !w-[40px]"
+              icon={<Bot className="px-2" size={40} strokeWidth={1} />}
+              disabled={
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !aiEnabledV2
+              }
+              onClick={async () => {
+                if (!instance) {
+                  return;
+                }
+
+                const image = await instance.triggerAction<
+                  WeaveExportNodesActionParams,
+                  Promise<HTMLImageElement>
+                >("exportNodesTool", {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 0,
+                    pixelRatio: 1,
+                  },
+                });
+
+                const base64URL: unknown = instance.imageToBase64(
+                  image,
+                  "image/png"
+                );
+
+                sidebarToggle(SIDEBAR_ELEMENTS.images);
+
+                setImagesLLMPopupSelectedNodesV2(nodes.map((n) => n.instance));
+                setImagesLLMPopupTypeV2("edit-prompt");
+                setImagesLLMPopupImageV2(base64URL as string);
+                setImagesLLMPopupVisibleV2(true);
+              }}
+              label={
+                <div className="flex gap-3 justify-start items-center">
+                  <p>Edit with AI</p>
+                </div>
+              }
+              tooltipSide="left"
+              tooltipAlign="center"
+            />
+          )}
         </React.Fragment>
       );
     }
@@ -395,6 +574,9 @@ export function ToolsNodeOverlay() {
     return actualNodeTools;
   }, [
     aiEnabled,
+    aiEnabledV2,
+    clientId,
+    mutationUploadV2,
     instance,
     mutationUpload,
     nodes,
@@ -411,6 +593,13 @@ export function ToolsNodeOverlay() {
     setRemoveBackgroundPopupImageURL,
     setRemoveBackgroundPopupOriginImage,
     setRemoveBackgroundPopupOriginNodeId,
+    setImagesLLMPopupImageV2,
+    setImagesLLMPopupSelectedNodesV2,
+    setImagesLLMPopupTypeV2,
+    setImagesLLMPopupVisibleV2,
+    sidebarToggle,
+    user?.name,
+    workloadsEnabled,
   ]);
 
   const colorTokenTools = React.useMemo(() => {
@@ -1997,8 +2186,6 @@ export function ToolsNodeOverlay() {
     imageCroppingEnabled,
     imageCroppingNode,
   ]);
-
-  if (nodes && nodes.length > 1 && !imageCroppingEnabled) return null;
 
   if (!actualNode && !imageCroppingEnabled) {
     return null;

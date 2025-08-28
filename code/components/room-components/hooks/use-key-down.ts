@@ -39,9 +39,9 @@ export const useKeyDown = (
   );
 
   React.useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [onKeyDown]);
 };

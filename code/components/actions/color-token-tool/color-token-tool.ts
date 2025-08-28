@@ -95,6 +95,10 @@ export class ColorTokenToolAction extends WeaveAction {
     });
 
     stage.on("pointermove", (e) => {
+      if (this.state === COLOR_TOKEN_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+
       if (!this.isPressed(e)) return;
 
       if (!this.pointers.has(e.evt.pointerId)) return;
@@ -124,11 +128,7 @@ export class ColorTokenToolAction extends WeaveAction {
   }
 
   private addColorToken(position?: Vector2d) {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = "crosshair";
-    stage.container().blur();
-    stage.container().focus();
+    this.setCursor();
 
     if (position) {
       this.handleAdding(position);
@@ -219,5 +219,10 @@ export class ColorTokenToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(COLOR_TOKEN_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = "crosshair";
   }
 }

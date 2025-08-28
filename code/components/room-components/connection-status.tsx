@@ -51,16 +51,14 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
           <>
             <CloudOff size={18} strokeWidth={1} />
-            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
-              error
-            </span>
+            <span className="ml-1 font-inter text-xs uppercase">error</span>
           </>
         )}
         {weaveConnectionStatus ===
           WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED && (
           <>
             <CloudOff size={18} strokeWidth={1} />
-            <span className="hidden 2xl:block ml-1 font-inter text-xs uppercase">
+            <span className="ml-1 font-inter text-xs uppercase">
               disconnected
             </span>
           </>

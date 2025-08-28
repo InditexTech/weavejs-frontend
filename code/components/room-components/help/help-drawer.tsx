@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Keyboard, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { SYSTEM_OS } from "@/lib/utils";
 import { HelpTools } from "./help-tools";
 import React from "react";
@@ -59,7 +59,7 @@ export const HelpDrawerTrigger = ({
       }}
       className="w-full text-foreground cursor-pointer hover:rounded-none"
     >
-      <Keyboard /> Keyboard shortcuts
+      <div className="w-[16px] h-[16px]" /> Keyboard shortcuts
       <DropdownMenuShortcut>
         {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
         {[SYSTEM_OS.WINDOWS as string].includes(os) && "Alt Ctrl C"}

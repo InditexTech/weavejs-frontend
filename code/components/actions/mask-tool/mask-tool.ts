@@ -9,6 +9,7 @@ import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { type MaskToolActionState } from "./types";
 import { MASK_TOOL_ACTION_NAME, MASK_TOOL_STATE } from "./constants";
 import { setupTransformer } from "../utils/utils";
+import { KonvaEventObject } from "konva/lib/Node";
 
 export class MaskToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -96,7 +97,11 @@ export class MaskToolAction extends WeaveAction {
     });
 
     stage.on("pointermove", (e) => {
+      if (this.state === MASK_TOOL_STATE.IDLE) return;
+
       e.evt.preventDefault();
+
+      this.setCursor();
 
       this.handleMovement();
     });
@@ -109,9 +114,7 @@ export class MaskToolAction extends WeaveAction {
   }
 
   private addMask() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = "crosshair";
+    this.setCursor();
 
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
@@ -145,13 +148,16 @@ export class MaskToolAction extends WeaveAction {
       });
       utilityLayer?.add(this.mask);
 
-      this.mask.on("pointerover", (e) => {
-        if (e.target.getAttrs().selectable) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = "pointer";
-          e.cancelBubble = true;
+      this.mask.on(
+        "pointerover",
+        (e: KonvaEventObject<PointerEvent, Konva.Line>) => {
+          if (e.target.getAttrs().selectable) {
+            const stage = this.instance.getStage();
+            stage.container().style.cursor = "pointer";
+            e.cancelBubble = true;
+          }
         }
-      });
+      );
 
       this.tempPoint = new Konva.Circle({
         x: this.clickPoint?.x ?? 0,
@@ -322,5 +328,12 @@ export class MaskToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(MASK_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = "crosshair";
+    stage.container().blur();
+    stage.container().focus();
   }
 }

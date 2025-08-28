@@ -22,6 +22,7 @@ import { UploadFiles } from "../room-components/upload-files";
 import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
 import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
+import { useCommentsHandler } from "../room-components/hooks/use-comments-handler";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -127,6 +128,7 @@ export const Room = () => {
   }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
 
   useTasksEvents();
+  useCommentsHandler();
 
   const isBrowser =
     typeof window !== "undefined" && typeof window.document !== "undefined";
@@ -193,7 +195,7 @@ export const Room = () => {
           fonts={FONTS}
           nodes={NODES()}
           plugins={PLUGINS(getUser)}
-          actions={ACTIONS()}
+          actions={ACTIONS(getUser)}
         >
           <UploadFile />
           <UploadFiles />

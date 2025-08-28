@@ -4,6 +4,8 @@
 
 "use client";
 
+import Konva from "konva";
+import { formatDistanceToNow } from "date-fns";
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
@@ -25,6 +27,7 @@ import {
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
   WeaveAlignNodesToolAction,
+  WeaveCommentToolAction,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -38,6 +41,7 @@ import {
   WeaveRegularPolygonNode,
   WeaveFrameNode,
   WeaveStrokeNode,
+  WeaveCommentNode,
   WeaveStageGridPlugin,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
@@ -51,8 +55,12 @@ import {
   WeaveContextMenuPlugin,
   WeaveNodesEdgeSnappingPlugin,
   WeaveNodesDistanceSnappingPlugin,
+  WeaveCommentsRendererPlugin,
+  WeaveCommentNodeCreateAction,
+  WeaveCommentNodeViewAction,
+  WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
-import { type WeaveUser } from "@inditextech/weave-types";
+import { WeaveElementInstance, type WeaveUser } from "@inditextech/weave-types";
 import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
@@ -62,6 +70,12 @@ import { MaskToolAction } from "../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 import { MaskEraserToolAction } from "../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
+import {
+  createCommentDOM,
+  viewCommentDOM,
+} from "../room-components/comment/comment-dom";
+import { getUserShort } from "./users";
+import { ThreadEntity } from "../room-components/hooks/types";
 
 const FONTS = [
   {
@@ -156,6 +170,9 @@ const NODES = () => [
         ],
         keepRatio: true,
       },
+      onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
+        instance.triggerCrop(node);
+      },
     },
   }),
   new WeaveStarNode(),
@@ -173,6 +190,87 @@ const NODES = () => [
         rotateEnabled: false,
         resizeEnabled: false,
         enabledAnchors: [] as string[],
+      },
+    },
+  }),
+  new WeaveCommentNode<ThreadEntity>({
+    config: {
+      style: {
+        contracted: {
+          userName: {
+            fontFamily: inter.style.fontFamily,
+          },
+        },
+        expanded: {
+          userName: {
+            fontFamily: inter.style.fontFamily,
+          },
+          date: {
+            fontFamily: inter.style.fontFamily,
+          },
+          content: {
+            fontFamily: inter.style.fontFamily,
+          },
+        },
+      },
+      model: {
+        getDate: (comment: ThreadEntity) => {
+          return (comment.updatedAt as unknown as string) ?? "";
+        },
+        getId: (comment: ThreadEntity) => {
+          return comment.threadId;
+        },
+        getUserId: (comment: ThreadEntity) => {
+          return comment.userMetadata.name;
+        },
+        getStatus: (comment: ThreadEntity) => {
+          return comment.status;
+        },
+        getUserShortName: (comment: ThreadEntity) => {
+          return getUserShort(comment.userMetadata.name).toUpperCase();
+        },
+        getUserFullName: (comment: ThreadEntity) => {
+          return comment.userMetadata.name;
+        },
+        canUserDrag: () => {
+          return true;
+        },
+        getContent: (comment: ThreadEntity) => {
+          return comment.content;
+        },
+        setMarkResolved: (comment: ThreadEntity) => {
+          return { ...comment, status: WEAVE_COMMENT_STATUS.RESOLVED };
+        },
+        setContent: (comment: ThreadEntity, content: string) => {
+          return { ...comment, content };
+        },
+      },
+      formatDate: (date: string) => {
+        return formatDistanceToNow(new Date(date).toISOString(), {
+          addSuffix: true,
+        });
+      },
+      createComment: async (
+        ele: HTMLDivElement,
+        node: WeaveElementInstance,
+        finish: (
+          node: WeaveElementInstance,
+          content: string,
+          action: WeaveCommentNodeCreateAction
+        ) => void
+      ) => {
+        createCommentDOM({ ele, node, finish });
+      },
+      viewComment: async (
+        ele: HTMLDivElement,
+        node: WeaveElementInstance,
+        finish: (
+          node: WeaveElementInstance,
+          content: string,
+          action: WeaveCommentNodeViewAction
+        ) => void
+      ) => {
+        viewCommentDOM({ ele, node, finish });
       },
     },
   }),
@@ -270,9 +368,29 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       yOffset: 10,
     },
   }),
+  new WeaveCommentsRendererPlugin({
+    config: {
+      model: {
+        getId: (comment: ThreadEntity) => comment.threadId,
+        getPosition: (comment: ThreadEntity) => ({
+          x: comment.x,
+          y: comment.y,
+        }),
+        getUser: (comment: ThreadEntity) => comment.userMetadata,
+        getStatus: (comment: ThreadEntity) => comment.status,
+      },
+      getUser,
+      getUserBackgroundColor: (user: WeaveUser) =>
+        stringToColor(user?.name ?? "#000000"),
+      getUserForegroundColor: (user: WeaveUser) => {
+        const bgColor = stringToColor(user?.name ?? "#ffffff");
+        return getContrastTextColor(bgColor);
+      },
+    },
+  }),
 ];
 
-const ACTIONS = () => [
+const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
@@ -298,6 +416,34 @@ const ACTIONS = () => [
   new MaskToolAction(),
   new FuzzyMaskToolAction(),
   new MaskEraserToolAction(),
+  new WeaveCommentToolAction({
+    config: {
+      style: {
+        cursor: {
+          add: "url(/cursors/message-square-plus.svg) 0 20, crosshair",
+          block: "url(/cursors/message-square-off.svg) 0 20, not-allowed",
+        },
+      },
+      model: {
+        getCreateModel: () => {
+          const createDate = new Date();
+
+          return {
+            userMetadata: getUser(),
+            createdAt: createDate,
+            updatedAt: createDate,
+          } as Partial<ThreadEntity>;
+        },
+      },
+      getUser,
+      getUserBackgroundColor: (user: WeaveUser) =>
+        stringToColor(user?.name ?? "#000000"),
+      getUserForegroundColor: (user: WeaveUser) => {
+        const bgColor = stringToColor(user?.name ?? "#ffffff");
+        return getContrastTextColor(bgColor);
+      },
+    },
+  }),
 ];
 
 export { FONTS, NODES, ACTIONS, PLUGINS };

@@ -9,12 +9,14 @@ import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
+import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import { motion } from "framer-motion";
 import { bottomElementVariants } from "./variants";
 import { useCollaborationRoom } from "@/store/store";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { ToolsOverlayTouch } from "./tools-overlay.touch";
 import { ToolsOverlayMouse } from "./tools-overlay.mouse";
 import { ToolsNodeOverlay } from "./tools-node-overlay";
@@ -28,6 +30,7 @@ import {
   WeaveNodesSelectionPlugin,
 } from "@inditextech/weave-sdk";
 import { WeaveElementInstance } from "@inditextech/weave-types";
+import { ToolsMaskingOverlayV2 } from "./tools-masking-overlay-v2";
 
 export function ToolsOverlay() {
   useKeyboardHandler();
@@ -50,7 +53,15 @@ export function ToolsOverlay() {
   const setCroppingNode = useCollaborationRoom(
     (state) => state.setCroppingNode
   );
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
+
   const imagesLLMPopupVisible = useIACapabilities(
+    (state) => state.llmPopup.visible
+  );
+
+  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
     (state) => state.llmPopup.visible
   );
 
@@ -58,6 +69,9 @@ export function ToolsOverlay() {
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
+      if (workloadsEnabled) {
+        return await postImageV2(room ?? "", file);
+      }
       return await postImage(room ?? "", file);
     },
   });
@@ -186,8 +200,8 @@ export function ToolsOverlay() {
       const file = new File([blob], "external.image");
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
-          const room: string = data.fileName.split("/")[0];
-          const imageId = data.fileName.split("/")[1];
+          const room: string = data.image.fileName.split("/")[0];
+          const imageId = data.image.fileName.split("/")[1];
 
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
@@ -206,7 +220,8 @@ export function ToolsOverlay() {
 
           setPositionCalculated(positionCalculated);
         },
-        onError: () => {
+        onError: (ex) => {
+          console.error(ex);
           setUploadingImage(false);
           console.error("Error uploading image");
         },
@@ -260,6 +275,15 @@ export function ToolsOverlay() {
         </>
       )}
       {imagesLLMPopupVisible && <ToolsMaskingOverlay />}
+      {!imagesLLMPopupVisibleV2 && (
+        <>
+          <ToolsOverlayTouch />
+          <ToolsOverlayMouse />
+          <ToolsNodeOverlay />
+          <ToolsNodesOverlay />
+        </>
+      )}
+      {imagesLLMPopupVisibleV2 && <ToolsMaskingOverlayV2 />}
     </>
   );
 }

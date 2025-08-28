@@ -86,6 +86,12 @@ export class ImagesToolAction extends WeaveAction {
           imageURL: window.weaveDragImageURL,
           position,
         });
+        if (window.weaveDragImageId) {
+          this.instance.updatePropsAction("imageTool", {
+            imageId: window.weaveDragImageId,
+          });
+          window.weaveDragImageId = undefined;
+        }
         window.weaveDragImageURL = undefined;
       }
     });
@@ -126,6 +132,10 @@ export class ImagesToolAction extends WeaveAction {
     });
 
     stage.on("pointermove", (e) => {
+      if (this.state === IMAGES_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+
       if (
         this.pointers.size === 2 &&
         this.instance.getActiveAction() === IMAGES_TOOL_ACTION_NAME
@@ -142,9 +152,6 @@ export class ImagesToolAction extends WeaveAction {
         this.instance.getActiveAction() === IMAGES_TOOL_ACTION_NAME &&
         e.evt.pointerType === "mouse"
       ) {
-        stage.container().style.cursor = "crosshair";
-        stage.container().focus();
-
         const mousePos = stage.getRelativePointerPosition();
 
         this.tempImageNode?.setAttrs({
@@ -212,8 +219,7 @@ export class ImagesToolAction extends WeaveAction {
   private addImages(position?: Vector2d) {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "crosshair";
-    stage.container().focus();
+    this.setCursor();
 
     if (position) {
       this.setState(IMAGES_TOOL_STATE.SELECTED_POSITION);
@@ -406,5 +412,12 @@ export class ImagesToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(IMAGES_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = "crosshair";
+    stage.container().blur();
+    stage.container().focus();
   }
 }

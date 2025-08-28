@@ -12,7 +12,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
 import { WeaveSelection } from "@inditextech/weave-types";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
@@ -24,6 +24,7 @@ import {
   ClipboardPaste,
   Group,
   Bot,
+  BrushCleaning,
   Ungroup,
   Trash,
   SendToBack,
@@ -37,7 +38,9 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
-import { postRemoveBackgroundV2 } from "@/api/post-remove-background-v2";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
+import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 function useContextMenu() {
   const [doExportingImage, setDoExportingImage] = React.useState(false);
@@ -50,7 +53,9 @@ function useContextMenu() {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
   );
@@ -84,6 +89,10 @@ function useContextMenu() {
   const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
     (state) => state.setRemoveBackgroundPopupImageURL
   );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
   const aiEnabled = useIACapabilities((state) => state.enabled);
   const setImagesLLMPopupSelectedNodes = useIACapabilities(
     (state) => state.setImagesLLMPopupSelectedNodes
@@ -96,6 +105,29 @@ function useContextMenu() {
   );
   const setImagesLLMPopupImage = useIACapabilities(
     (state) => state.setImagesLLMPopupImage
+  );
+  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
+  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupSelectedNodesV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupSelectedNodes
+  );
+  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupImage
+  );
+
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
+    },
+    [setSidebarActive]
   );
 
   const mutationUpload = useMutation({
@@ -120,7 +152,10 @@ function useContextMenu() {
       userId: string;
       clientId: string;
       imageId: string;
-      image: { dataBase64: string; contentType: string };
+      image: {
+        dataBase64: string;
+        contentType: string;
+      };
     }) => {
       return await postRemoveBackgroundV2(
         userId,
@@ -211,81 +246,85 @@ function useContextMenu() {
           ["image"].includes(nodes[0].node?.type ?? "") &&
           !singleLocked
         ) {
-          options.push({
-            id: "removeBackground",
-            type: "button",
-            label: "Remove image background",
-            icon: <Bot size={16} />,
-            onClick: () => {
-              if (instance) {
-                const nodeImage = nodes[0].instance as Konva.Group | undefined;
-                if (nodeImage) {
-                  setTransformingImage(true);
+          if (!workloadsEnabled) {
+            options.push({
+              id: "removeBackground",
+              type: "button",
+              label: "Remove background",
+              icon: <BrushCleaning size={16} />,
+              onClick: () => {
+                if (instance) {
+                  const nodeImage = nodes[0].instance as
+                    | Konva.Group
+                    | undefined;
+                  if (nodeImage) {
+                    setTransformingImage(true);
 
-                  setTimeout(async () => {
-                    const img = await instance.exportNodes(
-                      [nodeImage],
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (nodes: any) => nodes,
-                      {
-                        format: "image/png",
-                        padding: 0,
-                        pixelRatio: 1,
-                      }
-                    );
-
-                    const dataBase64Url = instance.imageToBase64(
-                      img,
-                      "image/png"
-                    );
-
-                    setRemoveBackgroundPopupOriginImage(dataBase64Url);
-
-                    const dataBase64 = dataBase64Url.split(",")[1];
-
-                    mutationUpload.mutate(
-                      {
-                        imageId: uuidv4(),
-                        image: {
-                          dataBase64,
-                          contentType: "image/png",
-                        },
-                      },
-                      {
+                    setTimeout(async () => {
+                      const img = await instance.exportNodes(
+                        [nodeImage],
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        onSuccess: (data: any) => {
-                          const room = data.fileName.split("/")[0];
-                          const imageId = data.fileName.split("/")[1];
+                        (nodes: any) => nodes,
+                        {
+                          format: "image/png",
+                          padding: 0,
+                          pixelRatio: 1,
+                        }
+                      );
 
-                          const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+                      const dataBase64Url = instance.imageToBase64(
+                        img,
+                        "image/png"
+                      );
 
-                          setRemoveBackgroundPopupOriginNodeId(
-                            nodeImage.getAttrs().id
-                          );
-                          setRemoveBackgroundPopupImageId(imageId);
-                          setRemoveBackgroundPopupImageURL(imageURL);
-                          setRemoveBackgroundPopupShow(true);
+                      setRemoveBackgroundPopupOriginImage(dataBase64Url);
+
+                      const dataBase64 = dataBase64Url.split(",")[1];
+
+                      mutationUpload.mutate(
+                        {
+                          imageId: uuidv4(),
+                          image: {
+                            dataBase64,
+                            contentType: "image/png",
+                          },
                         },
-                        onError: () => {
-                          console.error("Error uploading image");
-                        },
-                        onSettled: () => {
-                          setTransformingImage(false);
-                        },
-                      }
-                    );
-                  }, 10);
+                        {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          onSuccess: (data: any) => {
+                            const room = data.fileName.split("/")[0];
+                            const imageId = data.fileName.split("/")[1];
+
+                            const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+
+                            setRemoveBackgroundPopupOriginNodeId(
+                              nodeImage.getAttrs().id
+                            );
+                            setRemoveBackgroundPopupImageId(imageId);
+                            setRemoveBackgroundPopupImageURL(imageURL);
+                            setRemoveBackgroundPopupShow(true);
+                          },
+                          onError: () => {
+                            console.error("Error uploading image");
+                          },
+                          onSettled: () => {
+                            setTransformingImage(false);
+                          },
+                        }
+                      );
+                    }, 10);
+                  }
                 }
-              }
-              setContextMenuShow(false);
-            },
-          });
-          if (asyncAPIActive) {
+                setContextMenuShow(false);
+              },
+            });
+          }
+          if (workloadsEnabled) {
             options.push({
               id: "removeBackgroundAsync",
               type: "button",
-              label: "Remove image background (v2)",
-              icon: <Bot size={16} />,
+              label: "Remove background",
+              icon: <BrushCleaning size={16} />,
               onClick: () => {
                 if (instance) {
                   const nodeImage = nodes[0].instance as
@@ -310,24 +349,12 @@ function useContextMenu() {
                         "image/png"
                       );
 
-                      setRemoveBackgroundPopupOriginImage(dataBase64Url);
-                      setRemoveBackgroundPopupOriginNodeId(
-                        nodeImage.getAttrs().id
-                      );
-
                       const dataBase64 = dataBase64Url.split(",")[1];
-
-                      if (!clientId) {
-                        toast.error("Client ID is not available");
-                        return;
-                      }
-
-                      const userId = user?.name ?? "";
 
                       mutationUploadV2.mutate(
                         {
-                          userId,
-                          clientId,
+                          userId: user?.name ?? "",
+                          clientId: clientId ?? "",
                           imageId: uuidv4(),
                           image: {
                             dataBase64,
@@ -336,12 +363,12 @@ function useContextMenu() {
                         },
                         {
                           onSuccess: () => {
-                            toast.success(
-                              "Image background removed requested successfully"
-                            );
+                            sidebarToggle(SIDEBAR_ELEMENTS.images);
                           },
                           onError: () => {
-                            toast.error("Error uploading image");
+                            toast.error(
+                              "Error requesting image background removal."
+                            );
                           },
                           onSettled: () => {
                             setTransformingImage(false);
@@ -351,6 +378,7 @@ function useContextMenu() {
                     }, 10);
                   }
                 }
+
                 setContextMenuShow(false);
               },
             });
@@ -358,40 +386,80 @@ function useContextMenu() {
         }
         // EDIT IMAGE WITH A PROMPT
         if (!singleLocked) {
-          options.push({
-            id: "editIAImage",
-            type: "button",
-            disabled: !aiEnabled,
-            label: "Edit with AI",
-            icon: <Bot size={16} />,
-            onClick: async () => {
-              const image = await instance.triggerAction<
-                WeaveExportNodesActionParams,
-                Promise<HTMLImageElement>
-              >("exportNodesTool", {
-                nodes: nodes.map((n) => n.instance),
-                options: {
-                  padding: 0,
-                  pixelRatio: 1,
-                },
-              });
+          if (!workloadsEnabled) {
+            options.push({
+              id: "editIAImage",
+              type: "button",
+              disabled: !aiEnabled,
+              label: "Edit with AI",
+              icon: <Bot size={16} />,
+              onClick: async () => {
+                const image = await instance.triggerAction<
+                  WeaveExportNodesActionParams,
+                  Promise<HTMLImageElement>
+                >("exportNodesTool", {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 0,
+                    pixelRatio: 1,
+                  },
+                });
 
-              const base64URL: unknown = instance.imageToBase64(
-                image,
-                "image/png"
-              );
+                const base64URL: unknown = instance.imageToBase64(
+                  image,
+                  "image/png"
+                );
 
-              setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-              setImagesLLMPopupType("edit-prompt");
-              setImagesLLMPopupImage(base64URL as string);
-              setImagesLLMPopupVisible(true);
-              setContextMenuShow(false);
-            },
-          });
-          options.push({
-            id: "div--1",
-            type: "divider",
-          });
+                setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+                setImagesLLMPopupType("edit-prompt");
+                setImagesLLMPopupImage(base64URL as string);
+                setImagesLLMPopupVisible(true);
+                setContextMenuShow(false);
+              },
+            });
+            options.push({
+              id: "div--1",
+              type: "divider",
+            });
+          }
+          if (workloadsEnabled) {
+            options.push({
+              id: "editIAImage",
+              type: "button",
+              disabled: !aiEnabledV2,
+              label: "Edit with AI",
+              icon: <Bot size={16} />,
+              onClick: async () => {
+                const image = await instance.triggerAction<
+                  WeaveExportNodesActionParams,
+                  Promise<HTMLImageElement>
+                >("exportNodesTool", {
+                  nodes: nodes.map((n) => n.instance),
+                  options: {
+                    padding: 0,
+                    pixelRatio: 1,
+                  },
+                });
+
+                const base64URL: unknown = instance.imageToBase64(
+                  image,
+                  "image/png"
+                );
+
+                sidebarToggle(SIDEBAR_ELEMENTS.images);
+
+                setImagesLLMPopupSelectedNodesV2(nodes.map((n) => n.instance));
+                setImagesLLMPopupTypeV2("edit-prompt");
+                setImagesLLMPopupImageV2(base64URL as string);
+                setImagesLLMPopupVisibleV2(true);
+                setContextMenuShow(false);
+              },
+            });
+            options.push({
+              id: "div--1",
+              type: "divider",
+            });
+          }
         }
         if (!singleLocked) {
           // EXPORT
@@ -733,16 +801,21 @@ function useContextMenu() {
     },
     [
       user?.name,
-      asyncAPIActive,
+      workloadsEnabled,
       instance,
       clientId,
       mutationUpload,
       mutationUploadV2,
       aiEnabled,
+      aiEnabledV2,
       setImagesLLMPopupSelectedNodes,
       setImagesLLMPopupType,
       setImagesLLMPopupVisible,
       setImagesLLMPopupImage,
+      setImagesLLMPopupSelectedNodesV2,
+      setImagesLLMPopupTypeV2,
+      setImagesLLMPopupVisibleV2,
+      setImagesLLMPopupImageV2,
       setTransformingImage,
       setContextMenuShow,
       setRemoveBackgroundPopupImageId,
@@ -750,6 +823,7 @@ function useContextMenu() {
       setRemoveBackgroundPopupOriginNodeId,
       setRemoveBackgroundPopupOriginImage,
       setRemoveBackgroundPopupShow,
+      sidebarToggle,
     ]
   );
 
@@ -780,7 +854,7 @@ function useContextMenu() {
         stageClickPoint,
       });
 
-      if (contextMenu.length > 0) {
+      if (contextMenu.length > 0 && !imagesLLMPopupVisibleV2) {
         setContextMenuShow(visible);
         setContextMenuPosition(contextMenuPoint);
         setContextMenuOptions(contextMenu);
@@ -796,6 +870,7 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
+      imagesLLMPopupVisibleV2,
     ]
   );
 

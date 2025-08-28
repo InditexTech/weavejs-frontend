@@ -9,9 +9,9 @@ export const SIDEBAR_ELEMENTS = {
   images: "images",
   frames: "frames",
   colorTokens: "colorTokens",
+  comments: "comments",
   nodesTree: "nodesTree",
   nodeProperties: "nodeProperties",
-  aiTasks: "aiTasks",
 } as const;
 
 export const DRAWER_ELEMENTS = {

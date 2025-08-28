@@ -30,7 +30,7 @@ import {
   Projector,
   ChevronDown,
   ChevronUp,
-  ListTodo,
+  MessageSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -49,6 +49,7 @@ import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { MoveToolTrigger } from "./tools-triggers/move-tool";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
@@ -73,7 +74,6 @@ export function ToolsOverlayMouse() {
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const asyncAPIActive = useCollaborationRoom((state) => state.asyncAPIActive);
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
   );
@@ -95,6 +95,22 @@ export function ToolsOverlayMouse() {
   );
   const setImagesLLMPopupVisible = useIACapabilities(
     (state) => state.setImagesLLMPopupVisible
+  );
+  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
+  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.type
+  );
+  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupVisible
+  );
+  const threadsEnabled = useCollaborationRoom(
+    (state) => state.features.threads
   );
 
   const sidebarToggle = React.useCallback(
@@ -121,7 +137,7 @@ export function ToolsOverlayMouse() {
   const STROKES_TOOLS = useStrokesTools();
   const IMAGES_TOOLS = useImagesTools();
 
-  if (!showUI || imageCroppingEnabled) {
+  if (!showUI || imageCroppingEnabled || imagesLLMPopupVisibleV2) {
     return null;
   }
 
@@ -571,27 +587,54 @@ export function ToolsOverlayMouse() {
                 <Images size={20} strokeWidth={1} /> Images tool
                 <DropdownMenuShortcut>O</DropdownMenuShortcut>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                disabled={!aiEnabled}
-                onClick={() => {
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
+              {aiEnabled && !aiEnabledV2 && (
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  disabled={!aiEnabled}
+                  onClick={() => {
+                    setShapesMenuOpen(false);
+                    setStrokesMenuOpen(false);
+                    setImagesMenuOpen(false);
+                    setSidebarsMenuOpen(false);
 
-                  setActualImagesTool("generateImageTool");
-                  setImagesLLMPopupType("create");
-                  if (imagesLLMPopupType === "create") {
-                    setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-                  } else {
-                    setImagesLLMPopupVisible(true);
-                  }
-                }}
-              >
-                <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
-                <DropdownMenuShortcut>G</DropdownMenuShortcut>
-              </DropdownMenuItem>
+                    setActualImagesTool("generateImageTool");
+                    setImagesLLMPopupType("create");
+                    if (imagesLLMPopupType === "create") {
+                      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+                    } else {
+                      setImagesLLMPopupVisible(true);
+                    }
+                  }}
+                >
+                  <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
+                  <DropdownMenuShortcut>G</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
+              {aiEnabledV2 && (
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  disabled={!aiEnabled && !aiEnabledV2}
+                  onClick={() => {
+                    setShapesMenuOpen(false);
+                    setStrokesMenuOpen(false);
+                    setImagesMenuOpen(false);
+                    setSidebarsMenuOpen(false);
+
+                    setActualImagesTool("generateImageTool");
+                    sidebarToggle(SIDEBAR_ELEMENTS.images);
+
+                    setImagesLLMPopupTypeV2("create");
+                    if (imagesLLMPopupTypeV2 === "create") {
+                      setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
+                    } else {
+                      setImagesLLMPopupVisibleV2(true);
+                    }
+                  }}
+                >
+                  <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
+                  <DropdownMenuShortcut>G</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -639,6 +682,33 @@ export function ToolsOverlayMouse() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        {threadsEnabled && (
+          <ToolbarButton
+            className="rounded-full !w-[40px]"
+            icon={<MessageSquare className="px-2" size={40} strokeWidth={1} />}
+            disabled={
+              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+            }
+            active={actualAction === "commentTool"}
+            onClick={() => {
+              triggerTool("commentTool", nodeCreateProps);
+              sidebarToggle(SIDEBAR_ELEMENTS.comments);
+            }}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Comment tool</p>
+                <ShortcutElement
+                  shortcuts={{
+                    [SYSTEM_OS.MAC]: "H",
+                    [SYSTEM_OS.OTHER]: "H",
+                  }}
+                />
+              </div>
+            }
+            tooltipSide="top"
+            tooltipAlign="center"
+          />
+        )}
         <DropdownMenu modal={false} open={sidebarsMenuOpen}>
           <DropdownMenuTrigger
             disabled={
@@ -707,7 +777,7 @@ export function ToolsOverlayMouse() {
                 sidebarToggle(SIDEBAR_ELEMENTS.images);
               }}
             >
-              <Images /> Images
+              <Images strokeWidth={1} /> Images
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
               </DropdownMenuShortcut>
@@ -722,7 +792,7 @@ export function ToolsOverlayMouse() {
                 sidebarToggle(SIDEBAR_ELEMENTS.frames);
               }}
             >
-              <Projector /> Frames
+              <Projector strokeWidth={1} /> Frames
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
               </DropdownMenuShortcut>
@@ -737,11 +807,28 @@ export function ToolsOverlayMouse() {
                 sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
               }}
             >
-              <SwatchBook /> Color tokens
+              <SwatchBook strokeWidth={1} /> Color tokens
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
+            {threadsEnabled && (
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onClick={() => {
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
+                  sidebarToggle(SIDEBAR_ELEMENTS.comments);
+                }}
+              >
+                <MessageSquare strokeWidth={1} /> Comments
+                <DropdownMenuShortcut>
+                  {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onClick={() => {
@@ -752,28 +839,11 @@ export function ToolsOverlayMouse() {
                 sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
               }}
             >
-              <ListTree /> Elements tree
+              <ListTree strokeWidth={1} /> Elements tree
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-            {asyncAPIActive && (
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.aiTasks);
-              }}
-            >
-              <ListTodo /> Tasks
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <ToolbarDivider />

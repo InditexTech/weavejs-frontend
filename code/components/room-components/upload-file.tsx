@@ -6,6 +6,7 @@ import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
+import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 
 export function UploadFile() {
@@ -24,11 +25,17 @@ export function UploadFile() {
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
   );
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
 
   const queryClient = useQueryClient();
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
+      if (workloadsEnabled) {
+        return await postImageV2(room ?? "", file);
+      }
       return await postImage(room ?? "", file);
     },
   });
@@ -41,7 +48,11 @@ export function UploadFile() {
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
 
-          if (instance) {
+          if (!instance) {
+            return;
+          }
+
+          if (!workloadsEnabled) {
             inputFileRef.current.value = null;
             const room = data.fileName.split("/")[0];
             const imageId = data.fileName.split("/")[1];
@@ -57,8 +68,26 @@ export function UploadFile() {
               `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
             );
           }
+
+          if (workloadsEnabled) {
+            inputFileRef.current.value = null;
+            const room = data.image.roomId;
+            const imageId = data.image.imageId;
+
+            const { finishUploadCallback } = instance.triggerAction(
+              "imageTool"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ) as any;
+
+            instance.updatePropsAction("imageTool", { imageId });
+
+            finishUploadCallback?.(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+            );
+          }
         },
-        onError: () => {
+        onError: (ex) => {
+          console.error(ex);
           console.error("Error uploading image");
         },
         onSettled: () => {
@@ -66,7 +95,14 @@ export function UploadFile() {
         },
       });
     },
-    [instance, room, mutationUpload, queryClient, setUploadingImage]
+    [
+      instance,
+      room,
+      workloadsEnabled,
+      mutationUpload,
+      queryClient,
+      setUploadingImage,
+    ]
   );
 
   React.useEffect(() => {

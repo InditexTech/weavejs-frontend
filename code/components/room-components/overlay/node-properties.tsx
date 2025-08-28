@@ -111,7 +111,7 @@ export const NodeProperties = () => {
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+      <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light text-[24px] items-center text-md pl-2 uppercase">
           {title}
         </div>
