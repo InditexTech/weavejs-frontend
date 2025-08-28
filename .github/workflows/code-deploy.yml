@@ -43,6 +43,7 @@ jobs:
       AZURE_IDENTITY_ID: ${{ secrets.AZURE_IDENTITY_ID }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_API_V2_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_V2_ENDPOINT }}
+      NEXT_PUBLIC_API_V3_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_V3_ENDPOINT }}
       NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
       CDN_IP_LIST: ${{ secrets.CDN_IP_LIST }}
     steps:
@@ -73,6 +74,7 @@ jobs:
           touch .env.production
           echo NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} >> .env.production
           echo NEXT_PUBLIC_API_V2_ENDPOINT=${{ env.NEXT_PUBLIC_API_V2_ENDPOINT }} >> .env.production
+          echo NEXT_PUBLIC_API_V3_ENDPOINT=${{ env.NEXT_PUBLIC_API_V3_ENDPOINT }} >> .env.production
           echo NEXT_PUBLIC_API_ENDPOINT_HUB_NAME=${{ env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }} >> .env.production
           echo BACKEND_ENDPOINT=${{ env.BACKEND_ENDPOINT }} >> .env.production
 
