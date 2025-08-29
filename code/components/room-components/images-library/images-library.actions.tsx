@@ -358,7 +358,7 @@ export const ImagesLibraryActions = ({
   }
 
   return (
-    <div className="w-full h-[40px] p-3 px-6 bg-white flex justify-between items-center border-t border-[#c9c9c9]">
+    <div className="w-full h-[40px] p-3 px-6 bg-white flex justify-between items-center border-t-[0.5px] border-[#c9c9c9]">
       <div
         className={cn("flex gap-2 items-center font-inter font-light text-xs", {
           ["justify-start"]: actions.length > 0,

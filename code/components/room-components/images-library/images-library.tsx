@@ -408,7 +408,7 @@ export const ImagesLibrary = () => {
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
+      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
           <SidebarSelector title="Images" />
         </div>
@@ -538,7 +538,7 @@ export const ImagesLibrary = () => {
         </ScrollArea>
       )}
       {showSelection && (
-        <div className="w-full h-[40px] p-0 px-6 bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+        <div className="w-full h-[40px] p-0 px-6 bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
           <div className="flex gap-1 justify-start items-center font-inter font-light text-xs">
             SELECTED{" "}
             <Badge className="font-inter text-xs">
