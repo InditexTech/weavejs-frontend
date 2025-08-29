@@ -52,12 +52,20 @@ export const UploadedImage = ({
   return (
     <div
       key={image.imageId}
-      className="group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200"
+      className={cn(
+        "group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200 cursor-pointer",
+        {
+          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300"]: true,
+          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
+            selected,
+        }
+      )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className={cn("w-full block object-cover", {
-          ["opacity-50"]: selected,
+          [" after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity"]:
+            selected,
         })}
         style={{
           aspectRatio: `${image.aspectRatio}`,

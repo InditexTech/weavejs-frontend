@@ -688,11 +688,15 @@ export const ImagesLibrary = () => {
                       <ContextMenu>
                         <ContextMenuTrigger>
                           <div
-                            className={cn("relative w-full", {
-                              ["cursor-pointer"]: !(
-                                imagesLLMPopupVisible || imagesLLMPopupVisibleV2
-                              ),
-                            })}
+                            className={cn(
+                              "group relative w-full cursor-pointer",
+                              {
+                                ["cursor-pointer"]: !(
+                                  imagesLLMPopupVisible ||
+                                  imagesLLMPopupVisibleV2
+                                ),
+                              }
+                            )}
                           >
                             {imageComponent}
                             {showSelection &&
@@ -720,7 +724,7 @@ export const ImagesLibrary = () => {
                                 </div>
                               )}
                             {typeof appImage !== "undefined" && (
-                              <div className="absolute right-0 bottom-0 flex gap-1 justify-start items-end p-2">
+                              <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
                                 <Badge
                                   className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
                                   variant="default"
@@ -831,7 +835,7 @@ export const ImagesLibrary = () => {
             </Masonry>
             <div ref={ref} className="h-[0px]" />
             {query.isFetchingNextPage && (
-              <p className="font-inter text-base uppercase text-center mt-4">
+              <p className="font-inter text-xs uppercase text-center py-4">
                 loading more...
               </p>
             )}

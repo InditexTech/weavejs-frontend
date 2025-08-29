@@ -317,6 +317,55 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         multipleSelection: {
           enabled: true,
         },
+        onMultipleSelection: (nodes: Konva.Node[]) => {
+          const containsColorToken = nodes.some(
+            (node) => node.getAttrs().nodeType === "color-token"
+          );
+
+          const containsFrame = nodes.some(
+            (node) => node.getAttrs().nodeType === "frame"
+          );
+
+          if (containsColorToken || containsFrame) {
+            return {
+              resizeEnabled: false,
+              rotateEnabled: false,
+              enabledAnchors: [],
+            };
+          }
+
+          const containsImage = nodes.some(
+            (node) => node.getAttrs().nodeType === "image"
+          );
+
+          if (containsImage) {
+            return {
+              resizeEnabled: true,
+              rotateEnabled: true,
+              enabledAnchors: [
+                "top-left",
+                "top-right",
+                "bottom-left",
+                "bottom-right",
+              ],
+            };
+          }
+
+          return {
+            resizeEnabled: true,
+            rotateEnabled: true,
+            enabledAnchors: [
+              "top-left",
+              "top-center",
+              "top-right",
+              "middle-right",
+              "middle-left",
+              "bottom-left",
+              "bottom-center",
+              "bottom-right",
+            ],
+          };
+        },
       },
     },
   }),

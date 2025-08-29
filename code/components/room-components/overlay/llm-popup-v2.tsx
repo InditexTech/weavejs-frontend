@@ -853,7 +853,9 @@ export function LLMGenerationPopupV2() {
                     mutationEdit.mutate();
                   }
 
-                  document.getElementById("llm-prompt-textarea")?.focus();
+                  setTimeout(() => {
+                    document.getElementById("llm-prompt-textarea")?.focus();
+                  }, 100);
                 }}
               >
                 {buttonText}

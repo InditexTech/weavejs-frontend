@@ -24,10 +24,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIACapabilities } from "@/store/ia";
 import { X } from "lucide-react";
-import {
-  WeaveElementAttributes,
-  WeaveStateElement,
-} from "@inditextech/weave-types";
 
 const IMAGES_LIMIT = 20;
 
@@ -35,7 +31,6 @@ export const LLMReferenceSelectionPopup = () => {
   const imagesRef = React.useRef<HTMLDivElement>(null);
 
   const instance = useWeave((state) => state.instance);
-  const appState = useWeave((state) => state.appState);
 
   const [selectedImages, setSelectedImages] = React.useState<string[]>([]);
 
@@ -118,42 +113,6 @@ export const LLMReferenceSelectionPopup = () => {
   const linearData = React.useMemo(() => {
     return query.data?.pages.flatMap((page) => page.images) ?? [];
   }, [query.data]);
-
-  const appImages = React.useMemo(() => {
-    function extractImages(
-      images: WeaveStateElement[],
-      node: WeaveStateElement
-    ) {
-      if (node.props && node.props.nodeType === "image" && node.props.imageId) {
-        images.push(node);
-      }
-      if (node.props && node.props.children) {
-        for (const child of node.props.children) {
-          extractImages(images, child);
-        }
-      }
-    }
-
-    const mainStateProps: WeaveElementAttributes = appState.weave
-      .props as WeaveElementAttributes;
-
-    const mainStateChildren: WeaveStateElement[] | undefined =
-      mainStateProps?.children;
-    const mainLayerElement: WeaveStateElement | undefined =
-      mainStateChildren?.find((child: WeaveStateElement) => {
-        return child.key === "mainLayer";
-      });
-
-    const images: WeaveStateElement[] = [];
-
-    if (typeof mainLayerElement === "undefined") {
-      return images;
-    }
-
-    extractImages(images, mainLayerElement);
-
-    return images;
-  }, [appState]);
 
   const isFetching = React.useMemo(() => {
     return query.isFetching;
@@ -307,10 +266,6 @@ export const LLMReferenceSelectionPopup = () => {
                       const roomId = image.roomId;
                       const imageId = image.imageId;
 
-                      const appImage = appImages.find(
-                        (appImage) => appImage.props.imageId === imageId
-                      );
-
                       const imageUrl = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/images/${imageId}`;
 
                       return (
@@ -325,11 +280,11 @@ export const LLMReferenceSelectionPopup = () => {
                             src={imageUrl}
                             alt="An image"
                           />
-                          {typeof appImage !== "undefined" && (
+                          {/* {typeof appImage !== "undefined" && (
                             <div className="absolute bottom-[8px] left-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer font-inter text-xs">
                               in use
                             </div>
-                          )}
+                          )} */}
                         </div>
                       );
                     })}

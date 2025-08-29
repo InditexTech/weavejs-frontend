@@ -6,7 +6,7 @@
 
 import React from "react";
 // import { Badge } from "@/components/ui/badge";
-import { Image } from "lucide-react";
+// import { Image } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -53,7 +53,14 @@ export const GeneratedImage = ({
   return (
     <div
       key={image.imageId}
-      className="group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200"
+      className={cn(
+        "group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200 cursor-pointer",
+        {
+          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300"]: true,
+          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
+            selected,
+        }
+      )}
     >
       {((image.removalJobId === null &&
         ["created", "pending", "working", "failed"].includes(image.status)) ||
@@ -67,16 +74,13 @@ export const GeneratedImage = ({
           }}
         >
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          <Image strokeWidth={1} size={32} stroke="#000000" fill="#ffffff" />
+          {/* <Image strokeWidth={1} size={32} stroke="#000000" fill="#ffffff" /> */}
         </div>
       )}
       {["completed"].includes(image.status) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          className={cn("w-full block object-cover", {
-            [" after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity"]:
-              selected,
-          })}
+          className="w-full block object-cover relative"
           style={{
             aspectRatio: `${image.aspectRatio}`,
           }}
