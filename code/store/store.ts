@@ -38,6 +38,7 @@ interface CollaborationRoomState {
   };
   ui: {
     show: boolean;
+    minimap: boolean;
   };
   drawer: {
     keyboardShortcuts: {
@@ -92,6 +93,7 @@ interface CollaborationRoomState {
     };
   };
   setShowUi: (newShowUI: boolean) => void;
+  setShowMinimap: (newShowMinimap: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
     newFetchConnectionUrlError: Error | null
@@ -147,6 +149,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   },
   ui: {
     show: true,
+    minimap: false,
   },
   fetchConnectionUrl: {
     loading: false,
@@ -221,6 +224,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       ui: { ...state.ui, show: newShowUI },
+    })),
+  setShowMinimap: (newShowMinimap) =>
+    set((state) => ({
+      ...state,
+      ui: { ...state.ui, minimap: newShowMinimap },
     })),
   setFetchConnectionUrlLoading: (newLoading) =>
     set((state) => ({

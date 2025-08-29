@@ -594,6 +594,7 @@ export function LLMGenerationPopupV2() {
               <div className="min-w-[330px] max-w-[330px] flex flex-col gap-2 justify-center items-start bg-white text-black">
                 <div className="font-inter text-xs uppercase">Prompt</div>
                 <Textarea
+                  id="llm-prompt-textarea"
                   className="rounded-none !border-black !shadow-none resize-none"
                   value={prompt}
                   disabled={mutationGenerate.isPending}
@@ -851,6 +852,8 @@ export function LLMGenerationPopupV2() {
                   if (imagesLLMPopupType === "edit-mask") {
                     mutationEdit.mutate();
                   }
+
+                  document.getElementById("llm-prompt-textarea")?.focus();
                 }}
               >
                 {buttonText}

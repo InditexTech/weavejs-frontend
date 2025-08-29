@@ -5,19 +5,21 @@
 "use client";
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
+import { cn } from "@/lib/utils";
+
+type UploadedImageProps = { image: ImageEntity; selected: boolean };
 
 export const UploadedImage = ({
   image,
-}: {
-  image: ImageEntity;
-}) => {
+  selected,
+}: Readonly<UploadedImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
   const sidebarLeftActive = useCollaborationRoom(
@@ -50,11 +52,13 @@ export const UploadedImage = ({
   return (
     <div
       key={image.imageId}
-      className="group block w-full bg-light-background-1 object-cover relative border border-zinc-200"
+      className="group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        className="w-full block object-cover"
+        className={cn("w-full block object-cover", {
+          ["opacity-50"]: selected,
+        })}
         style={{
           aspectRatio: `${image.aspectRatio}`,
         }}
@@ -69,6 +73,11 @@ export const UploadedImage = ({
       {image.removalJobId !== null &&
         image.removalStatus !== null &&
         ["pending", "working"].includes(image.removalStatus) && (
+          <div className="pulseOverlay"></div>
+        )}
+      {/* {image.removalJobId !== null &&
+        image.removalStatus !== null &&
+        ["pending", "working"].includes(image.removalStatus) && (
           <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex justify-center items-center">
             <Badge
               className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
@@ -77,7 +86,7 @@ export const UploadedImage = ({
               REMOVING
             </Badge>
           </div>
-        )}
+        )} */}
     </div>
   );
 };

@@ -51,6 +51,8 @@ export function useKeyboardHandler() {
   const setImagesLLMPopupVisible = useIACapabilities(
     (state) => state.setImagesLLMPopupVisible
   );
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const triggerTool = React.useCallback(
     (toolName: string) => {
@@ -515,4 +517,8 @@ export function useKeyboardHandler() {
       sidebarToggle(SIDEBAR_ELEMENTS.comments);
     }
   }, ["KeyH"]);
+
+  useKeyDown(() => {
+    setShowMinimap(!showMinimap);
+  }, ["KeyN"]);
 }

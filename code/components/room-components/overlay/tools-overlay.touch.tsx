@@ -31,6 +31,7 @@ import {
   SwatchBook,
   Projector,
   MessageSquare,
+  MapPinned,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -110,6 +111,8 @@ export function ToolsOverlayTouch() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -190,6 +193,27 @@ export function ToolsOverlayTouch() {
           tooltipSide="right"
           tooltipAlign="center"
         />
+        <ToolbarDivider orientation="horizontal" />
+
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={showMinimap}
+          onClick={() => {
+            setShowMinimap(!showMinimap);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Minimap</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+
         <ToolbarDivider orientation="horizontal" />
         <DropdownMenu modal={false} open={sidebarsMenuOpen}>
           <DropdownMenuTrigger

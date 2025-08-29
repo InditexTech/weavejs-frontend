@@ -56,6 +56,7 @@ import {
   WeaveNodesEdgeSnappingPlugin,
   WeaveNodesDistanceSnappingPlugin,
   WeaveCommentsRendererPlugin,
+  WeaveStageMinimapPlugin,
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
   WEAVE_COMMENT_STATUS,
@@ -386,6 +387,16 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         const bgColor = stringToColor(user?.name ?? "#ffffff");
         return getContrastTextColor(bgColor);
       },
+    },
+  }),
+  new WeaveStageMinimapPlugin({
+    config: {
+      getContainer: () => {
+        return document?.getElementById("minimap") as HTMLElement;
+      },
+      id: "weave_stage_minimap",
+      width: window.innerWidth * 0.2,
+      fitToContentPadding: 40,
     },
   }),
 ];

@@ -5,7 +5,7 @@
 "use client";
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Image } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -13,8 +13,11 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
+import { cn } from "@/lib/utils";
 
-export const EditImage = ({ image }: { image: ImageEntity }) => {
+type EditImageProps = { image: ImageEntity; selected: boolean };
+
+export const EditImage = ({ image, selected }: Readonly<EditImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
   const sidebarLeftActive = useCollaborationRoom(
@@ -47,7 +50,13 @@ export const EditImage = ({ image }: { image: ImageEntity }) => {
   return (
     <div
       key={image.imageId}
-      className="group block w-full bg-light-background-1 object-cover relative border border-zinc-200"
+      className={cn(
+        "group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200",
+        {
+          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100 after:transition-opacity"]:
+            selected,
+        }
+      )}
     >
       {((image.removalJobId === null &&
         ["created", "pending", "working", "failed"].includes(image.status)) ||
@@ -61,7 +70,7 @@ export const EditImage = ({ image }: { image: ImageEntity }) => {
           }}
         >
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          <Image strokeWidth={1} size={48} />
+          <Image strokeWidth={1} size={32} stroke="#000000" fill="#ffffff" />
         </div>
       )}
       {["completed"].includes(image.status) && (
@@ -82,7 +91,13 @@ export const EditImage = ({ image }: { image: ImageEntity }) => {
           alt="An image"
         />
       )}
-      {image.removalJobId === null && ["pending"].includes(image.status) && (
+      {(["pending", "working"].includes(image.status) ||
+        (image.removalJobId !== null &&
+          image.removalStatus !== null &&
+          ["pending", "working"].includes(image.removalStatus))) && (
+        <div className="pulseOverlay"></div>
+      )}
+      {/* {image.removalJobId === null && ["pending"].includes(image.status) && (
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex flex-col gap-1 justify-center items-center">
           <Badge
             className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
@@ -113,7 +128,7 @@ export const EditImage = ({ image }: { image: ImageEntity }) => {
               REMOVING
             </Badge>
           </div>
-        )}
+        )} */}
     </div>
   );
 };

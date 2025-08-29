@@ -10,18 +10,15 @@ import { toast } from "sonner";
 import { useInView } from "react-intersection-observer";
 import Masonry from "react-responsive-masonry";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+// import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  useMutation,
-  useInfiniteQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
   BrushCleaning,
   Info,
   Link,
-  RefreshCw,
   SquareCheck,
   SquareX,
   Trash,
@@ -59,6 +56,7 @@ import {
 } from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
 import { ImageEntity } from "./types";
+import { ImagesLibraryActions } from "./images-library.actions";
 
 function isRelativeUrl(url: string) {
   try {
@@ -77,6 +75,7 @@ export const ImagesLibrary = () => {
 
   const [selectedImages, setSelectedImages] = React.useState<ImageEntity[]>([]);
   const [images, setImages] = React.useState<ImageEntity[]>([]);
+  const [showSelection, setShowSelection] = React.useState<boolean>(false);
 
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
@@ -90,8 +89,6 @@ export const ImagesLibrary = () => {
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
-
-  const queryClient = useQueryClient();
 
   const aiEnabled = useIACapabilities((state) => state.enabled);
   const imagesLLMPopupVisible = useIACapabilities(
@@ -207,49 +204,6 @@ export const ImagesLibrary = () => {
     [imagesReferences, setImagesReferences]
   );
 
-  const handleSetImagesReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (images: any[]) => {
-      const newReferences = [...imagesReferences];
-
-      for (const image of images) {
-        const element = document.querySelector(
-          `img[id="${image.imageId}"]`
-        ) as HTMLImageElement | null;
-
-        if (!element) {
-          return;
-        }
-
-        const existsReference = newReferences.find(
-          (ele) => ele.id === image.imageId
-        );
-
-        if (typeof existsReference !== "undefined") {
-          continue;
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = element.naturalWidth;
-        canvas.height = element.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(element, 0, 0);
-
-          const dataURL = canvas.toDataURL("image/png");
-          newReferences.push({
-            id: image.imageId,
-            aspectRatio: image.aspectRatio,
-            base64Image: dataURL,
-          });
-        }
-      }
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
   const handleRemoveImageReference = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (image: any) => {
@@ -264,28 +218,6 @@ export const ImagesLibrary = () => {
       let newReferences = [...imagesReferences];
 
       newReferences = newReferences.filter((ele) => ele.id !== image.imageId);
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
-  const handleRemoveImagesReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (images: any[]) => {
-      let newReferences = [...imagesReferences];
-
-      for (const image of images) {
-        const element = document.querySelector(
-          `img[id="${image.imageId}"]`
-        ) as HTMLImageElement | null;
-
-        if (!element) {
-          continue;
-        }
-
-        newReferences = newReferences.filter((ele) => ele.id !== image.imageId);
-      }
 
       setImagesReferences(newReferences);
     },
@@ -436,40 +368,6 @@ export const ImagesLibrary = () => {
     return selectedImages.filter((image) => images.includes(image));
   }, [selectedImages, images]);
 
-  const inUseSelectedImages = React.useMemo(() => {
-    const inUse = [];
-
-    for (const image of realSelectedImages) {
-      const appImage = appImages.find(
-        (appImage) => appImage.props.imageId === image.imageId
-      );
-      if (typeof appImage !== "undefined") {
-        inUse.push(image);
-      }
-    }
-
-    return inUse;
-  }, [realSelectedImages, appImages]);
-
-  const [unreferencedSelectedImages, referencedSelectedImages] =
-    React.useMemo(() => {
-      const unreferenced = [];
-      const referenced = [];
-
-      for (const image of realSelectedImages) {
-        const referenceImage = imagesReferences.find(
-          (appImage) => appImage.id === image.imageId
-        );
-        if (typeof referenceImage !== "undefined") {
-          referenced.push(image);
-        } else {
-          unreferenced.push(image);
-        }
-      }
-
-      return [unreferenced, referenced];
-    }, [realSelectedImages, imagesReferences]);
-
   const handleCheckNone = React.useCallback(() => {
     setSelectedImages([]);
   }, []);
@@ -515,33 +413,22 @@ export const ImagesLibrary = () => {
           <SidebarSelector title="Images" />
         </div>
         <div className="flex justify-end items-center gap-4">
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              handleCheckNone();
-            }}
-          >
-            <SquareX size={20} strokeWidth={1} />
-          </button>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              handleCheckAll();
-            }}
-          >
-            <SquareCheck size={20} strokeWidth={1} />
-          </button>
-          {workloadsEnabled && (
-            <button
-              className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-              onClick={() => {
-                const queryKey = ["getImages", room];
-                queryClient.invalidateQueries({ queryKey });
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="selection-mode"
+              checked={showSelection}
+              onCheckedChange={(checked) => {
+                setShowSelection(checked);
               }}
+              className="w-[32px] cursor-pointer"
+            />
+            <Label
+              htmlFor="selection-mode"
+              className="!font-inter !text-xs cursor-pointer"
             >
-              <RefreshCw size={20} strokeWidth={1} />
-            </button>
-          )}
+              SELECTION
+            </Label>
+          </div>
           <button
             className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
             onClick={() => {
@@ -597,7 +484,7 @@ export const ImagesLibrary = () => {
                     return (
                       <div
                         key={imageId}
-                        className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border border-zinc-200 relative"
+                        className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border-0 border-zinc-200 relative"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -650,15 +537,44 @@ export const ImagesLibrary = () => {
           </div>
         </ScrollArea>
       )}
+      {showSelection && (
+        <div className="w-full h-[40px] p-0 px-6 bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+          <div className="flex gap-1 justify-start items-center font-inter font-light text-xs">
+            SELECTED{" "}
+            <Badge className="font-inter text-xs">
+              {realSelectedImages.length}
+            </Badge>
+          </div>
+          <div className="flex gap-2 justify-end items-center">
+            <button
+              className="cursor-pointer flex gap-1 justify-center items-center h-[40px] font-inter text-xs text-center bg-transparent hover:text-[#c9c9c9]"
+              onClick={() => {
+                handleCheckNone();
+              }}
+            >
+              <span>NONE</span> <SquareX size={20} strokeWidth={1} />
+            </button>
+            <button
+              className="cursor-pointer flex gap-1 justify-center items-center h-[40px] font-inter text-xs text-center bg-transparent hover:text-[#c9c9c9]"
+              onClick={() => {
+                handleCheckAll();
+              }}
+            >
+              <span>ALL</span>
+              <SquareCheck size={20} strokeWidth={1} />
+            </button>
+          </div>
+        </div>
+      )}
       {workloadsEnabled && (
         <ScrollArea
-          className={cn("w-full h-[calc(100%-95px)] overflow-auto", {
-            ["h-[calc(100%-95px)]"]: realSelectedImages.length === 0,
-            ["h-[calc(100%-95px-65px)]"]: realSelectedImages.length > 0,
+          className={cn("w-full overflow-auto", {
+            ["h-[calc(100%-95px-40px-40px)]"]: showSelection,
+            ["h-[calc(100%-95px)]"]: !showSelection,
           })}
         >
           <div
-            className="w-full weaveDraggable p-[24px]"
+            className="w-full weaveDraggable p-0"
             onDragStart={(e) => {
               if (imagesLLMPopupVisible || imagesLLMPopupVisibleV2) {
                 e.preventDefault();
@@ -687,7 +603,7 @@ export const ImagesLibrary = () => {
                 </span>
               </div>
             )}
-            <Masonry sequential columnsCount={2} gutter="8px">
+            <Masonry sequential columnsCount={2} gutter="1px">
               {images.length > 0 &&
                 images.map((image) => {
                   const appImage = appImages.find(
@@ -701,13 +617,18 @@ export const ImagesLibrary = () => {
                   const isChecked = realSelectedImages.includes(image);
 
                   let imageComponent = (
-                    <UploadedImage key={image.imageId} image={image} />
+                    <UploadedImage
+                      key={image.imageId}
+                      selected={isChecked}
+                      image={image}
+                    />
                   );
 
                   if (image.operation === "background-removal") {
                     imageComponent = (
                       <RemovedBackgroundImage
                         key={image.imageId}
+                        selected={isChecked}
                         image={image}
                       />
                     );
@@ -715,18 +636,55 @@ export const ImagesLibrary = () => {
 
                   if (image.operation === "image-generation") {
                     imageComponent = (
-                      <GeneratedImage key={image.imageId} image={image} />
+                      <GeneratedImage
+                        key={image.imageId}
+                        selected={isChecked}
+                        image={image}
+                      />
                     );
                   }
 
                   if (image.operation === "image-edition") {
                     imageComponent = (
-                      <EditImage key={image.imageId} image={image} />
+                      <EditImage
+                        key={image.imageId}
+                        selected={isChecked}
+                        image={image}
+                      />
                     );
                   }
 
                   return (
-                    <div key={image.imageId} className="w-full">
+                    <div
+                      key={image.imageId}
+                      className={cn("w-full", {
+                        ["cursor-pointer"]:
+                          showSelection &&
+                          !(
+                            ["pending", "working"].includes(image.status) ||
+                            (image.removalJobId !== null &&
+                              image.removalStatus !== null &&
+                              ["pending", "working"].includes(
+                                image.removalStatus
+                              ))
+                          ),
+                      })}
+                      onClick={() => {
+                        if (
+                          showSelection &&
+                          !(
+                            ["pending", "working"].includes(image.status) ||
+                            (image.removalJobId !== null &&
+                              image.removalStatus !== null &&
+                              ["pending", "working"].includes(
+                                image.removalStatus
+                              ))
+                          )
+                        ) {
+                          handleCheckboxChange(!isChecked, image);
+                        }
+                      }}
+                    >
                       <ContextMenu>
                         <ContextMenuTrigger>
                           <div
@@ -737,20 +695,30 @@ export const ImagesLibrary = () => {
                             })}
                           >
                             {imageComponent}
-                            <div className="absolute top-[8px] right-[8px] z-10">
-                              <Checkbox
-                                id="terms"
-                                className="bg-white rounded-none cursor-pointer"
-                                value={image.imageId}
-                                checked={isChecked}
-                                onCheckedChange={(checked) => {
-                                  handleCheckboxChange(
-                                    checked as boolean,
-                                    image
-                                  );
-                                }}
-                              />
-                            </div>
+                            {showSelection &&
+                              !(
+                                ["pending", "working"].includes(image.status) ||
+                                (image.removalJobId !== null &&
+                                  image.removalStatus !== null &&
+                                  ["pending", "working"].includes(
+                                    image.removalStatus
+                                  ))
+                              ) && (
+                                <div className="absolute top-[8px] right-[8px] z-10">
+                                  <Checkbox
+                                    id="terms"
+                                    className="bg-white rounded-none cursor-pointer"
+                                    value={image.imageId}
+                                    checked={isChecked}
+                                    onCheckedChange={(checked) => {
+                                      handleCheckboxChange(
+                                        checked as boolean,
+                                        image
+                                      );
+                                    }}
+                                  />
+                                </div>
+                              )}
                             {typeof appImage !== "undefined" && (
                               <div className="absolute right-0 bottom-0 flex gap-1 justify-start items-end p-2">
                                 <Badge
@@ -773,7 +741,7 @@ export const ImagesLibrary = () => {
                             )}
                           </div>
                         </ContextMenuTrigger>
-                        <ContextMenuContent className="w-52 rounded-none border border-[#c9c9c9] shadow-none">
+                        <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
                           {typeof appImage !== "undefined" && (
                             <>
                               <ContextMenuItem
@@ -861,7 +829,7 @@ export const ImagesLibrary = () => {
                   );
                 })}
             </Masonry>
-            <div ref={ref} className="h-1" />
+            <div ref={ref} className="h-[0px]" />
             {query.isFetchingNextPage && (
               <p className="font-inter text-base uppercase text-center mt-4">
                 loading more...
@@ -870,67 +838,12 @@ export const ImagesLibrary = () => {
           </div>
         </ScrollArea>
       )}
-      {realSelectedImages.length > 0 && (
-        <div className="w-full min-h-[65px] p-3 px-6 bg-white flex justify-between items-center border-t border-[#c9c9c9]">
-          <div className="font-inter text-sm">
-            SELECTED {realSelectedImages.length}
-          </div>
-          <div className="flex gap-1 justify-end items-center">
-            {inUseSelectedImages.length === 0 && (
-              <Button
-                size="sm"
-                className="cursor-pointer rounded-none"
-                variant="destructive"
-                onClick={() => {
-                  for (const image of realSelectedImages) {
-                    handleDeleteImage(image);
-                  }
-                }}
-              >
-                <Trash strokeWidth={1} size={16} />
-              </Button>
-            )}
-            <Button
-              size="sm"
-              className="cursor-pointer rounded-none"
-              variant="secondary"
-              onClick={() => {
-                for (const image of realSelectedImages) {
-                  handleRemoveBackground(image);
-                }
-              }}
-            >
-              <BrushCleaning strokeWidth={1} size={16} />
-            </Button>
-            {imagesLLMPopupVisibleV2 &&
-              realSelectedImages.length === referencedSelectedImages.length && (
-                <Button
-                  size="sm"
-                  className="cursor-pointer rounded-none"
-                  variant="secondary"
-                  onClick={() => {
-                    handleRemoveImagesReference(realSelectedImages);
-                  }}
-                >
-                  <Unlink strokeWidth={1} size={16} />
-                </Button>
-              )}
-            {imagesLLMPopupVisibleV2 &&
-              realSelectedImages.length === unreferencedSelectedImages.length &&
-              realSelectedImages.length <= 4 - imagesReferences.length && (
-                <Button
-                  size="sm"
-                  className="cursor-pointer rounded-none"
-                  variant="secondary"
-                  onClick={() => {
-                    handleSetImagesReference(realSelectedImages);
-                  }}
-                >
-                  <Link strokeWidth={1} size={16} />
-                </Button>
-              )}
-          </div>
-        </div>
+      {showSelection && (
+        <ImagesLibraryActions
+          images={images}
+          appImages={appImages}
+          selectedImages={selectedImages}
+        />
       )}
     </div>
   );

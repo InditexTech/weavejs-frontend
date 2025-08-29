@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Eye, MousePointer } from "lucide-react";
+import { Eye, MapPinned, MousePointer } from "lucide-react";
 import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
 
@@ -16,6 +16,14 @@ export const HelpView = () => {
           shortcuts={{
             [SYSTEM_OS.MAC]: "⌘ \\",
             [SYSTEM_OS.OTHER]: "Ctrl \\",
+          }}
+        />
+        <HelpShortcutElement
+          icon={<MapPinned />}
+          label="Show/Hide Minimap"
+          shortcuts={{
+            [SYSTEM_OS.MAC]: "N",
+            [SYSTEM_OS.OTHER]: "N",
           }}
         />
       </div>

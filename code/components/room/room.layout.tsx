@@ -78,6 +78,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     (state) => state.images.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -181,16 +182,16 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                 options={contextMenuOptions}
               />
               <ToolsOverlay />
-              {/* {transformingImage && (
-                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                    <Logo kind="large" variant="no-text" />
-                    <div className="font-inter text-base">
-                      Removing background...
-                    </div>
-                  </div>
-                </div>
-              )} */}
+              <div
+                id="minimap"
+                className={cn(
+                  "absolute bottom-[16px] right-[16px] border border-[#c9c9c9] w-[460px] w-auto bg-white z-[11]",
+                  {
+                    ["visible"]: showMinimap,
+                    ["invisible"]: !showMinimap,
+                  }
+                )}
+              ></div>
             </>
           )}
         </section>
