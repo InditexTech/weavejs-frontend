@@ -12,7 +12,6 @@ import Masonry from "react-responsive-masonry";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-// import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
@@ -41,12 +40,10 @@ import { WeaveImageNode } from "@inditextech/weave-sdk";
 import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-import { RemovedBackgroundImage } from "./removed-background.image";
 import { UploadedImage } from "./uploaded.image";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { GeneratedImage } from "./generated-image.image";
-import { EditImage } from "./edit-image.image";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -626,32 +623,24 @@ export const ImagesLibrary = () => {
                     />
                   );
 
-                  if (image.operation === "background-removal") {
-                    imageComponent = (
-                      <RemovedBackgroundImage
-                        key={image.imageId}
-                        selected={isChecked}
-                        image={image}
-                      />
-                    );
-                  }
-
-                  if (image.operation === "image-generation") {
+                  if (
+                    [
+                      "background-removal",
+                      "image-generation",
+                      "image-edition",
+                    ].includes(image.operation)
+                  ) {
                     imageComponent = (
                       <GeneratedImage
                         key={image.imageId}
                         selected={isChecked}
                         image={image}
-                      />
-                    );
-                  }
-
-                  if (image.operation === "image-edition") {
-                    imageComponent = (
-                      <EditImage
-                        key={image.imageId}
-                        selected={isChecked}
-                        image={image}
+                        operation={
+                          image.operation as
+                            | "background-removal"
+                            | "image-generation"
+                            | "image-edition"
+                        }
                       />
                     );
                   }

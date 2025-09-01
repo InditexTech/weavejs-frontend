@@ -227,7 +227,6 @@ export function LLMGenerationPopupV2() {
 
   const mutationGenerate = useMutation({
     mutationFn: async () => {
-      // setImagesLLMPopupState("generating");
       return await postGenerateImageV2(
         {
           userId: user?.name ?? "",
@@ -243,13 +242,8 @@ export function LLMGenerationPopupV2() {
         }
       );
     },
-    onSettled: () => {
-      // setImagesLLMPopupState("idle");
-    },
     onSuccess: (data) => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
-
-      // setImagesLLMPopupState("uploading");
 
       setImagesLLMPredictions(data.data);
 
@@ -262,8 +256,6 @@ export function LLMGenerationPopupV2() {
 
   const mutationEdit = useMutation({
     mutationFn: async () => {
-      // setImagesLLMPopupState("generating");
-
       if (!imagesLLMPopupImageBase64) {
         throw new Error("No reference image");
       }
@@ -297,13 +289,8 @@ export function LLMGenerationPopupV2() {
         }
       );
     },
-    onSettled: () => {
-      // setImagesLLMPopupState("idle");
-    },
     onSuccess: (data) => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
-
-      // setImagesLLMPopupState("uploading");
 
       setImagesLLMPredictions(data.data);
 

@@ -171,6 +171,8 @@ export const LLMReferenceSelectionPopupV2 = () => {
 
                     return (
                       <div
+                        role="button"
+                        tabIndex={0}
                         key={imageId}
                         className="group block w-full aspect-auto bg-light-background-1 object-cover cursor-pointer relative mb-[1px] border border-zinc-200 cursor-pointer"
                         onClick={() => {
@@ -205,10 +207,7 @@ export const LLMReferenceSelectionPopupV2 = () => {
                               height: "100%",
                               aspectRatio: `${image.aspectRatio}`,
                             }}
-                          >
-                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                            {/* <Image strokeWidth={1} size={32} stroke="#000000" fill="#ffffff" /> */}
-                          </div>
+                          ></div>
                         )}
                         {["completed"].includes(image.status) && (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -220,11 +219,6 @@ export const LLMReferenceSelectionPopupV2 = () => {
                             alt="An image"
                           />
                         )}
-                        {/* {typeof appImage !== "undefined" && (
-                            <div className="absolute bottom-[8px] left-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer font-inter text-xs">
-                              in use
-                            </div>
-                          )} */}
                       </div>
                     );
                   })}

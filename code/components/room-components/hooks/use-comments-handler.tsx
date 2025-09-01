@@ -75,7 +75,7 @@ export const useCommentsHandler = () => {
         instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>("comment");
 
       if (commentHandler && data.thread) {
-        commentHandler.afterCreatePersist(node, data.thread);
+        commentHandler.setCommentModel(node, data.thread);
 
         eventBus.emit("onCommentsChanged");
       }
