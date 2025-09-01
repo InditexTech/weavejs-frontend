@@ -56,8 +56,12 @@ export const CommentAnswer = ({
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
 
-  const { commentId, handleRefreshComment, handleRefreshCommentAnswers } =
-    useComment({ node });
+  const {
+    commentId,
+    comment: { data: commentData },
+    handleRefreshComment,
+    handleRefreshCommentAnswers,
+  } = useComment({ node });
 
   const mutateEditThread = useMutation({
     mutationFn: async ({
@@ -319,70 +323,71 @@ export const CommentAnswer = ({
                 })}
               </div>
             </div>
-            {answer.userMetadata.name === user?.name && (
-              <DropdownMenu modal={false} open={menuOpen}>
-                <DropdownMenuTrigger
-                  className={cn(
-                    "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                    {
-                      ["font-normal"]: menuOpen,
-                      ["font-extralight"]: !menuOpen,
-                    }
-                  )}
-                  asChild
-                >
-                  <Button
-                    className="rounded-none w-[20px] h-[20px] cursor-pointer"
-                    variant="link"
-                    onClick={() => setMenuOpen((prev) => !prev)}
+            {answer.userMetadata.name === user?.name &&
+              commentData?.thread?.status !== "resolved" && (
+                <DropdownMenu modal={false} open={menuOpen}>
+                  <DropdownMenuTrigger
+                    className={cn(
+                      "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["font-normal"]: menuOpen,
+                        ["font-extralight"]: !menuOpen,
+                      }
+                    )}
+                    asChild
                   >
-                    <Ellipsis strokeWidth={1} size={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  onCloseAutoFocus={(e) => {
-                    e.preventDefault();
-                  }}
-                  onFocusOutside={() => {
-                    setMenuOpen(false);
-                  }}
-                  align="end"
-                  side="bottom"
-                  alignOffset={0}
-                  sideOffset={8}
-                  className="font-inter rounded-none shadow-none"
-                >
-                  <DropdownMenuItem
-                    className="text-foreground cursor-pointer font-inter text-xs hover:rounded-none"
-                    onPointerDown={(e) => {
+                    <Button
+                      className="rounded-none w-[20px] h-[20px] cursor-pointer"
+                      variant="link"
+                      onClick={() => setMenuOpen((prev) => !prev)}
+                    >
+                      <Ellipsis strokeWidth={1} size={16} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
                       e.preventDefault();
-                      setMenuOpen(false);
-                      setContent(answer.content);
-                      setEditing(true);
                     }}
+                    onFocusOutside={() => {
+                      setMenuOpen(false);
+                    }}
+                    align="end"
+                    side="bottom"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="font-inter rounded-none shadow-none"
                   >
-                    Edit
-                  </DropdownMenuItem>
-                  {!isMain && (
                     <DropdownMenuItem
                       className="text-foreground cursor-pointer font-inter text-xs hover:rounded-none"
                       onPointerDown={(e) => {
                         e.preventDefault();
-
                         setMenuOpen(false);
-                        mutateDeleteThreadAnswer.mutate({
-                          node,
-                          threadId: node.getAttrs().threadId,
-                          answerId: answer.answerId,
-                        });
+                        setContent(answer.content);
+                        setEditing(true);
                       }}
                     >
-                      Delete
+                      Edit
                     </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+                    {!isMain && (
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer font-inter text-xs hover:rounded-none"
+                        onPointerDown={(e) => {
+                          e.preventDefault();
+
+                          setMenuOpen(false);
+                          mutateDeleteThreadAnswer.mutate({
+                            node,
+                            threadId: node.getAttrs().threadId,
+                            answerId: answer.answerId,
+                          });
+                        }}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
           </div>
           <div className="font-inter text-xs text-left whitespace-pre-line">
             {answer.content}

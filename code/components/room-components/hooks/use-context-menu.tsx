@@ -446,7 +446,7 @@ function useContextMenu() {
                   "image/png"
                 );
 
-                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                sidebarToggle(null);
 
                 setImagesLLMPopupSelectedNodesV2(nodes.map((n) => n.instance));
                 setImagesLLMPopupTypeV2("edit-prompt");

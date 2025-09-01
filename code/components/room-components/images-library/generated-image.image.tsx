@@ -5,8 +5,6 @@
 "use client";
 
 import React from "react";
-// import { Badge } from "@/components/ui/badge";
-// import { Image } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -15,11 +13,16 @@ import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { cn } from "@/lib/utils";
 
-type GeneratedImageProps = { image: ImageEntity; selected: boolean };
+type GeneratedImageProps = {
+  image: ImageEntity;
+  selected: boolean;
+  operation: "background-removal" | "image-generation" | "image-edition";
+};
 
 export const GeneratedImage = ({
   image,
   selected,
+  operation,
 }: Readonly<GeneratedImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
@@ -54,9 +57,10 @@ export const GeneratedImage = ({
     <div
       key={image.imageId}
       className={cn(
-        "group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200 cursor-pointer",
+        "group block w-full bg-white object-cover relative border-0 border-zinc-200 overflow-hidden",
         {
-          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300"]: true,
+          ["cursor-pointer hover:bg-black"]:
+            ["completed"].includes(image.status) && image.removalJobId === null,
           ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
         }
@@ -72,28 +76,30 @@ export const GeneratedImage = ({
             height: "100%",
             aspectRatio: `${image.aspectRatio}`,
           }}
-        >
-          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          {/* <Image strokeWidth={1} size={32} stroke="#000000" fill="#ffffff" /> */}
-        </div>
+        ></div>
       )}
       {["completed"].includes(image.status) && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          className="w-full block object-cover relative"
-          style={{
-            aspectRatio: `${image.aspectRatio}`,
-          }}
-          id={image.imageId}
-          data-image-id={image.imageId}
-          draggable={
-            imagesLLMPopupVisible || imagesLLMPopupVisibleV2
-              ? undefined
-              : "true"
-          }
-          src={imageUrl}
-          alt="An image"
-        />
+        <>
+          {operation === "background-removal" && (
+            <div className="absolute inset-0 checkered transition-transform duration-500 group-hover:opacity-60"></div>
+          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
+            style={{
+              aspectRatio: `${image.aspectRatio}`,
+            }}
+            id={image.imageId}
+            data-image-id={image.imageId}
+            draggable={
+              imagesLLMPopupVisible || imagesLLMPopupVisibleV2 || selected
+                ? undefined
+                : "true"
+            }
+            src={imageUrl}
+            alt="An image"
+          />
+        </>
       )}
       {(["pending", "working"].includes(image.status) ||
         (image.removalJobId !== null &&
@@ -101,38 +107,6 @@ export const GeneratedImage = ({
           ["pending", "working"].includes(image.removalStatus))) && (
         <div className="pulseOverlay"></div>
       )}
-      {/* {image.removalJobId === null && ["pending"].includes(image.status) && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex flex-col gap-1 justify-center items-center">
-          <Badge
-            className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-            variant="default"
-          >
-            WAITING
-          </Badge>
-        </div>
-      )}
-      {image.removalJobId === null && ["working"].includes(image.status) && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex flex-col gap-1 justify-center items-center">
-          <Badge
-            className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-            variant="default"
-          >
-            GENERATING
-          </Badge>
-        </div>
-      )}
-      {image.removalJobId !== null &&
-        image.removalStatus !== null &&
-        ["pending", "working"].includes(image.removalStatus) && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex justify-center items-center">
-            <Badge
-              className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-              variant="default"
-            >
-              REMOVING
-            </Badge>
-          </div>
-        )} */}
     </div>
   );
 };

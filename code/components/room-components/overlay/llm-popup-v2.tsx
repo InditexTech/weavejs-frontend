@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCollaborationRoom } from "@/store/store";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { postGenerateImageV2 } from "@/api/v3/post-generate-image";
 import { postEditImageV2 } from "@/api/v3/post-edit-image";
@@ -41,6 +41,7 @@ import {
   WEAVE_STAGE_DEFAULT_MODE,
   WeaveNodesSelectionPlugin,
 } from "@inditextech/weave-sdk";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function LLMGenerationPopupV2() {
   useKeyboardHandler();
@@ -56,6 +57,10 @@ export function LLMGenerationPopupV2() {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
   const setImagesLLMPopupError = useIACapabilitiesV2(
     (state) => state.setImagesLLMPopupError
   );
@@ -99,6 +104,16 @@ export function LLMGenerationPopupV2() {
   const setImagesReferences = useIACapabilitiesV2(
     (state) => state.setImagesLLMReferences
   );
+  const setImagesLLMReferencesVisible = useIACapabilitiesV2(
+    (state) => state.setImagesLLMReferencesVisible
+  );
+
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
+    },
+    [setSidebarActive]
+  );
 
   const [actualMaskBase64, actualMaskBase64UI] = useGenerateMaskV2();
 
@@ -109,6 +124,9 @@ export function LLMGenerationPopupV2() {
 
     if (imagesLLMPopupVisible) {
       (instance.getStage() as Konva.Stage).mode("llmPopup");
+      setTimeout(() => {
+        document.getElementById("llm-prompt-textarea")?.focus();
+      }, 100);
     } else {
       (instance.getStage() as Konva.Stage).mode(WEAVE_STAGE_DEFAULT_MODE);
     }
@@ -171,9 +189,44 @@ export function LLMGenerationPopupV2() {
     });
   }, [instance, imagesLLMPopupType]);
 
+  const handleClose = React.useCallback(
+    (doFormCleanup = true) => {
+      if (!instance) {
+        return;
+      }
+
+      const maskEraserTool =
+        instance.getActionHandler<MaskEraserToolAction>("maskEraserTool");
+      if (maskEraserTool) {
+        maskEraserTool.removeMaskNodes();
+      }
+
+      if (doFormCleanup) {
+        setPrompt("");
+        setSize("1024x1024");
+        setModeration("auto");
+        setQuality("medium");
+        setImageSamples("4");
+      }
+
+      setImagesLLMReferences([]);
+      setImagesLLMPopupError(null);
+      setImagesLLMPopupVisible(false);
+
+      instance.triggerAction("selectionTool");
+    },
+    [
+      instance,
+      setImagesLLMReferences,
+      setPrompt,
+      setSize,
+      setImagesLLMPopupError,
+      setImagesLLMPopupVisible,
+    ]
+  );
+
   const mutationGenerate = useMutation({
     mutationFn: async () => {
-      setImagesLLMPopupState("generating");
       return await postGenerateImageV2(
         {
           userId: user?.name ?? "",
@@ -189,13 +242,12 @@ export function LLMGenerationPopupV2() {
         }
       );
     },
-    onSettled: () => {
-      setImagesLLMPopupState("idle");
-    },
     onSuccess: (data) => {
-      setImagesLLMPopupState("uploading");
+      sidebarToggle(SIDEBAR_ELEMENTS.images);
 
       setImagesLLMPredictions(data.data);
+
+      handleClose(false);
     },
     onError(error) {
       setImagesLLMPopupError(error);
@@ -204,8 +256,6 @@ export function LLMGenerationPopupV2() {
 
   const mutationEdit = useMutation({
     mutationFn: async () => {
-      setImagesLLMPopupState("generating");
-
       if (!imagesLLMPopupImageBase64) {
         throw new Error("No reference image");
       }
@@ -239,13 +289,12 @@ export function LLMGenerationPopupV2() {
         }
       );
     },
-    onSettled: () => {
-      setImagesLLMPopupState("idle");
-    },
     onSuccess: (data) => {
-      setImagesLLMPopupState("uploading");
+      sidebarToggle(SIDEBAR_ELEMENTS.images);
 
       setImagesLLMPredictions(data.data);
+
+      handleClose(false);
     },
     onError(error) {
       setImagesLLMPopupError(error);
@@ -254,8 +303,6 @@ export function LLMGenerationPopupV2() {
 
   React.useEffect(() => {
     if (imagesLLMPopupType) {
-      setPrompt("");
-      setSize("1024x1024");
       setImagesLLMPopupError(null);
       setImagesLLMPopupState("idle");
     }
@@ -272,8 +319,6 @@ export function LLMGenerationPopupV2() {
       stage.allowActions(["maskTool", "fuzzyMaskTool"]);
       stage.allowSelectNodes(["mask", "fuzzy-mask"]);
       stage.allowSelection(true);
-      setPrompt("");
-      setSize("1024x1024");
       setImagesLLMPopupError(null);
       setImagesLLMPopupState("idle");
     } else {
@@ -367,27 +412,7 @@ export function LLMGenerationPopupV2() {
             </div>
             <button
               className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-              onClick={() => {
-                if (!instance) {
-                  return;
-                }
-
-                const maskEraserTool =
-                  instance.getActionHandler<MaskEraserToolAction>(
-                    "maskEraserTool"
-                  );
-                if (maskEraserTool) {
-                  maskEraserTool.removeMaskNodes();
-                }
-
-                setImagesLLMReferences([]);
-                setPrompt("");
-                setSize("1024x1024");
-                setImagesLLMPopupError(null);
-                setImagesLLMPopupVisible(false);
-
-                instance.triggerAction("selectionTool");
-              }}
+              onClick={() => handleClose()}
             >
               <X size={16} strokeWidth={1} />
             </button>
@@ -408,11 +433,6 @@ export function LLMGenerationPopupV2() {
                   maskEraserTool.removeMaskNodes();
                 }
 
-                setPrompt("");
-                setSize("1024x1024");
-                setModeration("auto");
-                setQuality("medium");
-                setImageSamples("4");
                 setImagesLLMReferences([]);
                 setImagesLLMPopupError(null);
                 setImagesLLMPopupType(value as LLMGeneratorType);
@@ -520,22 +540,28 @@ export function LLMGenerationPopupV2() {
                 </div>
               )}
             {["edit-variation"].includes(imagesLLMPopupType) && (
-              <div className="w-full flex flex-col pointer-events-auto">
-                <div className="w-full flex border-b border-[#c9c9c9] h-[100px]">
-                  <ScrollArea className="w-full h-[100px]">
-                    <div className="w-full flex gap-2 justify-start items-center p-2">
+              <div className="w-full max-w-[370px] flex flex-col pointer-events-auto">
+                <div className="w-full flex flex-col border-b border-[#c9c9c9]">
+                  <div className="w-full p-5">
+                    <Button
+                      className="w-full uppercase cursor-pointer font-inter rounded-none"
+                      onClick={() => {
+                        setImagesLLMReferencesVisible(true);
+                      }}
+                    >
+                      MANAGE IMAGES REFERENCES
+                    </Button>
+                  </div>
+                  <ScrollArea className="w-full h-[116px] border-t border-[#c9c9c9]">
+                    <div className="w-full flex flex-1 gap-2 justify-start items-center p-2">
                       {(!imageReferences ||
                         (imageReferences && imageReferences.length === 0)) && (
-                        <div className="w-[calc(100%)] h-[calc(100px_-_16px)] flex gap-3 bg-[#ededed] p-3 justify-center items-center">
+                        <div className="w-[calc(100%)] h-[calc(100px)] flex gap-3 bg-[#ededed] p-3 justify-center items-center">
                           <ImageOff size={32} strokeWidth={1} />
                           <div className="font-inter text-xs text-left">
                             <span className="text-xs uppercase">
-                              No references
+                              No references defined
                             </span>
-                            <br />
-                            set references from the images library
-                            <br />
-                            maximum four (4) images
                           </div>
                         </div>
                       )}
@@ -543,11 +569,11 @@ export function LLMGenerationPopupV2() {
                         (imageReference: ImageReference, index: number) => (
                           <div
                             key={index}
-                            className="relative bg-white aspect-square border border-[#c9c9c9]"
+                            className="w-[calc(100px)] h-[calc(100px)] relative bg-white aspect-square border border-[#c9c9c9]"
                           >
-                            <div className="absolute bottom-0 right-0 bg-white/75 pointer-cursor">
+                            {/* <div className="absolute bottom-0 right-0 bg-white/75 pointer-cursor">
                               <Button
-                                className="w-[20px] h-[24px] flex justify-center items-center cursor-pointer rounded-none"
+                                className="w-[24px] h-[24px] flex justify-center items-center cursor-pointer rounded-none"
                                 onClick={() => {
                                   let newReferences: ImageReference[] = [];
                                   if (imageReferences) {
@@ -563,12 +589,12 @@ export function LLMGenerationPopupV2() {
                               >
                                 <X strokeWidth={1} />
                               </Button>
-                            </div>
+                            </div> */}
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={imageReference.base64Image}
                               alt={`Reference ${index + 1}`}
-                              className="w-[calc(100px_-_16px)] h-[calc(100px_-_16px)] bg-transparent object-cover"
+                              className="flex-auto w-[calc(100px)] h-[calc(100px)] bg-transparent object-cover"
                               style={{
                                 aspectRatio: `${imageReference.aspectRatio}`,
                               }}

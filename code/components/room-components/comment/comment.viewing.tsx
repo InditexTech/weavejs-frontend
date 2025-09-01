@@ -212,6 +212,10 @@ export const CommentViewing = ({
     };
   }, [instance, node, commentId, handleCloseComment]);
 
+  if (!commentData) {
+    return null;
+  }
+
   return (
     <motion.div
       id={commentId ?? ""}
@@ -226,16 +230,17 @@ export const CommentViewing = ({
           Comment
         </div>
         <div className="flex justify-end items-center gap-1">
-          {commentData?.thread?.userMetadata.name === user?.name && (
-            <Button
-              className="rounded-none cursor-pointer w-[24px] h-[24px] color-red"
-              variant="link"
-              disabled={isLoadingComment}
-              onClick={handleDeleteComment}
-            >
-              <Trash strokeWidth={1} size={16} />
-            </Button>
-          )}
+          {commentData?.thread?.userMetadata.name === user?.name &&
+            commentData?.thread?.status !== "resolved" && (
+              <Button
+                className="rounded-none cursor-pointer w-[24px] h-[24px] color-red"
+                variant="link"
+                disabled={isLoadingComment}
+                onClick={handleDeleteComment}
+              >
+                <Trash strokeWidth={1} size={16} />
+              </Button>
+            )}
           {!isLoadingComment && (
             <Button
               className="rounded-none cursor-pointer w-[24px] h-[24px]"

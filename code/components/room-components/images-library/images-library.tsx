@@ -12,7 +12,6 @@ import Masonry from "react-responsive-masonry";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-// import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
@@ -41,12 +40,10 @@ import { WeaveImageNode } from "@inditextech/weave-sdk";
 import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-import { RemovedBackgroundImage } from "./removed-background.image";
 import { UploadedImage } from "./uploaded.image";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { GeneratedImage } from "./generated-image.image";
-import { EditImage } from "./edit-image.image";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -376,7 +373,9 @@ export const ImagesLibrary = () => {
     const newSelectedImages = [];
 
     for (const image of images) {
-      newSelectedImages.push(image);
+      if (["completed"].includes(image.status) && image.removalJobId === null) {
+        newSelectedImages.push(image);
+      }
     }
 
     setSelectedImages(newSelectedImages);
@@ -624,32 +623,24 @@ export const ImagesLibrary = () => {
                     />
                   );
 
-                  if (image.operation === "background-removal") {
-                    imageComponent = (
-                      <RemovedBackgroundImage
-                        key={image.imageId}
-                        selected={isChecked}
-                        image={image}
-                      />
-                    );
-                  }
-
-                  if (image.operation === "image-generation") {
+                  if (
+                    [
+                      "background-removal",
+                      "image-generation",
+                      "image-edition",
+                    ].includes(image.operation)
+                  ) {
                     imageComponent = (
                       <GeneratedImage
                         key={image.imageId}
                         selected={isChecked}
                         image={image}
-                      />
-                    );
-                  }
-
-                  if (image.operation === "image-edition") {
-                    imageComponent = (
-                      <EditImage
-                        key={image.imageId}
-                        selected={isChecked}
-                        image={image}
+                        operation={
+                          image.operation as
+                            | "background-removal"
+                            | "image-generation"
+                            | "image-edition"
+                        }
                       />
                     );
                   }
@@ -657,18 +648,7 @@ export const ImagesLibrary = () => {
                   return (
                     <div
                       key={image.imageId}
-                      className={cn("w-full", {
-                        ["cursor-pointer"]:
-                          showSelection &&
-                          !(
-                            ["pending", "working"].includes(image.status) ||
-                            (image.removalJobId !== null &&
-                              image.removalStatus !== null &&
-                              ["pending", "working"].includes(
-                                image.removalStatus
-                              ))
-                          ),
-                      })}
+                      className="w-full"
                       onClick={() => {
                         if (
                           showSelection &&
@@ -687,17 +667,7 @@ export const ImagesLibrary = () => {
                     >
                       <ContextMenu>
                         <ContextMenuTrigger>
-                          <div
-                            className={cn(
-                              "group relative w-full cursor-pointer",
-                              {
-                                ["cursor-pointer"]: !(
-                                  imagesLLMPopupVisible ||
-                                  imagesLLMPopupVisibleV2
-                                ),
-                              }
-                            )}
-                          >
+                          <div className="group relative w-full">
                             {imageComponent}
                             {showSelection &&
                               !(

@@ -35,6 +35,7 @@ import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-b
 import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
 import { LLMGenerationPopupV2 } from "../room-components/overlay/llm-popup-v2";
 import { Comments } from "../room-components/comment/comments";
+import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-reference-selection-v2";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -252,6 +253,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <LLMGenerationPopupV2 />
             <LLMPredictionsSelectionPopup />
             <LLMReferenceSelectionPopup />
+            <LLMReferenceSelectionPopupV2 />
             <RemoveBackgroundActionPopup />
           </>
         )}

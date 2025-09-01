@@ -624,7 +624,7 @@ export function ToolsOverlayMouse() {
                     setSidebarsMenuOpen(false);
 
                     setActualImagesTool("generateImageTool");
-                    sidebarToggle(SIDEBAR_ELEMENTS.images);
+                    sidebarToggle(null);
 
                     setImagesLLMPopupTypeV2("create");
                     if (imagesLLMPopupTypeV2 === "create") {

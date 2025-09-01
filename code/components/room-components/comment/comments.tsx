@@ -114,7 +114,17 @@ export const Comments = () => {
       });
     },
     onSuccess() {
+      if (!instance) return;
+
       eventBus.emit("onCommentsChanged");
+
+      const commentHandler =
+        instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>("comment");
+
+      if (commentHandler) {
+        commentHandler.setCommentViewing(null);
+      }
+
       handleRefreshComments();
     },
     onError(error) {
@@ -274,7 +284,9 @@ export const Comments = () => {
           <div className="flex flex-col gap-3 w-full p-5">
             {data.items.map((thread: ThreadEntity, index: number) => {
               return (
-                <button
+                <div
+                  role="button"
+                  tabIndex={0}
                   key={thread.threadId}
                   className="w-full group p-3 hover:bg-[#ededed99] cursor-pointer flex flex-col gap-3"
                   onClick={() => {
@@ -295,6 +307,7 @@ export const Comments = () => {
                         variant="link"
                         onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleDeleteComment(thread.threadId);
                         }}
                       >
@@ -306,6 +319,7 @@ export const Comments = () => {
                           variant="link"
                           onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             handleMarkResolvedComment(thread.threadId);
                           }}
                         >
@@ -357,7 +371,7 @@ export const Comments = () => {
                       )}
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
