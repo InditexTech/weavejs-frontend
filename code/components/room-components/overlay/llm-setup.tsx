@@ -71,6 +71,25 @@ export function LlmSetupDialog() {
     },
   });
 
+  const onKeyDown = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (event: any) => {
+      if (!setupVisible) return;
+
+      if (event.key === "Enter") {
+        mutationGenerate.mutate(password);
+      }
+    },
+    [password, setupVisible, mutationGenerate]
+  );
+
+  React.useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
+
   return (
     <Dialog open={setupVisible} onOpenChange={(open) => setSetupVisible(open)}>
       <form>

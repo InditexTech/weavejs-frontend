@@ -376,7 +376,9 @@ export const ImagesLibrary = () => {
     const newSelectedImages = [];
 
     for (const image of images) {
-      newSelectedImages.push(image);
+      if (["completed"].includes(image.status) && image.removalJobId === null) {
+        newSelectedImages.push(image);
+      }
     }
 
     setSelectedImages(newSelectedImages);
@@ -657,18 +659,7 @@ export const ImagesLibrary = () => {
                   return (
                     <div
                       key={image.imageId}
-                      className={cn("w-full", {
-                        ["cursor-pointer"]:
-                          showSelection &&
-                          !(
-                            ["pending", "working"].includes(image.status) ||
-                            (image.removalJobId !== null &&
-                              image.removalStatus !== null &&
-                              ["pending", "working"].includes(
-                                image.removalStatus
-                              ))
-                          ),
-                      })}
+                      className="w-full"
                       onClick={() => {
                         if (
                           showSelection &&
@@ -687,17 +678,7 @@ export const ImagesLibrary = () => {
                     >
                       <ContextMenu>
                         <ContextMenuTrigger>
-                          <div
-                            className={cn(
-                              "group relative w-full cursor-pointer",
-                              {
-                                ["cursor-pointer"]: !(
-                                  imagesLLMPopupVisible ||
-                                  imagesLLMPopupVisibleV2
-                                ),
-                              }
-                            )}
-                          >
+                          <div className="group relative w-full">
                             {imageComponent}
                             {showSelection &&
                               !(

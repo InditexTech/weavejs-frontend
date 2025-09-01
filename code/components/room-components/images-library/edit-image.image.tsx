@@ -51,9 +51,10 @@ export const EditImage = ({ image, selected }: Readonly<EditImageProps>) => {
     <div
       key={image.imageId}
       className={cn(
-        "group block w-full bg-light-background-1 object-cover relative border-0 border-zinc-200 cursor-pointer",
+        "group block w-full bg-white object-cover relative border-0 border-zinc-200 overflow-hidden",
         {
-          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300"]: true,
+          ["cursor-pointer hover:bg-black"]:
+            ["completed"].includes(image.status) && image.removalJobId === null,
           ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
         }
@@ -77,7 +78,7 @@ export const EditImage = ({ image, selected }: Readonly<EditImageProps>) => {
       {["completed"].includes(image.status) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          className="w-full block object-cover"
+          className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
           style={{
             aspectRatio: `${image.aspectRatio}`,
           }}
