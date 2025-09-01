@@ -97,7 +97,7 @@ export const GeneratedImage = ({
                 : "true"
             }
             src={imageUrl}
-            alt="An image"
+            alt="A generated image"
           />
         </>
       )}

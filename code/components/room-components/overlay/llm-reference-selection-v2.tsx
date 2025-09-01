@@ -216,7 +216,7 @@ export const LLMReferenceSelectionPopupV2 = () => {
                             draggable="true"
                             id={imageId}
                             src={imageUrl}
-                            alt="An image"
+                            alt="An image that can be selected as reference"
                           />
                         )}
                       </div>

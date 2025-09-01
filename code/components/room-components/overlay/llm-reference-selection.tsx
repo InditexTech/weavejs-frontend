@@ -278,7 +278,7 @@ export const LLMReferenceSelectionPopup = () => {
                             className="w-full h-full aspect-auto block object-cover"
                             draggable="true"
                             src={imageUrl}
-                            alt="An image"
+                            alt="An image that can be selected as reference"
                           />
                           {/* {typeof appImage !== "undefined" && (
                             <div className="absolute bottom-[8px] left-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer font-inter text-xs">

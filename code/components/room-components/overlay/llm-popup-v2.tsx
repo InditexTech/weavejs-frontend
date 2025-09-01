@@ -571,25 +571,6 @@ export function LLMGenerationPopupV2() {
                             key={index}
                             className="w-[calc(100px)] h-[calc(100px)] relative bg-white aspect-square border border-[#c9c9c9]"
                           >
-                            {/* <div className="absolute bottom-0 right-0 bg-white/75 pointer-cursor">
-                              <Button
-                                className="w-[24px] h-[24px] flex justify-center items-center cursor-pointer rounded-none"
-                                onClick={() => {
-                                  let newReferences: ImageReference[] = [];
-                                  if (imageReferences) {
-                                    newReferences = [...imageReferences];
-                                  }
-
-                                  newReferences = newReferences.filter(
-                                    (_, refIndex) => index !== refIndex
-                                  );
-
-                                  setImagesLLMReferences(newReferences);
-                                }}
-                              >
-                                <X strokeWidth={1} />
-                              </Button>
-                            </div> */}
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={imageReference.base64Image}

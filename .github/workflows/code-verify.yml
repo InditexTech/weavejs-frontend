@@ -77,10 +77,3 @@ jobs:
         working-directory: code
         run: |
           npm run verify
-
-      - name: Store project information
-        id: version
-        run: |
-          echo "app-version=$(jq ".version" code/package.json)" >> "$GITHUB_OUTPUT"
-          echo "app-name=$(yq -oy '.name' code/package.json)" >> "$GITHUB_OUTPUT"
-          echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
