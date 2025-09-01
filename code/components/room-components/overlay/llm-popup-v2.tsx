@@ -46,7 +46,10 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 export function LLMGenerationPopupV2() {
   useKeyboardHandler();
 
-  const [prompt, setPrompt] = React.useState<string>("");
+  const [promptGenerate, setPromptGenerate] = React.useState<string>("");
+  const [promptEdit, setPromptEdit] = React.useState<Record<string, string>>(
+    {}
+  );
   const [imageSamples, setImageSamples] = React.useState<string>("4");
   const [moderation, setModeration] = React.useState<ImageModeration>("auto");
   const [quality, setQuality] = React.useState<ImageQuality>("medium");
@@ -73,6 +76,9 @@ export function LLMGenerationPopupV2() {
   );
   const imagesLLMPopupVisible = useIACapabilitiesV2(
     (state) => state.llmPopup.visible
+  );
+  const imagesLLMPopupImageSelected = useIACapabilitiesV2(
+    (state) => state.llmPopup.selected
   );
   const imagesLLMPopupImageBase64 = useIACapabilitiesV2(
     (state) => state.llmPopup.imageBase64
@@ -125,7 +131,15 @@ export function LLMGenerationPopupV2() {
     if (imagesLLMPopupVisible) {
       (instance.getStage() as Konva.Stage).mode("llmPopup");
       setTimeout(() => {
-        document.getElementById("llm-prompt-textarea")?.focus();
+        const textArea = document.getElementById(
+          "llm-prompt-textarea"
+        ) as HTMLTextAreaElement;
+
+        if (textArea) {
+          textArea.focus();
+          const length = textArea.value.length;
+          textArea.setSelectionRange(length, length);
+        }
       }, 100);
     } else {
       (instance.getStage() as Konva.Stage).mode(WEAVE_STAGE_DEFAULT_MODE);
@@ -189,41 +203,28 @@ export function LLMGenerationPopupV2() {
     });
   }, [instance, imagesLLMPopupType]);
 
-  const handleClose = React.useCallback(
-    (doFormCleanup = true) => {
-      if (!instance) {
-        return;
-      }
+  const handleClose = React.useCallback(() => {
+    if (!instance) {
+      return;
+    }
 
-      const maskEraserTool =
-        instance.getActionHandler<MaskEraserToolAction>("maskEraserTool");
-      if (maskEraserTool) {
-        maskEraserTool.removeMaskNodes();
-      }
+    const maskEraserTool =
+      instance.getActionHandler<MaskEraserToolAction>("maskEraserTool");
+    if (maskEraserTool) {
+      maskEraserTool.removeMaskNodes();
+    }
 
-      if (doFormCleanup) {
-        setPrompt("");
-        setSize("1024x1024");
-        setModeration("auto");
-        setQuality("medium");
-        setImageSamples("4");
-      }
+    setImagesLLMReferences([]);
+    setImagesLLMPopupError(null);
+    setImagesLLMPopupVisible(false);
 
-      setImagesLLMReferences([]);
-      setImagesLLMPopupError(null);
-      setImagesLLMPopupVisible(false);
-
-      instance.triggerAction("selectionTool");
-    },
-    [
-      instance,
-      setImagesLLMReferences,
-      setPrompt,
-      setSize,
-      setImagesLLMPopupError,
-      setImagesLLMPopupVisible,
-    ]
-  );
+    instance.triggerAction("selectionTool");
+  }, [
+    instance,
+    setImagesLLMReferences,
+    setImagesLLMPopupError,
+    setImagesLLMPopupVisible,
+  ]);
 
   const mutationGenerate = useMutation({
     mutationFn: async () => {
@@ -232,7 +233,7 @@ export function LLMGenerationPopupV2() {
           userId: user?.name ?? "",
           clientId: clientId ?? "",
           roomId: room ?? "",
-          prompt: prompt,
+          prompt: promptGenerate,
         },
         {
           quality,
@@ -247,7 +248,7 @@ export function LLMGenerationPopupV2() {
 
       setImagesLLMPredictions(data.data);
 
-      handleClose(false);
+      handleClose();
     },
     onError(error) {
       setImagesLLMPopupError(error);
@@ -269,7 +270,9 @@ export function LLMGenerationPopupV2() {
           userId: user?.name ?? "",
           clientId: clientId ?? "",
           roomId: room ?? "",
-          prompt,
+          prompt:
+            promptEdit[imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""] ??
+            "",
           image: imagesLLMPopupImageBase64,
           ...(imageReferences &&
             imageReferences.length > 0 && {
@@ -294,7 +297,7 @@ export function LLMGenerationPopupV2() {
 
       setImagesLLMPredictions(data.data);
 
-      handleClose(false);
+      handleClose();
     },
     onError(error) {
       setImagesLLMPopupError(error);
@@ -335,9 +338,18 @@ export function LLMGenerationPopupV2() {
 
   const handlePromptChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setPrompt(event.target.value);
+      if (imagesLLMPopupType === "create") {
+        setPromptGenerate(event.target.value);
+      } else {
+        const newPromptEdit = { ...promptEdit };
+        if (imagesLLMPopupImageSelected) {
+          newPromptEdit[imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""] =
+            event.target.value;
+        }
+        setPromptEdit(newPromptEdit);
+      }
     },
-    []
+    [imagesLLMPopupImageSelected, promptEdit, imagesLLMPopupType]
   );
 
   const buttonText = React.useMemo(() => {
@@ -394,6 +406,23 @@ export function LLMGenerationPopupV2() {
         }
     }
   }, [imagesLLMPopupState, imagesLLMPopupType]);
+
+  const prompt = React.useMemo(() => {
+    if (imagesLLMPopupType === "create") {
+      return promptGenerate;
+    }
+    if (imagesLLMPopupType === "edit-prompt") {
+      return (
+        promptEdit[imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""] ?? ""
+      );
+    }
+    return "";
+  }, [
+    promptGenerate,
+    promptEdit,
+    imagesLLMPopupImageSelected,
+    imagesLLMPopupType,
+  ]);
 
   if (!imagesLLMPopupVisible) {
     return null;
@@ -821,7 +850,21 @@ export function LLMGenerationPopupV2() {
                 disabled={mutationGenerate.isPending || mutationEdit.isPending}
                 onClick={async () => {
                   setImagesReferences([]);
-                  setPrompt("");
+                  if (imagesLLMPopupType === "create") {
+                    setPromptGenerate("");
+                  } else {
+                    const newPromptEdit = { ...promptEdit };
+                    if (
+                      newPromptEdit[
+                        imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""
+                      ]
+                    ) {
+                      delete newPromptEdit[
+                        imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""
+                      ];
+                    }
+                    setPromptEdit(newPromptEdit);
+                  }
                   setModeration("auto");
                   setSize("1024x1024");
                   setQuality("medium");
@@ -868,7 +911,15 @@ export function LLMGenerationPopupV2() {
                   }
 
                   setTimeout(() => {
-                    document.getElementById("llm-prompt-textarea")?.focus();
+                    const textArea = document.getElementById(
+                      "llm-prompt-textarea"
+                    ) as HTMLTextAreaElement;
+
+                    if (textArea) {
+                      textArea.focus();
+                      const length = textArea.value.length;
+                      textArea.setSelectionRange(length, length);
+                    }
                   }, 100);
                 }}
               >
