@@ -13,7 +13,7 @@ export const getThread = async ({
   userId: string;
   clientId: string;
 }) => {
-  let endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/threads/${threadId}`;
+  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/threads/${threadId}`;
 
   const response = await fetch(endpoint, {
     headers: {
@@ -23,8 +23,11 @@ export const getThread = async ({
     },
   });
 
-  if (!response.ok) {
+  if (!response.ok && response.status !== 404) {
     throw new Error(`Error getting the thread: ${response.statusText}`);
+  }
+  if (!response.ok && response.status === 404) {
+    return null;
   }
 
   const data = await response.json();
