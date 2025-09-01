@@ -401,7 +401,7 @@ export function LLMGenerationPopupV2() {
 
   return (
     <>
-      <div className="absolute bottom-[16px] right-[16px] min-w-[370px] pointer-events-none flex justify-center items-center">
+      <div className="absolute bottom-[16px] left-[16px] min-w-[370px] pointer-events-none flex justify-center items-center">
         <div className="w-full h-full max-h-[calc(100dvh-72px-48px)] flex flex-col justify-center items-end bg-white text-black border border-[#c9c9c9] ">
           <div className="flex justify-between items-center w-full px-[24px] py-[29px] font-inter font-light text-[24px] uppercase border-b border-[#c9c9c9] pointer-events-auto">
             <div>
@@ -604,7 +604,9 @@ export function LLMGenerationPopupV2() {
                   id="llm-prompt-textarea"
                   className="rounded-none !border-black !shadow-none resize-none"
                   value={prompt}
-                  disabled={mutationGenerate.isPending}
+                  disabled={
+                    mutationGenerate.isPending || mutationEdit.isPending
+                  }
                   onFocus={() => {
                     window.weaveOnFieldFocus = true;
                   }}
@@ -628,7 +630,9 @@ export function LLMGenerationPopupV2() {
                           onValueChange={(value) =>
                             setModeration(value as ImageModeration)
                           }
-                          disabled={mutationGenerate.isPending}
+                          disabled={
+                            mutationGenerate.isPending || mutationEdit.isPending
+                          }
                         >
                           <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                             <SelectValue placeholder="Moderation" />
@@ -666,7 +670,9 @@ export function LLMGenerationPopupV2() {
                           onValueChange={(value) =>
                             setQuality(value as ImageQuality)
                           }
-                          disabled={mutationGenerate.isPending}
+                          disabled={
+                            mutationGenerate.isPending || mutationEdit.isPending
+                          }
                         >
                           <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                             <SelectValue placeholder="Size" />
@@ -708,7 +714,9 @@ export function LLMGenerationPopupV2() {
                         <Select
                           value={size}
                           onValueChange={(value) => setSize(value as ImageSize)}
-                          disabled={mutationGenerate.isPending}
+                          disabled={
+                            mutationGenerate.isPending || mutationEdit.isPending
+                          }
                         >
                           <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                             <SelectValue placeholder="Size" />
@@ -750,7 +758,9 @@ export function LLMGenerationPopupV2() {
                         <Select
                           value={imageSamples}
                           onValueChange={setImageSamples}
-                          disabled={mutationGenerate.isPending}
+                          disabled={
+                            mutationGenerate.isPending || mutationEdit.isPending
+                          }
                         >
                           <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                             <SelectValue placeholder="Amount" />
@@ -808,6 +818,7 @@ export function LLMGenerationPopupV2() {
               <Button
                 className="uppercase cursor-pointer font-inter rounded-none"
                 variant="secondary"
+                disabled={mutationGenerate.isPending || mutationEdit.isPending}
                 onClick={async () => {
                   setImagesReferences([]);
                   setPrompt("");
@@ -824,23 +835,19 @@ export function LLMGenerationPopupV2() {
               <Button
                 className="uppercase cursor-pointer font-inter rounded-none"
                 disabled={
+                  mutationGenerate.isPending ||
+                  mutationEdit.isPending ||
                   (["create"].includes(imagesLLMPopupType) &&
-                    (mutationGenerate.isPending ||
-                      !prompt ||
-                      prompt.length === 0)) ||
+                    (!prompt || prompt.length === 0)) ||
                   (["edit-prompt"].includes(imagesLLMPopupType) &&
-                    (mutationGenerate.isPending ||
-                      !prompt ||
-                      prompt.length === 0)) ||
+                    (!prompt || prompt.length === 0)) ||
                   (["edit-variation"].includes(imagesLLMPopupType) &&
-                    (mutationGenerate.isPending ||
-                      !prompt ||
+                    (!prompt ||
                       prompt.length === 0 ||
                       !imageReferences ||
                       (imageReferences && imageReferences.length === 0))) ||
                   (["edit-mask"].includes(imagesLLMPopupType) &&
-                    (mutationGenerate.isPending ||
-                      !prompt ||
+                    (!prompt ||
                       prompt.length === 0 ||
                       !actualMaskBase64 ||
                       actualMaskBase64.length === 0))
@@ -865,7 +872,9 @@ export function LLMGenerationPopupV2() {
                   }, 100);
                 }}
               >
-                {buttonText}
+                {mutationGenerate.isPending || mutationEdit.isPending
+                  ? "REQUESTING"
+                  : buttonText}
               </Button>
             </div>
           </div>
