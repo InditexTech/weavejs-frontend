@@ -908,16 +908,16 @@ export function LLMGenerationPopupV2() {
                 onClick={async () => {
                   setImagesLLMPopupError(null);
                   if (imagesLLMPopupType === "create") {
-                    mutationGenerate.mutate({});
+                    mutationGenerate.mutate();
                   }
                   if (imagesLLMPopupType === "edit-variation") {
-                    mutationEdit.mutate({});
+                    mutationEdit.mutate();
                   }
                   if (imagesLLMPopupType === "edit-prompt") {
-                    mutationEdit.mutate({});
+                    mutationEdit.mutate();
                   }
                   if (imagesLLMPopupType === "edit-mask") {
-                    mutationEdit.mutate({});
+                    mutationEdit.mutate();
                   }
 
                   setTimeout(() => {
