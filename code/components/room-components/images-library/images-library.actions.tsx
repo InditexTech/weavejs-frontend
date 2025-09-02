@@ -102,7 +102,6 @@ export const ImagesLibraryActions = ({
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSettled: (_, __, ___, context: any) => {
-      console.log({ context });
       if (context?.toastId) {
         toast.dismiss(context.toastId);
       }

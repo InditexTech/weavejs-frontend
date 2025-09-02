@@ -46,8 +46,6 @@ export const useTasksEvents = () => {
 
       const { url } = await getCommBusNegotiate(room, user?.name ?? "");
 
-      console.log("connect to comm bus on: ", url);
-
       const ws = new WebSocket(url);
 
       ws.onclose = () => console.log("🔌 closed");
