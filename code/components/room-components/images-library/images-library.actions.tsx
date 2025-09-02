@@ -263,6 +263,12 @@ export const ImagesLibraryActions = ({
       return [unreferenced, referenced];
     }, [realSelectedImages, imagesReferences]);
 
+  const allRealImages = React.useMemo(() => {
+    return realSelectedImages.every((image) =>
+      ["completed"].includes(image.status)
+    );
+  }, [realSelectedImages]);
+
   const actions = React.useMemo(() => {
     const selectionActions = [];
 
@@ -282,7 +288,7 @@ export const ImagesLibraryActions = ({
       );
     }
 
-    if (realSelectedImages.length > 0) {
+    if (realSelectedImages.length > 0 && allRealImages) {
       selectionActions.push(
         <button
           key="remove-background-selected"
@@ -301,7 +307,8 @@ export const ImagesLibraryActions = ({
     if (
       imagesLLMPopupVisibleV2 &&
       realSelectedImages.length > 0 &&
-      realSelectedImages.length === referencedSelectedImages.length
+      realSelectedImages.length === referencedSelectedImages.length &&
+      allRealImages
     ) {
       selectionActions.push(
         <button
@@ -320,7 +327,8 @@ export const ImagesLibraryActions = ({
       imagesLLMPopupVisibleV2 &&
       realSelectedImages.length > 0 &&
       realSelectedImages.length === unreferencedSelectedImages.length &&
-      realSelectedImages.length <= 4 - imagesReferences.length
+      realSelectedImages.length <= 4 - imagesReferences.length &&
+      allRealImages
     ) {
       selectionActions.push(
         <button
@@ -347,6 +355,7 @@ export const ImagesLibraryActions = ({
     imagesReferences.length,
     unreferencedSelectedImages.length,
     realSelectedImages,
+    allRealImages,
   ]);
 
   if (!instance) {

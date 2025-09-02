@@ -41,7 +41,9 @@ export const Room = () => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
-  const sseConnected = useCollaborationRoom((state) => state.sse.connected);
+  const comBusConnected = useCollaborationRoom(
+    (state) => state.commBus.connected
+  );
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const loadingFetchConnectionUrl = useCollaborationRoom(
@@ -76,8 +78,8 @@ export const Room = () => {
   }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
-    if (!sseConnected) {
-      return "Connecting to the server...";
+    if (!comBusConnected) {
+      return "Connecting to the bus...";
     }
     if (!loadedParams) {
       return "Fetching room parameters...";
@@ -90,7 +92,7 @@ export const Room = () => {
     }
 
     return "";
-  }, [loadedParams, loadingFetchConnectionUrl, status, sseConnected]);
+  }, [loadedParams, loadingFetchConnectionUrl, status, comBusConnected]);
 
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
@@ -154,7 +156,7 @@ export const Room = () => {
       <AnimatePresence>
         {(!loadedParams ||
           loadingFetchConnectionUrl ||
-          !sseConnected ||
+          !comBusConnected ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
           <>
@@ -186,7 +188,7 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && storeProvider && sseConnected && (
+      {loadedParams && room && user && storeProvider && comBusConnected && (
         <WeaveProvider
           getContainer={() => {
             return document?.getElementById("weave") as HTMLDivElement;

@@ -6,6 +6,7 @@
 
 import React from "react";
 import Konva from "konva";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -85,9 +86,6 @@ export function LLMGenerationPopupV2() {
   );
   const imagesLLMPopupState = useIACapabilitiesV2(
     (state) => state.llmPopup.state
-  );
-  const imagesLLMPopupError = useIACapabilitiesV2(
-    (state) => state.llmPopup.error
   );
   const setImagesLLMPopupType = useIACapabilitiesV2(
     (state) => state.setImagesLLMPopupType
@@ -243,6 +241,16 @@ export function LLMGenerationPopupV2() {
         }
       );
     },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images generation...");
+      return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, context: any) => {
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+    },
     onSuccess: (data) => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
 
@@ -251,6 +259,7 @@ export function LLMGenerationPopupV2() {
       handleClose();
     },
     onError(error) {
+      toast.error("Error requesting images generation.");
       setImagesLLMPopupError(error);
     },
   });
@@ -291,6 +300,10 @@ export function LLMGenerationPopupV2() {
           size,
         }
       );
+    },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images generation...");
+      return { toastId };
     },
     onSuccess: (data) => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
@@ -830,15 +843,6 @@ export function LLMGenerationPopupV2() {
                     </div>
                   </div>
                 </div>
-                {imagesLLMPopupError && (
-                  <div className="font-inter text-xs text-[#cc0000] mt-4">
-                    {imagesLLMPopupType === "create" &&
-                      "Failed to generate image."}
-                    {["edit-prompt", "edit-mask"].includes(
-                      imagesLLMPopupType
-                    ) && "Failed to edit image."}
-                  </div>
-                )}
               </div>
             </div>
           </ScrollArea>

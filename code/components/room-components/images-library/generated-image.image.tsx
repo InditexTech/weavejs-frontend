@@ -12,6 +12,7 @@ import { ImageEntity } from "./types";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { cn } from "@/lib/utils";
+import { CircleOff } from "lucide-react";
 
 type GeneratedImageProps = {
   image: ImageEntity;
@@ -60,23 +61,38 @@ export const GeneratedImage = ({
         "group block w-full bg-white object-cover relative border-0 border-zinc-200 overflow-hidden",
         {
           ["cursor-pointer hover:bg-black"]:
-            ["completed"].includes(image.status) && image.removalJobId === null,
+            ["completed", "failed"].includes(image.status) &&
+            image.removalJobId === null,
           ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
         }
       )}
     >
-      {((image.removalJobId === null &&
-        ["created", "pending", "working", "failed"].includes(image.status)) ||
-        (image.removalJobId !== null && ["failed"].includes(image.status))) && (
-        <div
-          className="w-full h-full flex justify-center items-center"
-          style={{
-            width: "100%",
-            height: "100%",
-            aspectRatio: `${image.aspectRatio}`,
-          }}
-        ></div>
+      {image.removalJobId === null &&
+        ["created", "pending", "working"].includes(image.status) && (
+          <div
+            className="w-full h-full flex justify-center items-center"
+            style={{
+              width: "100%",
+              height: "100%",
+              aspectRatio: `${image.aspectRatio}`,
+            }}
+          ></div>
+        )}
+      {["failed"].includes(image.status) && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <div
+            className="w-full block object-cover bg-[#ededed] flex justify-center items-center relative transition-transform duration-500 group-hover:opacity-60"
+            style={{
+              width: `100%`,
+              aspectRatio: `${image.aspectRatio}`,
+            }}
+            id={image.imageId}
+          >
+            <CircleOff strokeWidth={1} size={32} color="black" />
+          </div>
+        </>
       )}
       {["completed"].includes(image.status) && (
         <>

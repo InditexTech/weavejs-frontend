@@ -13,7 +13,11 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useInfiniteQuery,
+  // useQueryClient,
+} from "@tanstack/react-query";
 import {
   BrushCleaning,
   Info,
@@ -54,6 +58,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ImageEntity } from "./types";
 import { ImagesLibraryActions } from "./images-library.actions";
+// import { eventBus } from "@/components/utils/events-bus";
 
 function isRelativeUrl(url: string) {
   try {
@@ -64,7 +69,7 @@ function isRelativeUrl(url: string) {
   }
 }
 
-const IMAGES_LIMIT = 8;
+const IMAGES_LIMIT = 20;
 
 export const ImagesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -101,6 +106,8 @@ export const ImagesLibrary = () => {
   const setImagesReferences = useIACapabilitiesV2(
     (state) => state.setImagesLLMReferences
   );
+
+  // const queryClient = useQueryClient();
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
@@ -732,55 +739,60 @@ export const ImagesLibrary = () => {
                               <ContextMenuSeparator />
                             </>
                           )}
-                          {imagesLLMPopupVisibleV2 && (
-                            <>
-                              <ContextMenuItem
-                                className="rounded-none uppercase font-inter text-xs"
-                                onClick={() => {
-                                  handleSetImageReference(image);
-                                }}
-                                disabled={typeof isReference !== "undefined"}
-                              >
-                                <Link
-                                  strokeWidth={1}
-                                  size={16}
-                                  className="mr-2"
-                                />
-                                Set as reference
-                              </ContextMenuItem>
-                              <ContextMenuItem
-                                className="rounded-none uppercase font-inter text-xs"
-                                onClick={() => {
-                                  handleRemoveImageReference(image);
-                                }}
-                                disabled={typeof isReference === "undefined"}
-                              >
-                                <Unlink
-                                  strokeWidth={1}
-                                  size={16}
-                                  className="mr-2"
-                                />
-                                Remove as reference
-                              </ContextMenuItem>
-                              <ContextMenuSeparator />
-                            </>
+                          {imagesLLMPopupVisibleV2 &&
+                            ["completed"].includes(image.status) && (
+                              <>
+                                <ContextMenuItem
+                                  className="rounded-none uppercase font-inter text-xs"
+                                  onClick={() => {
+                                    handleSetImageReference(image);
+                                  }}
+                                  disabled={typeof isReference !== "undefined"}
+                                >
+                                  <Link
+                                    strokeWidth={1}
+                                    size={16}
+                                    className="mr-2"
+                                  />
+                                  Set as reference
+                                </ContextMenuItem>
+                                <ContextMenuItem
+                                  className="rounded-none uppercase font-inter text-xs"
+                                  onClick={() => {
+                                    handleRemoveImageReference(image);
+                                  }}
+                                  disabled={typeof isReference === "undefined"}
+                                >
+                                  <Unlink
+                                    strokeWidth={1}
+                                    size={16}
+                                    className="mr-2"
+                                  />
+                                  Remove as reference
+                                </ContextMenuItem>
+                                <ContextMenuSeparator />
+                              </>
+                            )}
+                          {["completed"].includes(image.status) && (
+                            <ContextMenuItem
+                              className="rounded-none uppercase font-inter text-xs"
+                              onClick={() => {
+                                handleRemoveBackground(image);
+                              }}
+                            >
+                              <BrushCleaning
+                                strokeWidth={1}
+                                size={16}
+                                className="mr-2"
+                              />
+                              Remove background
+                            </ContextMenuItem>
                           )}
-                          <ContextMenuItem
-                            className="rounded-none uppercase font-inter text-xs"
-                            onClick={() => {
-                              handleRemoveBackground(image);
-                            }}
-                          >
-                            <BrushCleaning
-                              strokeWidth={1}
-                              size={16}
-                              className="mr-2"
-                            />
-                            Remove background
-                          </ContextMenuItem>
                           {typeof appImage === "undefined" && (
                             <>
-                              <ContextMenuSeparator />
+                              {["completed"].includes(image.status) && (
+                                <ContextMenuSeparator />
+                              )}
                               <ContextMenuItem
                                 className="rounded-none uppercase font-inter text-xs"
                                 disabled={typeof appImage !== "undefined"}

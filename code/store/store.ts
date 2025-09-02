@@ -65,7 +65,7 @@ interface CollaborationRoomState {
     action: NodePropertiesAction;
     createProps: WeaveElementAttributes | undefined;
   };
-  sse: {
+  commBus: {
     connected: boolean;
   };
   comments: {
@@ -137,7 +137,7 @@ interface CollaborationRoomState {
   ) => void;
   setRemoveBackgroundPopupImageId: (newImageId: string | undefined) => void;
   setRemoveBackgroundPopupImageURL: (newImageURL: string | undefined) => void;
-  setSseConnected: (newConnected: boolean) => void;
+  setCommBusConnected: (newConnected: boolean) => void;
   setImageExporting: (newExportingImage: boolean) => void;
   setCommentsStatus: (newStatus: CommentsStatus) => void;
 }
@@ -181,7 +181,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     visible: false,
     createProps: undefined,
   },
-  sse: {
+  commBus: {
     connected: false,
   },
   images: {
@@ -418,10 +418,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         },
       },
     })),
-  setSseConnected: (newConnected) =>
+  setCommBusConnected: (newConnected) =>
     set((state) => ({
       ...state,
-      sse: { ...state.sse, connected: newConnected },
+      commBus: { ...state.commBus, connected: newConnected },
     })),
   setImageExporting(newExportingImage) {
     set((state) => ({

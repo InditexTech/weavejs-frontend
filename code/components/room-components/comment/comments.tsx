@@ -65,6 +65,10 @@ export const Comments = () => {
   const { data, refetch, error, isLoading } = useQuery({
     queryKey: ["comments", room ?? ""],
     queryFn: () => {
+      if (!room) {
+        return Promise.resolve({ items: [], total: 0 });
+      }
+
       return getThreads(room ?? "", commentsStatus, true);
     },
     enabled: typeof instance !== "undefined",

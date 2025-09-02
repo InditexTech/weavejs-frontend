@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export type ImageStatus = "pending" | "working" | "available" | "failed";
+export type ImageStatus = "pending" | "working" | "completed" | "failed";
 export type ImageOperation =
   | "uploaded"
   | "background-removal"
