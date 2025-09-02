@@ -246,7 +246,7 @@ export function LLMGenerationPopupV2() {
       return { toastId };
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSettled: (_, __, context: any) => {
+    onSettled: (_, __, ___, context: any) => {
       if (context?.toastId) {
         toast.dismiss(context.toastId);
       }
@@ -304,6 +304,12 @@ export function LLMGenerationPopupV2() {
     onMutate: () => {
       const toastId = toast.loading("Requesting images generation...");
       return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, ___, context: any) => {
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
     },
     onSuccess: (data) => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
@@ -902,16 +908,16 @@ export function LLMGenerationPopupV2() {
                 onClick={async () => {
                   setImagesLLMPopupError(null);
                   if (imagesLLMPopupType === "create") {
-                    mutationGenerate.mutate();
+                    mutationGenerate.mutate({});
                   }
                   if (imagesLLMPopupType === "edit-variation") {
-                    mutationEdit.mutate();
+                    mutationEdit.mutate({});
                   }
                   if (imagesLLMPopupType === "edit-prompt") {
-                    mutationEdit.mutate();
+                    mutationEdit.mutate({});
                   }
                   if (imagesLLMPopupType === "edit-mask") {
-                    mutationEdit.mutate();
+                    mutationEdit.mutate({});
                   }
 
                   setTimeout(() => {

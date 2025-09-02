@@ -13,11 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  useMutation,
-  useInfiniteQuery,
-  // useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
   BrushCleaning,
   Info,
@@ -36,7 +32,7 @@ import {
 } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
-import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
@@ -132,6 +128,19 @@ export const ImagesLibrary = () => {
         image
       );
     },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images background removal...");
+      return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, ___, context: any) => {
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+    },
+    onError() {
+      toast.error("Error requesting images background removal.");
+    },
   });
 
   const mutationDelete = useMutation({
@@ -143,6 +152,19 @@ export const ImagesLibrary = () => {
         imageId
       );
     },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images deletion...");
+      return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, ___, context: any) => {
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+    },
+    onError() {
+      toast.error("Error requesting images deletion.");
+    },
   });
 
   const handleDeleteImage = React.useCallback(
@@ -152,20 +174,9 @@ export const ImagesLibrary = () => {
         return;
       }
 
-      mutationDelete.mutate(image.imageId, {
-        onError: () => {
-          toast.error("Error requesting image removal.");
-        },
-      });
+      mutationDelete.mutate(image.imageId);
     },
     [instance, mutationDelete]
-  );
-
-  const sidebarToggle = React.useCallback(
-    (element: SidebarActive) => {
-      setSidebarActive(element);
-    },
-    [setSidebarActive]
   );
 
   const handleSetImageReference = React.useCallback(
@@ -253,28 +264,18 @@ export const ImagesLibrary = () => {
 
         const dataBase64 = dataBase64Url.split(",")[1];
 
-        mutationUploadV2.mutate(
-          {
-            userId: user?.name ?? "",
-            clientId: clientId ?? "",
-            imageId: uuidv4(),
-            image: {
-              dataBase64,
-              contentType: "image/png",
-            },
+        mutationUploadV2.mutate({
+          userId: user?.name ?? "",
+          clientId: clientId ?? "",
+          imageId: uuidv4(),
+          image: {
+            dataBase64,
+            contentType: "image/png",
           },
-          {
-            onSuccess: () => {
-              sidebarToggle(SIDEBAR_ELEMENTS.images);
-            },
-            onError: () => {
-              toast.error("Error requesting image background removal.");
-            },
-          }
-        );
+        });
       }
     },
-    [instance, clientId, user, sidebarToggle, mutationUploadV2]
+    [instance, clientId, user, mutationUploadV2]
   );
 
   const query = useInfiniteQuery({

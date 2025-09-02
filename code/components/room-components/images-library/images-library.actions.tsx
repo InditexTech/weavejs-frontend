@@ -12,7 +12,7 @@ import { BrushCleaning, Link, Trash, Unlink } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
-import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
@@ -37,9 +37,6 @@ export const ImagesLibraryActions = ({
   const room = useCollaborationRoom((state) => state.room);
   const sidebarLeftActive = useCollaborationRoom(
     (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
   );
 
   const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
@@ -75,6 +72,19 @@ export const ImagesLibraryActions = ({
         image
       );
     },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images background removal...");
+      return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, ___, context: any) => {
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+    },
+    onError() {
+      toast.error("Error requesting images background removal.");
+    },
   });
 
   const mutationDelete = useMutation({
@@ -86,6 +96,20 @@ export const ImagesLibraryActions = ({
         imageId
       );
     },
+    onMutate: () => {
+      const toastId = toast.loading("Requesting images deletion...");
+      return { toastId };
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSettled: (_, __, ___, context: any) => {
+      console.log({ context });
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+    },
+    onError() {
+      toast.error("Error requesting images deletion.");
+    },
   });
 
   const handleDeleteImage = React.useCallback(
@@ -95,20 +119,9 @@ export const ImagesLibraryActions = ({
         return;
       }
 
-      mutationDelete.mutate(image.imageId, {
-        onError: () => {
-          toast.error("Error requesting image removal.");
-        },
-      });
+      mutationDelete.mutate(image.imageId);
     },
     [instance, mutationDelete]
-  );
-
-  const sidebarToggle = React.useCallback(
-    (element: SidebarActive) => {
-      setSidebarActive(element);
-    },
-    [setSidebarActive]
   );
 
   const handleSetImagesReference = React.useCallback(
@@ -201,28 +214,18 @@ export const ImagesLibraryActions = ({
 
         const dataBase64 = dataBase64Url.split(",")[1];
 
-        mutationUploadV2.mutate(
-          {
-            userId: user?.name ?? "",
-            clientId: clientId ?? "",
-            imageId: uuidv4(),
-            image: {
-              dataBase64,
-              contentType: "image/png",
-            },
+        mutationUploadV2.mutate({
+          userId: user?.name ?? "",
+          clientId: clientId ?? "",
+          imageId: uuidv4(),
+          image: {
+            dataBase64,
+            contentType: "image/png",
           },
-          {
-            onSuccess: () => {
-              sidebarToggle(SIDEBAR_ELEMENTS.images);
-            },
-            onError: () => {
-              toast.error("Error requesting image background removal.");
-            },
-          }
-        );
+        });
       }
     },
-    [instance, clientId, user, sidebarToggle, mutationUploadV2]
+    [instance, clientId, user, mutationUploadV2]
   );
 
   const realSelectedImages = React.useMemo(() => {
