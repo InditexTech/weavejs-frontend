@@ -19,6 +19,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useIACapabilities } from "@/store/ia";
+import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -40,6 +41,12 @@ export function useKeyboardHandler() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
+  const workloadsEnabled = useCollaborationRoom(
+    (state) => state.features.workloads
+  );
+
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
   const imagesLLMPopupVisible = useIACapabilities(
@@ -51,8 +58,19 @@ export function useKeyboardHandler() {
   const setImagesLLMPopupVisible = useIACapabilities(
     (state) => state.setImagesLLMPopupVisible
   );
-  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
+
+  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.type
+  );
+  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.llmPopup.visible
+  );
+  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupType
+  );
+  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
+    (state) => state.setImagesLLMPopupVisible
+  );
 
   const triggerTool = React.useCallback(
     (toolName: string) => {
@@ -489,12 +507,21 @@ export function useKeyboardHandler() {
   /* IA Utilities */
 
   useKeyDown(() => {
-    if (aiEnabled) {
+    if (aiEnabled && !workloadsEnabled) {
       setImagesLLMPopupType("create");
       if (imagesLLMPopupType === "create") {
         setImagesLLMPopupVisible(!imagesLLMPopupVisible);
       } else {
         setImagesLLMPopupVisible(true);
+      }
+    }
+
+    if (aiEnabled && workloadsEnabled) {
+      setImagesLLMPopupTypeV2("create");
+      if (imagesLLMPopupTypeV2 === "create") {
+        setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
+      } else {
+        setImagesLLMPopupVisibleV2(true);
       }
     }
   }, ["KeyG"]);

@@ -1,0 +1,8 @@
+set export
+
+alias sld := link-deps
+
+link-deps:
+  npm link @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub 
+  ln -s /Users/jesusmpc/inditex/weavejs/code/node_modules/konva node_modules/konva
+  ln -s /Users/jesusmpc/inditex/weavejs/code/node_modules/yjs node_modules/yjs
