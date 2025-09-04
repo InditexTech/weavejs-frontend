@@ -4,9 +4,7 @@
 
 "use client";
 
-// import { v4 as uuidv4 } from "uuid";
 import React from "react";
-// import { toast } from "sonner";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -38,7 +36,6 @@ import {
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
-  // WeaveExportStageActionParams,
   WeaveStageGridPlugin,
   WeaveStageGridType,
   WeaveUsersPointersPlugin,
@@ -61,8 +58,6 @@ export function RoomHeader() {
   const os = useGetOs();
   const router = useRouter();
 
-  // const [doExportingImage, setDoExportingImage] = React.useState(false);
-
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -70,9 +65,10 @@ export function RoomHeader() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const user = useCollaborationRoom((state) => state.user);
   const room = useCollaborationRoom((state) => state.room);
-  // const setImageExporting = useCollaborationRoom(
-  //   (state) => state.setImageExporting
-  // );
+  const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
+  const setExportConfigVisible = useCollaborationRoom(
+    (state) => state.setExportConfigVisible
+  );
 
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
@@ -87,7 +83,7 @@ export function RoomHeader() {
 
   const {
     handlePrintStateSnapshotToClipboard,
-    handleExportToImageServerSide,
+    // handleExportToImageServerSide,
     isExporting,
   } = useExportToImageServerSide();
 
@@ -159,13 +155,6 @@ export function RoomHeader() {
     [instance]
   );
 
-  // const handleExportToImage = React.useCallback(async () => {
-  //   setMenuOpen(false);
-  //   if (instance && instance.getActiveAction() !== "exportStageTool") {
-  //     setDoExportingImage(true);
-  //   }
-  // }, [instance]);
-
   React.useEffect(() => {
     if (instance) {
       setGridEnabled(instance.isPluginEnabled("stageGrid"));
@@ -180,42 +169,6 @@ export function RoomHeader() {
       setGridType(stageGridPlugin?.getType());
     }
   }, [instance]);
-
-  // React.useEffect(() => {
-  //   if (!instance) return;
-
-  //   function doExportingImageHandler() {
-  //     if (!instance) return;
-
-  //     setTimeout(async () => {
-  //       const image = await instance.triggerAction<
-  //         WeaveExportStageActionParams,
-  //         Promise<HTMLImageElement>
-  //       >("exportStageTool", {
-  //         options: {
-  //           padding: 20,
-  //           pixelRatio: 1,
-  //         },
-  //       });
-
-  //       const link = document.createElement("a");
-  //       link.href = image.src;
-  //       link.download = `${uuidv4()}image/png`;
-  //       link.click();
-
-  //       toast.success("Image exported successfully");
-
-  //       setImageExporting(false);
-  //       setDoExportingImage(false);
-  //     }, 100);
-  //   }
-
-  //   if (doExportingImage) {
-  //     setImageExporting(true);
-  //     doExportingImageHandler();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [instance, doExportingImage, setImageExporting]);
 
   const handleExitRoom = React.useCallback(() => {
     sessionStorage.removeItem(`weave.js_${room}`);
@@ -384,7 +337,8 @@ export function RoomHeader() {
                             isExporting())
                         }
                         onPointerDown={async () => {
-                          handleExportToImageServerSide([]);
+                          setExportNodes([]);
+                          setExportConfigVisible(true);
                           setMenuOpen(false);
                         }}
                       >

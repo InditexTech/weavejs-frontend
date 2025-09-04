@@ -10,6 +10,52 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-italic-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Sansita";
+  src: url("/fonts/sansita-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sansita";
+  src: url("/fonts/sansita-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 @theme {
   --inter: var(--inter);
 }

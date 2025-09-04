@@ -6,7 +6,10 @@ import React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { postExportToImage } from "@/api/post-export-to-image";
-import { WeaveExportNodesOptions } from "@inditextech/weave-types";
+import {
+  WeaveExportFormats,
+  WeaveExportNodesOptions,
+} from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 
 export const useExportToImageServerSide = () => {
@@ -82,7 +85,21 @@ export const useExportToImageServerSide = () => {
   }, [instance]);
 
   const handleExportToImageServerSide = React.useCallback(
-    async (nodes: string[]) => {
+    async ({
+      nodes,
+      format,
+      padding,
+      backgroundColor,
+      pixelRatio,
+      quality,
+    }: {
+      nodes: string[];
+      format: WeaveExportFormats;
+      padding: number;
+      backgroundColor: string;
+      pixelRatio: number;
+      quality?: number;
+    }) => {
       if (!instance) return;
 
       setExporting(true);
@@ -95,11 +112,11 @@ export const useExportToImageServerSide = () => {
         roomData: Buffer.from(snapshot).toString("base64"),
         nodes,
         options: {
-          format: "image/png",
-          quality: 1,
-          pixelRatio: 1,
-          padding: 0,
-          backgroundColor: "#ffffff",
+          format,
+          pixelRatio,
+          padding,
+          backgroundColor,
+          ...(format === "image/jpeg" && { quality }),
         },
       });
     },

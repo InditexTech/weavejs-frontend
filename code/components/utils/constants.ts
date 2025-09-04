@@ -22,8 +22,6 @@ import {
   WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
-  // WeaveExportNodesToolAction,
-  // WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
   WeaveAlignNodesToolAction,
@@ -62,7 +60,6 @@ import {
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
 import { WeaveElementInstance, type WeaveUser } from "@inditextech/weave-types";
-import { Inter } from "next/font/google";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
@@ -81,7 +78,11 @@ import { ThreadEntity } from "../room-components/hooks/types";
 const FONTS = [
   {
     id: "Inter",
-    name: "Inter, sans-serif",
+    name: `'Inter', sans-serif`,
+  },
+  {
+    id: "Sansita",
+    name: `'Sansita', sans-serif`,
   },
   {
     id: "Arial",
@@ -145,12 +146,6 @@ const FONTS = [
   },
 ];
 
-const inter = Inter({
-  preload: true,
-  variable: "--inter",
-  subsets: ["latin"],
-});
-
 const NODES = () => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
@@ -181,7 +176,7 @@ const NODES = () => [
   new WeaveRegularPolygonNode(),
   new WeaveFrameNode({
     config: {
-      fontFamily: inter.style.fontFamily,
+      fontFamily: "'Inter', sans-serif",
       fontStyle: "normal",
       fontSize: 14,
       borderColor: "#9E9994",
@@ -199,18 +194,18 @@ const NODES = () => [
       style: {
         contracted: {
           userName: {
-            fontFamily: inter.style.fontFamily,
+            fontFamily: "'Inter', sans-serif",
           },
         },
         expanded: {
           userName: {
-            fontFamily: inter.style.fontFamily,
+            fontFamily: "'Inter', sans-serif",
           },
           date: {
-            fontFamily: inter.style.fontFamily,
+            fontFamily: "'Inter', sans-serif",
           },
           content: {
-            fontFamily: inter.style.fontFamily,
+            fontFamily: "'Inter', sans-serif",
           },
         },
       },
@@ -375,7 +370,7 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       ui: {
         label: {
           fontSize: 12,
-          fontFamily: inter.style.fontFamily,
+          fontFamily: "'Inter', sans-serif",
         },
       },
     },
@@ -470,8 +465,6 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new WeaveAlignNodesToolAction(),
-  // new WeaveExportNodesToolAction(),
-  // new WeaveExportStageToolAction(),
   new ImagesToolAction(),
   new MaskToolAction(),
   new FuzzyMaskToolAction(),

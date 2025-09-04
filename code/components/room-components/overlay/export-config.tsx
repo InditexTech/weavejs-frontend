@@ -5,7 +5,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -15,72 +14,89 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import React from "react";
-import { useMutation } from "@tanstack/react-query";
-import { postValidatePassword } from "@/api/post-validate-password";
 import { X } from "lucide-react";
+import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
+import { useCollaborationRoom } from "@/store/store";
+import { Input } from "@/components/ui/input";
+import { WeaveExportFormats } from "@inditextech/weave-types";
+
+function safeParseInt(value: unknown, fallback = 0): number {
+  if (typeof value === "number") {
+    return Math.floor(value); // ya es número, forzamos a entero
+  }
+  if (typeof value === "string") {
+    const n = parseInt(value, 10); // siempre base 10
+    return Number.isNaN(n) ? fallback : n;
+  }
+  return fallback;
+}
 
 export function ExportConfigDialog() {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [password, setPassword] = React.useState<string>("");
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-  const setupVisible = useIACapabilities((state) => state.setup.visible);
-  const setAIEnabled = useIACapabilities((state) => state.setEnabled);
-  const setSetupVisible = useIACapabilities((state) => state.setSetupVisible);
-  const setSetupState = useIACapabilities((state) => state.setSetupState);
-  const setAIEnabledV2 = useIACapabilitiesV2((state) => state.setEnabled);
+  const [format, setFormat] = React.useState<string>("image/png");
+  const [padding, setPadding] = React.useState<string>("20");
+  const [backgroundColor, setBackgroundColor] =
+    React.useState<string>("#FFFFFF");
+  const [pixelRatio, setPixelRatio] = React.useState<string>("1");
+
+  const nodesToExport = useCollaborationRoom((state) => state.export.nodes);
+  const exportConfigVisible = useCollaborationRoom(
+    (state) => state.export.config.visible
+  );
+  const setExportConfigVisible = useCollaborationRoom(
+    (state) => state.setExportConfigVisible
+  );
 
   React.useEffect(() => {
-    if (setupVisible) {
+    if (exportConfigVisible) {
       setTimeout(() => {
-        inputRef.current?.focus();
+        buttonRef.current?.focus();
       }, 0);
     }
-  }, [setupVisible]);
+  }, [exportConfigVisible]);
 
-  const mutationGenerate = useMutation({
-    mutationFn: async (password: string) => {
-      setSetupState("validating");
-      return await postValidatePassword(password);
-    },
-    onSettled: () => {
-      setSetupState("idle");
-    },
-    onSuccess: () => {
-      toast.success("Setup AI capabilities", {
-        description: "You have successfully enabled AI capabilities.",
-      });
-      sessionStorage.setItem("weave_ai_enabled", "true");
-      sessionStorage.setItem("weave_ai_password", password);
-      setSetupVisible(false);
-      setAIEnabled(true);
-      setAIEnabledV2(true);
-    },
-    onError() {
-      toast.error("Setup AI capabilities", {
-        description:
-          "Failed to enable AI capabilities. Please check and try again.",
-      });
-      sessionStorage.setItem("weave_ai_enabled", "false");
-      setAIEnabled(false);
-      setAIEnabledV2(false);
-    },
-  });
+  const { handleExportToImageServerSide, isExporting } =
+    useExportToImageServerSide();
+
+  const handleExport = React.useCallback(() => {
+    handleExportToImageServerSide({
+      nodes: nodesToExport,
+      format: format as WeaveExportFormats,
+      padding: safeParseInt(padding, 0),
+      backgroundColor: backgroundColor,
+      pixelRatio: safeParseInt(pixelRatio, 1),
+    });
+    setExportConfigVisible(false);
+  }, [
+    nodesToExport,
+    format,
+    padding,
+    backgroundColor,
+    pixelRatio,
+    handleExportToImageServerSide,
+    setExportConfigVisible,
+  ]);
 
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      if (!setupVisible) return;
+      if (!exportConfigVisible) return;
 
       if (event.key === "Enter") {
-        mutationGenerate.mutate(password);
+        handleExport();
       }
     },
-    [password, setupVisible, mutationGenerate]
+    [exportConfigVisible, handleExport]
   );
 
   React.useEffect(() => {
@@ -91,19 +107,22 @@ export function ExportConfigDialog() {
   }, [onKeyDown]);
 
   return (
-    <Dialog open={setupVisible} onOpenChange={(open) => setSetupVisible(open)}>
+    <Dialog
+      open={exportConfigVisible}
+      onOpenChange={(open) => setExportConfigVisible(open)}
+    >
       <form>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <div className="w-full flex gap-5 justify-between items-center">
               <DialogTitle className="font-inter text-2xl font-normal uppercase">
-                Setup AI Capabilities
+                Export to Image
               </DialogTitle>
               <DialogClose asChild>
                 <button
                   className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
                   onClick={() => {
-                    setSetupVisible(false);
+                    setExportConfigVisible(false);
                   }}
                 >
                   <X size={16} strokeWidth={1} />
@@ -111,38 +130,149 @@ export function ExportConfigDialog() {
               </DialogClose>
             </div>
             <DialogDescription className="font-inter text-sm mt-5">
-              Enable the AI capabilities to use image editing features.
+              Define the properties of the exported image.
             </DialogDescription>
-            <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="password font-inter font-xs">Password:</Label>
-              <Input
-                ref={inputRef}
-                id="password"
-                name="password"
-                type="password"
-                value={password}
-                onFocus={() => {
-                  window.weaveOnFieldFocus = true;
-                }}
-                onBlurCapture={() => {
-                  window.weaveOnFieldFocus = false;
-                }}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
-              />
+          <div className="grid gap-1">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex justify-start items-center inter text-xs">
+                Format
+              </div>
+              <div className="flex justify-end items-center">
+                <Select
+                  value={format}
+                  onValueChange={setFormat}
+                  disabled={isExporting()}
+                >
+                  <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                    <SelectValue placeholder="Amount" />
+                  </SelectTrigger>
+                  <SelectContent
+                    className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                    align="end"
+                  >
+                    <SelectGroup>
+                      <SelectItem
+                        value="image/png"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        PNG
+                      </SelectItem>
+                      <SelectItem
+                        value="image/jpeg"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        JPEG
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex justify-start items-center inter text-xs">
+                Padding (px)
+              </div>
+              <div className="flex justify-end items-center">
+                <Input
+                  className="w-[100px] font-inter !py-1 !pt-[2px] text-right text-xs rounded-none !h-[30px] !border-black !shadow-none"
+                  value={padding}
+                  disabled={isExporting()}
+                  onFocus={() => {
+                    window.weaveOnFieldFocus = true;
+                  }}
+                  onBlurCapture={() => {
+                    window.weaveOnFieldFocus = false;
+                  }}
+                  onChange={(e) => setPadding(e.target.value)}
+                  placeholder="Example: 20"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex justify-start items-center inter text-xs">
+                Background color
+              </div>
+              <div className="flex justify-end items-center">
+                <Select
+                  value={backgroundColor}
+                  onValueChange={setBackgroundColor}
+                  disabled={isExporting()}
+                >
+                  <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                    <SelectValue placeholder="Amount" />
+                  </SelectTrigger>
+                  <SelectContent
+                    className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                    align="end"
+                  >
+                    <SelectGroup>
+                      <SelectItem
+                        value="#FFFFFF"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        White
+                      </SelectItem>
+                      <SelectItem
+                        value="#000000"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        Black
+                      </SelectItem>
+                      <SelectItem
+                        value="transparent"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        None
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex justify-start items-center inter text-xs">
+                Pixel ratio
+              </div>
+              <div className="flex justify-end items-center">
+                <Select
+                  value={pixelRatio}
+                  onValueChange={setPixelRatio}
+                  disabled={isExporting()}
+                >
+                  <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                    <SelectValue placeholder="Amount" />
+                  </SelectTrigger>
+                  <SelectContent
+                    className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                    align="end"
+                  >
+                    <SelectGroup>
+                      {Array.from({ length: 10 }, (_, i) => i + 1).map(
+                        (ratio) => (
+                          <SelectItem
+                            key={ratio}
+                            value={`${ratio}`}
+                            className="font-inter text-xs rounded-none"
+                          >
+                            {`${ratio}`}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-          <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           <DialogFooter>
             <Button
+              ref={buttonRef}
               type="button"
               className="cursor-pointer font-inter rounded-none"
-              onClick={() => mutationGenerate.mutate(password)}
+              onClick={handleExport}
             >
-              ENABLE
+              EXPORT
             </Button>
           </DialogFooter>
         </DialogContent>

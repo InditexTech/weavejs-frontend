@@ -53,7 +53,7 @@ function InputFontFamily({
             className="w-full h-[40px] rounded-none !text-[14] text-black border-black justify-between font-normal bg-transparent shadow-none"
             style={{ fontFamily: selectedFont }}
           >
-            {selectedFont}
+            {FONTS.find((font) => font.name === selectedFont)?.id || "Unknown"}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -96,7 +96,7 @@ function InputFontFamily({
                       className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none"
                       style={{ fontFamily: font.name }}
                     >
-                      {font.name}
+                      {font.id}
                     </span>
                     {selectedFont === font.id && (
                       <Check className="ml-auto h-4 w-4" />
