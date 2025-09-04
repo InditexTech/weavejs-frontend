@@ -836,6 +836,8 @@ function useContextMenu() {
       mutationUploadV2,
       aiEnabled,
       aiEnabledV2,
+      handleExportToImageServerSide,
+      isExporting,
       setImagesLLMPopupSelectedNodes,
       setImagesLLMPopupType,
       setImagesLLMPopupVisible,
