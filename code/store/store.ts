@@ -68,6 +68,11 @@ interface CollaborationRoomState {
   commBus: {
     connected: boolean;
   };
+  export: {
+    config: {
+      visible: boolean;
+    };
+  };
   comments: {
     status: CommentsStatus;
   };
@@ -140,6 +145,7 @@ interface CollaborationRoomState {
   setCommBusConnected: (newConnected: boolean) => void;
   setImageExporting: (newExportingImage: boolean) => void;
   setCommentsStatus: (newStatus: CommentsStatus) => void;
+  setExportConfigVisible: (newVisible: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -183,6 +189,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   },
   commBus: {
     connected: false,
+  },
+  export: {
+    config: {
+      visible: false,
+    },
   },
   images: {
     showSelectFiles: false,
@@ -435,6 +446,17 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       comments: {
         ...state.comments,
         status: newStatus,
+      },
+    })),
+  setExportConfigVisible: (newVisible: boolean) =>
+    set((state) => ({
+      ...state,
+      export: {
+        ...state.export,
+        config: {
+          ...state.export.config,
+          visible: newVisible,
+        },
       },
     })),
 }));

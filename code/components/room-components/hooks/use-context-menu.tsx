@@ -41,12 +41,13 @@ import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useExportToImageServerSide } from "./use-export-to-image-server-side";
 
 function useContextMenu() {
-  const [doExportingImage, setDoExportingImage] = React.useState(false);
-  const [nodesToExport, setNodesToExport] = React.useState<WeaveSelection[]>(
-    []
-  );
+  // const [doExportingImage, setDoExportingImage] = React.useState(false);
+  // const [nodesToExport, setNodesToExport] = React.useState<WeaveSelection[]>(
+  //   []
+  // );
 
   const instance = useWeave((state) => state.instance);
 
@@ -59,9 +60,9 @@ function useContextMenu() {
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
   );
-  const setImageExporting = useCollaborationRoom(
-    (state) => state.setImageExporting
-  );
+  // const setImageExporting = useCollaborationRoom(
+  //   (state) => state.setImageExporting
+  // );
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
   );
@@ -130,6 +131,9 @@ function useContextMenu() {
     [setSidebarActive]
   );
 
+  const { handleExportToImageServerSide, isExporting } =
+    useExportToImageServerSide();
+
   const mutationUpload = useMutation({
     mutationFn: async ({
       imageId,
@@ -167,43 +171,43 @@ function useContextMenu() {
     },
   });
 
-  React.useEffect(() => {
-    if (!instance) return;
+  // React.useEffect(() => {
+  //   if (!instance) return;
 
-    function doExportingImageHandler() {
-      if (!instance) return;
+  //   function doExportingImageHandler() {
+  //     if (!instance) return;
 
-      setTimeout(async () => {
-        const image = await instance.triggerAction<
-          WeaveExportNodesActionParams,
-          Promise<HTMLImageElement>
-        >("exportNodesTool", {
-          nodes: nodesToExport.map((n) => n.instance),
-          options: {
-            padding: 20,
-            pixelRatio: 1,
-          },
-        });
+  //     setTimeout(async () => {
+  //       const image = await instance.triggerAction<
+  //         WeaveExportNodesActionParams,
+  //         Promise<HTMLImageElement>
+  //       >("exportNodesTool", {
+  //         nodes: nodesToExport.map((n) => n.instance),
+  //         options: {
+  //           padding: 20,
+  //           pixelRatio: 1,
+  //         },
+  //       });
 
-        setImageExporting(false);
+  //       setImageExporting(false);
 
-        const link = document.createElement("a");
-        link.href = image.src;
-        link.download = `${uuidv4()}image/png`;
-        link.click();
+  //       const link = document.createElement("a");
+  //       link.href = image.src;
+  //       link.download = `${uuidv4()}image/png`;
+  //       link.click();
 
-        setNodesToExport([]);
-        setImageExporting(false);
-        setDoExportingImage(false);
-      }, 100);
-    }
+  //       setNodesToExport([]);
+  //       setImageExporting(false);
+  //       setDoExportingImage(false);
+  //     }, 100);
+  //   }
 
-    if (doExportingImage) {
-      setImageExporting(true);
-      doExportingImageHandler();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instance, nodesToExport, doExportingImage, setImageExporting]);
+  //   if (doExportingImage) {
+  //     setImageExporting(true);
+  //     doExportingImageHandler();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [instance, nodesToExport, doExportingImage, setImageExporting]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -462,9 +466,9 @@ function useContextMenu() {
           }
         }
         if (!singleLocked) {
-          // EXPORT
+          // EXPORT ON THE SERVER
           options.push({
-            id: "export",
+            id: "export-server",
             type: "button",
             label: (
               <div className="w-full flex justify-between items-center">
@@ -478,14 +482,38 @@ function useContextMenu() {
               </div>
             ),
             icon: <ImageDown size={16} />,
-            disabled: nodes.length <= 0,
+            disabled: nodes.length <= 0 || isExporting(),
             onClick: async () => {
-              setNodesToExport(nodes);
-              setDoExportingImage(true);
-
+              handleExportToImageServerSide(
+                nodes.map((n) => n.node?.key ?? "")
+              );
               setContextMenuShow(false);
             },
           });
+          // EXPORT ON THE CLIENT
+          // options.push({
+          //   id: "export-client",
+          //   type: "button",
+          //   label: (
+          //     <div className="w-full flex justify-between items-center">
+          //       <div>Export as image (on the client)</div>
+          //       <ShortcutElement
+          //         shortcuts={{
+          //           [SYSTEM_OS.MAC]: "⇧ ⌘ E",
+          //           [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
+          //         }}
+          //       />
+          //     </div>
+          //   ),
+          //   icon: <ImageDown size={16} />,
+          //   disabled: nodes.length <= 0,
+          //   onClick: async () => {
+          //     setNodesToExport(nodes);
+          //     setDoExportingImage(true);
+
+          //     setContextMenuShow(false);
+          //   },
+          // });
           // SEPARATOR
           options.push({
             id: "div-0",

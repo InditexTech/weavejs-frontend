@@ -4,9 +4,9 @@
 
 "use client";
 
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import React from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
-  WeaveExportStageActionParams,
+  // WeaveExportStageActionParams,
   WeaveStageGridPlugin,
   WeaveStageGridType,
   WeaveUsersPointersPlugin,
@@ -55,12 +55,13 @@ import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
 
 export function RoomHeader() {
   const os = useGetOs();
   const router = useRouter();
 
-  const [doExportingImage, setDoExportingImage] = React.useState(false);
+  // const [doExportingImage, setDoExportingImage] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
@@ -69,9 +70,9 @@ export function RoomHeader() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const user = useCollaborationRoom((state) => state.user);
   const room = useCollaborationRoom((state) => state.room);
-  const setImageExporting = useCollaborationRoom(
-    (state) => state.setImageExporting
-  );
+  // const setImageExporting = useCollaborationRoom(
+  //   (state) => state.setImageExporting
+  // );
 
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
@@ -83,6 +84,12 @@ export function RoomHeader() {
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
     WEAVE_GRID_TYPES.LINES
   );
+
+  const {
+    handlePrintStateSnapshotToClipboard,
+    handleExportToImageServerSide,
+    isExporting,
+  } = useExportToImageServerSide();
 
   const handleToggleUsersPointers = React.useCallback(() => {
     if (!instance) return;
@@ -152,12 +159,12 @@ export function RoomHeader() {
     [instance]
   );
 
-  const handleExportToImage = React.useCallback(async () => {
-    setMenuOpen(false);
-    if (instance && instance.getActiveAction() !== "exportStageTool") {
-      setDoExportingImage(true);
-    }
-  }, [instance]);
+  // const handleExportToImage = React.useCallback(async () => {
+  //   setMenuOpen(false);
+  //   if (instance && instance.getActiveAction() !== "exportStageTool") {
+  //     setDoExportingImage(true);
+  //   }
+  // }, [instance]);
 
   React.useEffect(() => {
     if (instance) {
@@ -174,41 +181,41 @@ export function RoomHeader() {
     }
   }, [instance]);
 
-  React.useEffect(() => {
-    if (!instance) return;
+  // React.useEffect(() => {
+  //   if (!instance) return;
 
-    function doExportingImageHandler() {
-      if (!instance) return;
+  //   function doExportingImageHandler() {
+  //     if (!instance) return;
 
-      setTimeout(async () => {
-        const image = await instance.triggerAction<
-          WeaveExportStageActionParams,
-          Promise<HTMLImageElement>
-        >("exportStageTool", {
-          options: {
-            padding: 20,
-            pixelRatio: 1,
-          },
-        });
+  //     setTimeout(async () => {
+  //       const image = await instance.triggerAction<
+  //         WeaveExportStageActionParams,
+  //         Promise<HTMLImageElement>
+  //       >("exportStageTool", {
+  //         options: {
+  //           padding: 20,
+  //           pixelRatio: 1,
+  //         },
+  //       });
 
-        const link = document.createElement("a");
-        link.href = image.src;
-        link.download = `${uuidv4()}image/png`;
-        link.click();
+  //       const link = document.createElement("a");
+  //       link.href = image.src;
+  //       link.download = `${uuidv4()}image/png`;
+  //       link.click();
 
-        toast.success("Image exported successfully");
+  //       toast.success("Image exported successfully");
 
-        setImageExporting(false);
-        setDoExportingImage(false);
-      }, 100);
-    }
+  //       setImageExporting(false);
+  //       setDoExportingImage(false);
+  //     }, 100);
+  //   }
 
-    if (doExportingImage) {
-      setImageExporting(true);
-      doExportingImageHandler();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instance, doExportingImage, setImageExporting]);
+  //   if (doExportingImage) {
+  //     setImageExporting(true);
+  //     doExportingImageHandler();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [instance, doExportingImage, setImageExporting]);
 
   const handleExitRoom = React.useCallback(() => {
     sessionStorage.removeItem(`weave.js_${room}`);
@@ -372,13 +379,30 @@ export function RoomHeader() {
                         className="text-foreground cursor-pointer hover:rounded-none"
                         disabled={
                           instance?.isEmpty() ??
+                          (weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                            isExporting())
+                        }
+                        onPointerDown={async () => {
+                          handleExportToImageServerSide([]);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        <ImageDown size={16} strokeWidth={1} /> Export room as
+                        image
+                      </DropdownMenuItem>
+                      {/* <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        disabled={
+                          instance?.isEmpty() ??
                           weaveConnectionStatus !==
                             WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                         }
                         onPointerDown={handleExportToImage}
                       >
-                        <ImageDown size={16} strokeWidth={1} /> Export as image
-                      </DropdownMenuItem>
+                        <ImageDown size={16} strokeWidth={1} /> Export room as
+                        image (on the client)
+                      </DropdownMenuItem> */}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
@@ -546,6 +570,21 @@ export function RoomHeader() {
                           {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
                           {[SYSTEM_OS.WINDOWS as string].includes(os) &&
                             "Alt Ctrl C"}
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        onPointerDown={() => {
+                          handlePrintStateSnapshotToClipboard();
+                          setMenuOpen(false);
+                        }}
+                      >
+                        <div className="w-[16px] h-[16px]" /> Set state snapshot
+                        to clipboard
+                        <DropdownMenuShortcut>
+                          {[SYSTEM_OS.MAC as string].includes(os) && "⌘ S"}
+                          {[SYSTEM_OS.WINDOWS as string].includes(os) &&
+                            "Ctrl S"}
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
