@@ -59,7 +59,11 @@ import {
   WeaveCommentNodeViewAction,
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
-import { WeaveElementInstance, type WeaveUser } from "@inditextech/weave-types";
+import {
+  WeaveElementInstance,
+  WeaveFont,
+  type WeaveUser,
+} from "@inditextech/weave-types";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
@@ -75,76 +79,122 @@ import {
 import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 
-const FONTS = [
-  {
-    id: "Inter",
-    name: `'Inter', sans-serif`,
-  },
-  {
-    id: "Sansita",
-    name: `'Sansita', sans-serif`,
-  },
-  {
-    id: "Arial",
-    name: "Arial, sans-serif",
-  },
-  {
-    id: "Helvetica",
-    name: "Helvetica, sans-serif",
-  },
-  {
-    id: "TimesNewRoman",
-    name: "Times New Roman, serif",
-  },
-  {
-    id: "Times",
-    name: "Times, serif",
-  },
-  {
-    id: "CourierNew",
-    name: "Courier New, monospace",
-  },
-  {
-    id: "Courier",
-    name: "Courier, monospace",
-  },
-  {
-    id: "Verdana",
-    name: "Verdana, sans-serif",
-  },
-  {
-    id: "Georgia",
-    name: "Georgia, serif",
-  },
-  {
-    id: "Palatino",
-    name: "Palatino, serif",
-  },
-  {
-    id: "Garamond",
-    name: "Garamond, serif",
-  },
-  {
-    id: "Bookman",
-    name: "Bookman, serif",
-  },
-  {
-    id: "ComicSansMS",
-    name: "Comic Sans MS, cursive",
-  },
-  {
-    id: "TrebuchetMS",
-    name: "Trebuchet MS, sans-serif",
-  },
-  {
-    id: "ArialBlack",
-    name: "Arial Black, sans-serif",
-  },
-  {
-    id: "Impact",
-    name: "Impact, sans-serif",
-  },
-];
+const FONTS = async (): Promise<WeaveFont[]> => {
+  const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
+    weight: "400",
+    style: "normal",
+  });
+  await interRegular.load();
+  document.fonts.add(interRegular);
+
+  const interBold = new FontFace("Inter", "url(/fonts/inter-bold.ttf)", {
+    weight: "700",
+    style: "normal",
+  });
+  await interBold.load();
+  document.fonts.add(interBold);
+
+  const interItalic = new FontFace("Inter", "url(/fonts/inter-italic.ttf)", {
+    weight: "400",
+    style: "italic",
+  });
+  await interItalic.load();
+  document.fonts.add(interItalic);
+
+  const interItalicBold = new FontFace(
+    "Inter",
+    "url(/fonts/inter-italic-bold.ttf)",
+    { weight: "700", style: "italic" }
+  );
+  await interItalicBold.load();
+  document.fonts.add(interItalicBold);
+
+  const sansitaRegular = new FontFace(
+    "Sansita",
+    "url(/fonts/sansita-regular.ttf)",
+    { weight: "400", style: "normal" }
+  );
+  await sansitaRegular.load();
+  document.fonts.add(sansitaRegular);
+
+  const sansitaBold = new FontFace("Sansita", "url(/fonts/sansita-bold.ttf)", {
+    weight: "700",
+    style: "normal",
+  });
+  await sansitaBold.load();
+  document.fonts.add(sansitaBold);
+
+  return [
+    {
+      id: "Inter",
+      name: `'Inter', sans-serif`,
+    },
+    {
+      id: "Sansita",
+      name: `'Sansita', sans-serif`,
+    },
+    {
+      id: "Arial",
+      name: "Arial, sans-serif",
+    },
+    {
+      id: "Helvetica",
+      name: "Helvetica, sans-serif",
+    },
+    {
+      id: "TimesNewRoman",
+      name: "Times New Roman, serif",
+    },
+    {
+      id: "Times",
+      name: "Times, serif",
+    },
+    {
+      id: "CourierNew",
+      name: "Courier New, monospace",
+    },
+    {
+      id: "Courier",
+      name: "Courier, monospace",
+    },
+    {
+      id: "Verdana",
+      name: "Verdana, sans-serif",
+    },
+    {
+      id: "Georgia",
+      name: "Georgia, serif",
+    },
+    {
+      id: "Palatino",
+      name: "Palatino, serif",
+    },
+    {
+      id: "Garamond",
+      name: "Garamond, serif",
+    },
+    {
+      id: "Bookman",
+      name: "Bookman, serif",
+    },
+    {
+      id: "ComicSansMS",
+      name: "Comic Sans MS, cursive",
+    },
+    {
+      id: "TrebuchetMS",
+      name: "Trebuchet MS, sans-serif",
+    },
+    {
+      id: "ArialBlack",
+      name: "Arial Black, sans-serif",
+    },
+    {
+      id: "Impact",
+      name: "Impact, sans-serif",
+    },
+  ];
+};
 
 const NODES = () => [
   new WeaveStageNode(),

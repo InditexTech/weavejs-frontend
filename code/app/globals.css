@@ -10,7 +10,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
+/* @font-face {
   font-family: "Inter";
   src: url("/fonts/inter-regular.ttf") format("truetype");
   font-weight: 400;
@@ -54,7 +54,7 @@
   src: url("/fonts/sansita-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
-}
+} */
 
 @theme {
   --inter: var(--inter);

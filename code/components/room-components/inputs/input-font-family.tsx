@@ -19,7 +19,7 @@ import { Check, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { FONTS } from "@/components/utils/constants";
+import { useCollaborationRoom } from "@/store/store";
 
 function InputFontFamily({
   value,
@@ -31,6 +31,8 @@ function InputFontFamily({
   const [selectedFont, setSelectedFont] = React.useState<string>(value);
   const [open, setOpen] = React.useState(false);
   const lastSelectedFontFamily = React.useRef<string>(value);
+
+  const fontsValues = useCollaborationRoom((state) => state.fonts.values);
 
   React.useEffect(() => {
     if (onChange && selectedFont !== lastSelectedFontFamily.current) {
@@ -53,7 +55,8 @@ function InputFontFamily({
             className="w-full h-[40px] rounded-none !text-[14] text-black border-black justify-between font-normal bg-transparent shadow-none"
             style={{ fontFamily: selectedFont }}
           >
-            {FONTS.find((font) => font.name === selectedFont)?.id || "Unknown"}
+            {fontsValues.find((font) => font.name === selectedFont)?.id ||
+              "Unknown"}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -82,7 +85,7 @@ function InputFontFamily({
                 </span>
               </CommandEmpty>
               <CommandGroup>
-                {FONTS.map((font) => (
+                {fontsValues.map((font) => (
                   <CommandItem
                     key={font.id}
                     value={font.name}

@@ -82,6 +82,25 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
 
+  const fontsLoaded = useCollaborationRoom((state) => state.fonts.loaded);
+  const setFontsLoaded = useCollaborationRoom((state) => state.setFontsLoaded);
+  const setFontsValues = useCollaborationRoom((state) => state.setFontsValues);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    async function handleFontsLoaded(fonts: WeaveFont[]) {
+      setFontsValues(fonts);
+      setFontsLoaded(true);
+    }
+
+    instance.addEventListener("onFontsLoaded", handleFontsLoaded);
+
+    return () => {
+      instance.removeEventListener("onFontsLoaded", handleFontsLoaded);
+    };
+  }, [instance, fontsLoaded, setFontsLoaded, setFontsValues]);
+
   React.useEffect(() => {
     if (!instance) return;
 

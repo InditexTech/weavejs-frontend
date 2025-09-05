@@ -36,6 +36,11 @@ interface CollaborationRoomState {
     loading: boolean;
     error: Error | null;
   };
+  fonts: {
+    loaded: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    values: { id: string; name: string }[];
+  };
   ui: {
     show: boolean;
     minimap: boolean;
@@ -148,6 +153,9 @@ interface CollaborationRoomState {
   setCommentsStatus: (newStatus: CommentsStatus) => void;
   setExportNodes: (newNodes: string[]) => void;
   setExportConfigVisible: (newVisible: boolean) => void;
+  setFontsLoaded: (newLoaded: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setFontsValues: (newValues: { id: string; name: string }[]) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -173,6 +181,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     right: {
       active: null,
     },
+  },
+  fonts: {
+    loaded: false,
+    values: [],
   },
   drawer: {
     keyboardShortcuts: {
@@ -469,5 +481,16 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
           visible: newVisible,
         },
       },
+    })),
+  setFontsLoaded: (newLoaded) =>
+    set((state) => ({
+      ...state,
+      fonts: { ...state.fonts, loaded: newLoaded },
+    })),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setFontsValues: (newValues: { id: string; name: string }[]) =>
+    set((state) => ({
+      ...state,
+      fonts: { ...state.fonts, values: newValues },
     })),
 }));
