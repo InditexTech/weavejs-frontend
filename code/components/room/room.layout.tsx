@@ -13,6 +13,7 @@ import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
 import {
   WEAVE_INSTANCE_STATUS,
   WEAVE_STORE_CONNECTION_STATUS,
+  WeaveFont,
 } from "@inditextech/weave-types";
 import { Logo } from "../utils/logo";
 import { AnimatePresence, motion } from "framer-motion";
