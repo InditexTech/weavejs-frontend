@@ -30,7 +30,6 @@ import {
   Check,
   ExternalLink,
   IdCard,
-  ImageDown,
   Bookmark,
   Contact,
 } from "lucide-react";
@@ -342,7 +341,7 @@ export function RoomHeader() {
                           setMenuOpen(false);
                         }}
                       >
-                        <ImageDown size={16} strokeWidth={1} /> Export room as
+                        <div className="w-[16px] h-[16px]" /> Export room as
                         image
                       </DropdownMenuItem>
                       {/* <DropdownMenuItem
