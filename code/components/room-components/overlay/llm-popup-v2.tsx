@@ -33,7 +33,12 @@ import {
 import { cn } from "@/lib/utils";
 import { useGenerateMaskV2 } from "../hooks/use-generate-mask-v2";
 import { ImageOff, X } from "lucide-react";
-import { ImageModeration, ImageQuality, ImageSize } from "@/api/types";
+import {
+  ImageModel,
+  ImageModeration,
+  ImageQuality,
+  ImageSize,
+} from "@/api/types";
 import { Tabs, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useWeave } from "@inditextech/weave-react";
@@ -47,6 +52,8 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 export function LLMGenerationPopupV2() {
   useKeyboardHandler();
 
+  const [modelToUse, setModelToUse] =
+    React.useState<ImageModel>("openai/gpt-image-1");
   const [promptGenerate, setPromptGenerate] = React.useState<string>("");
   const [promptEdit, setPromptEdit] = React.useState<Record<string, string>>(
     {}
@@ -234,6 +241,7 @@ export function LLMGenerationPopupV2() {
           prompt: promptGenerate,
         },
         {
+          model: modelToUse,
           quality,
           moderation,
           size,
@@ -669,14 +677,14 @@ export function LLMGenerationPopupV2() {
                     <div className="w-full grid grid-cols-2 gap-x-3 gap-y-2 justify-start items-center">
                       <div className="flex gap-1 justify-start items-center">
                         <span className="font-inter text-xs uppercase">
-                          Moderation
+                          Model
                         </span>
                       </div>
                       <div className="w-full flex justify-end items-center">
                         <Select
-                          value={moderation}
+                          value={modelToUse}
                           onValueChange={(value) =>
-                            setModeration(value as ImageModeration)
+                            setModelToUse(value as ImageModel)
                           }
                           disabled={
                             mutationGenerate.isPending || mutationEdit.isPending
@@ -692,111 +700,162 @@ export function LLMGenerationPopupV2() {
                             <SelectGroup>
                               <SelectItem
                                 className="font-inter text-xs rounded-none"
-                                value="low"
+                                value="openai/gpt-image-1"
                               >
-                                Low
+                                openai/gpt-image-1
                               </SelectItem>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="auto"
-                              >
-                                Auto
-                              </SelectItem>
+                              {imagesLLMPopupType === "create" && (
+                                <SelectItem
+                                  className="font-inter text-xs rounded-none"
+                                  value="gemini/gemini-2.5-flash-image-preview"
+                                >
+                                  gemini/gemini-2.5-flash-image-preview
+                                </SelectItem>
+                              )}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
-                      <div className="flex gap-1 justify-start items-center">
-                        <span className="font-inter text-xs uppercase">
-                          Quality
-                        </span>
-                      </div>
-                      <div className="w-full flex justify-end items-center">
-                        <Select
-                          value={quality}
-                          onValueChange={(value) =>
-                            setQuality(value as ImageQuality)
-                          }
-                          disabled={
-                            mutationGenerate.isPending || mutationEdit.isPending
-                          }
-                        >
-                          <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
-                            <SelectValue placeholder="Size" />
-                          </SelectTrigger>
-                          <SelectContent
-                            className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
-                            align="end"
-                          >
-                            <SelectGroup>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="low"
+                      {modelToUse === "openai/gpt-image-1" && (
+                        <>
+                          <div className="flex gap-1 justify-start items-center">
+                            <span className="font-inter text-xs uppercase">
+                              Moderation
+                            </span>
+                          </div>
+                          <div className="w-full flex justify-end items-center">
+                            <Select
+                              value={moderation}
+                              onValueChange={(value) =>
+                                setModeration(value as ImageModeration)
+                              }
+                              disabled={
+                                mutationGenerate.isPending ||
+                                mutationEdit.isPending
+                              }
+                            >
+                              <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                                <SelectValue placeholder="Moderation" />
+                              </SelectTrigger>
+                              <SelectContent
+                                className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                                align="end"
                               >
-                                Low
-                              </SelectItem>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="medium"
+                                <SelectGroup>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="low"
+                                  >
+                                    Low
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="auto"
+                                  >
+                                    Auto
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
+                          <div className="flex gap-1 justify-start items-center">
+                            <span className="font-inter text-xs uppercase">
+                              Quality
+                            </span>
+                          </div>
+                          <div className="w-full flex justify-end items-center">
+                            <Select
+                              value={quality}
+                              onValueChange={(value) =>
+                                setQuality(value as ImageQuality)
+                              }
+                              disabled={
+                                mutationGenerate.isPending ||
+                                mutationEdit.isPending
+                              }
+                            >
+                              <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                                <SelectValue placeholder="Size" />
+                              </SelectTrigger>
+                              <SelectContent
+                                className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                                align="end"
                               >
-                                Medium
-                              </SelectItem>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="high"
+                                <SelectGroup>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="low"
+                                  >
+                                    Low
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="medium"
+                                  >
+                                    Medium
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="high"
+                                  >
+                                    High
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
+                          <div className="flex gap-1 justify-start items-center">
+                            <span className="font-inter text-xs uppercase">
+                              Aspect Ratio (Size)
+                            </span>
+                          </div>
+                          <div className="w-full flex justify-end items-center">
+                            <Select
+                              value={size}
+                              onValueChange={(value) =>
+                                setSize(value as ImageSize)
+                              }
+                              disabled={
+                                mutationGenerate.isPending ||
+                                mutationEdit.isPending
+                              }
+                            >
+                              <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+                                <SelectValue placeholder="Size" />
+                              </SelectTrigger>
+                              <SelectContent
+                                className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+                                align="end"
                               >
-                                High
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
-                      <div className="flex gap-1 justify-start items-center">
-                        <span className="font-inter text-xs uppercase">
-                          Aspect Ratio (Size)
-                        </span>
-                      </div>
-                      <div className="w-full flex justify-end items-center">
-                        <Select
-                          value={size}
-                          onValueChange={(value) => setSize(value as ImageSize)}
-                          disabled={
-                            mutationGenerate.isPending || mutationEdit.isPending
-                          }
-                        >
-                          <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
-                            <SelectValue placeholder="Size" />
-                          </SelectTrigger>
-                          <SelectContent
-                            className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
-                            align="end"
-                          >
-                            <SelectGroup>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="1024x1024"
-                              >
-                                Squared (1024x1024)
-                              </SelectItem>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="1024x1536"
-                              >
-                                Portrait (1024x1536)
-                              </SelectItem>
-                              <SelectItem
-                                className="font-inter text-xs rounded-none"
-                                value="1536x1024"
-                              >
-                                Landscape (1536x1024)
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
+                                <SelectGroup>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="1024x1024"
+                                  >
+                                    Squared (1024x1024)
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="1024x1536"
+                                  >
+                                    Portrait (1024x1536)
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="font-inter text-xs rounded-none"
+                                    value="1536x1024"
+                                  >
+                                    Landscape (1536x1024)
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2 h-[1px] bg-[#c9c9c9]"></div>
+                        </>
+                      )}
                       <div className="flex gap-1 justify-start items-center">
                         <span className="font-inter text-xs uppercase">
                           Samples

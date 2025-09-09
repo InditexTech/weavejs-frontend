@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  ImageModel,
   ImageModeration,
   ImageQuality,
   ImageSampleCount,
@@ -17,6 +18,7 @@ export const postGenerateImageV2 = async (
     prompt: string;
   },
   options: {
+    model: ImageModel;
     quality: ImageQuality;
     moderation: ImageModeration;
     sampleCount: ImageSampleCount;
@@ -34,6 +36,7 @@ export const postGenerateImageV2 = async (
       "x-weave-client-id": params.clientId,
     },
     body: JSON.stringify({
+      model: options.model,
       prompt: params.prompt,
       sample_count: options.sampleCount,
       size: options.size,
