@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export type Model =
+export type ImageModel =
   | "openai/gpt-image-1"
   | "gemini/gemini-2.5-flash-image-preview";
 export type ImageQuality = "low" | "medium" | "high";
