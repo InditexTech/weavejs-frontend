@@ -74,9 +74,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const exportingToImage = useCollaborationRoom(
     (state) => state.images.exporting
   );
-  // const transformingImage = useCollaborationRoom(
-  //   (state) => state.images.transforming
-  // );
+  const transformingImage = useCollaborationRoom(
+    (state) => state.images.transforming
+  );
   const uploadingImage = useCollaborationRoom(
     (state) => state.images.uploading
   );
@@ -235,7 +235,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           )}
         </section>
-
         {uploadingImage && (
           <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
@@ -256,12 +255,22 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           </div>
         )}
-        {exportingToImage && (
-          <div className="bg-white flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+        {transformingImage && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
               <Logo kind="large" variant="no-text" />
               <div className="font-inter text-base">
-                Exporting, please wait...
+                Requesting background removal, please wait...
+              </div>
+            </div>
+          </div>
+        )}
+        {exportingToImage && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">
+                Loading AI UI, please wait...
               </div>
             </div>
           </div>

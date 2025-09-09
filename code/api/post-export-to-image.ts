@@ -7,7 +7,8 @@ import { WeaveExportNodesOptions } from "@inditextech/weave-types";
 export const postExportToImage = async (
   roomData: string,
   nodes: string[],
-  options: WeaveExportNodesOptions
+  options: WeaveExportNodesOptions,
+  responseType: "base64" | "blob" | "zip" = "zip"
 ) => {
   const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/export`;
 
@@ -21,7 +22,7 @@ export const postExportToImage = async (
       backgroundColor: options.backgroundColor,
       ...(options.format === "image/jpeg" && { quality: options.quality }),
     },
-    responseType: "zip",
+    responseType,
   };
 
   const response = await fetch(endpoint, {
@@ -36,7 +37,20 @@ export const postExportToImage = async (
     throw new Error("Failed to export room to image");
   }
 
-  const blob = await response.blob();
+  if (responseType === "zip") {
+    const blob = await response.blob();
 
-  return blob;
+    return blob;
+  }
+
+  if (responseType === "blob") {
+    const blob = await response.blob();
+
+    return blob;
+  }
+
+  if (responseType === "base64") {
+    const data = await response.json();
+    return data;
+  }
 };

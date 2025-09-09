@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import {
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
-  WeaveExportNodesActionParams,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
@@ -42,6 +41,7 @@ import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useExportToImageServerSide } from "./use-export-to-image-server-side";
+import { getImageBase64 } from "@/components/utils/images";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -88,6 +88,9 @@ function useContextMenu() {
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
     (state) => state.setExportConfigVisible
+  );
+  const setImageExporting = useCollaborationRoom(
+    (state) => state.setImageExporting
   );
 
   const aiEnabled = useIACapabilities((state) => state.enabled);
@@ -286,31 +289,26 @@ function useContextMenu() {
               type: "button",
               label: "Remove background",
               icon: <BrushCleaning size={16} />,
-              onClick: () => {
+              onClick: async () => {
                 if (instance) {
                   const nodeImage = nodes[0].instance as
                     | Konva.Group
                     | undefined;
+
                   if (nodeImage) {
                     setTransformingImage(true);
 
-                    setTimeout(async () => {
-                      const img = await instance.exportNodes(
-                        [nodeImage],
-                        (nodes: Konva.Node[]) => nodes,
-                        {
-                          format: "image/png",
+                    try {
+                      const { url } = await getImageBase64({
+                        instance,
+                        nodes: [nodeImage.getAttrs().id ?? ""],
+                        options: {
                           padding: 0,
                           pixelRatio: 1,
-                        }
-                      );
+                        },
+                      });
 
-                      const dataBase64Url = instance.imageToBase64(
-                        img,
-                        "image/png"
-                      );
-
-                      const dataBase64 = dataBase64Url.split(",")[1];
+                      const dataBase64 = url.split(",")[1];
 
                       mutationUploadV2.mutate(
                         {
@@ -336,7 +334,12 @@ function useContextMenu() {
                           },
                         }
                       );
-                    }, 10);
+                    } catch (error) {
+                      console.error(error);
+                      toast.error("Error transforming image.");
+                    } finally {
+                      setTransformingImage(false);
+                    }
                   }
                 }
 
@@ -355,27 +358,30 @@ function useContextMenu() {
               label: "Edit with AI",
               icon: <Bot size={16} />,
               onClick: async () => {
-                const image = await instance.triggerAction<
-                  WeaveExportNodesActionParams,
-                  Promise<HTMLImageElement>
-                >("exportNodesTool", {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 0,
-                    pixelRatio: 1,
-                  },
-                });
-
-                const base64URL: unknown = instance.imageToBase64(
-                  image,
-                  "image/png"
-                );
-
-                setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-                setImagesLLMPopupType("edit-prompt");
-                setImagesLLMPopupImage(base64URL as string);
-                setImagesLLMPopupVisible(true);
                 setContextMenuShow(false);
+
+                setImageExporting(true);
+
+                try {
+                  const { url } = await getImageBase64({
+                    instance,
+                    nodes: nodes.map((n) => n.node?.key ?? ""),
+                    options: {
+                      padding: 0,
+                      pixelRatio: 1,
+                    },
+                  });
+
+                  setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
+                  setImagesLLMPopupType("edit-prompt");
+                  setImagesLLMPopupImage(url);
+                  setImagesLLMPopupVisible(true);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Error exporting image.");
+                } finally {
+                  setImageExporting(false);
+                }
               },
             });
             options.push({
@@ -391,29 +397,34 @@ function useContextMenu() {
               label: "Edit with AI",
               icon: <Bot size={16} />,
               onClick: async () => {
-                const image = await instance.triggerAction<
-                  WeaveExportNodesActionParams,
-                  Promise<HTMLImageElement>
-                >("exportNodesTool", {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 0,
-                    pixelRatio: 1,
-                  },
-                });
-
-                const base64URL: unknown = instance.imageToBase64(
-                  image,
-                  "image/png"
-                );
-
-                sidebarToggle(null);
-
-                setImagesLLMPopupSelectedNodesV2(nodes.map((n) => n.instance));
-                setImagesLLMPopupTypeV2("edit-prompt");
-                setImagesLLMPopupImageV2(base64URL as string);
-                setImagesLLMPopupVisibleV2(true);
                 setContextMenuShow(false);
+
+                setImageExporting(true);
+
+                try {
+                  const { url } = await getImageBase64({
+                    instance,
+                    nodes: nodes.map((n) => n.node?.key ?? ""),
+                    options: {
+                      padding: 0,
+                      pixelRatio: 1,
+                    },
+                  });
+
+                  sidebarToggle(null);
+
+                  setImagesLLMPopupSelectedNodesV2(
+                    nodes.map((n) => n.instance)
+                  );
+                  setImagesLLMPopupTypeV2("edit-prompt");
+                  setImagesLLMPopupImageV2(url);
+                  setImagesLLMPopupVisibleV2(true);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Error exporting image.");
+                } finally {
+                  setImageExporting(false);
+                }
               },
             });
             options.push({
@@ -781,6 +792,7 @@ function useContextMenu() {
       setImagesLLMPopupImageV2,
       setTransformingImage,
       setContextMenuShow,
+      setImageExporting,
       setRemoveBackgroundPopupImageId,
       setRemoveBackgroundPopupImageURL,
       setRemoveBackgroundPopupOriginNodeId,

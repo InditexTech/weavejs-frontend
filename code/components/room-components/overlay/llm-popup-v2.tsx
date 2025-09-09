@@ -129,6 +129,15 @@ export function LLMGenerationPopupV2() {
   const [actualMaskBase64, actualMaskBase64UI] = useGenerateMaskV2();
 
   React.useEffect(() => {
+    if (modelToUse === "gemini/gemini-2.5-flash-image-preview") {
+      setImageSamples("1");
+    }
+    if (modelToUse === "openai/gpt-image-1") {
+      setImageSamples("4");
+    }
+  }, [modelToUse]);
+
+  React.useEffect(() => {
     if (!instance) {
       return;
     }
@@ -877,30 +886,45 @@ export function LLMGenerationPopupV2() {
                             align="end"
                           >
                             <SelectGroup>
-                              <SelectItem
-                                value="1"
-                                className="font-inter text-xs rounded-none"
-                              >
-                                1
-                              </SelectItem>
-                              <SelectItem
-                                value="2"
-                                className="font-inter text-xs rounded-none"
-                              >
-                                2
-                              </SelectItem>
-                              <SelectItem
-                                value="3"
-                                className="font-inter text-xs rounded-none"
-                              >
-                                3
-                              </SelectItem>
-                              <SelectItem
-                                value="4"
-                                className="font-inter text-xs rounded-none"
-                              >
-                                4
-                              </SelectItem>
+                              {modelToUse === "openai/gpt-image-1" && (
+                                <>
+                                  <SelectItem
+                                    value="1"
+                                    className="font-inter text-xs rounded-none"
+                                  >
+                                    1
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="2"
+                                    className="font-inter text-xs rounded-none"
+                                  >
+                                    2
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="3"
+                                    className="font-inter text-xs rounded-none"
+                                  >
+                                    3
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="4"
+                                    className="font-inter text-xs rounded-none"
+                                  >
+                                    4
+                                  </SelectItem>
+                                </>
+                              )}
+                              {modelToUse ===
+                                "gemini/gemini-2.5-flash-image-preview" && (
+                                <>
+                                  <SelectItem
+                                    value="1"
+                                    className="font-inter text-xs rounded-none"
+                                  >
+                                    1
+                                  </SelectItem>
+                                </>
+                              )}
                             </SelectGroup>
                           </SelectContent>
                         </Select>

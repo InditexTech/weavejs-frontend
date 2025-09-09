@@ -29,7 +29,6 @@ function useGetAzureWebPubsubProvider({
         {
           roomId: room,
           url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
-          resyncIntervalMs: 15 * 1000, // 15 seconds
         }
       );
 

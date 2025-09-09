@@ -59,6 +59,7 @@ import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-re
 import { useIACapabilities } from "@/store/ia";
 import { ColorPickerInput } from "../inputs/color-picker";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
+import { getImageBase64 } from "@/components/utils/images";
 
 export function ToolsNodeOverlay() {
   useKeyboardHandler();
@@ -123,6 +124,9 @@ export function ToolsNodeOverlay() {
   );
   const setNodePropertiesAction = useCollaborationRoom(
     (state) => state.setNodePropertiesAction
+  );
+  const setImageExporting = useCollaborationRoom(
+    (state) => state.setImageExporting
   );
 
   const aiEnabled = useIACapabilities((state) => state.enabled);
@@ -328,7 +332,7 @@ export function ToolsNodeOverlay() {
                 weaveConnectionStatus !==
                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
-              onClick={() => {
+              onClick={async () => {
                 if (!instance) {
                   return;
                 }
@@ -340,25 +344,19 @@ export function ToolsNodeOverlay() {
 
                   setTransformingImage(true);
 
-                  setTimeout(async () => {
-                    const img = await instance.exportNodes(
-                      [nodeImage],
-                      (nodes) => nodes,
-                      {
-                        format: "image/png",
+                  try {
+                    const { url } = await getImageBase64({
+                      instance,
+                      nodes: nodes.map((n) => n.node?.key ?? ""),
+                      options: {
                         padding: 0,
                         pixelRatio: 1,
-                      }
-                    );
+                      },
+                    });
 
-                    const dataBase64Url = instance.imageToBase64(
-                      img,
-                      "image/png"
-                    );
+                    setRemoveBackgroundPopupOriginImage(url);
 
-                    setRemoveBackgroundPopupOriginImage(dataBase64Url);
-
-                    const dataBase64 = dataBase64Url.split(",")[1];
+                    const dataBase64 = url.split(",")[1];
 
                     mutationUpload.mutate(
                       {
@@ -391,7 +389,12 @@ export function ToolsNodeOverlay() {
                         },
                       }
                     );
-                  }, 10);
+                  } catch (error) {
+                    console.error(error);
+                    toast.error("Error transforming the image.");
+                  } finally {
+                    setTransformingImage(false);
+                  }
                 }
               }}
               label={
@@ -413,7 +416,7 @@ export function ToolsNodeOverlay() {
                 weaveConnectionStatus !==
                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
-              onClick={() => {
+              onClick={async () => {
                 if (!instance) {
                   return;
                 }
@@ -425,23 +428,17 @@ export function ToolsNodeOverlay() {
 
                   setTransformingImage(true);
 
-                  setTimeout(async () => {
-                    const img = await instance.exportNodes(
-                      [nodeImage],
-                      (nodes) => nodes,
-                      {
-                        format: "image/png",
+                  try {
+                    const { url } = await getImageBase64({
+                      instance,
+                      nodes: nodes.map((n) => n.node?.key ?? ""),
+                      options: {
                         padding: 0,
                         pixelRatio: 1,
-                      }
-                    );
+                      },
+                    });
 
-                    const dataBase64Url = instance.imageToBase64(
-                      img,
-                      "image/png"
-                    );
-
-                    const dataBase64 = dataBase64Url.split(",")[1];
+                    const dataBase64 = url.split(",")[1];
 
                     mutationUploadV2.mutate(
                       {
@@ -467,7 +464,12 @@ export function ToolsNodeOverlay() {
                         },
                       }
                     );
-                  }, 10);
+                  } catch (error) {
+                    console.error(error);
+                    toast.error("Error transforming the image.");
+                  } finally {
+                    setTransformingImage(false);
+                  }
                 }
               }}
               label={
@@ -535,28 +537,32 @@ export function ToolsNodeOverlay() {
                   return;
                 }
 
-                const image = await instance.triggerAction<
-                  WeaveExportNodesActionParams,
-                  Promise<HTMLImageElement>
-                >("exportNodesTool", {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 0,
-                    pixelRatio: 1,
-                  },
-                });
+                setImageExporting(true);
 
-                const base64URL: unknown = instance.imageToBase64(
-                  image,
-                  "image/png"
-                );
+                try {
+                  const { url } = await getImageBase64({
+                    instance,
+                    nodes: nodes.map((n) => n.node?.key ?? ""),
+                    options: {
+                      padding: 0,
+                      pixelRatio: 1,
+                    },
+                  });
 
-                sidebarToggle(null);
+                  sidebarToggle(null);
 
-                setImagesLLMPopupSelectedNodesV2(nodes.map((n) => n.instance));
-                setImagesLLMPopupTypeV2("edit-prompt");
-                setImagesLLMPopupImageV2(base64URL as string);
-                setImagesLLMPopupVisibleV2(true);
+                  setImagesLLMPopupSelectedNodesV2(
+                    nodes.map((n) => n.instance)
+                  );
+                  setImagesLLMPopupTypeV2("edit-prompt");
+                  setImagesLLMPopupImageV2(url);
+                  setImagesLLMPopupVisibleV2(true);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Error exporting image.");
+                } finally {
+                  setImageExporting(false);
+                }
               }}
               label={
                 <div className="flex gap-3 justify-start items-center">
@@ -586,6 +592,7 @@ export function ToolsNodeOverlay() {
     setImagesLLMPopupType,
     setImagesLLMPopupVisible,
     setTransformingImage,
+    setImageExporting,
     singleLocked,
     weaveConnectionStatus,
     setRemoveBackgroundPopupImageId,
