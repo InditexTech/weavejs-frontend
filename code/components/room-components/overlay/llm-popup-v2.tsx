@@ -447,7 +447,11 @@ export function LLMGenerationPopupV2() {
     if (imagesLLMPopupType === "create") {
       return promptGenerate;
     }
-    if (imagesLLMPopupType === "edit-prompt") {
+    if (
+      ["edit-prompt", "edit-mask", "edit-variation"].includes(
+        imagesLLMPopupType
+      )
+    ) {
       return (
         promptEdit[imagesLLMPopupImageSelected?.[0].getAttrs().id ?? ""] ?? ""
       );
