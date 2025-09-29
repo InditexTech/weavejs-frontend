@@ -73,9 +73,9 @@ export function useKeyboardHandler() {
   );
 
   const triggerTool = React.useCallback(
-    (toolName: string) => {
+    (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
-        instance.triggerAction(toolName);
+        instance.triggerAction(toolName, params);
       }
       if (instance && actualAction === toolName) {
         instance.cancelAction(toolName);
@@ -136,6 +136,25 @@ export function useKeyboardHandler() {
   useKeyDown(() => {
     triggerTool("eraserTool");
   }, ["KeyD"]);
+
+  useKeyDown(
+    () => {
+      triggerTool("frameTool");
+    },
+    ["KeyF"],
+    (e) => !(e.ctrlKey || e.metaKey)
+  );
+
+  useKeyDown(
+    () => {
+      triggerTool("frameTool", {
+        frameWidth: 1080,
+        frameHeight: 1920,
+      });
+    },
+    ["KeyV"],
+    (e) => !(e.ctrlKey || e.metaKey)
+  );
 
   useKeyDown(
     () => {

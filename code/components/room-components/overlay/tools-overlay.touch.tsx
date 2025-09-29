@@ -13,7 +13,6 @@ import {
   PenTool,
   Square,
   Type,
-  Frame,
   MousePointer,
   Tag,
   Undo,
@@ -32,6 +31,8 @@ import {
   Projector,
   MessageSquare,
   MapPinned,
+  RectangleHorizontal,
+  RectangleVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -354,7 +355,7 @@ export function ToolsOverlayTouch() {
         )}
         <ToolbarButton
           className="rounded-full !w-[40px]"
-          icon={<Frame className="px-2" size={40} strokeWidth={1} />}
+          icon={<RectangleHorizontal className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
@@ -362,7 +363,29 @@ export function ToolsOverlayTouch() {
           onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add a frame</p>
+              <p>Add a landscape Frame</p>
+            </div>
+          }
+          tooltipSide="right"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<RectangleVertical className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "frameTool"}
+          onClick={() => {
+            triggerTool("frameTool", {
+              ...nodeCreateProps,
+              frameWidth: 1080,
+              frameHeight: 1920,
+            });
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a portrait Frame</p>
             </div>
           }
           tooltipSide="right"

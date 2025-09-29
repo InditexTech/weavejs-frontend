@@ -2215,6 +2215,10 @@ export function ToolsNodeOverlay() {
     return null;
   }
 
+  if (nodes.length >= 2) {
+    return null;
+  }
+
   return (
     <motion.div
       initial="hidden"
