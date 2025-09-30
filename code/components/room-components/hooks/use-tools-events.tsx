@@ -8,6 +8,62 @@ import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
 import { useIsTouchDevice } from "./use-is-touch-device";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { RectangleHorizontal, RectangleVertical } from "lucide-react";
+
+const AddFrameToast = () => {
+  const instance = useWeave((state) => state.instance);
+  const [frameKind, setFrameKind] = React.useState<"horizontal" | "vertical">(
+    "horizontal"
+  );
+
+  const isTouchDevice = useIsTouchDevice();
+
+  return (
+    <div className="w-full flex flex-col gap-1 justify-between items-center">
+      <div className="w-full">{`Select the frame orientation and then ${isTouchDevice ? "tap" : "click"} to add the frame.`}</div>
+      <div className="w-full flex gap-1 justify-end items-center pt-2">
+        <ToggleGroup
+          variant="outline"
+          type="single"
+          size="sm"
+          value={frameKind}
+          onValueChange={(value) => {
+            if (instance && value === "horizontal") {
+              setFrameKind("horizontal");
+              instance.updatePropsAction("frameTool", {
+                frameWidth: 1920,
+                frameHeight: 1080,
+              });
+            }
+            if (instance && value === "vertical") {
+              setFrameKind(value);
+              instance.updatePropsAction("frameTool", {
+                frameWidth: 1080,
+                frameHeight: 1920,
+              });
+            }
+          }}
+        >
+          <ToggleGroupItem
+            value="horizontal"
+            className="font-inter font-light text-xs !px-5 pointer-cursor"
+            aria-label="Frame is horizontal"
+          >
+            Horizontal <RectangleHorizontal size={32} strokeWidth={1} />
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="vertical"
+            className="font-inter font-light text-xs !px-5 pointer-cursor"
+            aria-label="Frame is vertical"
+          >
+            Vertical <RectangleVertical size={32} strokeWidth={1} />
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+    </div>
+  );
+};
 
 export const useToolsEvents = () => {
   const instance = useWeave((state) => state.instance);
@@ -417,7 +473,7 @@ export const useToolsEvents = () => {
 
     const handleFrameAdding = () => {
       toast("Add a frame", {
-        description: `${isTouchDevice ? "Tap" : "Click"} to add the frame.`,
+        description: AddFrameToast,
         duration: Infinity,
       });
     };

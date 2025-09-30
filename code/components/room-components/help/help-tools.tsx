@@ -12,8 +12,7 @@ import {
   Square,
   SwatchBook,
   Type,
-  RectangleHorizontal,
-  RectangleVertical,
+  Frame,
 } from "lucide-react";
 import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
@@ -36,19 +35,11 @@ export const HelpTools = () => {
           }}
         />
         <HelpShortcutElement
-          icon={<RectangleHorizontal />}
-          label="Frame tool (landscape)"
+          icon={<Frame />}
+          label="Frame tool"
           shortcuts={{
             [SYSTEM_OS.MAC]: "F",
             [SYSTEM_OS.OTHER]: "F",
-          }}
-        />
-        <HelpShortcutElement
-          icon={<RectangleVertical />}
-          label="Frame tool (portrait)"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "V",
-            [SYSTEM_OS.OTHER]: "V",
           }}
         />
       </div>

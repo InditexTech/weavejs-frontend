@@ -145,25 +145,6 @@ export function useKeyboardHandler() {
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
-  useKeyDown(
-    () => {
-      triggerTool("frameTool", {
-        frameWidth: 1080,
-        frameHeight: 1920,
-      });
-    },
-    ["KeyV"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
-
-  useKeyDown(
-    () => {
-      triggerTool("frameTool");
-    },
-    ["KeyF"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
-
   useKeyDown(() => {
     triggerTool("rectangleTool");
   }, ["KeyR"]);

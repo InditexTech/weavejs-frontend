@@ -215,8 +215,8 @@ export const Room = () => {
         toastOptions={{
           classNames: {
             toast: "font-inter font-light text-xs",
-            title: "font-inter font-semibold text-sm",
-            description: "font-inter font-light text-xs !text-black",
+            title: "w-full font-inter font-semibold text-sm",
+            description: "w-full font-inter font-light text-xs !text-black",
           },
           style: {
             borderRadius: "0px",

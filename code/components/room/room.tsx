@@ -210,9 +210,10 @@ export const Room = () => {
         mobileOffset={16}
         toastOptions={{
           classNames: {
-            toast: "font-inter font-light text-xs",
-            title: "font-inter font-semibold text-sm",
-            description: "font-inter font-light text-xs !text-black",
+            toast: "w-full font-inter font-light text-xs",
+            content: "w-full",
+            title: "w-full font-inter font-semibold text-sm",
+            description: "w-full font-inter font-light text-xs !text-black",
           },
           style: {
             borderRadius: "0px",
