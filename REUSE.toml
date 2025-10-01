@@ -14,12 +14,14 @@ path = [
     "**/.gitignore",
 
     # code/ directory licensing
+    "code/public/**",
     "code/.dockerignore",
     "code/.prettierignore",
     "code/.eslintrc.json",
     "code/.tool-versions",
     "code/components.json",
     "code/jsrepo.json",
+    "code/justfile",
     "code/package*.json",
     "code/tsconfig.json",
 ]
