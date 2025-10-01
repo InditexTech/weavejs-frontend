@@ -12,21 +12,6 @@ declare module "konva/lib/Node" {
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
     allowedAnchors(): string[];
-    getRealClientRect(
-      config?:
-        | {
-            skipTransform?: boolean;
-            skipShadow?: boolean;
-            skipStroke?: boolean;
-            relativeTo?: Container;
-          }
-        | undefined
-    ): {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatePosition(position: Vector2d): void;
     dblClick(): void;

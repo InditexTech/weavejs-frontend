@@ -8,15 +8,8 @@ import {
   WeaveElementInstance,
 } from "@inditextech/weave-types";
 import Konva from "konva";
-import { Inter } from "next/font/google";
 
 export const COLOR_TOKEN_NODE_TYPE = "color-token";
-
-const inter = Inter({
-  preload: true,
-  variable: "--inter",
-  subsets: ["latin"],
-});
 
 export class ColorTokenNode extends WeaveNode {
   protected nodeType = COLOR_TOKEN_NODE_TYPE;
@@ -49,9 +42,7 @@ export class ColorTokenNode extends WeaveNode {
       fill: "#FFFFFFFF",
       width: colorTokenParams.width,
       height: colorTokenParams.height,
-      strokeScaleEnabled: false,
-      stroke: "black",
-      strokeWidth: 2,
+      strokeEnabled: false,
     });
 
     colorTokenNode.add(internalRect);
@@ -63,6 +54,8 @@ export class ColorTokenNode extends WeaveNode {
       x: 0,
       y: 0,
       fill: colorTokenColor,
+      strokeWidth: 0,
+      strokeEnabled: false,
       width: colorTokenParams.width,
       height: (colorTokenParams.height ?? 0) - 60,
       listening: false,
@@ -78,7 +71,7 @@ export class ColorTokenNode extends WeaveNode {
       x: 20,
       y: 260,
       fontSize: 20,
-      fontFamily: inter.style.fontFamily,
+      fontFamily: "Inter, sans-serif",
       fill: "#CCCCCCFF",
       strokeEnabled: false,
       stroke: "#000000FF",
@@ -92,6 +85,23 @@ export class ColorTokenNode extends WeaveNode {
     });
 
     colorTokenNode.add(internalText);
+
+    const border = new Konva.Rect({
+      groupId: id,
+      nodeId: id,
+      id: `${id}-colorToken-border`,
+      x: 0,
+      y: 0,
+      fill: "transparent",
+      width: colorTokenParams.width,
+      height: colorTokenParams.height,
+      strokeScaleEnabled: true,
+      stroke: "black",
+      strokeWidth: 1,
+    });
+
+    colorTokenNode.add(border);
+    border.moveToTop();
 
     colorTokenNode.getTransformerProperties = () => {
       const baseConfig = this.defaultGetTransformerProperties({});

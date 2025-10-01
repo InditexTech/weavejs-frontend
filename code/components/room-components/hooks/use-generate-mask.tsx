@@ -40,7 +40,7 @@ function getBoundingBox(
       continue;
     }
 
-    const box = node.getRealClientRect({ relativeTo: layer });
+    const box = node.getClientRect({ relativeTo: layer });
 
     minX = Math.min(minX, box.x);
     minY = Math.min(minY, box.y);

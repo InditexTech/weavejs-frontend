@@ -11,8 +11,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
-import { motion } from "framer-motion";
-import { bottomElementVariants } from "./variants";
 import { useCollaborationRoom } from "@/store/store";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
@@ -20,8 +18,6 @@ import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { ToolsOverlayTouch } from "./tools-overlay.touch";
 import { ToolsOverlayMouse } from "./tools-overlay.mouse";
 import { ToolsNodeOverlay } from "./tools-node-overlay";
-import { ToolsNodesOverlay } from "./tools-nodes-overlay";
-import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ToolsMaskingOverlay } from "./tools-masking-overlay";
 import { isClipboardAPIAvailable } from "@/lib/utils";
 import {
@@ -245,33 +241,17 @@ export function ToolsOverlay() {
     setUploadingImage,
   ]);
 
-  const title = useNodeActionName();
-
   if (!showUI) {
     return null;
   }
 
   return (
     <>
-      {title !== "Unknown" && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={bottomElementVariants}
-          className="pointer-events-none absolute left-[16px] right-[16px] top-[16px] flex flex-col gap-2 justify-center items-center"
-        >
-          <div className="px-3 py-2 rounded-full font-inter text-xs uppercase bg-white border border-[#c9c9c9]">
-            {title}
-          </div>
-        </motion.div>
-      )}
       {!imagesLLMPopupVisible && (
         <>
           <ToolsOverlayTouch />
           <ToolsOverlayMouse />
           <ToolsNodeOverlay />
-          <ToolsNodesOverlay />
         </>
       )}
       {imagesLLMPopupVisible && <ToolsMaskingOverlay />}
@@ -280,7 +260,6 @@ export function ToolsOverlay() {
           <ToolsOverlayTouch />
           <ToolsOverlayMouse />
           <ToolsNodeOverlay />
-          <ToolsNodesOverlay />
         </>
       )}
       {imagesLLMPopupVisibleV2 && <ToolsMaskingOverlayV2 />}

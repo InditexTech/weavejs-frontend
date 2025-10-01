@@ -38,6 +38,7 @@ import { LLMGenerationPopupV2 } from "../room-components/overlay/llm-popup-v2";
 import { Comments } from "../room-components/comment/comments";
 import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-reference-selection-v2";
 import { ExportConfigDialog } from "../room-components/overlay/export-config";
+import { NodeToolbar } from "../room-components/overlay/node-toolbar";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -171,7 +172,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
               ["pointer-events-auto"]:
                 status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
             })}
-          ></div>
+          >
+            <NodeToolbar />
+          </div>
           {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
           {weaveConnectionStatus !==
             WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (

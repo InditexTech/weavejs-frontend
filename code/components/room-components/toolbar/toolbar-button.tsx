@@ -80,6 +80,7 @@ export const ToolbarButton = React.forwardRef<
             className
           )}
           disabled={disabled}
+          onMouseOver={(e) => e.preventDefault()}
           onClick={(e) => onClick(e)}
           {...bind()}
         >
