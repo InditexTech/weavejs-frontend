@@ -30,8 +30,9 @@ import {
   SwatchBook,
   Projector,
   MessageSquare,
-  MapPinned,
+  // MapPinned,
   Frame,
+  Video,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -111,8 +112,8 @@ export function ToolsOverlayTouch() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
-  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
+  // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -194,8 +195,7 @@ export function ToolsOverlayTouch() {
           tooltipAlign="center"
         />
         <ToolbarDivider orientation="horizontal" />
-
-        <ToolbarButton
+        {/* <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
           disabled={
@@ -213,8 +213,7 @@ export function ToolsOverlayTouch() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-
-        <ToolbarDivider orientation="horizontal" />
+        <ToolbarDivider orientation="horizontal" /> */}
         <DropdownMenu modal={false} open={sidebarsMenuOpen}>
           <DropdownMenuTrigger
             disabled={
@@ -379,6 +378,22 @@ export function ToolsOverlayTouch() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add text</p>
+            </div>
+          }
+          tooltipSide="right"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Video className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "videoTool"}
+          onClick={() => triggerTool("videoTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add video</p>
             </div>
           }
           tooltipSide="right"

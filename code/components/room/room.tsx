@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
@@ -205,22 +206,33 @@ export const Room = () => {
           <HelpDrawer />
         </WeaveProvider>
       )}
-      <Toaster
-        offset={16}
-        mobileOffset={16}
-        toastOptions={{
-          classNames: {
-            toast: "w-full font-inter font-light text-xs",
-            content: "w-full",
-            title: "w-full font-inter font-semibold text-sm",
-            description: "w-full font-inter font-light text-xs !text-black",
-          },
-          style: {
-            borderRadius: "0px",
-            boxShadow: "none",
-          },
-        }}
-      />
+      <Toasts />
     </>
   );
+};
+
+const Toasts = () => {
+  const toasterContent = (
+    <Toaster
+      offset={16}
+      mobileOffset={16}
+      toastOptions={{
+        classNames: {
+          toast: "w-full font-inter font-light text-xs",
+          content: "w-full",
+          title: "w-full font-inter font-semibold text-sm",
+          description: "w-full font-inter font-light text-xs !text-black",
+        },
+        style: {
+          borderRadius: "0px",
+          boxShadow: "none",
+        },
+      }}
+    />
+  );
+
+  // Only render in the browser
+  if (typeof window === "undefined") return null;
+
+  return createPortal(toasterContent, document.body);
 };

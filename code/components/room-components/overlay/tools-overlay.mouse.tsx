@@ -31,7 +31,8 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  MapPinned,
+  // MapPinned,
+  Video,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -113,8 +114,8 @@ export function ToolsOverlayMouse() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
-  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
+  // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -643,6 +644,43 @@ export function ToolsOverlayMouse() {
         </div>
         <ToolbarButton
           className="rounded-full !w-[40px]"
+          icon={<Video className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "videoTool"}
+          onClick={() => {
+            if (!instance) {
+              return;
+            }
+
+            const { finishUploadCallback } = instance.triggerAction(
+              "videoTool"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ) as any;
+
+            instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+
+            const videoURLUploaded =
+              "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
+            finishUploadCallback?.(videoURLUploaded);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Video tool</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "V",
+                  [SYSTEM_OS.OTHER]: "V",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
           icon={<Type className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -849,7 +887,7 @@ export function ToolsOverlayMouse() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ToolbarDivider />
+        {/* <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
@@ -873,7 +911,7 @@ export function ToolsOverlayMouse() {
           }
           tooltipSide="top"
           tooltipAlign="center"
-        />
+        /> */}
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"

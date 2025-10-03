@@ -39,6 +39,8 @@ export const useNodeActionName = () => {
         return "Vector path";
       case "text":
         return "Text";
+      case "video":
+        return "Video";
       case "image":
         return imagesLLMPopupVisible ? "Unknown" : "Image";
       case "star":

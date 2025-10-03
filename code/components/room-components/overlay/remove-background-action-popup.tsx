@@ -146,7 +146,7 @@ export function RemoveBackgroundActionPopup() {
                     imageURL,
                     stroke: "#000000ff",
                     strokeWidth: 0,
-                    strokeScaleEnabled: false,
+                    strokeScaleEnabled: true,
                     imageWidth,
                     imageHeight,
                     imageInfo,

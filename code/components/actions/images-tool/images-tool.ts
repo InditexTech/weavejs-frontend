@@ -252,7 +252,7 @@ export class ImagesToolAction extends WeaveAction {
         fill: "#c9c9c9",
         stroke: "#000000",
         strokeWidth: 0,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
       });
 
       this.tempImageNode.add(bgNode);
@@ -315,7 +315,7 @@ export class ImagesToolAction extends WeaveAction {
           imageURL: imageInfo.imageURL,
           stroke: "#000000ff",
           strokeWidth: 0,
-          strokeScaleEnabled: false,
+          strokeScaleEnabled: true,
           imageId: imageInfo.imageId,
           imageWidth: imageInfo.info.width,
           imageHeight: imageInfo.info.height,
@@ -417,7 +417,5 @@ export class ImagesToolAction extends WeaveAction {
   private setCursor() {
     const stage = this.instance.getStage();
     stage.container().style.cursor = "crosshair";
-    stage.container().blur();
-    stage.container().focus();
   }
 }

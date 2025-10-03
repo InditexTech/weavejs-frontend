@@ -10,19 +10,115 @@ import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
 import { useIsTouchDevice } from "./use-is-touch-device";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RectangleHorizontal, RectangleVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { cn } from "@/lib/utils";
+import { ToolbarButton } from "../toolbar/toolbar-button";
+import { ColorPickerInput } from "../inputs/color-picker";
+import { Button } from "@/components/ui/button";
 
 const AddFrameToast = () => {
   const instance = useWeave((state) => state.instance);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+
   const [frameKind, setFrameKind] = React.useState<"horizontal" | "vertical">(
     "horizontal"
   );
+  const [selectBackgroundColor, setSelectBackgroundColor] =
+    React.useState(false);
+  const [backgroundColor, setBackgroundColor] = React.useState("#ffffffff");
 
   const isTouchDevice = useIsTouchDevice();
 
   return (
     <div className="w-full flex flex-col gap-1 justify-between items-center">
-      <div className="w-full">{`Select the frame orientation and then ${isTouchDevice ? "tap" : "click"} to add the frame.`}</div>
-      <div className="w-full flex gap-1 justify-end items-center pt-2">
+      <div className="w-full">{`Select the frame background color and orientation and finally ${isTouchDevice ? "tap" : "click"} on the room to add the frame.`}</div>
+      <div className="w-full flex flex-col gap-1 justify-end items-end pt-2">
+        <div className="flex gap-1 justify-start items-center">
+          <div className="text-[10px] font-inter uppercase px-3">Color</div>
+          <DropdownMenu modal={false} open={selectBackgroundColor}>
+            <DropdownMenuTrigger
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
+              className={cn(
+                "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                {
+                  ["disabled:cursor-default disabled:opacity-50"]:
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                }
+              )}
+              asChild
+            >
+              <ToolbarButton
+                className="rounded-full min-w-[32px] !w-[32px] !h-[32px]"
+                icon={
+                  <div
+                    className="border border-[#c9c9c9c] w-[16px] h-[16px]"
+                    style={{
+                      background: backgroundColor,
+                    }}
+                  />
+                }
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={selectBackgroundColor}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectBackgroundColor((prev) => !prev);
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Background color</p>
+                  </div>
+                }
+                tooltipSide="right"
+                tooltipAlign="center"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              side="left"
+              alignOffset={0}
+              sideOffset={8}
+              className="min-w-auto font-inter rounded-none shadow-none flex flex-row !z-[1000000000]"
+            >
+              <div
+                className="flex !flex-col gap-0 w-[300px] p-4"
+                onClick={(e) => e.preventDefault()}
+              >
+                <ColorPickerInput
+                  value={backgroundColor}
+                  onChange={(color: string) => {
+                    setBackgroundColor(color);
+
+                    if (!instance) return;
+
+                    instance.updatePropsAction("frameTool", {
+                      frameBackground: color,
+                    });
+                  }}
+                />
+                <Button
+                  onClick={() => {
+                    setSelectBackgroundColor(false);
+                  }}
+                  className="cursor-pointer font-inter font-light rounded-none w-full"
+                >
+                  CLOSE
+                </Button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <ToggleGroup
           variant="outline"
           type="single"
@@ -47,14 +143,14 @@ const AddFrameToast = () => {
         >
           <ToggleGroupItem
             value="horizontal"
-            className="font-inter font-light text-xs !px-5 pointer-cursor"
+            className="text-[10px] font-inter uppercase !px-5 pointer-cursor"
             aria-label="Frame is horizontal"
           >
             Horizontal <RectangleHorizontal size={32} strokeWidth={1} />
           </ToggleGroupItem>
           <ToggleGroupItem
             value="vertical"
-            className="font-inter font-light text-xs !px-5 pointer-cursor"
+            className="text-[10px] font-inter uppercase !px-5 pointer-cursor"
             aria-label="Frame is vertical"
           >
             Vertical <RectangleVertical size={32} strokeWidth={1} />
@@ -474,6 +570,7 @@ export const useToolsEvents = () => {
     const handleFrameAdding = () => {
       toast("Add a frame", {
         description: AddFrameToast,
+
         duration: Infinity,
       });
     };
