@@ -7,6 +7,7 @@ export const DOCUMENTATION_URL = "https://inditextech.github.io/weavejs";
 
 export const SIDEBAR_ELEMENTS = {
   images: "images",
+  videos: "videos",
   frames: "frames",
   colorTokens: "colorTokens",
   comments: "comments",

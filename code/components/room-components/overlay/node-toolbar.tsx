@@ -50,9 +50,9 @@ import {
   AlignVerticalJustifyEnd,
   UnfoldHorizontal,
   UnfoldVertical,
-  // Play,
-  // RotateCcw,
-  // Square,
+  Play,
+  Pause,
+  RotateCcw,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -61,7 +61,7 @@ import {
   WeaveCopyPasteNodesPlugin,
   WeaveNodesSelectionPlugin,
   WeaveAlignNodesToolActionTriggerParams,
-  // WeaveVideoNode,
+  WeaveVideoNode,
 } from "@inditextech/weave-sdk";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -92,6 +92,10 @@ export const NodeToolbar = () => {
   ] = React.useState(false);
   const [nodesAlignmentVerticalMenuOpen, setNodesAlignmentVerticalMenuOpen] =
     React.useState(false);
+
+  const [isSelecting, setIsSelecting] = React.useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
+  const [isVideoPaused, setIsVideoPaused] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -148,11 +152,35 @@ export const NodeToolbar = () => {
     }
 
     function handleNodesChange(selectedNodes: WeaveSelection[]) {
+      if (!instance) return;
+
       if (
         selectedNodes.length > 1 ||
         (selectedNodes.length === 1 &&
           actualNodeRef.current?.key !== selectedNodes[0].node?.key)
       ) {
+        if (
+          selectedNodes.length === 1 &&
+          selectedNodes[0].node?.type === "video"
+        ) {
+          const nodeVideo = instance
+            .getMainLayer()
+            ?.findOne(`#${selectedNodes[0].node?.key}`);
+
+          const nodeHandler = instance.getNodeHandler<WeaveVideoNode>("video");
+
+          if (nodeVideo && nodeHandler) {
+            const actualVideoState = nodeHandler.getVideoState(
+              nodeVideo as WeaveElementInstance
+            );
+
+            if (actualVideoState) {
+              setIsVideoPlaying(actualVideoState.playing);
+              setIsVideoPaused(actualVideoState.paused);
+            }
+          }
+        }
+
         setNodeStyleMenuOpen(false);
         setNodeLayeringMenuOpen(false);
         setNodeFillMenuOpen(false);
@@ -246,6 +274,12 @@ export const NodeToolbar = () => {
       actualNodeRef.current = node;
     }
 
+    function handleSelectionChange(active: boolean) {
+      setIsSelecting(active);
+    }
+
+    instance.addEventListener("onSelectionState", handleSelectionChange);
+
     return () => {
       if (!instance) return;
 
@@ -256,6 +290,7 @@ export const NodeToolbar = () => {
       actualNodeRef.current = undefined;
       instance.removeEventListener("onZoomChange", updateNodeToolbarPosition);
       instance.removeEventListener("onStageMove", updateNodeToolbarPosition);
+      instance.removeEventListener("onSelectionState", handleSelectionChange);
     };
   }, [instance, imageCroppingEnabled, node, nodes]);
 
@@ -342,25 +377,46 @@ export const NodeToolbar = () => {
     [actualNode]
   );
 
-  // React.useEffect(() => {
-  //   if (!instance) return;
+  React.useEffect(() => {
+    if (!instance) return;
 
-  //   return () => {};
-  // }, [instance]);
+    function onPlayVideoHandler({ nodeId }: { nodeId: string }) {
+      if (nodeId === actualNode?.key) {
+        setIsVideoPlaying(true);
+      } else {
+        setIsVideoPlaying(false);
+      }
+    }
 
-  // const isVideoPlaying = React.useMemo(() => {
-  //   if (!instance || !isVideoNode) return false;
+    function onPauseVideoHandler({ nodeId }: { nodeId: string }) {
+      if (nodeId === actualNode?.key) {
+        setIsVideoPlaying(false);
+        setIsVideoPaused(true);
+      } else {
+        setIsVideoPaused(false);
+      }
+    }
 
-  //   const nodeHandler = instance.getNodeHandler<WeaveVideoNode>("video");
+    function onStopVideoHandler({ nodeId }: { nodeId: string }) {
+      if (nodeId === actualNode?.key) {
+        setIsVideoPlaying(false);
+      } else {
+        setIsVideoPlaying(false);
+      }
+    }
 
-  //   const nodeVideo = instance.getMainLayer()?.findOne(`#${actualNode?.key}`);
+    instance.addEventListener("onVideoPlay", onPlayVideoHandler);
+    instance.addEventListener("onVideoPause", onPauseVideoHandler);
+    instance.addEventListener("onVideoStop", onStopVideoHandler);
 
-  //   if (nodeVideo && nodeHandler) {
-  //     return nodeHandler.isPlaying(nodeVideo as WeaveElementInstance);
-  //   }
+    return () => {
+      if (!instance) return;
 
-  //   return false;
-  // }, [isVideoNode, instance, actualNode]);
+      instance.removeEventListener("onVideoPlay", onPlayVideoHandler);
+      instance.removeEventListener("onVideoPause", onPauseVideoHandler);
+      instance.removeEventListener("onVideoStop", onStopVideoHandler);
+    };
+  }, [instance, actualNode]);
 
   const isFrameNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "frame",
@@ -391,6 +447,10 @@ export const NodeToolbar = () => {
       )
     );
   }, [isSingleNodeSelected, actualNode]);
+
+  if (isSelecting) {
+    return null;
+  }
 
   if (nodes.length === 0 || imageCroppingEnabled) {
     return null;
@@ -495,42 +555,7 @@ export const NodeToolbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {/* {isVideoNode && (
-            <>
-              <ToolbarButton
-                className="rounded-full !w-[32px] !h-[32px]"
-                icon={<RotateCcw className="px-2" size={32} strokeWidth={1} />}
-                disabled={
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                }
-                active={nodeStyleMenuOpen}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!instance || !actualNode) return;
-
-                  const nodeVideo = instance
-                    .getMainLayer()
-                    ?.findOne(`#${actualNode?.key}`);
-
-                  const nodeHandler =
-                    instance.getNodeHandler<WeaveVideoNode>("video");
-
-                  if (nodeVideo && nodeHandler) {
-                    nodeHandler.resetVideo(nodeVideo as WeaveElementInstance);
-                  }
-                }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>Restart video</p>
-                  </div>
-                }
-                tooltipSide="bottom"
-                tooltipAlign="center"
-              />
-            </>
-          )}
-          {isVideoNode && !isVideoPlaying && (
+          {isVideoNode && (
             <>
               {!isVideoPlaying && (
                 <ToolbarButton
@@ -553,7 +578,7 @@ export const NodeToolbar = () => {
                       instance.getNodeHandler<WeaveVideoNode>("video");
 
                     if (nodeVideo && nodeHandler) {
-                      nodeHandler.play(nodeVideo as WeaveElementInstance);
+                      nodeHandler.play(actualNode?.key);
                     }
                   }}
                   label={
@@ -568,7 +593,7 @@ export const NodeToolbar = () => {
               {isVideoPlaying && (
                 <ToolbarButton
                   className="rounded-full !w-[32px] !h-[32px]"
-                  icon={<Square className="px-2" size={32} strokeWidth={1} />}
+                  icon={<Pause className="px-2" size={32} strokeWidth={1} />}
                   disabled={
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -586,20 +611,51 @@ export const NodeToolbar = () => {
                       instance.getNodeHandler<WeaveVideoNode>("video");
 
                     if (nodeVideo && nodeHandler) {
-                      nodeHandler.stop(nodeVideo as WeaveElementInstance);
+                      nodeHandler.pause(actualNode?.key);
                     }
                   }}
                   label={
                     <div className="flex gap-3 justify-start items-center">
-                      <p>Stop video</p>
+                      <p>Pause video</p>
                     </div>
                   }
                   tooltipSide="bottom"
                   tooltipAlign="center"
                 />
               )}
+              <ToolbarButton
+                className="rounded-full !w-[32px] !h-[32px]"
+                icon={<RotateCcw className="px-2" size={32} strokeWidth={1} />}
+                disabled={!isVideoPlaying && !isVideoPaused}
+                active={nodeStyleMenuOpen}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance || !actualNode) return;
+
+                  const nodeVideo = instance
+                    .getMainLayer()
+                    ?.findOne(`#${actualNode?.key}`);
+
+                  const nodeHandler =
+                    instance.getNodeHandler<WeaveVideoNode>("video");
+
+                  if (nodeVideo && nodeHandler) {
+                    nodeHandler.stop(actualNode?.key);
+                    setIsVideoPaused(false);
+                    setIsVideoPlaying(false);
+                  }
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Reset video</p>
+                  </div>
+                }
+                tooltipSide="bottom"
+                tooltipAlign="center"
+              />
+              <ToolbarDivider orientation="vertical" className="!h-[28px]" />
             </>
-          )} */}
+          )}
           {!isGroup && canSetNodeStyling && (
             <DropdownMenu modal={false} open={nodeStyleMenuOpen}>
               <DropdownMenuTrigger

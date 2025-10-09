@@ -33,6 +33,7 @@ import {
   // MapPinned,
   Frame,
   Video,
+  Film,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -277,6 +278,18 @@ export function ToolsOverlayTouch() {
               }}
             >
               <Images /> Images
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
+                sidebarToggle(SIDEBAR_ELEMENTS.videos);
+              }}
+            >
+              <Film /> Videos
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"

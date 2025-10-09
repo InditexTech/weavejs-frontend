@@ -18,12 +18,13 @@ import { AnimatePresence } from "framer-motion";
 import useGetAzureWebPubSubProvider from "../room-components/hooks/use-get-azure-web-pubsub-provider";
 // import useGetWebsocketsProvider from "../room-components/hooks/use-get-websockets-provider";
 import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
-import { UploadFile } from "../room-components/upload-file";
-import { UploadFiles } from "../room-components/upload-files";
+import { UploadImage } from "../room-components/upload-image";
+import { UploadImages } from "../room-components/upload-images";
 import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
 import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
 import { useCommentsHandler } from "../room-components/hooks/use-comments-handler";
+import { UploadVideo } from "../room-components/upload-video";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -200,8 +201,9 @@ export const Room = () => {
           plugins={PLUGINS(getUser)}
           actions={ACTIONS(getUser)}
         >
-          <UploadFile />
-          <UploadFiles />
+          <UploadImage />
+          <UploadImages />
+          <UploadVideo />
           <RoomLayout inShadowDom={false} />
           <HelpDrawer />
         </WeaveProvider>

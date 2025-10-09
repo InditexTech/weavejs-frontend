@@ -13,7 +13,7 @@ import {
   type ImagesToolActionTriggerParams,
 } from "@/components/actions/images-tool/types";
 
-export function UploadFiles() {
+export function UploadImages() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputFileRef = React.useRef<any>(null);
 

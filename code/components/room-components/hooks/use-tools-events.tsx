@@ -537,6 +537,32 @@ export const useToolsEvents = () => {
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
 
+  // Video tool events
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const handleVideoAdding = () => {
+      toast("Add a video", {
+        description: `${isTouchDevice ? "Tap" : "Click"} to add the video to the room.`,
+        duration: Infinity,
+      });
+    };
+
+    const handleVideoAdded = () => {
+      toast.dismiss();
+    };
+
+    instance.addEventListener("onAddingVideo", handleVideoAdding);
+    instance.addEventListener("onAddedVideo", handleVideoAdded);
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener("onAddingVideo", handleVideoAdding);
+        instance.removeEventListener("onAddedVideo", handleVideoAdded);
+      }
+    };
+  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
+
   // Text tool events
   React.useEffect(() => {
     if (!instance) return;

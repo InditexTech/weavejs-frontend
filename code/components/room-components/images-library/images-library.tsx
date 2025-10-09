@@ -381,13 +381,21 @@ export const ImagesLibrary = () => {
     const newSelectedImages = [];
 
     for (const image of images) {
-      if (["completed"].includes(image.status) && image.removalJobId === null) {
+      const appImage = appImages.find(
+        (appImage) => appImage.props.imageId === image.imageId
+      );
+
+      if (
+        typeof appImage === "undefined" &&
+        ["completed"].includes(image.status) &&
+        image.removalJobId === null
+      ) {
         newSelectedImages.push(image);
       }
     }
 
     setSelectedImages(newSelectedImages);
-  }, [images]);
+  }, [images, appImages]);
 
   const handleCheckboxChange = React.useCallback(
     (checked: boolean, image: ImageEntity) => {
@@ -678,6 +686,7 @@ export const ImagesLibrary = () => {
                           <div className="group relative w-full">
                             {imageComponent}
                             {showSelection &&
+                              typeof appImage === "undefined" &&
                               !(
                                 ["pending", "working"].includes(image.status) ||
                                 (image.removalJobId !== null &&

@@ -33,6 +33,7 @@ import {
   MessageSquare,
   // MapPinned,
   Video,
+  Film,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -81,6 +82,9 @@ export function ToolsOverlayMouse() {
   );
   const imageCroppingEnabled = useCollaborationRoom(
     (state) => state.images.cropping.enabled
+  );
+  const setShowSelectFileVideo = useCollaborationRoom(
+    (state) => state.setShowSelectFileVideo
   );
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
@@ -654,16 +658,23 @@ export function ToolsOverlayMouse() {
               return;
             }
 
-            const { finishUploadCallback } = instance.triggerAction(
-              "videoTool"
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ) as any;
+            setShapesMenuOpen(false);
+            setStrokesMenuOpen(false);
+            setImagesMenuOpen(false);
+            setSidebarsMenuOpen(false);
+            triggerTool("videoTool");
+            setShowSelectFileVideo(true);
 
-            instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+            // const { finishUploadCallback } = instance.triggerAction(
+            //   "videoTool"
+            //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // ) as any;
 
-            const videoURLUploaded =
-              "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
-            finishUploadCallback?.(videoURLUploaded);
+            // instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+
+            // const videoURLUploaded =
+            //   "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
+            // finishUploadCallback?.(videoURLUploaded);
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
@@ -821,6 +832,21 @@ export function ToolsOverlayMouse() {
               <Images strokeWidth={1} /> Images
               <DropdownMenuShortcut>
                 {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
+                sidebarToggle(SIDEBAR_ELEMENTS.videos);
+              }}
+            >
+              <Film strokeWidth={1} /> Videos
+              <DropdownMenuShortcut>
+                {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl I"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem

@@ -72,6 +72,11 @@ export const useTasksEvents = () => {
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
         }
+
+        if (["deleteVideo"].includes(type)) {
+          const queryKey = ["getVideos", room];
+          queryClient.invalidateQueries({ queryKey });
+        }
       };
 
       ws.onerror = (err) => console.error("❌ error", err);

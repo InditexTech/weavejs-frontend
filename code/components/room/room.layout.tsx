@@ -39,6 +39,7 @@ import { Comments } from "../room-components/comment/comments";
 import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-reference-selection-v2";
 import { ExportConfigDialog } from "../room-components/overlay/export-config";
 import { NodeToolbar } from "../room-components/overlay/node-toolbar";
+import { VideosLibrary } from "../room-components/videos-library/videos-library";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -80,6 +81,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   );
   const uploadingImage = useCollaborationRoom(
     (state) => state.images.uploading
+  );
+  const uploadingVideo = useCollaborationRoom(
+    (state) => state.videos.uploading
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
@@ -147,6 +151,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         >
           <AnimatePresence>
             <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+            <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
             <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
             <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
             <Comments key={SIDEBAR_ELEMENTS.comments} />
@@ -244,6 +249,16 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
               <Logo kind="large" variant="no-text" />
               <div className="font-inter text-base">
                 Uploading image, please wait...
+              </div>
+            </div>
+          </div>
+        )}
+        {uploadingVideo && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">
+                Uploading video, please wait...
               </div>
             </div>
           </div>

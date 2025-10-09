@@ -87,6 +87,17 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={() => {
+              sidebarToggle(SIDEBAR_ELEMENTS.videos);
+            }}
+          >
+            <Images strokeWidth={1} /> Videos
+            <DropdownMenuShortcut>
+              {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl V"}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            onPointerDown={() => {
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >

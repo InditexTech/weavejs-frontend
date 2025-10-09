@@ -422,6 +422,16 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
+      sidebarToggle(SIDEBAR_ELEMENTS.videos);
+    },
+    ["KeyV"],
+    (e) =>
+      e.altKey &&
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+  );
+
+  useKeyDown(
+    () => {
       sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
     },
     ["KeyO"],
@@ -549,24 +559,24 @@ export function useKeyboardHandler() {
     setShowMinimap(!showMinimap);
   }, ["KeyN"]);
 
-  // useKeyDown(
-  //   () => {
-  //     if (!instance) {
-  //       return;
-  //     }
+  useKeyDown(
+    () => {
+      if (!instance) {
+        return;
+      }
 
-  //     const { finishUploadCallback } = instance.triggerAction(
-  //       "videoTool"
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     ) as any;
+      const { finishUploadCallback } = instance.triggerAction(
+        "videoTool"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any;
 
-  //     instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+      instance.updatePropsAction("videoTool", { videoId: "testJesus" });
 
-  //     const videoURLUploaded =
-  //       "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
-  //     finishUploadCallback?.(videoURLUploaded);
-  //   },
-  //   ["KeyV"],
-  //   (e) => !(e.ctrlKey || e.metaKey)
-  // );
+      const videoURLUploaded =
+        "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
+      finishUploadCallback?.(videoURLUploaded);
+    },
+    ["KeyV"],
+    (e) => !(e.ctrlKey || e.metaKey)
+  );
 }

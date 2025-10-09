@@ -82,6 +82,10 @@ interface CollaborationRoomState {
   comments: {
     status: CommentsStatus;
   };
+  videos: {
+    showSelectFile: boolean;
+    uploading: boolean;
+  };
   images: {
     showSelectFiles: boolean;
     showSelectFile: boolean;
@@ -118,6 +122,8 @@ interface CollaborationRoomState {
   setTransformingImage: (newTransformingImage: boolean) => void;
   setCroppingImage: (newCroppingImage: boolean) => void;
   setCroppingNode: (newCroppingNode: Konva.Node | undefined) => void;
+  setUploadingVideo: (newUploadingVideo: boolean) => void;
+  setShowSelectFileVideo: (newShowSelectFileVideo: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFilesImages: (newShowSelectFilesImages: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
@@ -209,6 +215,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     config: {
       visible: false,
     },
+  },
+  videos: {
+    showSelectFile: false,
+    uploading: false,
   },
   images: {
     showSelectFiles: false,
@@ -339,6 +349,16 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         ...state.images,
         finishUploadCallback: newFinishUploadCallbackImage,
       },
+    })),
+  setUploadingVideo: (newUploadingVideo) =>
+    set((state) => ({
+      ...state,
+      videos: { ...state.videos, uploading: newUploadingVideo },
+    })),
+  setShowSelectFileVideo: (newShowSelectFileVideo) =>
+    set((state) => ({
+      ...state,
+      videos: { ...state.videos, showSelectFile: newShowSelectFileVideo },
     })),
   setNodePropertiesAction: (newNodePropertiesAction) =>
     set((state) => ({

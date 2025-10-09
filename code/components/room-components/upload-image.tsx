@@ -9,7 +9,7 @@ import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 
-export function UploadFile() {
+export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputFileRef = React.useRef<any>(null);
 

@@ -41,6 +41,8 @@ declare global {
     weaveTextEditing?: Record<string, string>;
     weaveDragImageURL?: string;
     weaveDragImageId?: string;
+    weaveDragVideoParams?: WeaveVideoToolDragParams;
+    weaveDragVideoId?: string;
     colorTokenDragColor?: string;
   }
 }
