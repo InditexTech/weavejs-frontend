@@ -664,17 +664,6 @@ export function ToolsOverlayMouse() {
             setSidebarsMenuOpen(false);
             triggerTool("videoTool");
             setShowSelectFileVideo(true);
-
-            // const { finishUploadCallback } = instance.triggerAction(
-            //   "videoTool"
-            //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            // ) as any;
-
-            // instance.updatePropsAction("videoTool", { videoId: "testJesus" });
-
-            // const videoURLUploaded =
-            //   "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
-            // finishUploadCallback?.(videoURLUploaded);
           }}
           label={
             <div className="flex gap-3 justify-start items-center">

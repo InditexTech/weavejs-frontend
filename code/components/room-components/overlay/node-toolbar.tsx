@@ -2504,14 +2504,12 @@ export const NodeToolbar = () => {
                 return;
               }
 
-              if (!actualNode) {
+              if (actualNode) {
+                instance.removeNode(actualNode);
                 return;
               }
 
-              if (isSingleNodeSelected) {
-                instance.removeNode(actualNode);
-              }
-              if (isMultiNodesSelected) {
+              if (!actualNode && nodes.length > 1) {
                 for (const node of nodes) {
                   if (node.node) {
                     instance.removeNode(node.node);

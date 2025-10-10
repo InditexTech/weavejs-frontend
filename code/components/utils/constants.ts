@@ -340,7 +340,16 @@ const NODES = () => [
       },
     },
   }),
-  new WeaveVideoNode(),
+  new WeaveVideoNode({
+    config: {
+      style: {
+        track: {
+          resetOnEnd: true,
+          onlyOnHover: false,
+        },
+      },
+    },
+  }),
   new ColorTokenNode(),
 ];
 

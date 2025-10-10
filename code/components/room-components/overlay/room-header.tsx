@@ -52,12 +52,17 @@ import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
+import {
+  getSessionConfig,
+  setSessionConfig,
+} from "@/components/utils/session-config";
 
 export function RoomHeader() {
   const os = useGetOs();
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
+  const status = useWeave((state) => state.status);
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
@@ -128,18 +133,32 @@ export function RoomHeader() {
       return;
     }
 
+    if (!room) {
+      return;
+    }
+
     if (instance.isPluginEnabled("stageGrid")) {
       instance.disablePlugin("stageGrid");
+
+      const sessionConfig = getSessionConfig(room);
+      sessionConfig.grid.enabled = false;
+      setSessionConfig(room, sessionConfig);
+
       setGridEnabled(false);
       setMenuOpen(false);
       return;
     }
     if (!instance.isPluginEnabled("stageGrid")) {
       instance.enablePlugin("stageGrid");
+
+      const sessionConfig = getSessionConfig(room);
+      sessionConfig.grid.enabled = true;
+      setSessionConfig(room, sessionConfig);
+
       setGridEnabled(true);
       setMenuOpen(false);
     }
-  }, [instance]);
+  }, [instance, room]);
 
   const handleSetGridType = React.useCallback(
     (type: WeaveStageGridType) => {
@@ -148,11 +167,49 @@ export function RoomHeader() {
           type
         );
         setGridType(type);
+
+        if (!room) {
+          return;
+        }
+
+        const sessionConfig = getSessionConfig(room);
+        sessionConfig.grid.type = type;
+        setSessionConfig(room, sessionConfig);
       }
       setMenuOpen(false);
     },
-    [instance]
+    [instance, room]
   );
+
+  React.useEffect(() => {
+    if (!instance) {
+      return;
+    }
+
+    if (!room) {
+      return;
+    }
+
+    if (status !== "running") {
+      return;
+    }
+
+    const sessionConfig = getSessionConfig(room);
+
+    const stageGridPlugin = instance.getPlugin(
+      "stageGrid"
+    ) as WeaveStageGridPlugin;
+
+    stageGridPlugin?.setType(sessionConfig.grid.type);
+    setGridType(sessionConfig.grid.type);
+
+    if (sessionConfig.grid.enabled) {
+      instance.enablePlugin("stageGrid");
+    } else {
+      instance.disablePlugin("stageGrid");
+    }
+    setGridEnabled(sessionConfig.grid.enabled);
+  }, [instance, status, room]);
 
   React.useEffect(() => {
     if (instance) {
