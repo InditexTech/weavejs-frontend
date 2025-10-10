@@ -67,6 +67,9 @@ export const useTasksEvents = () => {
             "editImageReferences",
             "deleteImage",
             "removeImageBackground",
+            "negateImage",
+            "flipImage",
+            "grayscaleImage",
           ].includes(type)
         ) {
           const queryKey = ["getImages", room];

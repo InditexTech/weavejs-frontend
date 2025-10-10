@@ -19,6 +19,16 @@ type NodePropertiesAction = "create" | "update" | undefined;
 
 type CommentsStatus = "pending" | "resolved" | "all";
 
+export type TransformingOperation =
+  | "background-removal"
+  | "negate-image"
+  | "flip-horizontal-image"
+  | "flip-vertical-image"
+  | "grayscale-image"
+  | "image-generation"
+  | "image-edition"
+  | undefined;
+
 type FinishUploadCallback = (imageURL: string) => void;
 
 type DrawerKeyKeys = keyof typeof DRAWER_ELEMENTS;
@@ -90,6 +100,7 @@ interface CollaborationRoomState {
     showSelectFiles: boolean;
     showSelectFile: boolean;
     transforming: boolean;
+    transformingOperation: TransformingOperation;
     cropping: {
       enabled: boolean;
       node: Konva.Node | undefined;
@@ -119,7 +130,10 @@ interface CollaborationRoomState {
   setContextMenuShow: (newContextMenuShow: boolean) => void;
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
-  setTransformingImage: (newTransformingImage: boolean) => void;
+  setTransformingImage: (
+    newTransformingImage: boolean,
+    operation?: TransformingOperation
+  ) => void;
   setCroppingImage: (newCroppingImage: boolean) => void;
   setCroppingNode: (newCroppingNode: Konva.Node | undefined) => void;
   setUploadingVideo: (newUploadingVideo: boolean) => void;
@@ -224,6 +238,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     showSelectFiles: false,
     showSelectFile: false,
     transforming: false,
+    transformingOperation: undefined,
     cropping: {
       enabled: false,
       node: undefined,
@@ -301,10 +316,15 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state,
       contextMenu: { ...state.contextMenu, options: newContextMenuOptions },
     })),
-  setTransformingImage: (newTransformingImage) =>
+  setTransformingImage: (newTransformingImage, operation) =>
     set((state) => ({
       ...state,
-      images: { ...state.images, transforming: newTransformingImage },
+      images: {
+        ...state.images,
+        transforming: newTransformingImage,
+        transformingOperation:
+          !newTransformingImage && operation ? undefined : operation,
+      },
     })),
   setCroppingImage: (newCroppingImage) =>
     set((state) => ({

@@ -53,6 +53,10 @@ import {
   Play,
   Pause,
   RotateCcw,
+  Minus,
+  FlipHorizontal,
+  FlipVertical,
+  PaintRoller,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -68,6 +72,9 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ColorPickerInput } from "../inputs/color-picker";
 import { Button } from "@/components/ui/button";
 import { getImageBase64 } from "@/components/utils/images";
+import { postNegateImage } from "@/api/post-negate-image";
+import { postFlipImage } from "@/api/post-flip-image";
+import { postGrayscaleImage } from "@/api/post-grayscale-image";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -296,7 +303,7 @@ export const NodeToolbar = () => {
 
   const title = useNodeActionName();
 
-  const mutationUploadV2 = useMutation({
+  const mutationRemoveBackground = useMutation({
     mutationFn: async ({
       userId,
       clientId,
@@ -309,6 +316,75 @@ export const NodeToolbar = () => {
       image: { dataBase64: string; contentType: string };
     }) => {
       return await postRemoveBackground(
+        userId,
+        clientId,
+        room ?? "",
+        imageId,
+        image
+      );
+    },
+  });
+
+  const mutationNegate = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      imageId,
+      image,
+    }: {
+      userId: string;
+      clientId: string;
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postNegateImage(
+        userId,
+        clientId,
+        room ?? "",
+        imageId,
+        image
+      );
+    },
+  });
+
+  const mutationFlip = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      imageId,
+      image,
+      orientation,
+    }: {
+      userId: string;
+      clientId: string;
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+      orientation: "horizontal" | "vertical";
+    }) => {
+      return await postFlipImage(
+        userId,
+        clientId,
+        room ?? "",
+        imageId,
+        orientation,
+        image
+      );
+    },
+  });
+
+  const mutationGrayscale = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      imageId,
+      image,
+    }: {
+      userId: string;
+      clientId: string;
+      imageId: string;
+      image: { dataBase64: string; contentType: string };
+    }) => {
+      return await postGrayscaleImage(
         userId,
         clientId,
         room ?? "",
@@ -1642,81 +1718,395 @@ export const NodeToolbar = () => {
           {isImage && (
             <>
               {workloadsEnabled && (
-                <ToolbarButton
-                  className="rounded-full !w-[32px] !h-[32px]"
-                  icon={
-                    <BrushCleaning className="px-2" size={32} strokeWidth={1} />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={async () => {
-                    if (!instance) {
-                      return;
+                <>
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={
+                      <BrushCleaning
+                        className="px-2"
+                        size={32}
+                        strokeWidth={1}
+                      />
                     }
-
-                    const nodeImage = nodes[0].instance as
-                      | Konva.Group
-                      | undefined;
-
-                    if (nodeImage) {
-                      nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
-
-                      setTransformingImage(true);
-
-                      try {
-                        const { url } = await getImageBase64({
-                          instance,
-                          nodes: nodes.map((n) => n.node?.key ?? ""),
-                          options: {
-                            padding: 0,
-                            pixelRatio: 1,
-                          },
-                        });
-
-                        const dataBase64 = url.split(",")[1];
-
-                        mutationUploadV2.mutate(
-                          {
-                            userId: user?.name ?? "",
-                            clientId: clientId ?? "",
-                            imageId: uuidv4(),
-                            image: {
-                              dataBase64,
-                              contentType: "image/png",
-                            },
-                          },
-                          {
-                            onSuccess: () => {
-                              sidebarToggle(SIDEBAR_ELEMENTS.images);
-                            },
-                            onError: () => {
-                              toast.error(
-                                "Error requesting image background removal."
-                              );
-                            },
-                            onSettled: () => {
-                              setTransformingImage(false);
-                            },
-                          }
-                        );
-                      } catch (error) {
-                        console.error(error);
-                        toast.error("Error transforming the image.");
-                      } finally {
-                        setTransformingImage(false);
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
                       }
+
+                      const nodeImage = nodes[0].instance as
+                        | Konva.Group
+                        | undefined;
+
+                      if (nodeImage) {
+                        nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                        setTransformingImage(true, "background-removal");
+
+                        try {
+                          const { url } = await getImageBase64({
+                            instance,
+                            nodes: nodes.map((n) => n.node?.key ?? ""),
+                            options: {
+                              padding: 0,
+                              pixelRatio: 1,
+                            },
+                          });
+
+                          const dataBase64 = url.split(",")[1];
+
+                          mutationRemoveBackground.mutate(
+                            {
+                              userId: user?.name ?? "",
+                              clientId: clientId ?? "",
+                              imageId: uuidv4(),
+                              image: {
+                                dataBase64,
+                                contentType: "image/png",
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                              },
+                              onError: () => {
+                                toast.error(
+                                  "Error requesting image background removal."
+                                );
+                              },
+                              onSettled: () => {
+                                setTransformingImage(false);
+                              },
+                            }
+                          );
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error transforming the image.");
+                        } finally {
+                          setTransformingImage(false);
+                        }
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Remove background</p>
+                      </div>
                     }
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>Remove background</p>
-                    </div>
-                  }
-                  tooltipSide="bottom"
-                  tooltipAlign="center"
-                />
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={<Minus className="px-2" size={32} strokeWidth={1} />}
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const nodeImage = nodes[0].instance as
+                        | Konva.Group
+                        | undefined;
+
+                      if (nodeImage) {
+                        nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                        setTransformingImage(true, "negate-image");
+
+                        try {
+                          const { url } = await getImageBase64({
+                            instance,
+                            nodes: nodes.map((n) => n.node?.key ?? ""),
+                            options: {
+                              padding: 0,
+                              pixelRatio: 1,
+                            },
+                          });
+
+                          const dataBase64 = url.split(",")[1];
+
+                          mutationNegate.mutate(
+                            {
+                              userId: user?.name ?? "",
+                              clientId: clientId ?? "",
+                              imageId: uuidv4(),
+                              image: {
+                                dataBase64,
+                                contentType: "image/png",
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                              },
+                              onError: () => {
+                                toast.error(
+                                  "Error requesting image background removal."
+                                );
+                              },
+                              onSettled: () => {
+                                setTransformingImage(false);
+                              },
+                            }
+                          );
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error transforming the image.");
+                        } finally {
+                          setTransformingImage(false);
+                        }
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Negate</p>
+                      </div>
+                    }
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={
+                      <FlipHorizontal
+                        className="px-2"
+                        size={32}
+                        strokeWidth={1}
+                      />
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const nodeImage = nodes[0].instance as
+                        | Konva.Group
+                        | undefined;
+
+                      if (nodeImage) {
+                        nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                        setTransformingImage(true, "flip-horizontal-image");
+
+                        try {
+                          const { url } = await getImageBase64({
+                            instance,
+                            nodes: nodes.map((n) => n.node?.key ?? ""),
+                            options: {
+                              padding: 0,
+                              pixelRatio: 1,
+                            },
+                          });
+
+                          const dataBase64 = url.split(",")[1];
+
+                          mutationFlip.mutate(
+                            {
+                              userId: user?.name ?? "",
+                              clientId: clientId ?? "",
+                              imageId: uuidv4(),
+                              orientation: "horizontal",
+                              image: {
+                                dataBase64,
+                                contentType: "image/png",
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                              },
+                              onError: () => {
+                                toast.error(
+                                  "Error requesting image horizontal flip."
+                                );
+                              },
+                              onSettled: () => {
+                                setTransformingImage(false);
+                              },
+                            }
+                          );
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error transforming the image.");
+                        } finally {
+                          setTransformingImage(false);
+                        }
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Flip horizontally</p>
+                      </div>
+                    }
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={
+                      <FlipVertical
+                        className="px-2"
+                        size={32}
+                        strokeWidth={1}
+                      />
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const nodeImage = nodes[0].instance as
+                        | Konva.Group
+                        | undefined;
+
+                      if (nodeImage) {
+                        nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                        setTransformingImage(true, "flip-vertical-image");
+
+                        try {
+                          const { url } = await getImageBase64({
+                            instance,
+                            nodes: nodes.map((n) => n.node?.key ?? ""),
+                            options: {
+                              padding: 0,
+                              pixelRatio: 1,
+                            },
+                          });
+
+                          const dataBase64 = url.split(",")[1];
+
+                          mutationFlip.mutate(
+                            {
+                              userId: user?.name ?? "",
+                              clientId: clientId ?? "",
+                              imageId: uuidv4(),
+                              orientation: "vertical",
+                              image: {
+                                dataBase64,
+                                contentType: "image/png",
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                              },
+                              onError: () => {
+                                toast.error(
+                                  "Error requesting image vertical flip."
+                                );
+                              },
+                              onSettled: () => {
+                                setTransformingImage(false);
+                              },
+                            }
+                          );
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error transforming the image.");
+                        } finally {
+                          setTransformingImage(false);
+                        }
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Flip vertically</p>
+                      </div>
+                    }
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={
+                      <PaintRoller className="px-2" size={32} strokeWidth={1} />
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const nodeImage = nodes[0].instance as
+                        | Konva.Group
+                        | undefined;
+
+                      if (nodeImage) {
+                        nodeImage.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+                        setTransformingImage(true, "grayscale-image");
+
+                        try {
+                          const { url } = await getImageBase64({
+                            instance,
+                            nodes: nodes.map((n) => n.node?.key ?? ""),
+                            options: {
+                              padding: 0,
+                              pixelRatio: 1,
+                            },
+                          });
+
+                          const dataBase64 = url.split(",")[1];
+
+                          mutationGrayscale.mutate(
+                            {
+                              userId: user?.name ?? "",
+                              clientId: clientId ?? "",
+                              imageId: uuidv4(),
+                              image: {
+                                dataBase64,
+                                contentType: "image/png",
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                sidebarToggle(SIDEBAR_ELEMENTS.images);
+                              },
+                              onError: () => {
+                                toast.error(
+                                  "Error requesting image grayscaling."
+                                );
+                              },
+                              onSettled: () => {
+                                setTransformingImage(false);
+                              },
+                            }
+                          );
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error transforming the image.");
+                        } finally {
+                          setTransformingImage(false);
+                        }
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Graycale</p>
+                      </div>
+                    }
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                </>
               )}
               <ToolbarButton
                 className="rounded-full !w-[32px] !h-[32px]"
@@ -1746,6 +2136,7 @@ export const NodeToolbar = () => {
                 tooltipSide="bottom"
                 tooltipAlign="center"
               />
+              <ToolbarDivider orientation="vertical" className="!h-[28px]" />
             </>
           )}
           {isMultiNodesSelected && (

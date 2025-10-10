@@ -641,6 +641,9 @@ export const ImagesLibrary = () => {
 
                   if (
                     [
+                      "negate-image",
+                      "flip-image",
+                      "grayscale-image",
                       "background-removal",
                       "image-generation",
                       "image-edition",
@@ -651,12 +654,6 @@ export const ImagesLibrary = () => {
                         key={image.imageId}
                         selected={isChecked}
                         image={image}
-                        operation={
-                          image.operation as
-                            | "background-removal"
-                            | "image-generation"
-                            | "image-edition"
-                        }
                       />
                     );
                   }

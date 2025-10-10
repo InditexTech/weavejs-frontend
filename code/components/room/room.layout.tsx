@@ -6,7 +6,7 @@
 
 import React from "react";
 import { ContextMenuRender } from "@/components/room-components/context-menu";
-import { useCollaborationRoom } from "@/store/store";
+import { TransformingOperation, useCollaborationRoom } from "@/store/store";
 import { RoomHeader } from "@/components/room-components/overlay/room-header";
 import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
 import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
@@ -45,6 +45,19 @@ type RoomLayoutProps = {
   inShadowDom: boolean;
 };
 
+const TRANSFORMING_OPERATIONS: Record<
+  Exclude<TransformingOperation, undefined>,
+  string
+> = {
+  "background-removal": "background Removal",
+  "negate-image": "image negative",
+  "flip-horizontal-image": "image horizontal flip",
+  "flip-vertical-image": "image vertical flip",
+  "grayscale-image": "image grayscaling",
+  "image-generation": "image generation",
+  "image-edition": "image edition",
+};
+
 export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   useWeaveEvents();
   useContextMenu();
@@ -78,6 +91,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   );
   const transformingImage = useCollaborationRoom(
     (state) => state.images.transforming
+  );
+  const transformingOperation = useCollaborationRoom(
+    (state) => state.images.transformingOperation
   );
   const uploadingImage = useCollaborationRoom(
     (state) => state.images.uploading
@@ -273,12 +289,12 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           </div>
         )}
-        {transformingImage && (
+        {transformingImage && transformingOperation && (
           <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
               <Logo kind="large" variant="no-text" />
               <div className="font-inter text-base">
-                Requesting background removal, please wait...
+                {`Requesting ${TRANSFORMING_OPERATIONS[transformingOperation]}, please wait...`}
               </div>
             </div>
           </div>

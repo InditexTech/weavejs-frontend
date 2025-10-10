@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import {
   WeaveContextMenuPlugin,
@@ -17,13 +17,13 @@ import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
 import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
-import Konva from "konva";
+// import Konva from "konva";
 import {
   ClipboardCopy,
   ClipboardPaste,
   Group,
   Bot,
-  BrushCleaning,
+  // BrushCleaning,
   Ungroup,
   Trash,
   SendToBack,
@@ -34,21 +34,21 @@ import {
   Lock,
   EyeOff,
 } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { postRemoveBackground } from "@/api/post-remove-background";
+// import { useMutation } from "@tanstack/react-query";
+// import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
-import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+// import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
+// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useExportToImageServerSide } from "./use-export-to-image-server-side";
 import { getImageBase64 } from "@/components/utils/images";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
-  const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  // const user = useCollaborationRoom((state) => state.user);
+  // const clientId = useCollaborationRoom((state) => state.clientId);
+  // const room = useCollaborationRoom((state) => state.room);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
@@ -64,24 +64,24 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
-  const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
-  );
-  const setRemoveBackgroundPopupShow = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupShow
-  );
-  const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupOriginNodeId
-  );
-  const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupOriginImage
-  );
-  const setRemoveBackgroundPopupImageId = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupImageId
-  );
-  const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupImageURL
-  );
+  // const setTransformingImage = useCollaborationRoom(
+  //   (state) => state.setTransformingImage
+  // );
+  // const setRemoveBackgroundPopupShow = useCollaborationRoom(
+  //   (state) => state.setRemoveBackgroundPopupShow
+  // );
+  // const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
+  //   (state) => state.setRemoveBackgroundPopupOriginNodeId
+  // );
+  // const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
+  //   (state) => state.setRemoveBackgroundPopupOriginImage
+  // );
+  // const setRemoveBackgroundPopupImageId = useCollaborationRoom(
+  //   (state) => state.setRemoveBackgroundPopupImageId
+  // );
+  // const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
+  //   (state) => state.setRemoveBackgroundPopupImageURL
+  // );
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
@@ -132,42 +132,42 @@ function useContextMenu() {
 
   const { isExporting } = useExportToImageServerSide();
 
-  const mutationUpload = useMutation({
-    mutationFn: async ({
-      imageId,
-      image,
-    }: {
-      imageId: string;
-      image: { dataBase64: string; contentType: string };
-    }) => {
-      return await postRemoveBackground(room ?? "", imageId, image);
-    },
-  });
+  // const mutationUpload = useMutation({
+  //   mutationFn: async ({
+  //     imageId,
+  //     image,
+  //   }: {
+  //     imageId: string;
+  //     image: { dataBase64: string; contentType: string };
+  //   }) => {
+  //     return await postRemoveBackground(room ?? "", imageId, image);
+  //   },
+  // });
 
-  const mutationUploadV2 = useMutation({
-    mutationFn: async ({
-      userId,
-      clientId,
-      imageId,
-      image,
-    }: {
-      userId: string;
-      clientId: string;
-      imageId: string;
-      image: {
-        dataBase64: string;
-        contentType: string;
-      };
-    }) => {
-      return await postRemoveBackgroundV2(
-        userId,
-        clientId,
-        room ?? "",
-        imageId,
-        image
-      );
-    },
-  });
+  // const mutationUploadV2 = useMutation({
+  //   mutationFn: async ({
+  //     userId,
+  //     clientId,
+  //     imageId,
+  //     image,
+  //   }: {
+  //     userId: string;
+  //     clientId: string;
+  //     imageId: string;
+  //     image: {
+  //       dataBase64: string;
+  //       contentType: string;
+  //     };
+  //   }) => {
+  //     return await postRemoveBackgroundV2(
+  //       userId,
+  //       clientId,
+  //       room ?? "",
+  //       imageId,
+  //       image
+  //     );
+  //   },
+  // });
 
   React.useEffect(() => {
     if (!instance) return;
@@ -205,149 +205,149 @@ function useContextMenu() {
         nodes.length === 1 && nodes[0].instance.getAttrs().locked;
 
       if (nodes.length > 0) {
-        if (
-          nodes.length === 1 &&
-          ["image"].includes(nodes[0].node?.type ?? "") &&
-          !singleLocked
-        ) {
-          if (!workloadsEnabled) {
-            options.push({
-              id: "removeBackground",
-              type: "button",
-              label: "Remove background",
-              icon: <BrushCleaning size={16} />,
-              onClick: () => {
-                if (instance) {
-                  const nodeImage = nodes[0].instance as
-                    | Konva.Group
-                    | undefined;
-                  if (nodeImage) {
-                    setTransformingImage(true);
+        // if (
+        //   nodes.length === 1 &&
+        //   ["image"].includes(nodes[0].node?.type ?? "") &&
+        //   !singleLocked
+        // ) {
+        //   if (!workloadsEnabled) {
+        //     options.push({
+        //       id: "removeBackground",
+        //       type: "button",
+        //       label: "Remove background",
+        //       icon: <BrushCleaning size={16} />,
+        //       onClick: () => {
+        //         if (instance) {
+        //           const nodeImage = nodes[0].instance as
+        //             | Konva.Group
+        //             | undefined;
+        //           if (nodeImage) {
+        //             setTransformingImage(true, "background-removal");
 
-                    setTimeout(async () => {
-                      const img = await instance.exportNodes(
-                        [nodeImage],
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (nodes: any) => nodes,
-                        {
-                          format: "image/png",
-                          padding: 0,
-                          pixelRatio: 1,
-                        }
-                      );
+        //             setTimeout(async () => {
+        //               const img = await instance.exportNodes(
+        //                 [nodeImage],
+        //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //                 (nodes: any) => nodes,
+        //                 {
+        //                   format: "image/png",
+        //                   padding: 0,
+        //                   pixelRatio: 1,
+        //                 }
+        //               );
 
-                      const dataBase64Url = instance.imageToBase64(
-                        img,
-                        "image/png"
-                      );
+        //               const dataBase64Url = instance.imageToBase64(
+        //                 img,
+        //                 "image/png"
+        //               );
 
-                      setRemoveBackgroundPopupOriginImage(dataBase64Url);
+        //               setRemoveBackgroundPopupOriginImage(dataBase64Url);
 
-                      const dataBase64 = dataBase64Url.split(",")[1];
+        //               const dataBase64 = dataBase64Url.split(",")[1];
 
-                      mutationUpload.mutate(
-                        {
-                          imageId: uuidv4(),
-                          image: {
-                            dataBase64,
-                            contentType: "image/png",
-                          },
-                        },
-                        {
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          onSuccess: (data: any) => {
-                            const room = data.fileName.split("/")[0];
-                            const imageId = data.fileName.split("/")[1];
+        //               mutationUpload.mutate(
+        //                 {
+        //                   imageId: uuidv4(),
+        //                   image: {
+        //                     dataBase64,
+        //                     contentType: "image/png",
+        //                   },
+        //                 },
+        //                 {
+        //                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //                   onSuccess: (data: any) => {
+        //                     const room = data.fileName.split("/")[0];
+        //                     const imageId = data.fileName.split("/")[1];
 
-                            const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+        //                     const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
 
-                            setRemoveBackgroundPopupOriginNodeId(
-                              nodeImage.getAttrs().id
-                            );
-                            setRemoveBackgroundPopupImageId(imageId);
-                            setRemoveBackgroundPopupImageURL(imageURL);
-                            setRemoveBackgroundPopupShow(true);
-                          },
-                          onError: () => {
-                            console.error("Error uploading image");
-                          },
-                          onSettled: () => {
-                            setTransformingImage(false);
-                          },
-                        }
-                      );
-                    }, 10);
-                  }
-                }
-                setContextMenuShow(false);
-              },
-            });
-          }
-          if (workloadsEnabled) {
-            options.push({
-              id: "removeBackgroundAsync",
-              type: "button",
-              label: "Remove background",
-              icon: <BrushCleaning size={16} />,
-              onClick: async () => {
-                if (instance) {
-                  const nodeImage = nodes[0].instance as
-                    | Konva.Group
-                    | undefined;
+        //                     setRemoveBackgroundPopupOriginNodeId(
+        //                       nodeImage.getAttrs().id
+        //                     );
+        //                     setRemoveBackgroundPopupImageId(imageId);
+        //                     setRemoveBackgroundPopupImageURL(imageURL);
+        //                     setRemoveBackgroundPopupShow(true);
+        //                   },
+        //                   onError: () => {
+        //                     console.error("Error uploading image");
+        //                   },
+        //                   onSettled: () => {
+        //                     setTransformingImage(false);
+        //                   },
+        //                 }
+        //               );
+        //             }, 10);
+        //           }
+        //         }
+        //         setContextMenuShow(false);
+        //       },
+        //     });
+        //   }
+        //   if (workloadsEnabled) {
+        //     options.push({
+        //       id: "removeBackgroundAsync",
+        //       type: "button",
+        //       label: "Remove background",
+        //       icon: <BrushCleaning size={16} />,
+        //       onClick: async () => {
+        //         if (instance) {
+        //           const nodeImage = nodes[0].instance as
+        //             | Konva.Group
+        //             | undefined;
 
-                  if (nodeImage) {
-                    setTransformingImage(true);
+        //           if (nodeImage) {
+        //             setTransformingImage(true, "background-removal");
 
-                    try {
-                      const { url } = await getImageBase64({
-                        instance,
-                        nodes: [nodeImage.getAttrs().id ?? ""],
-                        options: {
-                          padding: 0,
-                          pixelRatio: 1,
-                        },
-                      });
+        //             try {
+        //               const { url } = await getImageBase64({
+        //                 instance,
+        //                 nodes: [nodeImage.getAttrs().id ?? ""],
+        //                 options: {
+        //                   padding: 0,
+        //                   pixelRatio: 1,
+        //                 },
+        //               });
 
-                      const dataBase64 = url.split(",")[1];
+        //               const dataBase64 = url.split(",")[1];
 
-                      mutationUploadV2.mutate(
-                        {
-                          userId: user?.name ?? "",
-                          clientId: clientId ?? "",
-                          imageId: uuidv4(),
-                          image: {
-                            dataBase64,
-                            contentType: "image/png",
-                          },
-                        },
-                        {
-                          onSuccess: () => {
-                            sidebarToggle(SIDEBAR_ELEMENTS.images);
-                          },
-                          onError: () => {
-                            toast.error(
-                              "Error requesting image background removal."
-                            );
-                          },
-                          onSettled: () => {
-                            setTransformingImage(false);
-                          },
-                        }
-                      );
-                    } catch (error) {
-                      console.error(error);
-                      toast.error("Error transforming image.");
-                    } finally {
-                      setTransformingImage(false);
-                    }
-                  }
-                }
+        //               mutationUploadV2.mutate(
+        //                 {
+        //                   userId: user?.name ?? "",
+        //                   clientId: clientId ?? "",
+        //                   imageId: uuidv4(),
+        //                   image: {
+        //                     dataBase64,
+        //                     contentType: "image/png",
+        //                   },
+        //                 },
+        //                 {
+        //                   onSuccess: () => {
+        //                     sidebarToggle(SIDEBAR_ELEMENTS.images);
+        //                   },
+        //                   onError: () => {
+        //                     toast.error(
+        //                       "Error requesting image background removal."
+        //                     );
+        //                   },
+        //                   onSettled: () => {
+        //                     setTransformingImage(false);
+        //                   },
+        //                 }
+        //               );
+        //             } catch (error) {
+        //               console.error(error);
+        //               toast.error("Error transforming image.");
+        //             } finally {
+        //               setTransformingImage(false);
+        //             }
+        //           }
+        //         }
 
-                setContextMenuShow(false);
-              },
-            });
-          }
-        }
+        //         setContextMenuShow(false);
+        //       },
+        //     });
+        //   }
+        // }
         // EDIT IMAGE WITH A PROMPT
         if (!singleLocked) {
           if (!workloadsEnabled) {
@@ -771,12 +771,12 @@ function useContextMenu() {
       return options;
     },
     [
-      user?.name,
+      // user?.name,
       workloadsEnabled,
       instance,
-      clientId,
-      mutationUpload,
-      mutationUploadV2,
+      // clientId,
+      // mutationUpload,
+      // mutationUploadV2,
       aiEnabled,
       aiEnabledV2,
       setExportConfigVisible,
@@ -790,14 +790,14 @@ function useContextMenu() {
       setImagesLLMPopupTypeV2,
       setImagesLLMPopupVisibleV2,
       setImagesLLMPopupImageV2,
-      setTransformingImage,
+      // setTransformingImage,
       setContextMenuShow,
       setImageExporting,
-      setRemoveBackgroundPopupImageId,
-      setRemoveBackgroundPopupImageURL,
-      setRemoveBackgroundPopupOriginNodeId,
-      setRemoveBackgroundPopupOriginImage,
-      setRemoveBackgroundPopupShow,
+      // setRemoveBackgroundPopupImageId,
+      // setRemoveBackgroundPopupImageURL,
+      // setRemoveBackgroundPopupOriginNodeId,
+      // setRemoveBackgroundPopupOriginImage,
+      // setRemoveBackgroundPopupShow,
       sidebarToggle,
     ]
   );
