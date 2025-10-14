@@ -65,6 +65,7 @@ export const NodeProperties = () => {
         "brushTool",
         "penTool",
         "imageTool",
+        "videoTool",
         "starTool",
         "arrowTool",
         "colorTokenTool",

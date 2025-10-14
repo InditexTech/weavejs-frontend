@@ -57,7 +57,7 @@ import {
   WeaveNodesEdgeSnappingPlugin,
   WeaveNodesDistanceSnappingPlugin,
   WeaveCommentsRendererPlugin,
-  // WeaveStageMinimapPlugin,
+  WeaveStageMinimapPlugin,
   WeaveStageKeyboardMovePlugin,
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
@@ -359,6 +359,10 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageResizePlugin(),
   new WeaveStageZoomPlugin({
     config: {
+      zoomSteps: [
+        0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 1, 1.25, 1.5, 1.75, 2, 3, 4, 6,
+        8, 10,
+      ],
       zoomInertia: {
         friction: 0.9,
         mouseWheelStep: 0.01,
@@ -513,16 +517,16 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  // new WeaveStageMinimapPlugin({
-  //   config: {
-  //     getContainer: () => {
-  //       return document?.getElementById("minimap") as HTMLElement;
-  //     },
-  //     id: "weave_stage_minimap",
-  //     width: window.innerWidth * 0.2,
-  //     fitToContentPadding: 40,
-  //   },
-  // }),
+  new WeaveStageMinimapPlugin({
+    config: {
+      getContainer: () => {
+        return document?.getElementById("minimap") as HTMLElement;
+      },
+      id: "weave_stage_minimap",
+      width: window.innerWidth * 0.2,
+      fitToContentPadding: 5,
+    },
+  }),
   new WeaveStageKeyboardMovePlugin({
     config: {
       movementDelta: 5,

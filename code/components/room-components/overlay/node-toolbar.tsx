@@ -57,6 +57,8 @@ import {
   FlipHorizontal,
   FlipVertical,
   PaintRoller,
+  // RectangleCircle,
+  // SquaresSubtract,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -88,6 +90,8 @@ export const NodeToolbar = () => {
     React.useState(false);
   const [nodeStrokeMenuOpen, setNodeStrokeMenuOpen] = React.useState(false);
   const [nodeStyleMenuOpen, setNodeStyleMenuOpen] = React.useState(false);
+  // const [nodeCompositeMenuOpen, setNodeCompositeMenuOpen] =
+  // React.useState(false);
   const [nodeLayeringMenuOpen, setNodeLayeringMenuOpen] = React.useState(false);
   const [colorTokenColorMenuOpen, setColorTokenColorMenuOpen] =
     React.useState(false);
@@ -191,6 +195,7 @@ export const NodeToolbar = () => {
         setNodeStyleMenuOpen(false);
         setNodeLayeringMenuOpen(false);
         setNodeFillMenuOpen(false);
+        // setNodeCompositeMenuOpen(false);
         setNodeStrokeMenuOpen(false);
         setNodeStrokeWidthMenuOpen(false);
         setNodeStrokeStyleMenuOpen(false);
@@ -2474,6 +2479,576 @@ export const NodeToolbar = () => {
               </DropdownMenu>
             </>
           )}
+          {/* <DropdownMenu modal={false} open={nodeCompositeMenuOpen}>
+            <DropdownMenuTrigger
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
+              className={cn(
+                "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                {
+                  ["disabled:cursor-default disabled:opacity-50"]:
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                }
+              )}
+              asChild
+            >
+              <ToolbarButton
+                className="rounded-full !w-[32px] !h-[32px]"
+                icon={
+                  <RectangleCircle className="px-2" size={32} strokeWidth={1} />
+                }
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={nodeCompositeMenuOpen}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setNodesAlignmentHorizontalMenuOpen(false);
+                  setNodesAlignmentVerticalMenuOpen(false);
+                  setNodeStyleMenuOpen(false);
+                  setColorTokenColorMenuOpen(false);
+                  setNodeLayeringMenuOpen(false);
+                  setNodeCompositeMenuOpen((prev) => !prev);
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Composite</p>
+                  </div>
+                }
+                tooltipSide="bottom"
+                tooltipAlign="center"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              onCloseAutoFocus={(e) => {
+                e.preventDefault();
+              }}
+              align="center"
+              side="bottom"
+              alignOffset={0}
+              sideOffset={8}
+              className="min-w-auto max-h-[200px] !p-0 font-inter rounded-none !border-zinc-200 shadow-none flex flex-row"
+            >
+              <div className="w-[120px] h-full flex flex-col gap-0 justify-center items-center py-1 px-1">
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">source-over</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === undefined ||
+                    actualNode?.props.globalCompositeOperation === "source-over"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "source-over",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={
+                    <span className="font-inter text-xs">destination-out</span>
+                  }
+                  active={
+                    actualNode?.props.globalCompositeOperation ===
+                    "destination-out"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "destination-out",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">multiply</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "multiply"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "multiply",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">screen</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "screen"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "screen",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">overlay</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "overlay"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "overlay",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">darken</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "darken"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "darken",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">lighten</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "lighten"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "lighten",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">color-dodge</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "color-dodge"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "color-dodge",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">color-burn</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "color-burn"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "color-burn",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">hard-light</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "hard-light"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "hard-light",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">soft-light</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "soft-light"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "soft-light",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">difference</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "difference"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "difference",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">exclusion</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "exclusion"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "exclusion",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">hue</span>}
+                  active={actualNode?.props.globalCompositeOperation === "hue"}
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "hue",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">saturation</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "saturation"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "saturation",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">color</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "color"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "color",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-none !w-full !h-[32px] !min-h-[32px]"
+                  icon={<span className="font-inter text-xs">luminosity</span>}
+                  active={
+                    actualNode?.props.globalCompositeOperation === "luminosity"
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setNodeCompositeMenuOpen(false);
+
+                    if (!actualNode) {
+                      return;
+                    }
+
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        globalCompositeOperation: "luminosity",
+                      },
+                    };
+
+                    updateElement(updatedNode);
+                  }}
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu> */}
           <DropdownMenu modal={false} open={nodeLayeringMenuOpen}>
             <DropdownMenuTrigger
               disabled={

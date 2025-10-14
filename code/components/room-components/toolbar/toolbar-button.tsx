@@ -39,7 +39,7 @@ export const ToolbarButton = React.forwardRef<
       className,
       icon,
       variant = "rounded",
-      label = "tool",
+      label = undefined,
       onClick,
       disabled = false,
       active = false,
@@ -100,6 +100,10 @@ export const ToolbarButton = React.forwardRef<
     ]);
 
     if (isTouchDevice) {
+      return ButtonElement;
+    }
+
+    if (!label) {
       return ButtonElement;
     }
 
