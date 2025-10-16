@@ -57,7 +57,7 @@ import {
   FlipHorizontal,
   FlipVertical,
   PaintRoller,
-  // RectangleCircle,
+  RectangleCircle,
   // SquaresSubtract,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
@@ -90,8 +90,8 @@ export const NodeToolbar = () => {
     React.useState(false);
   const [nodeStrokeMenuOpen, setNodeStrokeMenuOpen] = React.useState(false);
   const [nodeStyleMenuOpen, setNodeStyleMenuOpen] = React.useState(false);
-  // const [nodeCompositeMenuOpen, setNodeCompositeMenuOpen] =
-  // React.useState(false);
+  const [nodeCompositeMenuOpen, setNodeCompositeMenuOpen] =
+    React.useState(false);
   const [nodeLayeringMenuOpen, setNodeLayeringMenuOpen] = React.useState(false);
   const [colorTokenColorMenuOpen, setColorTokenColorMenuOpen] =
     React.useState(false);
@@ -195,7 +195,7 @@ export const NodeToolbar = () => {
         setNodeStyleMenuOpen(false);
         setNodeLayeringMenuOpen(false);
         setNodeFillMenuOpen(false);
-        // setNodeCompositeMenuOpen(false);
+        setNodeCompositeMenuOpen(false);
         setNodeStrokeMenuOpen(false);
         setNodeStrokeWidthMenuOpen(false);
         setNodeStrokeStyleMenuOpen(false);
@@ -2479,7 +2479,7 @@ export const NodeToolbar = () => {
               </DropdownMenu>
             </>
           )}
-          {/* <DropdownMenu modal={false} open={nodeCompositeMenuOpen}>
+          <DropdownMenu modal={false} open={nodeCompositeMenuOpen}>
             <DropdownMenuTrigger
               disabled={
                 weaveConnectionStatus !==
@@ -2565,7 +2565,7 @@ export const NodeToolbar = () => {
                   tooltipSide="bottom"
                   tooltipAlign="center"
                 />
-                <ToolbarButton
+                {/* <ToolbarButton
                   className="rounded-none !w-full !h-[32px] !min-h-[32px]"
                   icon={
                     <span className="font-inter text-xs">destination-out</span>
@@ -2597,7 +2597,7 @@ export const NodeToolbar = () => {
                   }}
                   tooltipSide="bottom"
                   tooltipAlign="center"
-                />
+                /> */}
                 <ToolbarButton
                   className="rounded-none !w-full !h-[32px] !min-h-[32px]"
                   icon={<span className="font-inter text-xs">multiply</span>}
@@ -3048,7 +3048,7 @@ export const NodeToolbar = () => {
                 />
               </div>
             </DropdownMenuContent>
-          </DropdownMenu> */}
+          </DropdownMenu>
           <DropdownMenu modal={false} open={nodeLayeringMenuOpen}>
             <DropdownMenuTrigger
               disabled={
