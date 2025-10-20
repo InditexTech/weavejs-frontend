@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave } from "@inditextech/weave-sdk";
+import { Weave } from "@inditextech/weave-sdk/client";
 import Konva from "konva";
 import { throttle } from "lodash";
 
