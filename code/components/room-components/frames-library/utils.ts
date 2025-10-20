@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave } from "@inditextech/weave-sdk";
+import { Weave } from "@inditextech/weave-sdk/client";
 import Konva from "konva";
 
 export type PresentationImage = {
@@ -20,7 +20,7 @@ export const toImageAsync = (
     y: number;
     width: number;
     height: number;
-  },
+  }
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
     node.toImage({
@@ -41,7 +41,7 @@ export const toImageAsync = (
 
 export async function generatePresentation(
   instance: Weave,
-  framesAvailable: Konva.Node[],
+  framesAvailable: Konva.Node[]
 ) {
   const stage = instance.getStage();
 

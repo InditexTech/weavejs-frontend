@@ -26,7 +26,7 @@ import { putThread } from "@/api/put-thread";
 import { putThreadAnswer } from "@/api/put-thread-answer";
 import { eventBus } from "@/components/utils/events-bus";
 import { useComment } from "./use-comment";
-import { WeaveCommentNodeViewAction } from "@inditextech/weave-sdk";
+import { WeaveCommentNodeViewAction } from "@inditextech/weave-sdk/client";
 
 type CommentAnswerProps = {
   node: WeaveElementInstance;

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { postExportToImage } from "@/api/post-export-to-image";
-import { Weave } from "@inditextech/weave-sdk";
+import { Weave } from "@inditextech/weave-sdk/client";
 import { WeaveExportNodesOptions } from "@inditextech/weave-types";
 
 export const getImageBase64 = async ({

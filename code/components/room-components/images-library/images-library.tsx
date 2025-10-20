@@ -36,7 +36,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
-import { WeaveImageNode } from "@inditextech/weave-sdk";
+import { WeaveImageNode } from "@inditextech/weave-sdk/client";
 import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";

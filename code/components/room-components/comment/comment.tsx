@@ -10,7 +10,7 @@ import { CommentViewing } from "./comment.viewing";
 import {
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 
 const queryClient = new QueryClient();
 

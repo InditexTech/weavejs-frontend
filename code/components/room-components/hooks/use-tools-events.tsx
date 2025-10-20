@@ -6,7 +6,7 @@ import React from "react";
 import { toast } from "sonner";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
-import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
+import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk/client";
 import { useIsTouchDevice } from "./use-is-touch-device";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RectangleHorizontal, RectangleVertical } from "lucide-react";

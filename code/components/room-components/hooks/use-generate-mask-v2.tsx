@@ -7,7 +7,10 @@ import Konva from "konva";
 import { WeaveElementInstance } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
-import { Weave, WeaveExportNodesActionParams } from "@inditextech/weave-sdk";
+import {
+  Weave,
+  WeaveExportNodesActionParams,
+} from "@inditextech/weave-sdk/client";
 
 type BoundingBox = {
   x: number;

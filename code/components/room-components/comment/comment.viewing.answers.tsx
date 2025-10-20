@@ -7,7 +7,7 @@ import { WeaveElementInstance } from "@inditextech/weave-types";
 import { ThreadAnswerEntity } from "../hooks/types";
 import { useComment } from "./use-comment";
 import { CommentAnswer } from "./comment.viewing.answer";
-import { WeaveCommentNodeViewAction } from "@inditextech/weave-sdk";
+import { WeaveCommentNodeViewAction } from "@inditextech/weave-sdk/client";
 
 type CommentAnswersProps = {
   node: WeaveElementInstance;

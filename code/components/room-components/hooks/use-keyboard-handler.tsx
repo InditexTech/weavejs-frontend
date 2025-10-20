@@ -16,7 +16,7 @@ import {
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";

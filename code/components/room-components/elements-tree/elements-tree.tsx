@@ -27,7 +27,10 @@ import {
   Group,
   LineSquiggle,
 } from "lucide-react";
-import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import {
+  Weave,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weave-sdk/client";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";

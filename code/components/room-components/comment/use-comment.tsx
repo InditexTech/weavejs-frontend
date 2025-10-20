@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { ThreadEntity } from "../hooks/types";
 import { getThread } from "@/api/get-thread";
-import { WeaveCommentNode } from "@inditextech/weave-sdk";
+import { WeaveCommentNode } from "@inditextech/weave-sdk/client";
 
 type UseCommentProps = {
   node: WeaveElementInstance;

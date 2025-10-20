@@ -8,7 +8,7 @@ import { WeaveElementInstance } from "@inditextech/weave-types";
 import {
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 
 let commentDomRoot: ReactDOM.Root | null = null;
 

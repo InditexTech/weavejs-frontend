@@ -24,7 +24,7 @@ import { ColorTokensLibrary } from "../room-components/color-tokens-library/colo
 import { ElementsTree } from "../room-components/elements-tree/elements-tree";
 import { NodeProperties } from "../room-components/overlay/node-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
+import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk/client";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
 import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";

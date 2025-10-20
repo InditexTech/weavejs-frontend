@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { WeaveElementInstance } from "@inditextech/weave-types";
-import { WeaveNode } from "@inditextech/weave-sdk";
+import { WeaveNode } from "@inditextech/weave-sdk/client";
 
 export function RemoveBackgroundActionPopup() {
   useKeyboardHandler();
