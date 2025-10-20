@@ -28,7 +28,8 @@
     "version:release": "npm ci && lerna version --no-git-tag-version --no-push --force-publish --exact --yes $RELEASE_VERSION && npm version $RELEASE_VERSION"
   },
   "overrides": {
-    "konva": "9.3.20",
+    "canvas": "3.2.0",
+    "konva": "10.0.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "yjs": "13.6.27"
@@ -37,10 +38,10 @@
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
     "@hookform/resolvers": "^4.1.3",
-    "@inditextech/weave-react": "0.77.0",
-    "@inditextech/weave-sdk": "0.77.0",
-    "@inditextech/weave-store-azure-web-pubsub": "0.77.0",
-    "@inditextech/weave-store-websockets": "0.77.0",
+    "@inditextech/weave-react": "1.0.3",
+    "@inditextech/weave-sdk": "1.0.3",
+    "@inditextech/weave-store-azure-web-pubsub": "1.0.3",
+    "@inditextech/weave-store-websockets": "1.0.3",
     "@next/env": "^15.2.1",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-avatar": "^1.1.3",
@@ -65,7 +66,6 @@
     "@react-three/postprocessing": "^2.19.1",
     "@tanstack/react-query": "^5.67.1",
     "boring-avatars": "^1.11.2",
-    "canvas": "^3.2.0",
     "change-case": "^5.4.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -74,6 +74,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^11.18.2",
     "husky": "9.1.4",
+    "konva": "10.0.2",
     "lodash": "^4.17.21",
     "motion": "^12.4.7",
     "next": "14.2.32",
@@ -102,6 +103,7 @@
     "use-long-press": "^3.3.0",
     "uuid": "^11.1.0",
     "vaul": "^1.1.2",
+    "yjs": "13.6.27",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },

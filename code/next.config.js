@@ -6,7 +6,7 @@ const nextConfig = {
   output: "standalone",
   reactStrictMode: false,
   webpack: (config) => {
-    config.externals = [...config.externals, { canvas: "canvas" }]; // required to make Konva work
+    config.externals = [...config.externals, { canvas: "canvas", ["skia-canvas"]: "skia-canvas" }]; // required to make Konva work
     return config;
   },
   experimental: {

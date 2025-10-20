@@ -51,7 +51,7 @@ import {
   WeaveBrushToolAction,
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodesActionParams,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import { Button } from "@/components/ui/button";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useMutation } from "@tanstack/react-query";

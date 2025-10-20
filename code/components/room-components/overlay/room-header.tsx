@@ -38,7 +38,7 @@ import {
   WeaveStageGridPlugin,
   WeaveStageGridType,
   WeaveUsersPointersPlugin,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import { ConnectionStatus } from "../connection-status";
 import { bottomElementVariants, topElementVariants } from "./variants";
 import { ConnectedUsers } from "../connected-users";

@@ -9,7 +9,7 @@ import {
   WeaveAction,
   WeaveImageNode,
   WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import {
   type ImagesToolActionTriggerParams,
   type ImagesToolActionState,

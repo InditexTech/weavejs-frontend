@@ -5,7 +5,10 @@
 import { v4 as uuidv4 } from "uuid";
 import Konva from "konva";
 import { type Vector2d } from "konva/lib/types";
-import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import {
+  WeaveAction,
+  WeaveNodesSelectionPlugin,
+} from "@inditextech/weave-sdk/client";
 import { FuzzyMaskCircle, type FuzzyMaskToolActionState } from "./types";
 import {
   FUZZY_MASK_TOOL_ACTION_NAME,

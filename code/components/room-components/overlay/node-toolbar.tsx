@@ -68,7 +68,7 @@ import {
   WeaveNodesSelectionPlugin,
   WeaveAlignNodesToolActionTriggerParams,
   WeaveVideoNode,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ColorPickerInput } from "../inputs/color-picker";

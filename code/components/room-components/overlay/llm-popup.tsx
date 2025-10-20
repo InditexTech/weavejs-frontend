@@ -39,7 +39,7 @@ import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask
 import {
   WEAVE_STAGE_DEFAULT_MODE,
   WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 
 export function LLMGenerationPopup() {
   useKeyboardHandler();

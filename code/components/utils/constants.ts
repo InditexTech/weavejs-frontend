@@ -62,7 +62,7 @@ import {
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
   WEAVE_COMMENT_STATUS,
-} from "@inditextech/weave-sdk";
+} from "@inditextech/weave-sdk/client";
 import {
   WeaveElementInstance,
   WeaveFont,

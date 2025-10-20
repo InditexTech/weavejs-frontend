@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveNode } from "@inditextech/weave-sdk";
+import { WeaveNode } from "@inditextech/weave-sdk/client";
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
