@@ -2,11 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+const path = require("path");
+
 const nextConfig = {
   output: "standalone",
   reactStrictMode: false,
   webpack: (config) => {
-    config.externals = [...config.externals, { canvas: "canvas" }]; // required to make Konva work
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        'konva': path.resolve(__dirname, 'node_modules/konva'),
+        'yjs': path.resolve(__dirname, 'node_modules/yjs'),
+      },
+    }
+    config.externals = [...config.externals, { canvas: "canvas", ["skia-canvas"]: "skia-canvas" }]; // required to make Konva work
     return config;
   },
   experimental: {
