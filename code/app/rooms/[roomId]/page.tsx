@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// import { Room } from "@/components/room/room";
-// import { NoSsr } from "@/components/room-components/no-ssr";
+"use client";
+
 import dynamic from "next/dynamic";
 
 const NoSsr = dynamic(
@@ -16,10 +16,6 @@ const Room = dynamic(
 );
 
 export default function RoomPage() {
-  if (typeof window !== "undefined") {
-    return null;
-  }
-
   return (
     <NoSsr>
       <Room />

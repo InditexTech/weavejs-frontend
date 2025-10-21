@@ -195,11 +195,15 @@ export const Room = () => {
           getContainer={() => {
             return document?.getElementById("weave") as HTMLDivElement;
           }}
-          store={storeProvider}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          store={storeProvider as any}
           fonts={FONTS}
-          nodes={NODES()}
-          plugins={PLUGINS(getUser)}
-          actions={ACTIONS(getUser)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          nodes={NODES() as any[]}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          plugins={PLUGINS(getUser) as any[]}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          actions={ACTIONS(getUser) as any[]}
         >
           <UploadImage />
           <UploadImages />

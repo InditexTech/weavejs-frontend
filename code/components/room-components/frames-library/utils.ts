@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave } from "@inditextech/weave-sdk/client";
+import { Weave } from "@inditextech/weave-sdk";
 import Konva from "konva";
 
 export type PresentationImage = {

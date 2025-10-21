@@ -5,7 +5,7 @@
 import {
   WeaveCopyPasteNodesPluginOnCopyEvent,
   WeaveCopyPasteNodesPluginOnPasteEvent,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { toast } from "sonner";

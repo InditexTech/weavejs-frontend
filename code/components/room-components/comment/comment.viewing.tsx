@@ -24,7 +24,7 @@ import { CommentReply } from "./comment.viewing.reply";
 import {
   WEAVE_COMMENT_STATUS,
   WeaveCommentNodeViewAction,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 
 type CommentViewingProps = {
   node: WeaveElementInstance;

@@ -22,7 +22,7 @@ import {
   WeaveCommentNodeOnCreateCommentEvent,
   WeaveCommentNodeOnDragEndEvent,
   WeaveCommentsRendererPlugin,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 
 export const useCommentsHandler = () => {
   const [comments, setComments] = React.useState<ThreadEntity[]>([]);

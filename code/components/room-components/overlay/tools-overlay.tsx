@@ -24,7 +24,7 @@ import {
   WeaveImageToolActionOnAddedEvent,
   WeaveNode,
   WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 import { WeaveElementInstance } from "@inditextech/weave-types";
 import { ToolsMaskingOverlayV2 } from "./tools-masking-overlay-v2";
 

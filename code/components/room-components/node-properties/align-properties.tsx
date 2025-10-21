@@ -18,7 +18,7 @@ import {
 import {
   WeaveAlignNodesToolAction,
   WeaveAlignNodesToolActionTriggerParams,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 
 export function AlignProperties() {
   const [canAlign, setCanAlign] = React.useState(false);

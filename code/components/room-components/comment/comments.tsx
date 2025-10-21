@@ -32,7 +32,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   WeaveCommentNode,
   WeaveCommentsRendererPlugin,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 
 export const Comments = () => {
   const instance = useWeave((state) => state.instance);

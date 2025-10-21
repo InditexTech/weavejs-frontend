@@ -5,8 +5,6 @@ alias uld := unlink-deps
 
 link-deps:
   npm link @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone
-  # ln -s ${WEAVE_CODE_HOME}/code/node_modules/konva node_modules/konva
-  # ln -s ${WEAVE_CODE_HOME}/code/node_modules/yjs node_modules/yjs
 
 unlink-deps:
   npm unlink @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone

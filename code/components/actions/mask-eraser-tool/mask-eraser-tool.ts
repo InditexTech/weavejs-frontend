@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from "konva";
-import {
-  WeaveAction,
-  WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk/client";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { type MaskEraserToolActionState } from "./types";
 import {
   MASK_ERASER_TOOL_ACTION_NAME,

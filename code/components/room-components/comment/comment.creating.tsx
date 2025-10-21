@@ -8,7 +8,7 @@ import { CommentTextarea } from "./comment-textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CirclePlus } from "lucide-react";
-import { WeaveCommentNodeCreateAction } from "@inditextech/weave-sdk/client";
+import { WeaveCommentNodeCreateAction } from "@inditextech/weave-sdk";
 
 type CommentCreateProps = {
   node: WeaveElementInstance;

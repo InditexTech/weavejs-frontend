@@ -5,10 +5,7 @@
 import { v4 as uuidv4 } from "uuid";
 import Konva from "konva";
 import { type Vector2d } from "konva/lib/types";
-import {
-  WeaveAction,
-  WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk/client";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { type MaskToolActionState } from "./types";
 import { MASK_TOOL_ACTION_NAME, MASK_TOOL_STATE } from "./constants";
 import { setupTransformer } from "../utils/utils";

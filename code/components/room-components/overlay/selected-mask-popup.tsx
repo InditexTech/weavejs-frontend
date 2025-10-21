@@ -9,7 +9,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
 import { WeaveElementInstance } from "@inditextech/weave-types";
-import { WeaveExportNodesActionParams } from "@inditextech/weave-sdk/client";
+import { WeaveExportNodesActionParams } from "@inditextech/weave-sdk";
 import { X } from "lucide-react";
 import Konva from "konva";
 

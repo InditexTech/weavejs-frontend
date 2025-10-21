@@ -8,7 +8,7 @@ import {
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
-} from "@inditextech/weave-sdk/client";
+} from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";

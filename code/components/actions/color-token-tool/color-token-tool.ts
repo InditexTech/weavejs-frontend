@@ -11,10 +11,7 @@ import {
   ColorTokenToolActionTriggerParams,
 } from "./types";
 import { COLOR_TOKEN_ACTION_NAME, COLOR_TOKEN_TOOL_STATE } from "./constants";
-import {
-  WeaveAction,
-  WeaveNodesSelectionPlugin,
-} from "@inditextech/weave-sdk/client";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import Konva from "konva";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 
