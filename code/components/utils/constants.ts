@@ -28,6 +28,7 @@ import {
   WeaveCommentToolAction,
   WeaveExportNodesToolAction,
   WeaveVideoToolAction,
+  // WeaveConnectorToolAction,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -43,6 +44,7 @@ import {
   WeaveStrokeNode,
   WeaveCommentNode,
   WeaveVideoNode,
+  // WeaveConnectorNode,
   WeaveStageGridPlugin,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
@@ -57,7 +59,7 @@ import {
   WeaveNodesEdgeSnappingPlugin,
   WeaveNodesDistanceSnappingPlugin,
   WeaveCommentsRendererPlugin,
-  WeaveStageMinimapPlugin,
+  // WeaveStageMinimapPlugin,
   WeaveNodesMultiSelectionFeedbackPlugin,
   WeaveStageKeyboardMovePlugin,
   WeaveCommentNodeCreateAction,
@@ -351,6 +353,7 @@ const NODES = () => [
       },
     },
   }),
+  // new WeaveConnectorNode(),
   new ColorTokenNode(),
 ];
 
@@ -519,16 +522,16 @@ const PLUGINS = (getUser: () => WeaveUser) => [
     },
   }),
   new WeaveNodesMultiSelectionFeedbackPlugin(),
-  new WeaveStageMinimapPlugin({
-    config: {
-      getContainer: () => {
-        return document?.getElementById("minimap") as HTMLElement;
-      },
-      id: "weave_stage_minimap",
-      width: window.innerWidth * 0.2,
-      fitToContentPadding: 5,
-    },
-  }),
+  // new WeaveStageMinimapPlugin({
+  //   config: {
+  //     getContainer: () => {
+  //       return document?.getElementById("minimap") as HTMLElement;
+  //     },
+  //     id: "weave_stage_minimap",
+  //     width: window.innerWidth * 0.2,
+  //     fitToContentPadding: 5,
+  //   },
+  // }),
   new WeaveStageKeyboardMovePlugin({
     config: {
       movementDelta: 5,
@@ -552,6 +555,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new ColorTokenToolAction(),
   new WeaveTextToolAction(),
   new WeaveVideoToolAction(),
+  // new WeaveConnectorToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),
   new WeaveFitToScreenToolAction(),

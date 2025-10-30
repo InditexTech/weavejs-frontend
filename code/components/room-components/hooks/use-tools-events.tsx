@@ -485,6 +485,35 @@ export const useToolsEvents = () => {
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
 
+  // Connector tool events
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const handleConnectorAdding = () => {
+      toast("Add connector", {
+        description: `${isTouchDevice ? "Tap" : "Click"} on an element anchor to set the start point and then ${isTouchDevice ? "tap" : "click"} on another anchor to add the connector.`,
+        duration: Infinity,
+      });
+    };
+
+    const handleConnectorAdded = () => {
+      toast.dismiss();
+    };
+
+    instance.addEventListener("onAddingConnector", handleConnectorAdding);
+    instance.addEventListener("onAddedConnector", handleConnectorAdded);
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener(
+          "onAddingConnector",
+          handleConnectorAdding
+        );
+        instance.removeEventListener("onAddedConnector", handleConnectorAdded);
+      }
+    };
+  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
+
   // Image tool events
   React.useEffect(() => {
     if (!instance) return;

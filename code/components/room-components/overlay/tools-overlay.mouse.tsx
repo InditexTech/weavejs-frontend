@@ -31,9 +31,10 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  MapPinned,
+  // MapPinned,
   Video,
   Film,
+  // ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -118,8 +119,8 @@ export function ToolsOverlayMouse() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
-  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
+  // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -489,6 +490,34 @@ export function ToolsOverlayMouse() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        {/* <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={
+            <ChevronsLeftRightEllipsis
+              className="px-2"
+              size={40}
+              strokeWidth={1}
+            />
+          }
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "connectorTool"}
+          onClick={() => triggerTool("connectorTool", nodeCreateProps)}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Connector Tool</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: "X",
+                  [SYSTEM_OS.OTHER]: "X",
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        /> */}
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"
@@ -902,7 +931,7 @@ export function ToolsOverlayMouse() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ToolbarDivider />
+        {/* <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
@@ -926,7 +955,7 @@ export function ToolsOverlayMouse() {
           }
           tooltipSide="top"
           tooltipAlign="center"
-        />
+        /> */}
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"

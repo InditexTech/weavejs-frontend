@@ -37,6 +37,8 @@ export const useNodeActionName = () => {
         return "Stroke";
       case "line":
         return "Vector path";
+      case "connector":
+        return "Connector";
       case "text":
         return "Text";
       case "video":

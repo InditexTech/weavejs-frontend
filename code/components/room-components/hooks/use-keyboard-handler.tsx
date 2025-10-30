@@ -166,6 +166,10 @@ export function useKeyboardHandler() {
   }, ["KeyB"]);
 
   useKeyDown(() => {
+    triggerTool("connectorTool");
+  }, ["KeyX"]);
+
+  useKeyDown(() => {
     triggerTool("textTool");
   }, ["KeyT"]);
 
