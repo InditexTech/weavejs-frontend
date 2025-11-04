@@ -123,11 +123,10 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     await instance.getStore().connect();
   }, [instance]);
 
-  const handleExitRoom = React.useCallback(() => {
+  const handleExitRoom = React.useCallback(async () => {
     sessionStorage.removeItem(`weave.js_${room}`);
-    instance?.getStore().disconnect();
     router.push("/");
-  }, [instance, room, router]);
+  }, [room, router]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -152,11 +151,14 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     if (!roomLoaded) return;
 
     const elementsTree = instance.getElementsTree();
+
     if (elementsTree.length === 0) {
       const stage = instance.getStage();
       stage.x(stage.width() / 2);
       stage.y(stage.height() / 2);
-    } else {
+    }
+
+    if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       instance.triggerAction("fitToScreenTool", {
         previousAction: "selectionTool",
       });

@@ -47,10 +47,10 @@ export const ManageIdleDisconnection = () => {
       setDisconnectionStarted(true);
       setDisconnectionCounter(TIME_UNTIL_DISCONNECTION_SECONDS);
       setShowIdleWarning(true);
-      timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = setTimeout(async () => {
         setShowIdleWarning(false);
         sessionStorage.removeItem(`weave.js_${room}`);
-        instance?.getStore().disconnect();
+        await instance?.getStore().disconnect();
         router.push("/");
       }, TIME_UNTIL_DISCONNECTION_SECONDS * 1000);
       timeElapsedIntervalRef.current = setInterval(() => {

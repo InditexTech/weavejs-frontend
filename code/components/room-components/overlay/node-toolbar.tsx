@@ -109,6 +109,7 @@ export const NodeToolbar = () => {
   const [isVideoPaused, setIsVideoPaused] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
+  const roomLoaded = useWeave((state) => state.room.loaded);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
@@ -528,6 +529,10 @@ export const NodeToolbar = () => {
       )
     );
   }, [isSingleNodeSelected, actualNode]);
+
+  if (!roomLoaded) {
+    return null;
+  }
 
   if (isSelecting) {
     return null;
@@ -3297,7 +3302,6 @@ export const NodeToolbar = () => {
               tooltipAlign="center"
             />
           )}
-
           {isGroup && (
             <ToolbarButton
               className="rounded-full !w-[32px] !h-[32px]"

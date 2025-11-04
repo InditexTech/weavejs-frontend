@@ -233,9 +233,9 @@ export function RoomHeader() {
     }
   }, [instance]);
 
-  const handleExitRoom = React.useCallback(() => {
+  const handleExitRoom = React.useCallback(async () => {
     sessionStorage.removeItem(`weave.js_${room}`);
-    instance?.getStore().disconnect();
+    await instance?.getStore().disconnect();
     setMenuOpen(false);
     router.push("/");
   }, [instance, room, router]);

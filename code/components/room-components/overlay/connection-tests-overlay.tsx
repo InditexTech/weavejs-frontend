@@ -80,12 +80,12 @@ export function ConnectionTestsOverlay() {
     await instance.getStore().connect();
   }, [instance]);
 
-  const handleDisconnect = React.useCallback(() => {
+  const handleDisconnect = React.useCallback(async () => {
     if (!instance) {
       return;
     }
 
-    instance.getStore().disconnect();
+    await instance.getStore().disconnect();
   }, [instance]);
 
   const handleRemoteDisconnect = React.useCallback(() => {
