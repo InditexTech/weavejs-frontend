@@ -74,6 +74,13 @@ export function RoomHeader() {
     (state) => state.setExportConfigVisible
   );
 
+  const connectionTestsShow = useCollaborationRoom(
+    (state) => state.connection.tests.show
+  );
+  const setConnectionTestsShow = useCollaborationRoom(
+    (state) => state.setConnectionTestsShow
+  );
+
   const iaEnabled = useIACapabilities((state) => state.enabled);
   const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
 
@@ -229,8 +236,8 @@ export function RoomHeader() {
   const handleExitRoom = React.useCallback(() => {
     sessionStorage.removeItem(`weave.js_${room}`);
     instance?.getStore().disconnect();
-    router.push("/");
     setMenuOpen(false);
+    router.push("/");
   }, [instance, room, router]);
 
   const handlePrintToConsoleState = React.useCallback(() => {
@@ -249,25 +256,30 @@ export function RoomHeader() {
 
   return (
     <>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        variants={bottomElementVariants}
-        className="w-auto z-1 flex 2xl:hidden gap-1 justify-center items-center absolute bottom-[16px] left-[16px] right-[16px] pointer-events-none"
-      >
-        <div
-          className={cn(
-            "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]",
-            {
-              ["pointer-events-none"]: selectionActive,
-              ["pointer-events-auto"]: !selectionActive,
-            }
-          )}
+      {![
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ].includes(weaveConnectionStatus as any) && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={bottomElementVariants}
+          className="w-auto z-1 flex 2xl:hidden gap-1 justify-center items-center absolute bottom-[16px] left-[16px] right-[16px] pointer-events-none"
         >
-          <ZoomToolbar />
-        </div>
-      </motion.div>
+          <div
+            className={cn(
+              "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]",
+              {
+                ["pointer-events-none"]: selectionActive,
+                ["pointer-events-auto"]: !selectionActive,
+              }
+            )}
+          >
+            <ZoomToolbar />
+          </div>
+        </motion.div>
+      )}
       <motion.div
         initial="hidden"
         animate="visible"
@@ -387,10 +399,10 @@ export function RoomHeader() {
                       <DropdownMenuItem
                         className="text-foreground cursor-pointer hover:rounded-none"
                         disabled={
-                          instance?.isEmpty() ??
-                          (weaveConnectionStatus !==
-                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-                            isExporting())
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
+                          !instance?.isEmpty() &&
+                          !isExporting()
                         }
                         onPointerDown={async () => {
                           setExportNodes([]);
@@ -439,6 +451,10 @@ export function RoomHeader() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-foreground cursor-pointer hover:rounded-none"
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
                         onPointerDown={handleToggleComments}
                       >
                         {commentsEnabled ? (
@@ -556,8 +572,28 @@ export function RoomHeader() {
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="rounded-none">
                       <DropdownMenuItem
-                        disabled={iaEnabled}
                         className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          setConnectionTestsShow(!connectionTestsShow);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {connectionTestsShow ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[16px] h-[16px]" />
+                        )}
+                        Connection testing
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        disabled={
+                          weaveConnectionStatus ===
+                            WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED ||
+                          (weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
+                            iaEnabled)
+                        }
                         onPointerDown={() => {
                           setIASetupVisible(true);
                           setMenuOpen(false);
@@ -572,6 +608,10 @@ export function RoomHeader() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
                         onPointerDown={handlePrintToConsoleState}
                       >
                         <div className="w-[16px] h-[16px]" /> Print state to
@@ -584,6 +624,10 @@ export function RoomHeader() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
                         onPointerDown={() => {
                           handlePrintStateSnapshotToClipboard();
                           setMenuOpen(false);
@@ -618,34 +662,41 @@ export function RoomHeader() {
           </div>
         </div>
       </motion.div>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        variants={topElementVariants}
-        className={cn(
-          "w-auto z-1 flex gap-1 justify-center items-center absolute top-[16px] right-[16px]",
-          {
-            ["pointer-events-none"]: selectionActive,
-            ["pointer-events-auto"]: !selectionActive,
-          }
-        )}
-      >
-        <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
-          <div className="flex justify-end items-center gap-[16px]">
+      {![
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ].includes(weaveConnectionStatus as any) && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={topElementVariants}
+          className={cn(
+            "w-auto z-1 flex gap-1 justify-center items-center absolute top-[16px] right-[16px]",
+            {
+              ["pointer-events-none"]: selectionActive,
+              ["pointer-events-auto"]: !selectionActive,
+            }
+          )}
+        >
+          <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
             <div className="flex justify-end items-center gap-[16px]">
-              <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
-              <div className="max-w-[320px]">
-                <ConnectedUsers />
+              <div className="flex justify-end items-center gap-[16px]">
+                <ConnectionStatus
+                  weaveConnectionStatus={weaveConnectionStatus}
+                />
+                <div className="max-w-[320px]">
+                  <ConnectedUsers />
+                </div>
+              </div>
+              <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
+                <Divider />
+                <ZoomToolbar />
               </div>
             </div>
-            <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
-              <Divider />
-              <ZoomToolbar />
-            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
       <LlmSetupDialog />
     </>
   );

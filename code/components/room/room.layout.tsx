@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { ContextMenuRender } from "@/components/room-components/context-menu";
 import { TransformingOperation, useCollaborationRoom } from "@/store/store";
 import { RoomHeader } from "@/components/room-components/overlay/room-header";
@@ -40,6 +41,9 @@ import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-ref
 import { ExportConfigDialog } from "../room-components/overlay/export-config";
 import { NodeToolbar } from "../room-components/overlay/node-toolbar";
 import { VideosLibrary } from "../room-components/videos-library/videos-library";
+import { ConnectionTestsOverlay } from "../room-components/overlay/connection-tests-overlay";
+import { Button } from "../ui/button";
+import { ManageIdleDisconnection } from "../room-components/manage-idle-disconnection";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -59,6 +63,8 @@ const TRANSFORMING_OPERATIONS: Record<
 };
 
 export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
+  const router = useRouter();
+
   useWeaveEvents();
   useContextMenu();
   useCopyPaste();
@@ -66,6 +72,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
+  const room = useCollaborationRoom((state) => state.room);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const sidebarLeftActive = useCollaborationRoom(
@@ -107,6 +114,20 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const fontsLoaded = useCollaborationRoom((state) => state.fonts.loaded);
   const setFontsLoaded = useCollaborationRoom((state) => state.setFontsLoaded);
   const setFontsValues = useCollaborationRoom((state) => state.setFontsValues);
+
+  const handleReconnectRoom = React.useCallback(async () => {
+    if (!instance) {
+      return;
+    }
+
+    await instance.getStore().connect();
+  }, [instance]);
+
+  const handleExitRoom = React.useCallback(() => {
+    sessionStorage.removeItem(`weave.js_${room}`);
+    instance?.getStore().disconnect();
+    router.push("/");
+  }, [instance, room, router]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -197,8 +218,22 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <NodeToolbar />
           </div>
           {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
-          {weaveConnectionStatus !==
-            WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
+          {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
+            <div className="absolute top-0 left-0 right-0 bottom-0">
+              <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none">
+                <div className="bg-white p-8 flex justify-center items-center flex-col gap-2">
+                  <div className="text-2xl font-inter font-light uppercase">
+                    ERROR CONNECTING
+                  </div>
+                  <div className="text-xl font-inter font-light text-muted-foreground">
+                    Please wait...
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {weaveConnectionStatus ===
+            WEAVE_STORE_CONNECTION_STATUS.CONNECTING && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
               <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none">
                 <div className="bg-white p-8 flex justify-center items-center flex-col gap-2">
@@ -207,6 +242,36 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                   </div>
                   <div className="text-xl font-inter font-light text-muted-foreground">
                     Please wait...
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {weaveConnectionStatus ===
+            WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED && (
+            <div className="absolute top-0 left-0 right-0 bottom-0">
+              <div className="w-full h-full bg-black/50 flex justify-center items-center">
+                <div className="bg-white p-8 flex justify-center items-center flex-col gap-2">
+                  <div className="text-2xl font-inter font-light uppercase">
+                    YOU HAVE BEEN DISCONNECTED
+                  </div>
+                  <div className="text-xl font-inter font-light text-muted-foreground mt-3 flex gap-1">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="rounded-none !cursor-pointer uppercase !text-xs"
+                      onClick={handleReconnectRoom}
+                    >
+                      Reconnect to room
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="rounded-none !cursor-pointer uppercase !text-xs"
+                      onClick={handleExitRoom}
+                    >
+                      Close room
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -227,7 +292,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                 position={contextMenuPosition}
                 options={contextMenuOptions}
               />
-              <ToolsOverlay />
+              <ConnectionTestsOverlay />
+              {weaveConnectionStatus ===
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED && <ToolsOverlay />}
               <div
                 id="minimap"
                 className={cn(
@@ -312,6 +379,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
 
         {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
           <>
+            <ManageIdleDisconnection />
             <MaskSlider />
             <LLMGenerationPopup />
             <LLMGenerationPopupV2 />

@@ -107,6 +107,10 @@ export const ToolbarButton = React.forwardRef<
       return ButtonElement;
     }
 
+    if (disabled) {
+      return ButtonElement;
+    }
+
     return (
       <TooltipProvider delayDuration={300}>
         <Tooltip>

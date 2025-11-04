@@ -219,7 +219,7 @@ export const NodeToolbar = () => {
       if (node && nodes.length === 1) {
         const nodeId = node.key;
         const stage = instance.getStage();
-        const konvaNode = stage.findOne(`#${nodeId}`);
+        const konvaNode = stage?.findOne(`#${nodeId}`);
         if (konvaNode && toolbarRef.current) {
           nodesRect = konvaNode.getClientRect();
           hasNodes = true;

@@ -55,6 +55,11 @@ interface CollaborationRoomState {
     show: boolean;
     minimap: boolean;
   };
+  connection: {
+    tests: {
+      show: boolean;
+    };
+  };
   drawer: {
     keyboardShortcuts: {
       visible: boolean;
@@ -176,12 +181,18 @@ interface CollaborationRoomState {
   setFontsLoaded: (newLoaded: boolean) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFontsValues: (newValues: { id: string; name: string }[]) => void;
+  setConnectionTestsShow: (newShow: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   features: {
     workloads: true,
     threads: true,
+  },
+  connection: {
+    tests: {
+      show: false,
+    },
   },
   ui: {
     show: true,
@@ -532,5 +543,13 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       fonts: { ...state.fonts, values: newValues },
+    })),
+  setConnectionTestsShow: (newShow: boolean) =>
+    set((state) => ({
+      ...state,
+      connection: {
+        ...state.connection,
+        tests: { ...state.connection.tests, show: newShow },
+      },
     })),
 }));

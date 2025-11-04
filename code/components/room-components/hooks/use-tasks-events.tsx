@@ -4,7 +4,8 @@
 
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import ReconnectingWebsocket from "reconnecting-websocket";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCollaborationRoom } from "@/store/store";
 import { eventBus } from "@/components/utils/events-bus";
 import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
@@ -22,6 +23,10 @@ export const useTasksEvents = () => {
   );
 
   const queryClient = useQueryClient();
+
+  const getCommBusUrl = useMutation({
+    mutationFn: () => getCommBusNegotiate(room ?? "", user?.name ?? ""),
+  });
 
   React.useEffect(() => {
     if (typeof clientId === "undefined") {
@@ -44,9 +49,12 @@ export const useTasksEvents = () => {
         return;
       }
 
-      const { url } = await getCommBusNegotiate(room, user?.name ?? "");
+      const ws = new ReconnectingWebsocket(async () => {
+        const { url } = await getCommBusUrl.mutateAsync();
+        console.log("🔌 Connecting comm-bus");
 
-      const ws = new WebSocket(url);
+        return url;
+      });
 
       ws.onclose = () => console.log("🔌 closed");
 
@@ -85,13 +93,13 @@ export const useTasksEvents = () => {
       ws.onerror = (err) => console.error("❌ error", err);
 
       ws.onopen = async () => {
-        console.log("✅ Connected");
+        console.log("✅ Connected comm-bus");
 
         console.log(`🔌 Join Room ${room}`);
 
         await postCommBusJoin(room, user?.name ?? "");
 
-        console.log(`✅ Room ${room} joined`);
+        console.log(`✅ Room ${room} joined on comm-bus`);
 
         setCommBusConnected(true);
       };
@@ -100,5 +108,12 @@ export const useTasksEvents = () => {
     }
 
     connectToRoomCoomBus();
-  }, [initializedCommBus, room, user?.name, setCommBusConnected, queryClient]);
+  }, [
+    initializedCommBus,
+    getCommBusUrl,
+    room,
+    user?.name,
+    setCommBusConnected,
+    queryClient,
+  ]);
 };
