@@ -9,7 +9,6 @@ import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { Button } from "@/components/ui/button";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +23,6 @@ import { WeaveElementInstance } from "@inditextech/weave-types";
 import { WeaveNode } from "@inditextech/weave-sdk";
 
 export function RemoveBackgroundActionPopup() {
-  useKeyboardHandler();
-
   const instance = useWeave((state) => state.instance);
 
   const originNodeId = useCollaborationRoom(

@@ -12,30 +12,28 @@ const canDetectKeyboard = () => {
   return !editingTextNodes;
 };
 
-export const useKeyDown = (
-  callback: () => void,
-  keys: string[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modifiers: (event: any) => boolean = () => true
-) => {
+export type useKeyDownCallback = (event: KeyboardEvent) => void;
+
+export const useKeyDown = (callback: useKeyDownCallback) => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const onKeyDown = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (event: any) => {
-      const wasAnyKeyPressed = keys.some((key: string) => event.code === key);
-      if (
-        wasAnyKeyPressed &&
-        !window.weaveOnFieldFocus &&
-        canDetectKeyboard() &&
-        modifiers(event) &&
-        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-      ) {
-        event.preventDefault();
-        callback();
+    (event: KeyboardEvent) => {
+      if (weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
+        return;
       }
+
+      if (window.weaveOnFieldFocus) {
+        return;
+      }
+
+      if (!canDetectKeyboard()) {
+        return;
+      }
+
+      callback(event);
     },
-    [callback, keys, weaveConnectionStatus, modifiers]
+    [callback, weaveConnectionStatus]
   );
 
   React.useEffect(() => {

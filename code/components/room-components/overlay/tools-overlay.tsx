@@ -12,7 +12,6 @@ import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { ToolsOverlayTouch } from "./tools-overlay.touch";
@@ -29,8 +28,6 @@ import { WeaveElementInstance } from "@inditextech/weave-types";
 import { ToolsMaskingOverlayV2 } from "./tools-masking-overlay-v2";
 
 export function ToolsOverlay() {
-  useKeyboardHandler();
-
   const addImageRef = React.useRef<string | null>(null);
 
   const [positionCalculated, setPositionCalculated] =

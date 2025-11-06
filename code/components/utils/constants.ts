@@ -131,6 +131,14 @@ const FONTS = async (): Promise<WeaveFont[]> => {
   await sansitaBold.load();
   document.fonts.add(sansitaBold);
 
+  const notoSansRegular = new FontFace(
+    "NotoSansMono",
+    "url(/fonts/NotoSansMono-Regular.ttf)",
+    { weight: "400", style: "normal" }
+  );
+  await notoSansRegular.load();
+  document.fonts.add(notoSansRegular);
+
   return [
     {
       id: "Inter",
@@ -144,7 +152,7 @@ const FONTS = async (): Promise<WeaveFont[]> => {
     },
     {
       id: "Arial",
-      name: "Arial, sans-serif",
+      name: "Arial",
       offsetY: -1.6,
     },
     {
@@ -214,6 +222,11 @@ const FONTS = async (): Promise<WeaveFont[]> => {
     {
       id: "Impact",
       name: "Impact, sans-serif",
+      offsetY: -0.6,
+    },
+    {
+      id: "NotoSansMono",
+      name: "NotoSansMono, monospace",
       offsetY: -0.6,
     },
   ];

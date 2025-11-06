@@ -214,6 +214,12 @@ export function ExportConfigDialog() {
                         White
                       </SelectItem>
                       <SelectItem
+                        value="#D3D3D3"
+                        className="font-inter text-xs rounded-none"
+                      >
+                        Gray
+                      </SelectItem>
+                      <SelectItem
                         value="#000000"
                         className="font-inter text-xs rounded-none"
                       >

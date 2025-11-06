@@ -13,7 +13,6 @@ import { useCollaborationRoom } from "@/store/store";
 import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { Button } from "@/components/ui/button";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -35,8 +34,6 @@ import { CheckCheck, X } from "lucide-react";
 import { MaskEraserToolAction } from "@/components/actions/mask-eraser-tool/mask-eraser-tool";
 
 export function LLMPredictionsSelectionPopup() {
-  useKeyboardHandler();
-
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);

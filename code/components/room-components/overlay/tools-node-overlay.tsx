@@ -38,7 +38,6 @@ import { motion } from "framer-motion";
 import { rightElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { cn, SYSTEM_OS } from "@/lib/utils";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import {
   WEAVE_STORE_CONNECTION_STATUS,
   WeaveElementInstance,
@@ -63,8 +62,6 @@ import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { getImageBase64 } from "@/components/utils/images";
 
 export function ToolsNodeOverlay() {
-  useKeyboardHandler();
-
   const [onEraserMode, setOnEraserMode] = React.useState(false);
   const [actualNodeKey, setActualNodeKey] = React.useState("");
   const [colorTokenColorMenuOpen, setColorTokenColorMenuOpen] =

@@ -19,6 +19,14 @@ type NodePropertiesAction = "create" | "update" | undefined;
 
 type CommentsStatus = "pending" | "resolved" | "all";
 
+export const BACKGROUND_COLOR = {
+  ["WHITE"]: "#FFFFFF",
+  ["GRAY"]: "#D6D6D6",
+} as const;
+
+export type BackgroundColor =
+  (typeof BACKGROUND_COLOR)[keyof typeof BACKGROUND_COLOR];
+
 export type TransformingOperation =
   | "background-removal"
   | "negate-image"
@@ -38,6 +46,7 @@ type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
 interface CollaborationRoomState {
+  backgroundColor: BackgroundColor;
   features: {
     workloads: boolean;
     threads: boolean;
@@ -182,9 +191,11 @@ interface CollaborationRoomState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFontsValues: (newValues: { id: string; name: string }[]) => void;
   setConnectionTestsShow: (newShow: boolean) => void;
+  setBackgroundColor: (newBackgroundColor: BackgroundColor) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
+  backgroundColor: BACKGROUND_COLOR.WHITE,
   features: {
     workloads: true,
     threads: true,
@@ -551,5 +562,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         ...state.connection,
         tests: { ...state.connection.tests, show: newShow },
       },
+    })),
+  setBackgroundColor: (newBackgroundColor) =>
+    set((state) => ({
+      ...state,
+      backgroundColor: newBackgroundColor,
     })),
 }));

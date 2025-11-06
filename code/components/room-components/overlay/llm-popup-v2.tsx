@@ -21,7 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { postGenerateImageV2 } from "@/api/v3/post-generate-image";
 import { postEditImageV2 } from "@/api/v3/post-edit-image";
 import { Logo } from "@/components/utils/logo";
@@ -50,8 +49,6 @@ import {
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function LLMGenerationPopupV2() {
-  useKeyboardHandler();
-
   const [modelToUse, setModelToUse] =
     React.useState<ImageModel>("openai/gpt-image-1");
   const [promptGenerate, setPromptGenerate] = React.useState<string>("");

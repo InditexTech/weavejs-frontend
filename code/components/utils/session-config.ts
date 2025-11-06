@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { BACKGROUND_COLOR, BackgroundColor } from "@/store/store";
+
 type WeaveSessionConfig = {
   grid: {
     enabled: boolean;
     type: "lines" | "dots";
   };
+  backgroundColor: BackgroundColor;
 };
 
 const defaultSessionConfig: WeaveSessionConfig = {
@@ -14,6 +17,7 @@ const defaultSessionConfig: WeaveSessionConfig = {
     enabled: true,
     type: "lines",
   },
+  backgroundColor: BACKGROUND_COLOR.WHITE,
 };
 
 export const getSessionConfig = (room: string): WeaveSessionConfig => {

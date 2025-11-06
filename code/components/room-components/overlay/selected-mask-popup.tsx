@@ -6,7 +6,6 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { useIACapabilities } from "@/store/ia";
 import { WeaveElementInstance } from "@inditextech/weave-types";
 import { WeaveExportNodesActionParams } from "@inditextech/weave-sdk";
@@ -14,8 +13,6 @@ import { X } from "lucide-react";
 import Konva from "konva";
 
 export function SelectedMaskPopup() {
-  useKeyboardHandler();
-
   const instance = useWeave((state) => state.instance);
 
   const selectedMask = useIACapabilities((state) => state.mask.selected);

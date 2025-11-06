@@ -195,6 +195,18 @@ export const ElementsTree = () => {
       .filter((key) => typeof key !== "undefined")
   );
 
+  const amountOfNodes = React.useMemo(() => {
+    let amountNodes = 0;
+
+    for (const element of elementsTree) {
+      if (element.props.children && element.props.children.length > 0) {
+        amountNodes += element.props.children.length;
+      }
+      amountNodes++;
+    }
+    return amountNodes;
+  }, [elementsTree]);
+
   React.useEffect(() => {
     function handleOnStateChange() {
       if (!instance) return [];
@@ -271,7 +283,7 @@ export const ElementsTree = () => {
           </button>
         </div>
       </div>
-      <ScrollArea className="w-full h-[calc(100%-95px)]">
+      <ScrollArea className="w-full h-[calc(100%-95px-33px)]">
         <div className="flex flex-col gap-2 w-full h-full">
           {elementsTree.length === 0 && (
             <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
@@ -301,6 +313,9 @@ export const ElementsTree = () => {
           )}
         </div>
       </ScrollArea>
+      <div className="px-[24px] py-[8px] text-xs border-t border-[#c9c9c9]">
+        Nodes: {amountOfNodes}
+      </div>
     </div>
   );
 };

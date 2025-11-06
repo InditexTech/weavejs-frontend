@@ -47,7 +47,6 @@ import { motion } from "framer-motion";
 import { leftElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { cn } from "@/lib/utils";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { MoveToolTrigger } from "./tools-triggers/move-tool";
@@ -59,8 +58,6 @@ import { useImagesTools } from "./hooks/use-images-tools";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function ToolsOverlayTouch() {
-  useKeyboardHandler();
-
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
   const [actualStrokesTool, setActualStrokesTool] = React.useState("penTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");

@@ -125,123 +125,128 @@ export function useKeyboardHandler() {
   }, [actualAction]);
 
   /* Keyboard shortcuts toolbar */
-  useKeyDown(() => {
-    triggerTool("moveTool");
-  }, ["KeyM"]);
+  const keyDownHandler = React.useCallback(
+    async (event: KeyboardEvent) => {
+      if (event.code === "KeyM") {
+        event.preventDefault();
+        triggerTool("moveTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("selectionTool");
-  }, ["KeyS"]);
+      if (event.code === "KeyS") {
+        event.preventDefault();
+        triggerTool("selectionTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("eraserTool");
-  }, ["KeyD"]);
+      if (event.code === "KeyD") {
+        event.preventDefault();
+        triggerTool("eraserTool");
+      }
 
-  useKeyDown(
-    () => {
-      triggerTool("frameTool");
-    },
-    ["KeyF"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
+      if (event.code === "KeyF" && !(event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        triggerTool("frameTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("rectangleTool");
-  }, ["KeyR"]);
+      if (event.code === "KeyR") {
+        event.preventDefault();
+        triggerTool("rectangleTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("ellipseTool");
-  }, ["KeyE"]);
+      if (event.code === "KeyE") {
+        event.preventDefault();
+        triggerTool("ellipseTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("regularPolygonTool");
-  }, ["KeyP"]);
+      if (event.code === "KeyP") {
+        event.preventDefault();
+        triggerTool("regularPolygonTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("penTool");
-  }, ["KeyL"]);
+      if (event.code === "KeyL") {
+        event.preventDefault();
+        triggerTool("penTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("brushTool");
-  }, ["KeyB"]);
+      if (event.code === "KeyB") {
+        event.preventDefault();
+        triggerTool("brushTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("connectorTool");
-  }, ["KeyX"]);
+      if (event.code === "KeyX") {
+        event.preventDefault();
+        triggerTool("connectorTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("textTool");
-  }, ["KeyT"]);
+      if (event.code === "KeyT") {
+        event.preventDefault();
+        triggerTool("textTool");
+      }
 
-  useKeyDown(
-    () => {
-      triggerTool("imageTool");
-      setShowSelectFileImage(true);
-    },
-    ["KeyI"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
+      if (event.code === "KeyI" && !(event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        triggerTool("imageTool");
+        setShowSelectFileImage(true);
+      }
 
-  useKeyDown(
-    () => {
-      triggerTool("imagesTool");
-      setShowSelectFileImage(true);
-    },
-    ["KeyO"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
+      if (event.code === "KeyO" && !(event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        triggerTool("imagesTool");
+        setShowSelectFileImage(true);
+      }
 
-  useKeyDown(() => {
-    triggerTool("starTool");
-  }, ["KeyJ"]);
+      if (event.code === "KeyJ") {
+        event.preventDefault();
+        triggerTool("starTool");
+      }
 
-  useKeyDown(() => {
-    triggerTool("arrowTool");
-  }, ["KeyA"]);
+      if (event.code === "KeyA") {
+        event.preventDefault();
+        triggerTool("arrowTool");
+      }
 
-  useKeyDown(
-    () => {
-      triggerTool("colorTokenTool");
-    },
-    ["KeyK"],
-    (e) => !(e.ctrlKey || e.metaKey)
-  );
+      if (event.code === "KeyK" && !(event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        triggerTool("colorTokenTool");
+      }
 
-  useKeyDown(
-    () => {
-      if (instance) {
+      if (
+        event.code === "KeyZ" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance
+      ) {
         const actualStore = instance.getStore();
         actualStore.undoStateStep();
       }
-    },
-    ["KeyZ"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance) {
+      if (
+        event.code === "KeyY" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance
+      ) {
         const actualStore = instance.getStore();
         actualStore.redoStateStep();
       }
-    },
-    ["KeyY"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  /* Keyboard shortcuts visibility */
+      /* Keyboard shortcuts visibility */
 
-  useKeyDown(
-    () => {
-      setShowUi(!showUI);
-    },
-    ["IntlBackslash"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
+      if (
+        event.code === "IntlBackslash" &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        setShowUi(!showUI);
+      }
 
-  useKeyDown(
-    () => {
-      if (instance) {
+      if (
+        event.code === "KeyU" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance
+      ) {
         const usersPointersPlugin =
           instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
         if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
@@ -251,71 +256,65 @@ export function useKeyboardHandler() {
           usersPointersPlugin.enable();
         }
       }
-    },
-    ["KeyU"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  /* Keyboard shortcuts selection */
+      /* Keyboard shortcuts selection */
 
-  useKeyDown(
-    () => {
-      if (instance) {
+      if (
+        event.code === "KeyA" &&
+        event.shiftKey &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance
+      ) {
         const selectionPlugin =
           instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectAll();
         }
       }
-    },
-    ["KeyA"],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance) {
+      if (event.code === "Escape" && event.shiftKey && instance) {
         const selectionPlugin =
           instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectNone();
         }
       }
-    },
-    ["Escape"],
-    (e) => e.shiftKey
-  );
 
-  /* Keyboard shortcuts editing */
+      /* Keyboard shortcuts editing */
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodesActionParams, void>(
-          "exportNodeTool",
-          {
-            nodes: selectedNodes.map((node) => node.instance),
-            options: {
-              padding: 20,
-              pixelRatio: 2,
-            },
-          }
-        );
+      if (
+        event.code === "KeyE" &&
+        event.shiftKey &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length === 1
+      ) {
+        if (instance && selectedNodes.length === 1) {
+          instance.triggerAction<WeaveExportNodesActionParams, void>(
+            "exportNodeTool",
+            {
+              nodes: selectedNodes.map((node) => node.instance),
+              options: {
+                padding: 20,
+                pixelRatio: 2,
+              },
+            }
+          );
+        }
       }
-    },
-    ["KeyE"],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    async () => {
-      if (instance) {
+      if (
+        event.code === "KeyV" &&
+        event.shiftKey &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance
+      ) {
         const image = await instance.triggerAction<
           WeaveExportStageActionParams,
           Promise<HTMLImageElement>
@@ -331,256 +330,248 @@ export function useKeyboardHandler() {
         link.download = `${uuidv4()}image/png`;
         link.click();
       }
-    },
-    ["KeyV"],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  /* Keyboard shortcuts arrange */
+      /* Keyboard shortcuts arrange */
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length === 1) {
+      if (
+        event.code === "BracketRight" &&
+        !([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length === 1
+      ) {
         instance.bringToFront(selectedNodes[0].instance);
       }
-    },
-    ["BracketRight"],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length === 1) {
+      if (
+        event.code === "BracketRight" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length === 1
+      ) {
         instance.moveUp(selectedNodes[0].instance);
       }
-    },
-    ["BracketRight"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length === 1) {
+      if (
+        event.code === "BracketLeft" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length === 1
+      ) {
         instance.moveDown(selectedNodes[0].instance);
       }
-    },
-    ["BracketLeft"],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length === 1) {
+      if (
+        event.code === "BracketLeft" &&
+        !([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length === 1
+      ) {
         instance.sendToBack(selectedNodes[0].instance);
       }
-    },
-    ["BracketLeft"],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
-      if (instance && selectedNodes.length > 1) {
+      if (
+        event.code === "KeyG" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
+        instance &&
+        selectedNodes.length > 1
+      ) {
         instance.group(
           selectedNodes
             .map((n) => n?.node)
             .filter((node) => typeof node !== "undefined")
         );
       }
-    },
-    ["KeyG"],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  useKeyDown(
-    () => {
       if (
+        event.code === "KeyU" &&
+        ([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey) &&
         instance &&
         selectedNodes.length === 1 &&
         selectedNodes[0].node?.type === "group"
       ) {
         instance.unGroup(selectedNodes[0].node);
       }
-    },
-    ["KeyU"],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
 
-  /* Keyboard shortcuts sidebars */
+      /* Keyboard shortcuts sidebars */
 
-  useKeyDown(
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.images);
-    },
-    ["KeyI"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.videos);
-    },
-    ["KeyV"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-    },
-    ["KeyO"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.frames);
-    },
-    ["KeyF"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-    },
-    ["KeyE"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  /* Keyboard shortcuts zoom */
-
-  useKeyDown(
-    () => {
-      handleTriggerAction("zoomInTool", { previousAction: actualAction });
-    },
-    ["BracketRight"],
-    (e) =>
-      isZoomingAllowed &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      handleTriggerAction("zoomOutTool", { previousAction: actualAction });
-    },
-    ["Slash"],
-    (e) =>
-      isZoomingAllowed &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      handleTriggerAction("fitToScreenTool", {
-        previousAction: actualAction,
-      });
-    },
-    ["Digit1"],
-    (e) => isZoomingAllowed && e.shiftKey
-  );
-
-  useKeyDown(
-    () => {
-      handleTriggerAction("fitToSelectionTool", {
-        previousAction: actualAction,
-      });
-    },
-    ["Digit2"],
-    (e) => isZoomingAllowed && e.shiftKey
-  );
-
-  /* Keyboard shortcuts utility */
-
-  useKeyDown(
-    () => {
-      handlePrintToConsoleState();
-    },
-    ["KeyC"],
-    (e) =>
-      e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  /* IA Utilities */
-
-  useKeyDown(() => {
-    if (aiEnabled && !workloadsEnabled) {
-      setImagesLLMPopupType("create");
-      if (imagesLLMPopupType === "create") {
-        setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-      } else {
-        setImagesLLMPopupVisible(true);
-      }
-    }
-
-    if (aiEnabled && workloadsEnabled) {
-      setImagesLLMPopupTypeV2("create");
-      if (imagesLLMPopupTypeV2 === "create") {
-        setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
-      } else {
-        setImagesLLMPopupVisibleV2(true);
-      }
-    }
-  }, ["KeyG"]);
-
-  useKeyDown(() => {
-    if (aiEnabled) {
-      triggerTool("fuzzyMaskTool");
-    }
-  }, ["KeyQ"]);
-
-  useKeyDown(() => {
-    if (aiEnabled) {
-      triggerTool("maskTool");
-    }
-  }, ["KeyW"]);
-
-  useKeyDown(() => {
-    if (threadsEnabled) {
-      triggerTool("commentTool");
-      sidebarToggle(SIDEBAR_ELEMENTS.comments);
-    }
-  }, ["KeyH"]);
-
-  useKeyDown(() => {
-    setShowMinimap(!showMinimap);
-  }, ["KeyN"]);
-
-  useKeyDown(
-    () => {
-      if (!instance) {
-        return;
+      if (
+        event.code === "KeyI" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        sidebarToggle(SIDEBAR_ELEMENTS.images);
       }
 
-      const { finishUploadCallback } = instance.triggerAction(
-        "videoTool"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as any;
+      if (
+        event.code === "KeyV" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        sidebarToggle(SIDEBAR_ELEMENTS.videos);
+      }
 
-      instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+      if (
+        event.code === "KeyO" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
+      }
 
-      const videoURLUploaded =
-        "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
-      finishUploadCallback?.(videoURLUploaded);
+      if (
+        event.code === "KeyF" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        sidebarToggle(SIDEBAR_ELEMENTS.frames);
+      }
+
+      if (
+        event.code === "KeyE" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+      }
+
+      /* Keyboard shortcuts zoom */
+
+      if (
+        event.code === "BracketRight" &&
+        isZoomingAllowed &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        handleTriggerAction("zoomInTool", { previousAction: actualAction });
+      }
+
+      if (
+        event.code === "Slash" &&
+        isZoomingAllowed &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        handleTriggerAction("zoomOutTool", { previousAction: actualAction });
+      }
+
+      if (event.code === "Digit1" && isZoomingAllowed && event.shiftKey) {
+        handleTriggerAction("fitToScreenTool", {
+          previousAction: actualAction,
+        });
+      }
+
+      if (event.code === "Digit2" && isZoomingAllowed && event.shiftKey) {
+        handleTriggerAction("fitToSelectionTool", {
+          previousAction: actualAction,
+        });
+      }
+
+      /* Keyboard shortcuts utility */
+
+      if (
+        event.code === "KeyC" &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        handlePrintToConsoleState();
+      }
+
+      /* IA Utilities */
+
+      if (event.code === "KeyG") {
+        if (aiEnabled && !workloadsEnabled) {
+          setImagesLLMPopupType("create");
+          if (imagesLLMPopupType === "create") {
+            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
+          } else {
+            setImagesLLMPopupVisible(true);
+          }
+        }
+
+        if (aiEnabled && workloadsEnabled) {
+          setImagesLLMPopupTypeV2("create");
+          if (imagesLLMPopupTypeV2 === "create") {
+            setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
+          } else {
+            setImagesLLMPopupVisibleV2(true);
+          }
+        }
+      }
+
+      if (event.code === "KeyQ" && aiEnabled) {
+        triggerTool("fuzzyMaskTool");
+      }
+
+      if (event.code === "KeyW" && aiEnabled) {
+        triggerTool("maskTool");
+      }
+
+      /* Other tools */
+
+      if (event.code === "KeyH" && threadsEnabled) {
+        triggerTool("commentTool");
+        sidebarToggle(SIDEBAR_ELEMENTS.comments);
+      }
+
+      if (event.code === "KeyN") {
+        setShowMinimap(!showMinimap);
+      }
+
+      if (
+        event.code === "KeyV" &&
+        !(event.ctrlKey || event.metaKey) &&
+        instance
+      ) {
+        const { finishUploadCallback } = instance.triggerAction(
+          "videoTool"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any;
+
+        instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+
+        const videoURLUploaded =
+          "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
+        finishUploadCallback?.(videoURLUploaded);
+      }
     },
-    ["KeyV"],
-    (e) => !(e.ctrlKey || e.metaKey)
+    [
+      selectedNodes,
+      actualAction,
+      aiEnabled,
+      showUI,
+      threadsEnabled,
+      workloadsEnabled,
+      os,
+      instance,
+      isZoomingAllowed,
+      imagesLLMPopupType,
+      imagesLLMPopupVisible,
+      setImagesLLMPopupType,
+      setImagesLLMPopupVisible,
+      imagesLLMPopupTypeV2,
+      imagesLLMPopupVisibleV2,
+      setImagesLLMPopupTypeV2,
+      setImagesLLMPopupVisibleV2,
+      showMinimap,
+      setShowMinimap,
+      setShowUi,
+      sidebarToggle,
+      handleTriggerAction,
+      handlePrintToConsoleState,
+      triggerTool,
+      setShowSelectFileImage,
+    ]
   );
+
+  useKeyDown(keyDownHandler);
 }

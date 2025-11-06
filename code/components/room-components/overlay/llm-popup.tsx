@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCollaborationRoom } from "@/store/store";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { postGenerateImage } from "@/api/v2/post-generate-image";
 import { postEditImage } from "@/api/v2/post-edit-image";
 import { Logo } from "@/components/utils/logo";
@@ -42,8 +41,6 @@ import {
 } from "@inditextech/weave-sdk";
 
 export function LLMGenerationPopup() {
-  useKeyboardHandler();
-
   const [prompt, setPrompt] = React.useState<string>("");
   const [imageSamples, setImageSamples] = React.useState<string>("4");
   const [moderation, setModeration] = React.useState<ImageModeration>("auto");

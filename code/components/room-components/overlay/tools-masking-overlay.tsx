@@ -12,7 +12,6 @@ import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
 import { rightElementVariants } from "./variants";
 import { SYSTEM_OS } from "@/lib/utils";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { ShortcutElement } from "../help/shortcut-element";
@@ -20,8 +19,6 @@ import { useIACapabilities } from "@/store/ia";
 import { MoveToolTrigger } from "./tools-triggers/move-tool";
 
 export function ToolsMaskingOverlay() {
-  useKeyboardHandler();
-
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);

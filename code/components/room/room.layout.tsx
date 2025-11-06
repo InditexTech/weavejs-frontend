@@ -44,6 +44,7 @@ import { VideosLibrary } from "../room-components/videos-library/videos-library"
 import { ConnectionTestsOverlay } from "../room-components/overlay/connection-tests-overlay";
 import { Button } from "../ui/button";
 import { ManageIdleDisconnection } from "../room-components/manage-idle-disconnection";
+import { useKeyboardHandler } from "../room-components/hooks/use-keyboard-handler";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -115,6 +116,10 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const setFontsLoaded = useCollaborationRoom((state) => state.setFontsLoaded);
   const setFontsValues = useCollaborationRoom((state) => state.setFontsValues);
 
+  const backgroundColor = useCollaborationRoom(
+    (state) => state.backgroundColor
+  );
+
   const handleReconnectRoom = React.useCallback(async () => {
     if (!instance) {
       return;
@@ -166,6 +171,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   }, [instance, status, roomLoaded]);
 
   useToolsEvents();
+  useKeyboardHandler();
 
   return (
     <AnimatePresence>
@@ -207,6 +213,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           <div
             id="weave"
             tabIndex={0}
+            style={{
+              background: backgroundColor,
+            }}
             className={cn("w-full h-full relative overflow-hidden", {
               ["pointer-events-none"]:
                 weaveConnectionStatus !==

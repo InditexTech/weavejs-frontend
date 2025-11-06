@@ -50,7 +50,6 @@ import { topElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
@@ -62,8 +61,6 @@ import { useStrokesTools } from "./hooks/use-strokes-tools";
 import { useImagesTools } from "./hooks/use-images-tools";
 
 export function ToolsOverlayMouse() {
-  useKeyboardHandler();
-
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
   const [actualStrokesTool, setActualStrokesTool] = React.useState("penTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");

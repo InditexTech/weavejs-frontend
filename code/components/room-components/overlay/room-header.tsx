@@ -9,7 +9,11 @@ import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
+import {
+  BACKGROUND_COLOR,
+  BackgroundColor,
+  useCollaborationRoom,
+} from "@/store/store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +76,12 @@ export function RoomHeader() {
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
     (state) => state.setExportConfigVisible
+  );
+  const backgroundColor = useCollaborationRoom(
+    (state) => state.backgroundColor
+  );
+  const setBackgroundColor = useCollaborationRoom(
+    (state) => state.setBackgroundColor
   );
 
   const connectionTestsShow = useCollaborationRoom(
@@ -167,6 +177,25 @@ export function RoomHeader() {
     }
   }, [instance, room]);
 
+  const handleSetBackgroundColor = React.useCallback(
+    (color: BackgroundColor) => {
+      if (!instance) {
+        return;
+      }
+
+      setBackgroundColor(color);
+
+      if (!room) {
+        return;
+      }
+
+      const sessionConfig = getSessionConfig(room);
+      sessionConfig.backgroundColor = color;
+      setSessionConfig(room, sessionConfig);
+    },
+    [instance, room, setBackgroundColor]
+  );
+
   const handleSetGridType = React.useCallback(
     (type: WeaveStageGridType) => {
       if (instance) {
@@ -216,7 +245,9 @@ export function RoomHeader() {
       instance.disablePlugin("stageGrid");
     }
     setGridEnabled(sessionConfig.grid.enabled);
-  }, [instance, status, room]);
+
+    setBackgroundColor(sessionConfig.backgroundColor);
+  }, [instance, status, room, setBackgroundColor]);
 
   React.useEffect(() => {
     if (instance) {
@@ -523,6 +554,59 @@ export function RoomHeader() {
                           <div className="w-[16px] h-[16px]" />
                         )}
                         Lines
+                      </DropdownMenuItem>
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                        Background color
+                      </DropdownMenuLabel>
+                      <DropdownMenuItem
+                        disabled={
+                          backgroundColor === BACKGROUND_COLOR.WHITE ||
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          handleSetBackgroundColor(BACKGROUND_COLOR.WHITE);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {backgroundColor === BACKGROUND_COLOR.WHITE ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[18px] h-[18px]" />
+                        )}
+                        <div className="w-full flex gap-2 justify-between items-center">
+                          White
+                          <div
+                            style={{ background: BACKGROUND_COLOR.WHITE }}
+                            className={`w-[16px] h-[16px] border border-[#c9c9c9]`}
+                          />
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={
+                          backgroundColor === BACKGROUND_COLOR.GRAY ||
+                          weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        className="text-foreground cursor-pointer hover:rounded-none"
+                        onPointerDown={() => {
+                          handleSetBackgroundColor(BACKGROUND_COLOR.GRAY);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {backgroundColor === BACKGROUND_COLOR.GRAY ? (
+                          <Check size={16} strokeWidth={1} />
+                        ) : (
+                          <div className="w-[18px] h-[18px]" />
+                        )}
+                        <div className="w-full flex gap-2 justify-between items-center">
+                          Gray
+                          <div
+                            style={{ background: BACKGROUND_COLOR.GRAY }}
+                            className={`w-[16px] h-[16px] border border-[#c9c9c9]`}
+                          />
+                        </div>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>

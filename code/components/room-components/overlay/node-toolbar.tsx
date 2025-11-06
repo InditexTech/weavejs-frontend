@@ -77,6 +77,7 @@ import { getImageBase64 } from "@/components/utils/images";
 import { postNegateImage } from "@/api/post-negate-image";
 import { postFlipImage } from "@/api/post-flip-image";
 import { postGrayscaleImage } from "@/api/post-grayscale-image";
+import { throttle } from "lodash";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -273,17 +274,21 @@ export const NodeToolbar = () => {
     }
 
     if (nodes.length > 0 && toolbarRef.current) {
+      const throttledUpdatePosition = throttle(updateNodeToolbarPosition, 10);
       observerRef.current = new ResizeObserver(() => {
         updateNodeToolbarPosition();
       });
 
       observerRef.current.observe(toolbarRef.current);
 
-      instance.addEventListener("onDrag", handleOnDrag);
-      instance.addEventListener("onNodesChange", handleNodesChange);
-      instance.addEventListener("onZoomChange", updateNodeToolbarPosition);
-      instance.addEventListener("onStageMove", updateNodeToolbarPosition);
-      updateNodeToolbarPosition();
+      instance.addEventListener("onDrag", throttle(handleOnDrag, 10));
+      instance.addEventListener(
+        "onNodesChange",
+        throttle(handleNodesChange, 10)
+      );
+      instance.addEventListener("onZoomChange", throttledUpdatePosition);
+      instance.addEventListener("onStageMove", throttledUpdatePosition);
+      throttledUpdatePosition();
       actualNodeRef.current = node;
     }
 
