@@ -58,6 +58,9 @@ import {
   FlipVertical,
   PaintRoller,
   RectangleCircle,
+  Unlink,
+  Link,
+  HardDriveUpload,
   // SquaresSubtract,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
@@ -78,6 +81,7 @@ import { postNegateImage } from "@/api/post-negate-image";
 import { postFlipImage } from "@/api/post-flip-image";
 import { postGrayscaleImage } from "@/api/post-grayscale-image";
 import { throttle } from "lodash";
+import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -136,6 +140,9 @@ export const NodeToolbar = () => {
   const imageCroppingEnabled = useCollaborationRoom(
     (state) => state.images.cropping.enabled
   );
+
+  const linkedNode = useCollaborationRoom((state) => state.linkedNode);
+  const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
@@ -525,6 +532,11 @@ export const NodeToolbar = () => {
     [actualNode]
   );
 
+  const isImageTemplate = React.useMemo(
+    () => actualNode && (actualNode.type ?? "") === "image-template",
+    [actualNode]
+  );
+
   const canSetNodeStyling = React.useMemo(() => {
     return (
       isSingleNodeSelected &&
@@ -744,6 +756,94 @@ export const NodeToolbar = () => {
                 tooltipSide="bottom"
                 tooltipAlign="center"
               />
+              <ToolbarDivider orientation="vertical" className="!h-[28px]" />
+            </>
+          )}
+          {isImageTemplate && (
+            <>
+              {!actualNode?.props.isUsed && (
+                <ToolbarButton
+                  className="rounded-full !w-[32px] !h-[32px]"
+                  icon={<Link className="px-2" size={32} strokeWidth={1} />}
+                  disabled={
+                    !linkedNode ||
+                    weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={async () => {
+                    if (!instance) {
+                      return;
+                    }
+
+                    const handler =
+                      instance.getNodeHandler<ImageTemplateNode>(
+                        "image-template"
+                      );
+
+                    const stage = instance.getStage();
+                    const nodeInstance = stage.findOne(
+                      `#${actualNode?.key ?? ""}`
+                    );
+
+                    if (!handler || !nodeInstance || !linkedNode) {
+                      return;
+                    }
+
+                    if (!linkedNode) {
+                    }
+
+                    handler.setImage(
+                      nodeInstance as WeaveElementInstance,
+                      linkedNode as WeaveElementInstance
+                    );
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>link image</p>
+                    </div>
+                  }
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+              )}
+              {actualNode?.props.isUsed && (
+                <ToolbarButton
+                  className="rounded-full !w-[32px] !h-[32px]"
+                  icon={<Unlink className="px-2" size={32} strokeWidth={1} />}
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={async () => {
+                    if (!instance) {
+                      return;
+                    }
+
+                    const handler =
+                      instance.getNodeHandler<ImageTemplateNode>(
+                        "image-template"
+                      );
+
+                    const stage = instance.getStage();
+                    const nodeInstance = stage.findOne(
+                      `#${actualNode?.key ?? ""}`
+                    );
+
+                    if (!handler || !nodeInstance) {
+                      return;
+                    }
+
+                    handler.unlink(nodeInstance as WeaveElementInstance);
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>unlink image</p>
+                    </div>
+                  }
+                  tooltipSide="bottom"
+                  tooltipAlign="center"
+                />
+              )}
               <ToolbarDivider orientation="vertical" className="!h-[28px]" />
             </>
           )}
@@ -1732,6 +1832,37 @@ export const NodeToolbar = () => {
           )}
           {isImage && (
             <>
+              <ToolbarButton
+                className="rounded-full !w-[32px] !h-[32px]"
+                icon={
+                  <HardDriveUpload className="px-2" size={32} strokeWidth={1} />
+                }
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                onClick={async () => {
+                  if (!instance) {
+                    return;
+                  }
+
+                  const stage = instance.getStage();
+                  const nodeInstance = stage.findOne(
+                    `#${actualNode?.key ?? ""}`
+                  );
+
+                  setLinkedNode(nodeInstance || null);
+                  toast.success("Image set as template link.");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Set as link</p>
+                  </div>
+                }
+                tooltipSide="bottom"
+                tooltipAlign="center"
+              />
+              <ToolbarDivider orientation="vertical" className="!h-[28px]" />
               {workloadsEnabled && (
                 <>
                   <ToolbarButton

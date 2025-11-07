@@ -34,6 +34,7 @@ import {
   // MapPinned,
   Video,
   Film,
+  SquareDashed,
   // ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import {
@@ -515,6 +516,22 @@ export function ToolsOverlayMouse() {
           tooltipSide="top"
           tooltipAlign="center"
         /> */}
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<SquareDashed className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTemplateTool"}
+          onClick={() => triggerTool("imageTemplateTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Image Template Tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"

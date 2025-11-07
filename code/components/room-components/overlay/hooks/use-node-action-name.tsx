@@ -43,6 +43,8 @@ export const useNodeActionName = () => {
         return "Text";
       case "video":
         return "Video";
+      case "image-template":
+        return "Image Template";
       case "image":
         return imagesLLMPopupVisible ? "Unknown" : "Image";
       case "star":
