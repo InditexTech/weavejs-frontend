@@ -26,6 +26,7 @@ import {
   EyeOff,
   Group,
   LineSquiggle,
+  LayoutPanelTop,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -43,6 +44,7 @@ const iconsMap: Record<string, any> = {
   line: Spline,
   stroke: LineSquiggle,
   "regular-polygon": Hexagon,
+  "image-template": LayoutPanelTop,
   ellipse: Circle,
   star: Star,
   arrow: MoveUpRight,
