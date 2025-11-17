@@ -78,9 +78,15 @@ export function StrokeProperties() {
     return null;
 
   if (
-    ["group", "mask", "fuzzy-mask", "text", "color-token", "frame"].includes(
-      actualNode.type
-    )
+    [
+      "image-template",
+      "group",
+      "mask",
+      "fuzzy-mask",
+      "text",
+      "color-token",
+      "frame",
+    ].includes(actualNode.type)
   ) {
     return null;
   }

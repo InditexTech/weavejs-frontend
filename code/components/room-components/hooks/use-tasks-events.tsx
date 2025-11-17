@@ -84,6 +84,11 @@ export const useTasksEvents = () => {
           queryClient.invalidateQueries({ queryKey });
         }
 
+        if (["saveTemplate", "deleteTemplate"].includes(type)) {
+          const queryKey = ["getTemplates", room];
+          queryClient.invalidateQueries({ queryKey });
+        }
+
         if (["deleteVideo"].includes(type)) {
           const queryKey = ["getVideos", room];
           queryClient.invalidateQueries({ queryKey });

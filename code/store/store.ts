@@ -55,6 +55,7 @@ interface CollaborationRoomState {
     loading: boolean;
     error: Error | null;
   };
+  linkedNode: Konva.Node | null;
   fonts: {
     loaded: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -192,10 +193,12 @@ interface CollaborationRoomState {
   setFontsValues: (newValues: { id: string; name: string }[]) => void;
   setConnectionTestsShow: (newShow: boolean) => void;
   setBackgroundColor: (newBackgroundColor: BackgroundColor) => void;
+  setLinkedNode: (newLinkedNode: Konva.Node | null) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   backgroundColor: BACKGROUND_COLOR.WHITE,
+  linkedNode: null,
   features: {
     workloads: true,
     threads: true,
@@ -567,5 +570,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     set((state) => ({
       ...state,
       backgroundColor: newBackgroundColor,
+    })),
+  setLinkedNode: (newLinkedNode) =>
+    set((state) => ({
+      ...state,
+      linkedNode: newLinkedNode,
     })),
 }));

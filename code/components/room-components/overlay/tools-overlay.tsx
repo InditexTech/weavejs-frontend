@@ -26,6 +26,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { WeaveElementInstance } from "@inditextech/weave-types";
 import { ToolsMaskingOverlayV2 } from "./tools-masking-overlay-v2";
+import { ToolsNodeOverlayV2 } from "./tools-node-overlay-v2";
 
 export function ToolsOverlay() {
   const addImageRef = React.useRef<string | null>(null);
@@ -260,6 +261,7 @@ export function ToolsOverlay() {
         </>
       )}
       {imagesLLMPopupVisibleV2 && <ToolsMaskingOverlayV2 />}
+      <ToolsNodeOverlayV2 />
     </>
   );
 }

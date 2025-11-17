@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { Weave } from "@inditextech/weave-sdk";
 import "konva/lib/Node";
 import "konva/lib/Stage";
 
@@ -16,6 +17,10 @@ declare module "konva/lib/Node" {
     updatePosition(position: Vector2d): void;
     dblClick(): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
+    canMoveToContainer(node: Konva.Node): boolean;
+  }
+  interface Layer {
+    canMoveToContainer(node: Konva.Node): boolean;
   }
 }
 
@@ -43,6 +48,7 @@ declare global {
     weaveDragImageId?: string;
     weaveDragVideoParams?: WeaveVideoToolDragParams;
     weaveDragVideoId?: string;
+    weaveDragTemplateData?: WeaveTemplateDragParams;
     colorTokenDragColor?: string;
   }
 }

@@ -9,6 +9,7 @@ export const SIDEBAR_ELEMENTS = {
   images: "images",
   videos: "videos",
   frames: "frames",
+  templates: "templates",
   colorTokens: "colorTokens",
   comments: "comments",
   nodesTree: "nodesTree",

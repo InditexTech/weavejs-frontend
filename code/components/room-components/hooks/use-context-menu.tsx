@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import {
   WeaveContextMenuPlugin,
@@ -10,14 +9,13 @@ import {
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
-import { WeaveSelection } from "@inditextech/weave-types";
+import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
 import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
-// import Konva from "konva";
 import {
   ClipboardCopy,
   ClipboardPaste,
@@ -32,22 +30,23 @@ import {
   ImageDown,
   Lock,
   EyeOff,
+  Link,
+  HardDriveUpload,
+  PackagePlus,
+  PackageOpen,
 } from "lucide-react";
-// import { useMutation } from "@tanstack/react-query";
-// import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
-// import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useExportToImageServerSide } from "./use-export-to-image-server-side";
 import { getImageBase64 } from "@/components/utils/images";
+import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
+import { setTemplateOnPosition } from "@/components/utils/templates";
+import { useTemplates } from "@/store/templates";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
-  // const user = useCollaborationRoom((state) => state.user);
-  // const clientId = useCollaborationRoom((state) => state.clientId);
-  // const room = useCollaborationRoom((state) => state.room);
+  const room = useCollaborationRoom((state) => state.room);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
@@ -92,6 +91,9 @@ function useContextMenu() {
     (state) => state.setImageExporting
   );
 
+  const linkedNode = useCollaborationRoom((state) => state.linkedNode);
+  const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
+
   const aiEnabled = useIACapabilities((state) => state.enabled);
   const setImagesLLMPopupSelectedNodes = useIACapabilities(
     (state) => state.setImagesLLMPopupSelectedNodes
@@ -120,6 +122,10 @@ function useContextMenu() {
   );
   const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
     (state) => state.setImagesLLMPopupImage
+  );
+
+  const setSaveDialogVisible = useTemplates(
+    (state) => state.setSaveDialogVisible
   );
 
   const sidebarToggle = React.useCallback(
@@ -202,6 +208,14 @@ function useContextMenu() {
 
       const singleLocked =
         nodes.length === 1 && nodes[0].instance.getAttrs().locked;
+
+      const isSingleImage =
+        nodes.length === 1 && nodes[0].node?.type === "image";
+      const isSingleImageTemplate =
+        nodes.length === 1 && nodes[0].node?.type === "image-template";
+
+      const hasLinkedImageNode =
+        linkedNode !== null && linkedNode.getAttrs().nodeType === "image";
 
       if (nodes.length > 0) {
         // EDIT IMAGE WITH A PROMPT
@@ -289,6 +303,66 @@ function useContextMenu() {
             });
           }
         }
+
+        // LINK IMAGE TOOLS
+        if (isSingleImage) {
+          options.push({
+            id: "set-linked-image",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Set as template link</div>
+              </div>
+            ),
+            icon: <HardDriveUpload size={16} />,
+            onClick: async () => {
+              setLinkedNode(nodes[0].instance);
+              setContextMenuShow(false);
+              toast.success("Image set as template link.");
+            },
+          });
+          // SEPARATOR
+          options.push({
+            id: "div-link-image-tools",
+            type: "divider",
+          });
+        }
+
+        // IMAGE TEMPLATE TOOLS
+        if (isSingleImageTemplate && hasLinkedImageNode) {
+          options.push({
+            id: "set-image-link",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Link image</div>
+              </div>
+            ),
+            icon: <Link size={16} />,
+            onClick: async () => {
+              if (!instance) return;
+
+              const handler =
+                instance.getNodeHandler<ImageTemplateNode>("image-template");
+
+              if (handler) {
+                handler.setImage(
+                  nodes[0].instance,
+                  linkedNode as WeaveElementInstance
+                );
+              }
+
+              setLinkedNode(null);
+              setContextMenuShow(false);
+            },
+          });
+          // SEPARATOR
+          options.push({
+            id: "div-image-template-tools",
+            type: "divider",
+          });
+        }
+
         if (!singleLocked) {
           // EXPORT ON THE SERVER
           options.push({
@@ -319,6 +393,52 @@ function useContextMenu() {
             type: "divider",
           });
         }
+
+        if (!singleLocked) {
+          // SAVE AS TEMPLATE
+          options.push({
+            id: "save-as-template",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Save as template</div>
+              </div>
+            ),
+            icon: <PackagePlus size={16} />,
+            disabled: !["selectionTool"].includes(actActionActive ?? ""),
+            onClick: () => {
+              setSaveDialogVisible(true);
+              setContextMenuShow(false);
+            },
+          });
+        }
+        options.push({
+          id: "create-template-instance",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Add template instance here</div>
+            </div>
+          ),
+          icon: <PackageOpen size={16} />,
+          disabled: !sessionStorage.getItem(`weave.js_${room}_template`),
+          onClick: () => {
+            if (!instance) return;
+            const templateString = sessionStorage.getItem(
+              `weave.js_${room}_template`
+            );
+            setTemplateOnPosition(
+              instance,
+              templateString ? JSON.parse(templateString) : {},
+              clickPoint,
+              stageClickPoint
+            );
+          },
+        });
+        options.push({
+          id: "div-templates",
+          type: "divider",
+        });
 
         if (!singleLocked) {
           // COPY
@@ -655,6 +775,8 @@ function useContextMenu() {
       // setRemoveBackgroundPopupOriginImage,
       // setRemoveBackgroundPopupShow,
       sidebarToggle,
+      room,
+      linkedNode,
     ]
   );
 

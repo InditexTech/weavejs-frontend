@@ -27,6 +27,7 @@ import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
 import { AlignProperties } from "../node-properties/align-properties";
 import { useNodeActionName } from "./hooks/use-node-action-name";
+import { ImageTemplateProperties } from "../node-properties/image-template-properties";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -194,6 +195,7 @@ export const NodeProperties = () => {
           <MetaProperties />
           <ImageProperties />
           <ColorTokenProperties />
+          <ImageTemplateProperties />
           <FrameProperties />
           <PositionProperties />
           <SizeProperties />

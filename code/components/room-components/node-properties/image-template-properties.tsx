@@ -6,13 +6,11 @@
 
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { Eye, EyeOff } from "lucide-react";
-import { InputColor } from "./../inputs/input-color";
-import { ToggleIconButton } from "./../toggle-icon-button";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
+import { InputText } from "../inputs/input-text";
 
-export function FillProperties() {
+export function ImageTemplateProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
@@ -57,67 +55,40 @@ export function FillProperties() {
 
   if (nodes && nodes.length > 1) return null;
 
-  if (!instance || !actualNode || !nodePropertiesAction) {
-    return null;
-  }
+  if (!instance || !actualNode) return null;
 
   if (!actualAction && !actualNode) return null;
 
   if (
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
-    ["image-template", "group", "mask", "fuzzy-mask", "text", "frame"].includes(
-      actualNode.type
-    )
+    !["image-template"].includes(actualNode.type)
   ) {
     return null;
   }
 
-  if (
-    actualAction &&
-    !["selectionTool", "rectangleTool", "ellipseTool", "starTool"].includes(
-      actualAction
-    )
-  ) {
+  if (actualAction && !["selectionTool", "frameTool"].includes(actualAction))
     return null;
-  }
 
   return (
     <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
       <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
-            Fill
+            Image Template Properties
           </span>
         </div>
-        <ToggleIconButton
-          kind="toggle"
-          icon={<Eye size={16} strokeWidth={1} />}
-          pressedIcon={<EyeOff size={16} strokeWidth={1} />}
-          pressed={actualNode.props.fillEnabled ?? true}
-          onClick={(e) => {
-            e.stopPropagation();
-            const updatedNode: WeaveStateElement = {
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                fillEnabled: !(actualNode.props.fillEnabled ?? true),
-              },
-            };
-            updateElement(updatedNode);
-          }}
-        />
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
-        <InputColor
-          label="Color (#RGBA)"
-          value={actualNode.props.fill}
+        <InputText
+          label="Template ID"
+          value={`${actualNode.props.templateId ?? "-"}`}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                fill: value,
+                templateId: value,
               },
             };
             updateElement(updatedNode);

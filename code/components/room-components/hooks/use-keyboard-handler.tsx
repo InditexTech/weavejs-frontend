@@ -177,7 +177,14 @@ export function useKeyboardHandler() {
         triggerTool("connectorTool");
       }
 
-      if (event.code === "KeyT") {
+      if (
+        event.code === "KeyT" &&
+        !event.shiftKey &&
+        !event.altKey &&
+        !([SYSTEM_OS.MAC as string].includes(os)
+          ? event.metaKey
+          : event.ctrlKey)
+      ) {
         event.preventDefault();
         triggerTool("textTool");
       }
@@ -408,41 +415,67 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyI" &&
+        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.preventDefault();
+        event.stopPropagation();
         sidebarToggle(SIDEBAR_ELEMENTS.images);
       }
 
       if (
         event.code === "KeyV" &&
+        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.preventDefault();
+        event.stopPropagation();
         sidebarToggle(SIDEBAR_ELEMENTS.videos);
       }
 
       if (
-        event.code === "KeyO" &&
+        event.code === "KeyC" &&
+        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.preventDefault();
+        event.stopPropagation();
         sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
       }
 
       if (
         event.code === "KeyF" &&
+        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.preventDefault();
+        event.stopPropagation();
         sidebarToggle(SIDEBAR_ELEMENTS.frames);
       }
 
       if (
-        event.code === "KeyE" &&
+        event.code === "KeyT" &&
+        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.preventDefault();
+        event.stopPropagation();
+        sidebarToggle(SIDEBAR_ELEMENTS.templates);
+      }
+
+      if (
+        event.code === "KeyE" &&
+        event.shiftKey &&
+        event.altKey &&
+        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
         sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
       }
 

@@ -72,9 +72,11 @@ import {
   type WeaveUser,
 } from "@inditextech/weave-types";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
+import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
 import { ImagesToolAction } from "../actions/images-tool/images-tool";
+import { ImageTemplateToolAction } from "../actions/image-template-tool/image-template-tool";
 import { MaskToolAction } from "../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 import { MaskEraserToolAction } from "../actions/mask-eraser-tool/mask-eraser-tool";
@@ -368,6 +370,7 @@ const NODES = () => [
   }),
   // new WeaveConnectorNode(),
   new ColorTokenNode(),
+  new ImageTemplateNode(),
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
@@ -566,6 +569,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveArrowToolAction(),
   new WeaveRegularPolygonToolAction(),
   new ColorTokenToolAction(),
+  new ImageTemplateToolAction(),
   new WeaveTextToolAction(),
   new WeaveVideoToolAction(),
   // new WeaveConnectorToolAction(),
