@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { Weave } from "@inditextech/weave-sdk";
 import "konva/lib/Node";
 import "konva/lib/Stage";
 
@@ -47,6 +48,7 @@ declare global {
     weaveDragImageId?: string;
     weaveDragVideoParams?: WeaveVideoToolDragParams;
     weaveDragVideoId?: string;
+    weaveDragTemplateData?: WeaveTemplateDragParams;
     colorTokenDragColor?: string;
   }
 }
