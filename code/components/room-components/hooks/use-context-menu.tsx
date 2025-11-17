@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import {
   WeaveContextMenuPlugin,
@@ -17,7 +16,6 @@ import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
 import { ShortcutElement } from "../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
-// import Konva from "konva";
 import {
   ClipboardCopy,
   ClipboardPaste,
@@ -37,25 +35,17 @@ import {
   PackagePlus,
   PackageOpen,
 } from "lucide-react";
-// import { useMutation } from "@tanstack/react-query";
-// import { postRemoveBackground } from "@/api/post-remove-background";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
-// import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useExportToImageServerSide } from "./use-export-to-image-server-side";
 import { getImageBase64 } from "@/components/utils/images";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
-import {
-  getSelectionAsTemplate,
-  setTemplateOnPosition,
-} from "@/components/utils/templates";
+import { setTemplateOnPosition } from "@/components/utils/templates";
+import { useTemplates } from "@/store/templates";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
-  // const user = useCollaborationRoom((state) => state.user);
-  // const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
@@ -132,6 +122,10 @@ function useContextMenu() {
   );
   const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
     (state) => state.setImagesLLMPopupImage
+  );
+
+  const setSaveDialogVisible = useTemplates(
+    (state) => state.setSaveDialogVisible
   );
 
   const sidebarToggle = React.useCallback(
@@ -219,8 +213,6 @@ function useContextMenu() {
         nodes.length === 1 && nodes[0].node?.type === "image";
       const isSingleImageTemplate =
         nodes.length === 1 && nodes[0].node?.type === "image-template";
-
-      console.log("linkedNode", linkedNode);
 
       const hasLinkedImageNode =
         linkedNode !== null && linkedNode.getAttrs().nodeType === "image";
@@ -414,21 +406,39 @@ function useContextMenu() {
             ),
             icon: <PackagePlus size={16} />,
             disabled: !["selectionTool"].includes(actActionActive ?? ""),
-            onClick: async () => {
-              if (!instance) return;
-
-              const template = getSelectionAsTemplate(instance);
-
-              sessionStorage.setItem(
-                `weave.js_${room}_template`,
-                JSON.stringify(template)
-              );
-
-              toast.success("Selection saved as template.");
+            onClick: () => {
+              setSaveDialogVisible(true);
               setContextMenuShow(false);
             },
           });
         }
+        options.push({
+          id: "create-template-instance",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Add template instance here</div>
+            </div>
+          ),
+          icon: <PackageOpen size={16} />,
+          disabled: !sessionStorage.getItem(`weave.js_${room}_template`),
+          onClick: () => {
+            if (!instance) return;
+            const templateString = sessionStorage.getItem(
+              `weave.js_${room}_template`
+            );
+            setTemplateOnPosition(
+              instance,
+              templateString ? JSON.parse(templateString) : {},
+              clickPoint,
+              stageClickPoint
+            );
+          },
+        });
+        options.push({
+          id: "div-templates",
+          type: "divider",
+        });
 
         if (!singleLocked) {
           // COPY
@@ -459,29 +469,6 @@ function useContextMenu() {
           });
         }
       }
-      options.push({
-        id: "create-template-instance",
-        type: "button",
-        label: (
-          <div className="w-full flex justify-between items-center">
-            <div>Create template instance here</div>
-          </div>
-        ),
-        icon: <PackageOpen size={16} />,
-        disabled: !sessionStorage.getItem(`weave.js_${room}_template`),
-        onClick: () => {
-          if (!instance) return;
-          const templateString = sessionStorage.getItem(
-            `weave.js_${room}_template`
-          );
-          setTemplateOnPosition(
-            instance,
-            templateString ? JSON.parse(templateString) : {},
-            clickPoint,
-            stageClickPoint
-          );
-        },
-      });
       options.push({
         id: "paste",
         type: "button",

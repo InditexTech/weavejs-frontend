@@ -14,6 +14,8 @@ import {
   WeaveStateElement,
 } from "@inditextech/weave-types";
 import Konva from "konva";
+import { ImageTemplateFit } from "./types";
+import { IMAGE_TEMPLATE_FIT } from "./constants";
 
 export const IMAGE_TEMPLATE_NODE_TYPE = "image-template";
 
@@ -139,6 +141,21 @@ export class ImageTemplateNode extends WeaveNode {
       return node.getAttr("nodeType") === "image";
     };
 
+    if (imageTemplateNode.getAttrs().moving) {
+      this.instance.emitEvent("onImageTemplateFreed", {
+        template: imageTemplateNode,
+      });
+    } else {
+      this.instance.emitEvent("onImageTemplateLocked", {
+        template: imageTemplateNode,
+      });
+    }
+
+    if (imageTemplateNode.getAttrs().isUsed) {
+      internalRect.strokeWidth(0);
+      internalText.visible(false);
+    }
+
     return imageTemplateNode;
   }
 
@@ -185,13 +202,133 @@ export class ImageTemplateNode extends WeaveNode {
       internalRect.strokeWidth(this.borderWidth);
       internalText.visible(true);
     }
+
+    if (imageTemplateNode.getAttrs().moving) {
+      this.instance.emitEvent("onImageTemplateFreed", {
+        template: imageTemplateNode,
+      });
+    } else {
+      this.instance.emitEvent("onImageTemplateLocked", {
+        template: imageTemplateNode,
+      });
+    }
   }
 
   setImage(template: WeaveElementInstance, node: WeaveElementInstance) {
     moveNodeToContainer(this.instance, node, template);
   }
 
-  link(template: WeaveElementInstance, node: WeaveElementInstance) {
+  changeFit(template: WeaveElementInstance, fit: ImageTemplateFit) {
+    const nodeInstance = template as Konva.Group;
+
+    const internalGroup = nodeInstance.findOne(
+      `#${nodeInstance.getAttr("id")}-imageTemplate-group`
+    ) as Konva.Group;
+
+    if (!internalGroup) {
+      return;
+    }
+
+    this.link(
+      nodeInstance,
+      internalGroup.getChildren()[0] as WeaveElementInstance,
+      fit
+    );
+  }
+
+  freeImage(template: WeaveElementInstance) {
+    const nodeInstance = template as Konva.Group;
+
+    const internalGroup = nodeInstance.findOne(
+      `#${nodeInstance.getAttr("id")}-imageTemplate-group`
+    ) as Konva.Group;
+
+    if (!internalGroup) {
+      return;
+    }
+
+    const imageNode = internalGroup.getChildren()[0];
+
+    const imageHandler = this.instance.getNodeHandler<WeaveImageNode>("image");
+
+    if (!imageHandler) {
+      return;
+    }
+
+    imageNode.setAttrs({
+      lockToContainer: true,
+      draggable: true,
+      listening: true,
+    });
+
+    this.instance.updateNode(
+      imageHandler.serialize(imageNode as WeaveElementInstance)
+    );
+
+    template.setAttrs({
+      lockToContainer: true,
+      moving: true,
+    });
+    this.instance.updateNode(this.serialize(template as WeaveElementInstance));
+
+    this.instance.emitEvent("onImageTemplateFreed", { template });
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.setSelectedNodes([
+        imageNode as WeaveElementInstance,
+      ]);
+    }
+  }
+
+  lockImage(template: WeaveElementInstance) {
+    const nodeInstance = template as Konva.Group;
+
+    const internalGroup = nodeInstance.findOne(
+      `#${nodeInstance.getAttr("id")}-imageTemplate-group`
+    ) as Konva.Group;
+
+    if (!internalGroup) {
+      return;
+    }
+
+    const imageNode = internalGroup.getChildren()[0];
+
+    const imageHandler = this.instance.getNodeHandler<WeaveImageNode>("image");
+
+    if (!imageHandler) {
+      return;
+    }
+
+    imageNode.setAttr("lockToContainer", undefined);
+    imageNode.setAttrs({
+      draggable: false,
+      listening: false,
+    });
+
+    this.instance.updateNode(
+      imageHandler.serialize(imageNode as WeaveElementInstance)
+    );
+
+    template.setAttrs({
+      lockToContainer: false,
+      moving: false,
+    });
+    this.instance.updateNode(this.serialize(template as WeaveElementInstance));
+
+    this.instance.emitEvent("onImageTemplateLocked", { template });
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.setSelectedNodes([template as WeaveElementInstance]);
+    }
+  }
+
+  link(
+    template: WeaveElementInstance,
+    node: WeaveElementInstance,
+    fit: ImageTemplateFit = IMAGE_TEMPLATE_FIT.COVER
+  ) {
     const stage = this.instance.getStage();
     const imageNode = (node as Konva.Group).findOne(
       `#${node.getAttr("id")}-image`
@@ -204,8 +341,16 @@ export class ImageTemplateNode extends WeaveNode {
     const imageRect = imageNode?.getClientRect({
       relativeTo: stage,
     });
-    const iw = imageRect?.width ?? 1;
-    const ih = imageRect?.height ?? 1;
+    let iw = imageRect?.width ?? 1;
+    let ih = imageRect?.height ?? 1;
+
+    let saveOriginalImage = false;
+    if (template.getAttr("originalImageWidth") === undefined) {
+      saveOriginalImage = true;
+    } else {
+      iw = template.getAttr("originalImageWidth");
+      ih = template.getAttr("originalImageHeight");
+    }
 
     const templateRect = template.getClientRect({
       relativeTo: stage,
@@ -216,34 +361,78 @@ export class ImageTemplateNode extends WeaveNode {
     const imageRatio = iw / ih;
     const groupRatio = gw / gh;
 
-    let scale, x, y;
+    let scaleX, scaleY, x, y;
 
-    if (imageRatio > groupRatio) {
-      // image is wider -> fit height
-      scale = gh / ih;
-      x = (gw - iw * scale) / 2;
-      y = 0;
-    } else {
-      // image is taller -> fit width
-      scale = gw / iw;
-      x = 0;
-      y = (gh - ih * scale) / 2;
+    switch (fit) {
+      case IMAGE_TEMPLATE_FIT.FILL:
+        // fit both width and height
+        scaleX = gw / iw;
+        scaleY = gh / ih;
+        x = 0;
+        y = 0;
+        break;
+      case IMAGE_TEMPLATE_FIT.CONTAIN:
+        if (imageRatio > groupRatio) {
+          // image is wider -> fit width
+          scaleX = gw / iw;
+          scaleY = scaleX;
+          x = 0;
+          y = (gh - ih * scaleX) / 2;
+        } else {
+          // image is taller -> fit height
+          scaleY = gh / ih;
+          scaleX = scaleY;
+          x = (gw - iw * scaleY) / 2;
+          y = 0;
+        }
+        break;
+      case IMAGE_TEMPLATE_FIT.COVER:
+        if (imageRatio > groupRatio) {
+          // image is wider -> fit height
+          scaleX = gh / ih;
+          scaleY = scaleX;
+          x = (gw - iw * scaleX) / 2;
+          y = 0;
+        } else {
+          // image is taller -> fit width
+          scaleX = gw / iw;
+          scaleY = scaleX;
+          x = 0;
+          y = (gh - ih * scaleX) / 2;
+        }
+        break;
+      case IMAGE_TEMPLATE_FIT.FREE:
+        x = 0;
+        y = 0;
+        scaleX = 1;
+        scaleY = 1;
+        break;
+      default:
+        break;
     }
 
     const handler = this.instance.getNodeHandler<WeaveImageNode>("image");
 
     if (handler) {
-      node.x(x);
-      node.y(y);
-      node.scaleX(scale);
-      node.scaleY(scale);
-      node.draggable(false);
-      node.listening(false);
-      handler.scaleReset(node as Konva.Group);
+      node.setAttrs({
+        x,
+        y,
+        scaleX,
+        scaleY,
+        draggable: false,
+        listening: false,
+      });
       this.instance.updateNode(handler.serialize(node as WeaveElementInstance));
     }
 
-    template.setAttrs({ isUsed: true });
+    if (saveOriginalImage) {
+      template.setAttrs({ originalImageWidth: iw, originalImageHeight: ih });
+    }
+
+    template.setAttrs({
+      isUsed: true,
+      fit,
+    });
     this.instance.updateNode(this.serialize(template as WeaveElementInstance));
   }
 
@@ -292,6 +481,10 @@ export class ImageTemplateNode extends WeaveNode {
       imageNode.moveTo(layerToMove);
       imageNode.setAbsolutePosition(nodePos);
       imageNode.rotation(nodeRotation);
+      imageNode.setAttr("fit", undefined);
+      imageNode.setAttr("isUsed", undefined);
+      imageNode.setAttr("lockToContainer", undefined);
+      imageNode.setAttr("moving", undefined);
       imageNode.draggable(true);
       imageNode.listening(true);
       imageNode.x(
@@ -300,6 +493,7 @@ export class ImageTemplateNode extends WeaveNode {
       imageNode.y(
         imageNode.y() - (actualImageLayerAttrs?.containerOffsetY ?? 0)
       );
+      imageHandler.scaleReset(imageNode as Konva.Group);
 
       const actualNode = imageHandler.serialize(
         imageNode as WeaveElementInstance
@@ -308,7 +502,12 @@ export class ImageTemplateNode extends WeaveNode {
       this.instance.removeNode(actualNode);
       this.instance.addNode(actualNode, layerToMoveAttrs?.id);
 
-      imageTemplateNode.setAttrs({ isUsed: false });
+      imageTemplateNode.setAttr("originalImageWidth", undefined);
+      imageTemplateNode.setAttr("originalImageHeight", undefined);
+      imageTemplateNode.setAttr("fit", undefined);
+      imageTemplateNode.setAttr("isUsed", false);
+      imageTemplateNode.setAttr("lockToContainer", false);
+      imageTemplateNode.setAttr("moving", false);
       this.instance.updateNode(
         this.serialize(imageTemplateNode as WeaveElementInstance)
       );

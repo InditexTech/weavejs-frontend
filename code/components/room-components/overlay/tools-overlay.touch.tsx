@@ -34,6 +34,7 @@ import {
   Frame,
   Video,
   Film,
+  LayoutPanelTop,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -298,7 +299,19 @@ export function ToolsOverlayTouch() {
                 sidebarToggle(SIDEBAR_ELEMENTS.frames);
               }}
             >
-              <Projector /> Frames
+              <LayoutPanelTop /> Frames
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
+                sidebarToggle(SIDEBAR_ELEMENTS.templates);
+              }}
+            >
+              <Projector /> Templates
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"

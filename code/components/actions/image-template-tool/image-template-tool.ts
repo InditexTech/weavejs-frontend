@@ -159,6 +159,9 @@ export class ImageTemplateToolAction extends WeaveAction {
         y: this.clickPoint.y,
         width: 100,
         height: 100,
+        inUse: false,
+        lockToContainer: false,
+        moving: false,
       });
 
       this.instance.addNode(node, this.container?.getAttrs().id);

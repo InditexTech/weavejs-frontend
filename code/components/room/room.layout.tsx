@@ -45,6 +45,8 @@ import { ConnectionTestsOverlay } from "../room-components/overlay/connection-te
 import { Button } from "../ui/button";
 import { ManageIdleDisconnection } from "../room-components/manage-idle-disconnection";
 import { useKeyboardHandler } from "../room-components/hooks/use-keyboard-handler";
+import { SaveTemplateDialog } from "../room-components/overlay/save-template";
+import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -196,6 +198,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         >
           <AnimatePresence>
             <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+            <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
             <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
             <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
             <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
@@ -392,6 +395,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           <>
             <ManageIdleDisconnection />
             <MaskSlider />
+            <SaveTemplateDialog />
             <LLMGenerationPopup />
             <LLMGenerationPopupV2 />
             <LLMPredictionsSelectionPopup />

@@ -35,6 +35,7 @@ import {
   Video,
   Film,
   SquareDashed,
+  LayoutPanelTop,
   // ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import {
@@ -903,12 +904,27 @@ export function ToolsOverlayMouse() {
                 setStrokesMenuOpen(false);
                 setImagesMenuOpen(false);
                 setSidebarsMenuOpen(false);
+                sidebarToggle(SIDEBAR_ELEMENTS.templates);
+              }}
+            >
+              <LayoutPanelTop strokeWidth={1} /> Templates
+              <DropdownMenuShortcut>
+                {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onClick={() => {
+                setShapesMenuOpen(false);
+                setStrokesMenuOpen(false);
+                setImagesMenuOpen(false);
+                setSidebarsMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
               }}
             >
               <SwatchBook strokeWidth={1} /> Color tokens
               <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                {SYSTEM_OS.MAC ? "⌥ ⌘ C" : "Alt Ctrl C"}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
             {threadsEnabled && (

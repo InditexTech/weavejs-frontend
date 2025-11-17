@@ -61,7 +61,7 @@ import {
   Unlink,
   Link,
   HardDriveUpload,
-  // SquaresSubtract,
+  ImageUpscale,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -82,12 +82,15 @@ import { postFlipImage } from "@/api/post-flip-image";
 import { postGrayscaleImage } from "@/api/post-grayscale-image";
 import { throttle } from "lodash";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
+import { IMAGE_TEMPLATE_FIT } from "@/components/nodes/image-template/constants";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
   const observerRef = React.useRef<ResizeObserver | null>(null);
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
+  const [movingImageTemplate, setMovingImageTemplate] =
+    React.useState<Konva.Group | null>(null);
   const [nodeFillMenuOpen, setNodeFillMenuOpen] = React.useState(false);
   const [nodeStrokeWidthMenuOpen, setNodeStrokeWidthMenuOpen] =
     React.useState(false);
@@ -108,6 +111,7 @@ export const NodeToolbar = () => {
   ] = React.useState(false);
   const [nodesAlignmentVerticalMenuOpen, setNodesAlignmentVerticalMenuOpen] =
     React.useState(false);
+  const [templateFitMenuOpen, setTemplateFitMenuOpen] = React.useState(false);
 
   const [isSelecting, setIsSelecting] = React.useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
@@ -156,6 +160,43 @@ export const NodeToolbar = () => {
     },
     [instance, actualAction, nodePropertiesAction]
   );
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleImageTemplateFreed({ template }: { template: Konva.Group }) {
+      setMovingImageTemplate(template as Konva.Group);
+    }
+
+    function handleImageTemplateLocked({
+      template,
+    }: {
+      template: Konva.Group;
+    }) {
+      if (
+        movingImageTemplate?.getAttrs()?.id === (template.getAttrs().id ?? "")
+      ) {
+        setMovingImageTemplate(null);
+      }
+    }
+
+    instance.addEventListener("onImageTemplateFreed", handleImageTemplateFreed);
+    instance.addEventListener(
+      "onImageTemplateLocked",
+      handleImageTemplateLocked
+    );
+
+    return () => {
+      instance.removeEventListener(
+        "onImageTemplateFreed",
+        handleImageTemplateFreed
+      );
+      instance.removeEventListener(
+        "onImageTemplateLocked",
+        handleImageTemplateLocked
+      );
+    };
+  }, [instance, movingImageTemplate]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -537,6 +578,14 @@ export const NodeToolbar = () => {
     [actualNode]
   );
 
+  const imageTemplateFit = React.useMemo(() => {
+    if (!isImageTemplate || !actualNode) {
+      return undefined;
+    }
+
+    return actualNode.props.fit;
+  }, [isImageTemplate, actualNode]);
+
   const canSetNodeStyling = React.useMemo(() => {
     return (
       isSingleNodeSelected &&
@@ -807,42 +856,262 @@ export const NodeToolbar = () => {
                 />
               )}
               {actualNode?.props.isUsed && (
-                <ToolbarButton
-                  className="rounded-full !w-[32px] !h-[32px]"
-                  icon={<Unlink className="px-2" size={32} strokeWidth={1} />}
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={async () => {
-                    if (!instance) {
-                      return;
-                    }
+                <>
+                  <DropdownMenu modal={false} open={templateFitMenuOpen}>
+                    <DropdownMenuTrigger
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      className={cn(
+                        "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                        {
+                          ["disabled:cursor-default disabled:opacity-50"]:
+                            weaveConnectionStatus !==
+                            WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                        }
+                      )}
+                      asChild
+                    >
+                      <ToolbarButton
+                        className="rounded-full !w-[32px] !h-[32px]"
+                        icon={
+                          <ImageUpscale
+                            className="px-2"
+                            size={32}
+                            strokeWidth={1}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        active={nodeStyleMenuOpen}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setNodeLayeringMenuOpen(false);
+                          setTemplateFitMenuOpen((prev) => !prev);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Template fit</p>
+                          </div>
+                        }
+                        tooltipSide="bottom"
+                        tooltipAlign="center"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      onCloseAutoFocus={(e) => {
+                        e.preventDefault();
+                      }}
+                      align="center"
+                      side="bottom"
+                      alignOffset={0}
+                      sideOffset={8}
+                      className="min-w-auto !p-0 font-inter rounded-2xl !border-zinc-200 shadow-none flex flex-row"
+                    >
+                      <div className="grid grid-cols-1 gap-1justify-start items-center py-1 px-1">
+                        <button
+                          onClick={() => {
+                            if (!instance || !node) {
+                              return;
+                            }
 
-                    const handler =
-                      instance.getNodeHandler<ImageTemplateNode>(
-                        "image-template"
+                            const templateHandler =
+                              instance?.getNodeHandler<ImageTemplateNode>(
+                                "image-template"
+                              );
+
+                            if (!templateHandler) {
+                              return;
+                            }
+
+                            const nodeInstance = instance
+                              .getStage()
+                              .findOne(`#${node?.key ?? ""}`);
+
+                            if (!nodeInstance) {
+                              return;
+                            }
+
+                            templateHandler.changeFit(
+                              nodeInstance as WeaveElementInstance,
+                              IMAGE_TEMPLATE_FIT.FILL
+                            );
+
+                            setTemplateFitMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3 rounded-t-lg",
+                            {
+                              ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                                imageTemplateFit === IMAGE_TEMPLATE_FIT.FILL,
+                            }
+                          )}
+                        >
+                          Fill
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!instance || !node) {
+                              return;
+                            }
+
+                            const templateHandler =
+                              instance?.getNodeHandler<ImageTemplateNode>(
+                                "image-template"
+                              );
+
+                            if (!templateHandler) {
+                              return;
+                            }
+
+                            const nodeInstance = instance
+                              .getStage()
+                              .findOne(`#${node?.key ?? ""}`);
+
+                            if (!nodeInstance) {
+                              return;
+                            }
+
+                            templateHandler.changeFit(
+                              nodeInstance as WeaveElementInstance,
+                              IMAGE_TEMPLATE_FIT.CONTAIN
+                            );
+
+                            setTemplateFitMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3",
+                            {
+                              ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                                imageTemplateFit === IMAGE_TEMPLATE_FIT.CONTAIN,
+                            }
+                          )}
+                        >
+                          Contain
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!instance || !node) {
+                              return;
+                            }
+
+                            const templateHandler =
+                              instance?.getNodeHandler<ImageTemplateNode>(
+                                "image-template"
+                              );
+
+                            if (!templateHandler) {
+                              return;
+                            }
+
+                            const nodeInstance = instance
+                              .getStage()
+                              .findOne(`#${node?.key ?? ""}`);
+
+                            if (!nodeInstance) {
+                              return;
+                            }
+
+                            templateHandler.changeFit(
+                              nodeInstance as WeaveElementInstance,
+                              IMAGE_TEMPLATE_FIT.COVER
+                            );
+
+                            setTemplateFitMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3",
+                            {
+                              ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                                imageTemplateFit === IMAGE_TEMPLATE_FIT.COVER,
+                            }
+                          )}
+                        >
+                          Cover
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!instance || !node) {
+                              return;
+                            }
+
+                            const templateHandler =
+                              instance?.getNodeHandler<ImageTemplateNode>(
+                                "image-template"
+                              );
+
+                            if (!templateHandler) {
+                              return;
+                            }
+
+                            const nodeInstance = instance
+                              .getStage()
+                              .findOne(`#${node?.key ?? ""}`);
+
+                            if (!nodeInstance) {
+                              return;
+                            }
+
+                            templateHandler.changeFit(
+                              nodeInstance as WeaveElementInstance,
+                              IMAGE_TEMPLATE_FIT.FREE
+                            );
+
+                            setTemplateFitMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3 rounded-b-lg",
+                            {
+                              ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                                imageTemplateFit === IMAGE_TEMPLATE_FIT.FREE,
+                            }
+                          )}
+                        >
+                          Free
+                        </button>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={<Unlink className="px-2" size={32} strokeWidth={1} />}
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={async () => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const handler =
+                        instance.getNodeHandler<ImageTemplateNode>(
+                          "image-template"
+                        );
+
+                      const stage = instance.getStage();
+                      const nodeInstance = stage.findOne(
+                        `#${actualNode?.key ?? ""}`
                       );
 
-                    const stage = instance.getStage();
-                    const nodeInstance = stage.findOne(
-                      `#${actualNode?.key ?? ""}`
-                    );
+                      if (!handler || !nodeInstance) {
+                        return;
+                      }
 
-                    if (!handler || !nodeInstance) {
-                      return;
+                      handler.unlink(nodeInstance as WeaveElementInstance);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>unlink image</p>
+                      </div>
                     }
-
-                    handler.unlink(nodeInstance as WeaveElementInstance);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>unlink image</p>
-                    </div>
-                  }
-                  tooltipSide="bottom"
-                  tooltipAlign="center"
-                />
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                </>
               )}
               <ToolbarDivider orientation="vertical" className="!h-[28px]" />
             </>

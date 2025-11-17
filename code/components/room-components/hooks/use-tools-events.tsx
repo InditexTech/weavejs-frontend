@@ -6,10 +6,21 @@ import React from "react";
 import { toast } from "sonner";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
-import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
+import {
+  WeaveActionPropsChangeEvent,
+  WeaveFrameToolAction,
+} from "@inditextech/weave-sdk";
 import { useIsTouchDevice } from "./use-is-touch-device";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RectangleHorizontal, RectangleVertical } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +31,22 @@ import { cn } from "@/lib/utils";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { ColorPickerInput } from "../inputs/color-picker";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { getFrameTemplates } from "@/api/get-frame-templates";
+import { TemplateEntity } from "../templates-library/types";
+import Konva from "konva";
+import { setTemplateOnPosition } from "@/components/utils/templates";
 
 const AddFrameToast = () => {
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
+  const room = useCollaborationRoom((state) => state.room);
+
+  const [frameTemplate, setFrameTemplate] = React.useState<"none" | string>(
+    "none"
+  );
+  const [templates, setTemplates] = React.useState<TemplateEntity[]>([]);
   const [frameKind, setFrameKind] = React.useState<"horizontal" | "vertical">(
     "horizontal"
   );
@@ -34,128 +56,282 @@ const AddFrameToast = () => {
 
   const isTouchDevice = useIsTouchDevice();
 
+  const query = useQuery({
+    queryKey: ["getFrameTemplates", room],
+    queryFn: async () => {
+      if (!room) {
+        return [];
+      }
+
+      return await getFrameTemplates(room ?? "");
+    },
+    select: (newData) => newData, // keep shape stable
+    structuralSharing: true,
+  });
+
+  React.useEffect(() => {
+    if (!instance) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function handleClickStage(e: any) {
+      if (!instance) return;
+
+      if (frameTemplate === "none") {
+        return;
+      }
+
+      const template = templates.find(
+        (t) => t.templateId === frameTemplate
+      ) as TemplateEntity;
+
+      if (!template) {
+        return;
+      }
+
+      e.cancelBubble = true;
+
+      const position: Konva.Vector2d | null | undefined = instance
+        .getStage()
+        .getPointerPosition();
+
+      if (!position) {
+        return;
+      }
+
+      const { mousePoint } = instance.getMousePointer(position);
+
+      setTemplateOnPosition(
+        instance,
+        JSON.parse(template.templateData),
+        mousePoint
+      );
+
+      const actionHandler: WeaveFrameToolAction | undefined =
+        instance.getActionHandler("frameTool");
+
+      if (actionHandler) {
+        actionHandler.cleanup();
+      }
+    }
+
+    instance.getStage().on("pointerclick", handleClickStage);
+
+    return () => {
+      instance.getStage().off("pointerclick", handleClickStage);
+    };
+  }, [instance, frameTemplate, templates]);
+
+  React.useEffect(() => {
+    if (!query.data) return;
+    setTemplates(query.data.items);
+  }, [query.data]);
+
   return (
-    <div className="w-full flex flex-col gap-1 justify-between items-center">
+    <div className="cursor-auto w-full h-auto flex flex-col gap-1 justify-between items-center">
       <div className="w-full">{`Select the frame background color and orientation and finally ${isTouchDevice ? "tap" : "click"} on the room to add the frame.`}</div>
       <div className="w-full flex flex-col gap-1 justify-end items-end pt-2">
-        <div className="flex gap-1 justify-start items-center">
-          <div className="text-[10px] font-inter uppercase px-3">Color</div>
-          <DropdownMenu modal={false} open={selectBackgroundColor}>
-            <DropdownMenuTrigger
+        <div className="w-full flex flex-col gap-1 justify-start items-start">
+          <div className="text-[10px] font-inter uppercase px-0">Template</div>
+          <Select
+            value={frameTemplate}
+            onValueChange={(value) => {
+              setFrameTemplate(value);
+
+              if (!instance) return;
+
+              if (value !== "none") {
+                const actionHandler: WeaveFrameToolAction | undefined =
+                  instance.getActionHandler("frameTool");
+
+                if (actionHandler) {
+                  actionHandler.setTemplateToUse(value);
+                }
+              }
+            }}
+          >
+            <SelectTrigger
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              className="cursor-pointer w-full font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none"
+            >
+              <SelectValue placeholder="Amount" />
+            </SelectTrigger>
+            <SelectContent
+              className="!z-[1000000000] rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+              align="end"
+            >
+              <SelectGroup>
+                <SelectItem
+                  value="none"
+                  className="font-inter text-xs rounded-none"
+                >
+                  BLANK
+                </SelectItem>
+                {templates.map((template) => (
+                  <SelectItem
+                    key={template.templateId}
+                    value={template.templateId}
+                    className="font-inter text-xs rounded-none"
+                  >
+                    {template.name.toUpperCase()}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div
+          className={cn(
+            "w-full flex flex-col gap-1 justify-start items-start mt-3",
+            {
+              ["text-[var(--accent-foreground)] opacity-50"]:
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                frameTemplate !== "none",
+            }
+          )}
+        >
+          <div className="text-[10px] font-inter uppercase px-0">
+            Template properties
+          </div>
+          <div className="w-full flex flex-col border border-[#c9c9c9] p-3 gap-1">
+            <div className="w-full flex gap-1 justify-start items-center">
+              <DropdownMenu modal={false} open={selectBackgroundColor}>
+                <DropdownMenuTrigger
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  className={cn(
+                    "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                    {
+                      ["disabled:cursor-default disabled:opacity-50"]:
+                        weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                        frameTemplate !== "none",
+                    }
+                  )}
+                  asChild
+                >
+                  <ToolbarButton
+                    className="rounded-full min-w-[32px] !w-[32px] !h-[32px]"
+                    icon={
+                      <div
+                        className="border border-[#c9c9c9c] w-[16px] h-[16px]"
+                        style={{
+                          background: backgroundColor,
+                        }}
+                      />
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                      frameTemplate !== "none"
+                    }
+                    active={selectBackgroundColor}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectBackgroundColor((prev) => !prev);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Background color</p>
+                      </div>
+                    }
+                    tooltipSide="right"
+                    tooltipAlign="center"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  side="left"
+                  alignOffset={0}
+                  sideOffset={8}
+                  className="min-w-auto font-inter rounded-none shadow-none flex flex-row !z-[1000000000]"
+                >
+                  <div
+                    className="flex !flex-col gap-0 w-[300px] p-4"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <ColorPickerInput
+                      value={backgroundColor}
+                      onChange={(color: string) => {
+                        setBackgroundColor(color);
+
+                        if (!instance) return;
+
+                        instance.updatePropsAction("frameTool", {
+                          frameBackground: color,
+                        });
+                      }}
+                    />
+                    <Button
+                      onClick={() => {
+                        setSelectBackgroundColor(false);
+                      }}
+                      className="cursor-pointer font-inter font-light rounded-none w-full"
+                    >
+                      CLOSE
+                    </Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div
+                className={cn("text-[10px] font-inter uppercase", {
+                  ["text-[var(--accent-foreground)] opacity-50"]:
+                    weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                    frameTemplate !== "none",
+                })}
+              >
+                Background color
+              </div>
+            </div>
+            <ToggleGroup
+              variant="outline"
+              type="single"
+              size="sm"
+              className="w-full"
+              value={frameKind}
               disabled={
                 weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                frameTemplate !== "none"
               }
-              className={cn(
-                "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                {
-                  ["disabled:cursor-default disabled:opacity-50"]:
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+              onValueChange={(value) => {
+                if (instance && value === "horizontal") {
+                  setFrameKind("horizontal");
+                  instance.updatePropsAction("frameTool", {
+                    frameWidth: 1920,
+                    frameHeight: 1080,
+                  });
                 }
-              )}
-              asChild
+                if (instance && value === "vertical") {
+                  setFrameKind(value);
+                  instance.updatePropsAction("frameTool", {
+                    frameWidth: 1080,
+                    frameHeight: 1920,
+                  });
+                }
+              }}
             >
-              <ToolbarButton
-                className="rounded-full min-w-[32px] !w-[32px] !h-[32px]"
-                icon={
-                  <div
-                    className="border border-[#c9c9c9c] w-[16px] h-[16px]"
-                    style={{
-                      background: backgroundColor,
-                    }}
-                  />
-                }
-                disabled={
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                }
-                active={selectBackgroundColor}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelectBackgroundColor((prev) => !prev);
-                }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>Background color</p>
-                  </div>
-                }
-                tooltipSide="right"
-                tooltipAlign="center"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              side="left"
-              alignOffset={0}
-              sideOffset={8}
-              className="min-w-auto font-inter rounded-none shadow-none flex flex-row !z-[1000000000]"
-            >
-              <div
-                className="flex !flex-col gap-0 w-[300px] p-4"
-                onClick={(e) => e.preventDefault()}
+              <ToggleGroupItem
+                value="horizontal"
+                className="text-[10px] font-inter uppercase !px-5 cursor-pointer"
+                aria-label="Frame is horizontal"
               >
-                <ColorPickerInput
-                  value={backgroundColor}
-                  onChange={(color: string) => {
-                    setBackgroundColor(color);
-
-                    if (!instance) return;
-
-                    instance.updatePropsAction("frameTool", {
-                      frameBackground: color,
-                    });
-                  }}
-                />
-                <Button
-                  onClick={() => {
-                    setSelectBackgroundColor(false);
-                  }}
-                  className="cursor-pointer font-inter font-light rounded-none w-full"
-                >
-                  CLOSE
-                </Button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                Horizontal <RectangleHorizontal size={32} strokeWidth={1} />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="vertical"
+                className="text-[10px] font-inter uppercase !px-5 cursor-pointer"
+                aria-label="Frame is vertical"
+              >
+                Vertical <RectangleVertical size={32} strokeWidth={1} />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </div>
-        <ToggleGroup
-          variant="outline"
-          type="single"
-          size="sm"
-          value={frameKind}
-          onValueChange={(value) => {
-            if (instance && value === "horizontal") {
-              setFrameKind("horizontal");
-              instance.updatePropsAction("frameTool", {
-                frameWidth: 1920,
-                frameHeight: 1080,
-              });
-            }
-            if (instance && value === "vertical") {
-              setFrameKind(value);
-              instance.updatePropsAction("frameTool", {
-                frameWidth: 1080,
-                frameHeight: 1920,
-              });
-            }
-          }}
-        >
-          <ToggleGroupItem
-            value="horizontal"
-            className="text-[10px] font-inter uppercase !px-5 pointer-cursor"
-            aria-label="Frame is horizontal"
-          >
-            Horizontal <RectangleHorizontal size={32} strokeWidth={1} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="vertical"
-            className="text-[10px] font-inter uppercase !px-5 pointer-cursor"
-            aria-label="Frame is vertical"
-          >
-            Vertical <RectangleVertical size={32} strokeWidth={1} />
-          </ToggleGroupItem>
-        </ToggleGroup>
       </div>
     </div>
   );
