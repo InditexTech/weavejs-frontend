@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from "uuid";
 import { useCollaborationRoom } from "@/store/store";
 import { WeaveUser } from "@inditextech/weave-types";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
@@ -17,31 +16,26 @@ function useGetAzureWebPubsubProvider({
   loadedParams: boolean;
   getUser: () => WeaveUser;
 }) {
-  const [callId, setCallId] = React.useState<string>(uuidv4());
   const [wsProvider, setWsProvider] =
     React.useState<WeaveStoreAzureWebPubsub | null>(null);
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
 
   const { data: roomData, isFetched } = useQuery({
-    queryKey: ["roomData", room ?? "", callId],
+    queryKey: ["roomData", room ?? ""],
     queryFn: () => {
       return getRoom(room ?? "");
     },
     initialData: undefined,
     staleTime: 0,
     retry: false,
-    enabled: typeof room !== "undefined",
+    enabled: typeof room !== "undefined" && typeof user !== "undefined",
   });
 
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
     if (loadedParams && isFetched && room && user && !wsProvider) {
-      const queryKey = ["roomData", room ?? "", callId];
-      queryClient.invalidateQueries({ queryKey });
-      setCallId(uuidv4());
-
       const store = new WeaveStoreAzureWebPubsub(
         roomData,
         {
@@ -65,7 +59,6 @@ function useGetAzureWebPubsubProvider({
     wsProvider,
     roomData,
     queryClient,
-    callId,
     loadedParams,
     room,
     user,
