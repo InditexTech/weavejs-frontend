@@ -192,7 +192,7 @@ export const NodeToolbar = () => {
         handleOnExitTextEditMode
       );
     };
-  }, []);
+  }, [instance]);
 
   React.useEffect(() => {
     if (!instance) return;
