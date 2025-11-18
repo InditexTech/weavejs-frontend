@@ -111,6 +111,8 @@ export const setTemplateOnPosition = (
   const stage = instance.getStage();
   const nodesToSelect = [];
 
+  const container = containerOverCursor(instance, [], relativePosition);
+
   for (const element of Object.keys(template.weave)) {
     const node = template.weave[element].element;
     const posRelativeToSelection =
@@ -125,9 +127,9 @@ export const setTemplateOnPosition = (
     delete node.props.containerId;
     node.key = newNodeId;
     node.props.id = newNodeId;
-    const container = containerOverCursor(instance, [], relativePosition);
 
     let localPos = position;
+
     if (!container) {
       containerId = instance.getMainLayer()?.getAttrs().id ?? "";
 
@@ -172,4 +174,6 @@ export const setTemplateOnPosition = (
 
   const nodesSelectionPlugin = getNodesSelectionPlugin(instance);
   nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
+
+  stage.container().focus();
 };

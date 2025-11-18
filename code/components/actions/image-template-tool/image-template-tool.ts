@@ -19,10 +19,13 @@ import { ImageTemplateNode } from "@/components/nodes/image-template/image-templ
 
 export class ImageTemplateToolAction extends WeaveAction {
   protected initialized: boolean = false;
+  protected moved: boolean;
+  protected tempImageTemplateNode: Konva.Rect | null;
   protected state: ImageTemplateToolActionState;
   protected pointers: Map<number, Vector2d>;
   protected imageTemplateId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
+  protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -33,8 +36,11 @@ export class ImageTemplateToolAction extends WeaveAction {
     this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = IMAGE_TEMPLATE_TOOL_STATE.IDLE;
+    this.tempImageTemplateNode = null;
+    this.moved = false;
     this.imageTemplateId = null;
     this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
   }
 
@@ -44,10 +50,12 @@ export class ImageTemplateToolAction extends WeaveAction {
 
   initProps() {
     return {
-      colorToken: "#000000",
-      width: 300,
-      height: 300,
       opacity: 1,
+      fill: "#666666",
+      stroke: "#000000",
+      strokeWidth: 1,
+      width: 400,
+      height: 225,
     };
   }
 
@@ -75,6 +83,12 @@ export class ImageTemplateToolAction extends WeaveAction {
       }
     });
 
+    stage.on("pointermove", () => {
+      if (this.state === IMAGE_TEMPLATE_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+    });
+
     stage.on("pointerdown", (e) => {
       this.setTapStart(e);
 
@@ -92,7 +106,7 @@ export class ImageTemplateToolAction extends WeaveAction {
       }
 
       if (this.state === IMAGE_TEMPLATE_TOOL_STATE.ADDING) {
-        this.state = IMAGE_TEMPLATE_TOOL_STATE.DEFINING_SIZE;
+        this.handleAdding();
       }
     });
 
@@ -112,13 +126,23 @@ export class ImageTemplateToolAction extends WeaveAction {
         this.state = IMAGE_TEMPLATE_TOOL_STATE.ADDING;
         return;
       }
+
+      if (this.state === IMAGE_TEMPLATE_TOOL_STATE.DEFINING_SIZE) {
+        this.handleMovement();
+      }
     });
 
     stage.on("pointerup", (e) => {
       this.pointers.delete(e.evt.pointerId);
 
+      const isTap = this.isTap(e);
+
+      if (isTap) {
+        this.moved = false;
+      }
+
       if (this.state === IMAGE_TEMPLATE_TOOL_STATE.DEFINING_SIZE) {
-        this.handleAdding();
+        this.handleSettingSize();
       }
     });
 
@@ -137,34 +161,86 @@ export class ImageTemplateToolAction extends WeaveAction {
     );
 
     this.imageTemplateId = null;
+    this.tempImageTemplateNode = null;
+    this.moved = false;
+    this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
     this.setState(IMAGE_TEMPLATE_TOOL_STATE.ADDING);
   }
 
   private handleAdding(position?: Vector2d) {
-    const { mousePoint, container } = this.instance.getMousePointer(position);
+    const { mousePoint, container, measureContainer } =
+      this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
     this.container = container as Konva.Layer | Konva.Group;
+    this.measureContainer = measureContainer;
 
     this.imageTemplateId = uuidv4();
 
-    const nodeHandler =
-      this.instance.getNodeHandler<ImageTemplateNode>("image-template");
-
-    if (nodeHandler) {
-      const node = nodeHandler.create(this.imageTemplateId, {
+    if (!this.tempImageTemplateNode) {
+      this.tempImageTemplateNode = new Konva.Rect({
         ...this.props,
+        id: this.imageTemplateId,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        width: 0,
+        height: 0,
+      });
+      this.measureContainer?.add(this.tempImageTemplateNode);
+    }
+
+    this.setState(IMAGE_TEMPLATE_TOOL_STATE.DEFINING_SIZE);
+  }
+
+  private handleSettingSize() {
+    if (
+      this.imageTemplateId &&
+      this.tempImageTemplateNode &&
+      this.clickPoint &&
+      this.container
+    ) {
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.container
+      );
+
+      const rectPos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
-        width: 100,
-        height: 100,
-        inUse: false,
-        lockToContainer: false,
-        moving: false,
+      };
+      let rectWidth = this.props.width;
+      let rectHeight = this.props.height;
+      if (this.moved) {
+        rectPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        rectPos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        rectWidth = Math.abs(this.clickPoint.x - mousePoint.x);
+        rectHeight = Math.abs(this.clickPoint.y - mousePoint.y);
+      }
+
+      this.tempImageTemplateNode.setAttrs({
+        ...this.props,
+        x: rectPos.x,
+        y: rectPos.y,
+        width: rectWidth,
+        height: rectHeight,
       });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      const nodeHandler =
+        this.instance.getNodeHandler<ImageTemplateNode>("image-template");
+
+      if (nodeHandler) {
+        const clonedRectNode = this.tempImageTemplateNode.clone();
+        this.tempImageTemplateNode.destroy();
+
+        const node = nodeHandler.create(this.imageTemplateId, {
+          ...this.props,
+          ...clonedRectNode.getAttrs(),
+        });
+
+        this.instance.addNode(node, this.container?.getAttrs().id);
+      }
 
       this.instance.emitEvent<ImageTemplateToolActionOnAddedEvent>(
         "onAddedImageTemplate"
@@ -172,6 +248,33 @@ export class ImageTemplateToolAction extends WeaveAction {
     }
 
     this.cancelAction();
+  }
+
+  private handleMovement() {
+    if (this.state !== IMAGE_TEMPLATE_TOOL_STATE.DEFINING_SIZE) {
+      return;
+    }
+
+    if (
+      this.imageTemplateId &&
+      this.tempImageTemplateNode &&
+      this.measureContainer &&
+      this.clickPoint
+    ) {
+      this.moved = true;
+
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.measureContainer
+      );
+
+      const deltaX = mousePoint.x - this.clickPoint?.x;
+      const deltaY = mousePoint.y - this.clickPoint?.y;
+
+      this.tempImageTemplateNode.setAttrs({
+        width: deltaX,
+        height: deltaY,
+      });
+    }
   }
 
   trigger(cancelAction: () => void) {
@@ -189,8 +292,13 @@ export class ImageTemplateToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
-    this.props = this.initProps();
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
 
+    this.props = this.initProps();
     this.addImageTemplate();
   }
 
