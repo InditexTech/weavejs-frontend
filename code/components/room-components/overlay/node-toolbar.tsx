@@ -89,6 +89,7 @@ export const NodeToolbar = () => {
   const observerRef = React.useRef<ResizeObserver | null>(null);
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
+  const [dontRender, setDontRender] = React.useState(false);
   const [movingImageTemplate, setMovingImageTemplate] =
     React.useState<Konva.Group | null>(null);
   const [nodeFillMenuOpen, setNodeFillMenuOpen] = React.useState(false);
@@ -160,6 +161,38 @@ export const NodeToolbar = () => {
     },
     [instance, actualAction, nodePropertiesAction]
   );
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleOnEnterTextEditMode() {
+      setDontRender(true);
+    }
+
+    function handleOnExitTextEditMode() {
+      setDontRender(false);
+    }
+
+    instance.addEventListener(
+      "onEnterTextNodeEditMode",
+      handleOnEnterTextEditMode
+    );
+    instance.addEventListener(
+      "onExitTextNodeEditMode",
+      handleOnExitTextEditMode
+    );
+
+    return () => {
+      instance.removeEventListener(
+        "onEnterTextNodeEditMode",
+        handleOnEnterTextEditMode
+      );
+      instance.removeEventListener(
+        "onExitTextNodeEditMode",
+        handleOnExitTextEditMode
+      );
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -595,6 +628,10 @@ export const NodeToolbar = () => {
       )
     );
   }, [isSingleNodeSelected, actualNode]);
+
+  if (dontRender) {
+    return null;
+  }
 
   if (!roomLoaded) {
     return null;
