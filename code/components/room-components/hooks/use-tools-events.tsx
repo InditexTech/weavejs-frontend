@@ -583,6 +583,32 @@ export const useToolsEvents = () => {
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
 
+  // Line tool events
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const handleLineAdding = () => {
+      toast("Add line", {
+        description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint a line.`,
+        duration: Infinity,
+      });
+    };
+
+    const handleLineAdded = () => {
+      toast.dismiss();
+    };
+
+    instance.addEventListener("onAddingLine", handleLineAdding);
+    instance.addEventListener("onAddedLine", handleLineAdded);
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener("onAddingLine", handleLineAdding);
+        instance.removeEventListener("onAddedLine", handleLineAdded);
+      }
+    };
+  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
+
   // Pen tool events
   React.useEffect(() => {
     if (!instance) return;

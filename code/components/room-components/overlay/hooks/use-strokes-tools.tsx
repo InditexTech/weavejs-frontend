@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { ArrowUpRight, Brush, PenTool } from "lucide-react";
+import { ArrowUpRight, Brush, PenLine, PenTool } from "lucide-react";
 import React from "react";
 import { ShortcutElement } from "../../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
@@ -42,14 +42,30 @@ export const useStrokesTools = () => {
             <p>Pen tool</p>
             <ShortcutElement
               shortcuts={{
-                [SYSTEM_OS.MAC]: "L",
-                [SYSTEM_OS.OTHER]: "L",
+                [SYSTEM_OS.MAC]: "Q",
+                [SYSTEM_OS.OTHER]: "Q",
               }}
             />
           </div>
         ),
         onClick: () => triggerTool("penTool"),
         active: () => actualAction === "penTool",
+      },
+      lineTool: {
+        icon: <PenLine className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Line tool</p>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "L",
+                [SYSTEM_OS.OTHER]: "L",
+              }}
+            />
+          </div>
+        ),
+        onClick: () => triggerTool("lineTool"),
+        active: () => actualAction === "lineTool",
       },
       brushTool: {
         icon: <Brush className="px-2" size={40} strokeWidth={1} />,

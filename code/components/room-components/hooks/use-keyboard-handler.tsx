@@ -164,6 +164,11 @@ export function useKeyboardHandler() {
 
       if (event.code === "KeyL") {
         event.preventDefault();
+        triggerTool("lineTool");
+      }
+
+      if (event.code === "KeyQ") {
+        event.preventDefault();
         triggerTool("penTool");
       }
 
@@ -415,7 +420,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyI" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
@@ -426,7 +430,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyV" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
@@ -437,7 +440,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyC" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
@@ -448,7 +450,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyF" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
@@ -459,7 +460,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyT" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
@@ -470,7 +470,6 @@ export function useKeyboardHandler() {
 
       if (
         event.code === "KeyE" &&
-        event.shiftKey &&
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {

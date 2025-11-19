@@ -36,7 +36,11 @@ export const useNodeActionName = () => {
       case "stroke":
         return "Stroke";
       case "line":
-        return "Vector path";
+        if (node.props.points?.length && node.props.points.length === 4) {
+          return "Line";
+        } else {
+          return "Vector path";
+        }
       case "connector":
         return "Connector";
       case "text":

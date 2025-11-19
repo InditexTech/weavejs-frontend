@@ -195,6 +195,21 @@ export class ImageTemplateNode extends WeaveNode {
       clipHeight: nextProps.height,
     });
 
+    if (internalGroup?.getChildren().length === 0 && nextProps.isUsed) {
+      imageTemplateNode.setAttr("originalImageWidth", undefined);
+      imageTemplateNode.setAttr("originalImageHeight", undefined);
+      imageTemplateNode.setAttr("fit", undefined);
+      imageTemplateNode.setAttr("isUsed", false);
+      imageTemplateNode.setAttr("lockToContainer", false);
+      imageTemplateNode.setAttr("moving", false);
+
+      this.instance.updateNode(
+        this.serialize(imageTemplateNode as WeaveElementInstance)
+      );
+
+      this.getNodesSelectionPlugin()?.setSelectedNodes([imageTemplateNode]);
+    }
+
     if (nextProps.isUsed) {
       internalRect.strokeWidth(0);
       internalText.visible(false);

@@ -162,6 +162,35 @@ export const NodeToolbar = () => {
     [instance, actualAction, nodePropertiesAction]
   );
 
+  // Handle drag & transform
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleOnDrag(node: Konva.Node | null = null) {
+      if (node) {
+        setDontRender(true);
+      } else {
+        setDontRender(false);
+      }
+    }
+
+    function handleOnTransform(node: Konva.Node | null = null) {
+      if (node) {
+        setDontRender(true);
+      } else {
+        setDontRender(false);
+      }
+    }
+
+    instance.addEventListener("onDrag", handleOnDrag);
+    instance.addEventListener("onTransform", handleOnTransform);
+
+    return () => {
+      instance.addEventListener("onDrag", handleOnDrag);
+      instance.addEventListener("onTransform", handleOnTransform);
+    };
+  }, [instance]);
+
   React.useEffect(() => {
     if (!instance) return;
 

@@ -11,6 +11,7 @@ import {
   Image,
   Images,
   PenTool,
+  PenLine,
   Square,
   Frame,
   Type,
@@ -63,7 +64,7 @@ import { useImagesTools } from "./hooks/use-images-tools";
 
 export function ToolsOverlayMouse() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
-  const [actualStrokesTool, setActualStrokesTool] = React.useState("penTool");
+  const [actualStrokesTool, setActualStrokesTool] = React.useState("lineTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
@@ -444,12 +445,29 @@ export function ToolsOverlayMouse() {
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
                   setSidebarsMenuOpen(false);
+                  setActualStrokesTool("lineTool");
+                  STROKES_TOOLS["lineTool"].onClick();
+                }}
+              >
+                <PenLine size={20} strokeWidth={1} /> Line tool
+                <DropdownMenuShortcut>L</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
                   STROKES_TOOLS["penTool"].onClick();
                 }}
               >
                 <PenTool size={20} strokeWidth={1} /> Pen tool
-                <DropdownMenuShortcut>L</DropdownMenuShortcut>
+                <DropdownMenuShortcut>Q</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
