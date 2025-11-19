@@ -8,6 +8,7 @@ import {
   Images,
   MessageSquare,
   MousePointer,
+  PenLine,
   PenTool,
   Square,
   SwatchBook,
@@ -53,11 +54,19 @@ export const HelpTools = () => {
           }}
         />
         <HelpShortcutElement
-          icon={<PenTool />}
-          label="Pen tool"
+          icon={<PenLine />}
+          label="Line tool"
           shortcuts={{
             [SYSTEM_OS.MAC]: "L",
             [SYSTEM_OS.OTHER]: "L",
+          }}
+        />
+        <HelpShortcutElement
+          icon={<PenTool />}
+          label="Pen tool"
+          shortcuts={{
+            [SYSTEM_OS.MAC]: "Q",
+            [SYSTEM_OS.OTHER]: "Q",
           }}
         />
         <HelpShortcutElement
