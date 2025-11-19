@@ -11,7 +11,13 @@ import { useWeave } from "@inditextech/weave-react";
 import { toast } from "sonner";
 
 function useCopyPaste() {
+  const copyingToastIdRef = React.useRef<string | number | null>(null);
+
   const instance = useWeave((state) => state.instance);
+
+  const onPrepareCopyHandler = React.useCallback((): void => {
+    copyingToastIdRef.current = toast.loading("Copying...");
+  }, []);
 
   const onCopyHandler = React.useCallback(
     (copyInfo: WeaveCopyPasteNodesPluginOnCopyEvent): void => {
@@ -20,6 +26,11 @@ function useCopyPaste() {
         toast.error("An error occurred when copying to the clipboard");
       } else {
         toast.success("Copy successful");
+      }
+
+      if (copyingToastIdRef.current) {
+        toast.dismiss(copyingToastIdRef.current);
+        copyingToastIdRef.current = null;
       }
     },
     []
@@ -46,14 +57,16 @@ function useCopyPaste() {
   React.useEffect(() => {
     if (!instance) return;
 
+    instance.addEventListener("onPrepareCopy", onPrepareCopyHandler);
     instance.addEventListener("onCopy", onCopyHandler);
     instance.addEventListener("onPaste", onPasteHandler);
 
     return () => {
+      instance.removeEventListener("onPrepareCopy", onPrepareCopyHandler);
       instance.removeEventListener("onCopy", onCopyHandler);
       instance.removeEventListener("onPaste", onPasteHandler);
     };
-  }, [instance, onCopyHandler, onPasteHandler]);
+  }, [instance, onPrepareCopyHandler, onCopyHandler, onPasteHandler]);
 }
 
 export default useCopyPaste;

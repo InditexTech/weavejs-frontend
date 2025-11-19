@@ -88,6 +88,7 @@ import {
 } from "../room-components/comment/comment-dom";
 import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
+import { getImageBase64 } from "./images";
 
 const FONTS = async (): Promise<WeaveFont[]> => {
   const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
@@ -488,6 +489,19 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         paddingX: 20,
         paddingY: 20,
       },
+    },
+    getImageBase64: async (instance, nodes) => {
+      try {
+        const res = await getImageBase64({
+          instance: instance,
+          nodes: nodes.map((node) => node.getAttrs().id ?? ""),
+          options: { format: "image/png", padding: 0, pixelRatio: 1 },
+        });
+        return res.url;
+      } catch (error) {
+        console.error("Error getting image base64:", error);
+        throw error;
+      }
     },
   }),
   new WeaveConnectedUsersPlugin({
