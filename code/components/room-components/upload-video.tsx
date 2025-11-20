@@ -8,6 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postVideo } from "@/api/post-video";
 import { useWeave } from "@inditextech/weave-react";
 import { toast } from "sonner";
+import Konva from "konva";
+import { getPositionRelativeToContainerOnPosition } from "@inditextech/weave-sdk";
 
 export function UploadVideo() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +37,7 @@ export function UploadVideo() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File) => {
+    (file: File, position?: Konva.Vector2d) => {
       setUploadingVideo(true);
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
@@ -50,21 +52,39 @@ export function UploadVideo() {
           const roomId = data.video.roomId;
           const videoId = data.video.videoId;
 
-          const { finishUploadCallback } = instance.triggerAction(
-            "videoTool"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any;
+          if (position) {
+            instance.triggerAction(
+              "videoTool",
+              {
+                videoId,
+                videoParams: {
+                  url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}`,
+                  placeholderUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
+                  width: data.video.width,
+                  height: data.video.height,
+                },
+                position,
+                forceMainContainer: true,
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ) as any;
+          } else {
+            const { finishUploadCallback } = instance.triggerAction(
+              "videoTool"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ) as any;
 
-          instance.updatePropsAction("videoTool", {
-            videoId,
-            width: data.video.width,
-            height: data.video.height,
-          });
+            instance.updatePropsAction("videoTool", {
+              videoId,
+              width: data.video.width,
+              height: data.video.height,
+            });
 
-          finishUploadCallback?.({
-            url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}`,
-            placeholderUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
-          });
+            finishUploadCallback?.({
+              url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}`,
+              placeholderUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
+            });
+          }
         },
         onError: (ex) => {
           instance?.cancelAction("videoTool");
@@ -84,16 +104,30 @@ export function UploadVideo() {
 
   React.useEffect(() => {
     const onStageDrop = (e: DragEvent) => {
+      if (!instance) {
+        return;
+      }
+
       if (window.weaveDragVideoParams) {
         return;
       }
 
+      instance.getStage().setPointersPositions(e);
+      const position: Konva.Vector2d | null | undefined =
+        getPositionRelativeToContainerOnPosition(instance);
+
+      if (!position) {
+        return;
+      }
+
+      const { mousePoint } = instance.getMousePointer(position);
+
       if (e.dataTransfer?.items) {
         [...e.dataTransfer?.items].forEach((item) => {
-          if (item.kind === "file") {
+          if (item.kind === "file" && item.type.startsWith("video/")) {
             const file = item.getAsFile();
             if (file) {
-              handleUploadFile(file);
+              handleUploadFile(file, mousePoint);
             }
           }
         });
@@ -101,7 +135,9 @@ export function UploadVideo() {
       }
       if (e.dataTransfer?.files) {
         [...e.dataTransfer.files].forEach((file) => {
-          handleUploadFile(file);
+          if (file.type.startsWith("video/")) {
+            handleUploadFile(file, mousePoint);
+          }
         });
         return;
       }

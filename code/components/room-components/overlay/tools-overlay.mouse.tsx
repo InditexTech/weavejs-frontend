@@ -693,22 +693,6 @@ export function ToolsOverlayMouse() {
         </div>
         <ToolbarButton
           className="rounded-full !w-[40px]"
-          icon={<LayoutPanelTop className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          active={actualAction === "imageTemplateTool"}
-          onClick={() => triggerTool("imageTemplateTool")}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Image Template Tool</p>
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
           icon={<Video className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -779,6 +763,22 @@ export function ToolsOverlayMouse() {
                   [SYSTEM_OS.OTHER]: "F",
                 }}
               />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<LayoutPanelTop className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTemplateTool"}
+          onClick={() => triggerTool("imageTemplateTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Image Template Tool</p>
             </div>
           }
           tooltipSide="top"
