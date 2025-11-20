@@ -467,6 +467,25 @@ function useContextMenu() {
               setContextMenuShow(false);
             },
           });
+          options.push({
+            id: "copy-as-image",
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>Copy as image</div>
+              </div>
+            ),
+            icon: <ClipboardCopy size={16} />,
+            disabled: !["selectionTool"].includes(actActionActive ?? ""),
+            onClick: async () => {
+              setContextMenuShow(false);
+              const weaveCopyPasteNodesPlugin =
+                instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+              if (weaveCopyPasteNodesPlugin) {
+                await weaveCopyPasteNodesPlugin.copy(true);
+              }
+            },
+          });
         }
       }
       options.push({

@@ -8,6 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
+import Konva from "konva";
+import { getPositionRelativeToContainerOnPosition } from "@inditextech/weave-sdk";
 
 export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,7 +43,7 @@ export function UploadImage() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File) => {
+    (file: File, position?: Konva.Vector2d) => {
       setUploadingImage(true);
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
@@ -57,16 +59,31 @@ export function UploadImage() {
             const room = data.fileName.split("/")[0];
             const imageId = data.fileName.split("/")[1];
 
-            const { finishUploadCallback } = instance.triggerAction(
-              "imageTool"
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ) as any;
+            if (position) {
+              instance.triggerAction(
+                "imageTool",
+                {
+                  imageId,
+                  imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+                  position,
+                  forceMainContainer: true,
+                }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ) as any;
+            } else {
+              const { finishUploadCallback } = instance.triggerAction(
+                "imageTool"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ) as any;
 
-            instance.updatePropsAction("imageTool", { imageId });
+              instance.updatePropsAction("imageTool", {
+                imageId,
+              });
 
-            finishUploadCallback?.(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-            );
+              finishUploadCallback?.({
+                imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+              });
+            }
           }
 
           if (workloadsEnabled) {
@@ -74,16 +91,31 @@ export function UploadImage() {
             const room = data.image.roomId;
             const imageId = data.image.imageId;
 
-            const { finishUploadCallback } = instance.triggerAction(
-              "imageTool"
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ) as any;
+            if (position) {
+              instance.triggerAction(
+                "imageTool",
+                {
+                  imageId,
+                  imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+                  position,
+                  forceMainContainer: true,
+                }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ) as any;
+            } else {
+              const { finishUploadCallback } = instance.triggerAction(
+                "imageTool"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ) as any;
 
-            instance.updatePropsAction("imageTool", { imageId });
+              instance.updatePropsAction("imageTool", {
+                imageId,
+              });
 
-            finishUploadCallback?.(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-            );
+              finishUploadCallback?.(
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+              );
+            }
           }
         },
         onError: (ex) => {
@@ -107,16 +139,30 @@ export function UploadImage() {
 
   React.useEffect(() => {
     const onStageDrop = (e: DragEvent) => {
+      if (!instance) {
+        return;
+      }
+
       if (window.weaveDragImageURL) {
         return;
       }
 
+      instance.getStage().setPointersPositions(e);
+      const position: Konva.Vector2d | null | undefined =
+        getPositionRelativeToContainerOnPosition(instance);
+
+      if (!position) {
+        return;
+      }
+
+      const { mousePoint } = instance.getMousePointer(position);
+
       if (e.dataTransfer?.items) {
         [...e.dataTransfer?.items].forEach((item) => {
-          if (item.kind === "file") {
+          if (item.kind === "file" && item.type.startsWith("image/")) {
             const file = item.getAsFile();
             if (file) {
-              handleUploadFile(file);
+              handleUploadFile(file, mousePoint);
             }
           }
         });
@@ -124,7 +170,9 @@ export function UploadImage() {
       }
       if (e.dataTransfer?.files) {
         [...e.dataTransfer.files].forEach((file) => {
-          handleUploadFile(file);
+          if (file.type.startsWith("image/")) {
+            handleUploadFile(file, mousePoint);
+          }
         });
         return;
       }
