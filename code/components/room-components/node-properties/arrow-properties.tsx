@@ -63,12 +63,15 @@ export function ArrowProperties() {
   if (
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
-    !["arrow"].includes(actualNode.type)
+    !["arrow", "connector"].includes(actualNode.type)
   ) {
     return null;
   }
 
-  if (actualAction && !["selectionTool", "arrowTool"].includes(actualAction)) {
+  if (
+    actualAction &&
+    !["selectionTool", "arrowTool", "connectorTool"].includes(actualAction)
+  ) {
     return null;
   }
 

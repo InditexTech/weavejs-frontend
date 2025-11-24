@@ -133,6 +133,8 @@ export function StrokeProperties() {
           }}
         />
         {(["line"].includes(actualNode.type) ||
+          ["connector"].includes(actualNode.type) ||
+          ["lineTool"].includes(actualAction) ||
           ["penTool"].includes(actualAction)) && (
           <>
             <InputNumber

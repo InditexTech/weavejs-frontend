@@ -66,18 +66,30 @@ export function FillProperties() {
   if (
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
-    ["image-template", "group", "mask", "fuzzy-mask", "text", "frame"].includes(
-      actualNode.type
-    )
+    [
+      "image-template",
+      "line",
+      "connector",
+      "group",
+      "mask",
+      "fuzzy-mask",
+      "text",
+      "frame",
+    ].includes(actualNode.type)
   ) {
     return null;
   }
 
   if (
     actualAction &&
-    !["selectionTool", "rectangleTool", "ellipseTool", "starTool"].includes(
-      actualAction
-    )
+    ![
+      "selectionTool",
+      "lineTool",
+      "penTool",
+      "rectangleTool",
+      "ellipseTool",
+      "starTool",
+    ].includes(actualAction)
   ) {
     return null;
   }

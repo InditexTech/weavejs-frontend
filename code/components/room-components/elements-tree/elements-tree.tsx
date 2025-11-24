@@ -27,6 +27,7 @@ import {
   Group,
   LineSquiggle,
   LayoutPanelTop,
+  ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -41,6 +42,7 @@ const iconsMap: Record<string, any> = {
   frame: Frame,
   group: Group,
   "color-token": Tag,
+  connector: ChevronsLeftRightEllipsis,
   line: Spline,
   stroke: LineSquiggle,
   "regular-polygon": Hexagon,
