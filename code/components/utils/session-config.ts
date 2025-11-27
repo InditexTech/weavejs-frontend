@@ -14,10 +14,10 @@ type WeaveSessionConfig = {
 
 const defaultSessionConfig: WeaveSessionConfig = {
   grid: {
-    enabled: true,
+    enabled: false,
     type: "lines",
   },
-  backgroundColor: BACKGROUND_COLOR.WHITE,
+  backgroundColor: BACKGROUND_COLOR.GRAY,
 };
 
 export const getSessionConfig = (room: string): WeaveSessionConfig => {

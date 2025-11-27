@@ -197,7 +197,7 @@ interface CollaborationRoomState {
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
-  backgroundColor: BACKGROUND_COLOR.WHITE,
+  backgroundColor: BACKGROUND_COLOR.GRAY,
   linkedNode: null,
   features: {
     workloads: true,

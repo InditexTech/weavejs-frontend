@@ -84,6 +84,8 @@ import { throttle } from "lodash";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { IMAGE_TEMPLATE_FIT } from "@/components/nodes/image-template/constants";
 
+const positionCache = {};
+
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
   const observerRef = React.useRef<ResizeObserver | null>(null);
@@ -271,7 +273,7 @@ export const NodeToolbar = () => {
         toolbarRef.current.style.setProperty("visibility", "visible");
       }
 
-      updateNodeToolbarPosition();
+      // updateNodeToolbarPosition();
     }
 
     function handleNodesChange(selectedNodes: WeaveSelection[]) {
@@ -334,6 +336,7 @@ export const NodeToolbar = () => {
         const konvaNode = stage?.findOne(`#${nodeId}`);
         if (konvaNode && toolbarRef.current) {
           nodesRect = konvaNode.getClientRect();
+          positionCache[nodeId] = nodesRect;
           hasNodes = true;
         }
       }
@@ -386,7 +389,7 @@ export const NodeToolbar = () => {
     if (nodes.length > 0 && toolbarRef.current) {
       const throttledUpdatePosition = throttle(updateNodeToolbarPosition, 10);
       observerRef.current = new ResizeObserver(() => {
-        updateNodeToolbarPosition();
+        throttledUpdatePosition();
       });
 
       observerRef.current.observe(toolbarRef.current);
@@ -394,7 +397,7 @@ export const NodeToolbar = () => {
       instance.addEventListener("onDrag", throttle(handleOnDrag, 10));
       instance.addEventListener(
         "onNodesChange",
-        throttle(handleNodesChange, 10)
+        throttle(handleNodesChange, 100)
       );
       instance.addEventListener("onZoomChange", throttledUpdatePosition);
       instance.addEventListener("onStageMove", throttledUpdatePosition);
