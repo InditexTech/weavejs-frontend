@@ -3988,7 +3988,7 @@ export const NodeToolbar = () => {
                 onClick={() => {
                   setNodeLayeringMenuOpen(false);
                   setNodeStyleMenuOpen(false);
-                  setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+                  setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
                 }}
                 label={
                   <div className="flex gap-3 justify-start items-center">

@@ -34,6 +34,7 @@ import {
   HardDriveUpload,
   PackagePlus,
   PackageOpen,
+  Paperclip,
 } from "lucide-react";
 import { useIACapabilities } from "@/store/ia";
 import { useIACapabilitiesV2 } from "@/store/ia-v2";
@@ -42,6 +43,7 @@ import { getImageBase64 } from "@/components/utils/images";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { setTemplateOnPosition } from "@/components/utils/templates";
 import { useTemplates } from "@/store/templates";
+import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -136,6 +138,8 @@ function useContextMenu() {
   );
 
   const { isExporting } = useExportToImageServerSide();
+
+  const promptInputAttachmentsController = usePromptInputAttachments();
 
   // const mutationUpload = useMutation({
   //   mutationFn: async ({
@@ -303,6 +307,62 @@ function useContextMenu() {
             });
           }
         }
+
+        // LINK IMAGE AS ATTACHMENT TOOLS
+        // if (isSingleImage) {
+        options.push({
+          id: "set-prompt-attachment-image",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Set as prompt attachment</div>
+            </div>
+          ),
+          icon: <Paperclip size={16} />,
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            const id = toast.loading("Generating attachment...");
+
+            const selectionImage = await getImageBase64({
+              instance,
+              nodes: nodes.map((n) => n.node?.key ?? ""),
+              options: {
+                format: "image/png",
+                padding: 0,
+                backgroundColor: "transparent",
+                pixelRatio: 1,
+              },
+            });
+
+            const [header, base64] = selectionImage.url.split(",");
+            const mime = header.match(/:(.*?);/)![1];
+
+            const binary = atob(base64);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+
+            for (let i = 0; i < len; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+
+            const selectionBlob = new Blob([bytes], { type: mime });
+
+            const file = new File([selectionBlob], "image.png", {
+              type: mime,
+            });
+
+            promptInputAttachmentsController.add([file]);
+
+            toast.dismiss(id);
+          },
+        });
+        // SEPARATOR
+        options.push({
+          id: "div-link-image-template-tools",
+          type: "divider",
+        });
+        // }
 
         // LINK IMAGE TOOLS
         if (isSingleImage) {

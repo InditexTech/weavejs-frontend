@@ -25,9 +25,7 @@ export const GeneratedImage = ({
 }: Readonly<GeneratedImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -48,7 +46,7 @@ export const GeneratedImage = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
@@ -97,7 +95,7 @@ export const GeneratedImage = ({
           <div className="absolute inset-0 checkered transition-transform duration-500 group-hover:opacity-60"></div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
+            className="w-full block border border-[#c9c9c9] object-cover relative transition-transform duration-500 group-hover:opacity-60"
             style={{
               aspectRatio: `${image.aspectRatio}`,
             }}

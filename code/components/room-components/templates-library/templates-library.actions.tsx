@@ -27,9 +27,7 @@ export const TemplatesLibraryActions = ({
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const mutationDelete = useMutation({
     mutationFn: async (templateId: string) => {
@@ -93,7 +91,7 @@ export const TemplatesLibraryActions = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.templates) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
     return null;
   }
 

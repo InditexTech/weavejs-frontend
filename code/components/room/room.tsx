@@ -25,6 +25,7 @@ import { HelpDrawer } from "../room-components/help/help-drawer";
 import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
 import { useCommentsHandler } from "../room-components/hooks/use-comments-handler";
 import { UploadVideo } from "../room-components/upload-video";
+import ChatBotPromptProvider from "../room-components/ai-components/chatbot.prompt.provider";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -191,26 +192,28 @@ export const Room = () => {
         )}
       </AnimatePresence>
       {loadedParams && room && user && storeProvider && comBusConnected && (
-        <WeaveProvider
-          getContainer={() => {
-            return document?.getElementById("weave") as HTMLDivElement;
-          }}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          store={storeProvider as any}
-          fonts={FONTS}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          nodes={NODES() as any[]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          plugins={PLUGINS(getUser) as any[]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          actions={ACTIONS(getUser) as any[]}
-        >
-          <UploadImage />
-          <UploadImages />
-          <UploadVideo />
-          <RoomLayout inShadowDom={false} />
-          <HelpDrawer />
-        </WeaveProvider>
+        <ChatBotPromptProvider>
+          <WeaveProvider
+            getContainer={() => {
+              return document?.getElementById("weave") as HTMLDivElement;
+            }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            store={storeProvider as any}
+            fonts={FONTS}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            nodes={NODES() as any[]}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            plugins={PLUGINS(getUser) as any[]}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            actions={ACTIONS(getUser) as any[]}
+          >
+            <UploadImage />
+            <UploadImages />
+            <UploadVideo />
+            <RoomLayout inShadowDom={false} />
+            <HelpDrawer />
+          </WeaveProvider>
+        </ChatBotPromptProvider>
       )}
       <Toasts />
     </>

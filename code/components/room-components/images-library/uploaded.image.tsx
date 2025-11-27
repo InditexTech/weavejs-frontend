@@ -22,9 +22,7 @@ export const UploadedImage = ({
 }: Readonly<UploadedImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const imagesLLMPopupVisible = useIACapabilities(
     (state) => state.llmPopup.visible
@@ -45,7 +43,7 @@ export const UploadedImage = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 

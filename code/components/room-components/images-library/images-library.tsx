@@ -23,7 +23,6 @@ import {
   Trash,
   Trash2,
   Unlink,
-  X,
 } from "lucide-react";
 import {
   WeaveStateElement,
@@ -54,6 +53,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ImageEntity } from "./types";
 import { ImagesLibraryActions } from "./images-library.actions";
+import { SidebarHeader } from "../sidebar-header";
 // import { eventBus } from "@/components/utils/events-bus";
 
 function isRelativeUrl(url: string) {
@@ -78,12 +78,7 @@ export const ImagesLibrary = () => {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
@@ -308,7 +303,7 @@ export const ImagesLibrary = () => {
       }
       return undefined; // no more pages
     },
-    enabled: sidebarLeftActive === "images",
+    enabled: sidebarActive === "images",
   });
 
   const appImages = React.useMemo(() => {
@@ -417,43 +412,36 @@ export const ImagesLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
-          <SidebarSelector title="Images" />
-        </div>
-        <div className="flex justify-end items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="selection-mode"
-              checked={showSelection}
-              onCheckedChange={(checked) => {
-                setShowSelection(checked);
-              }}
-              className="w-[32px] cursor-pointer"
-            />
-            <Label
-              htmlFor="selection-mode"
-              className="!font-inter !text-xs cursor-pointer"
-            >
-              SELECTION
-            </Label>
+      <SidebarHeader
+        actions={
+          <div className="flex justify-end items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="selection-mode"
+                checked={showSelection}
+                onCheckedChange={(checked) => {
+                  setShowSelection(checked);
+                }}
+                className="w-[32px] cursor-pointer"
+              />
+              <Label
+                htmlFor="selection-mode"
+                className="!font-inter !text-xs cursor-pointer"
+              >
+                SELECTION
+              </Label>
+            </div>
           </div>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+        }
+      >
+        <SidebarSelector title="Images" />
+      </SidebarHeader>
       {!workloadsEnabled && (
         <ScrollArea className="w-full h-[calc(100%-95px)] overflow-auto">
           <div className="flex flex-col gap-2 w-full">
@@ -698,11 +686,8 @@ export const ImagesLibrary = () => {
                                     className="bg-white rounded-none cursor-pointer"
                                     value={image.imageId}
                                     checked={isChecked}
-                                    onCheckedChange={(checked) => {
-                                      handleCheckboxChange(
-                                        checked as boolean,
-                                        image
-                                      );
+                                    onCheckedChange={(checked: boolean) => {
+                                      handleCheckboxChange(checked, image);
                                     }}
                                   />
                                 </div>

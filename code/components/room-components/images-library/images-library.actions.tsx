@@ -35,9 +35,7 @@ export const ImagesLibraryActions = ({
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
     (state) => state.llmPopup.visible
@@ -364,7 +362,7 @@ export const ImagesLibraryActions = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 

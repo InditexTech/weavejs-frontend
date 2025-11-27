@@ -27,15 +27,13 @@ export const Template = ({
 }: Readonly<TemplateProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   if (!instance) {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.templates) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
     return null;
   }
 
@@ -64,7 +62,7 @@ export const Template = ({
             className="bg-white rounded-none cursor-pointer"
             value={template.templateId}
             checked={selected}
-            onCheckedChange={(checked) => {
+            onCheckedChange={(checked: boolean) => {
               onChange(checked);
             }}
           />

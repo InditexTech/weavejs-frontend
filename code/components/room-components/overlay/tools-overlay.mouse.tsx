@@ -25,16 +25,12 @@ import {
   ArrowUpRight,
   Hexagon,
   ImagePlus,
-  PencilRuler,
-  ListTree,
-  SwatchBook,
-  Projector,
   ChevronDown,
   ChevronUp,
   MessageSquare,
   // MapPinned,
   Video,
-  Film,
+  // Film,
   LayoutPanelTop,
   // ChevronsLeftRightEllipsis,
 } from "lucide-react";
@@ -69,7 +65,6 @@ export function ToolsOverlayMouse() {
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
   const [imagesMenuOpen, setImagesMenuOpen] = React.useState(false);
-  const [sidebarsMenuOpen, setSidebarsMenuOpen] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -155,9 +150,12 @@ export function ToolsOverlayMouse() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="pointer-events-none absolute left-[16px] right-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
+      className="pointer-events-none absolute left-[20px] right-[420px] bottom-[134px] flex flex-col gap-2 justify-center items-center"
     >
-      <Toolbar orientation="horizontal" className="hidden 2xl:flex">
+      <Toolbar
+        orientation="horizontal"
+        className="hidden 2xl:flex rounded-b-none rounded-t-3xl border-b-0"
+      >
         <MoveToolTrigger />
         <ToolbarButton
           className="rounded-full !w-[40px]"
@@ -251,7 +249,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen((prev) => !prev);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                 }}
                 label={
                   <div className="flex gap-3 justify-start items-center">
@@ -271,9 +268,9 @@ export function ToolsOverlayMouse() {
                 e.preventDefault();
               }}
               align="start"
-              side="bottom"
+              side="top"
               alignOffset={0}
-              sideOffset={3}
+              sideOffset={10}
               className="font-inter rounded-none shadow-none"
             >
               <DropdownMenuItem
@@ -285,7 +282,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualShapeTool("rectangleTool");
                   SHAPES_TOOLS["rectangleTool"].onClick();
                 }}
@@ -302,7 +298,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualShapeTool("ellipseTool");
                   SHAPES_TOOLS["ellipseTool"].onClick();
                 }}
@@ -319,7 +314,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualShapeTool("regularPolygonTool");
                   SHAPES_TOOLS["regularPolygonTool"].onClick();
                 }}
@@ -336,7 +330,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualShapeTool("starTool");
                   SHAPES_TOOLS["starTool"].onClick();
                 }}
@@ -353,7 +346,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualShapeTool("colorTokenTool");
                   SHAPES_TOOLS["colorTokenTool"].onClick();
                 }}
@@ -410,7 +402,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen((prev) => !prev);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                 }}
                 label={
                   <div className="flex gap-3 justify-start items-center">
@@ -430,9 +421,9 @@ export function ToolsOverlayMouse() {
                 setStrokesMenuOpen(false);
               }}
               align="start"
-              side="bottom"
+              side="top"
               alignOffset={0}
-              sideOffset={3}
+              sideOffset={10}
               className="font-inter rounded-none shadow-none"
             >
               <DropdownMenuItem
@@ -444,7 +435,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("lineTool");
                   STROKES_TOOLS["lineTool"].onClick();
                 }}
@@ -461,7 +451,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("penTool");
                   STROKES_TOOLS["penTool"].onClick();
                 }}
@@ -478,7 +467,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("brushTool");
                   STROKES_TOOLS["brushTool"].onClick();
                 }}
@@ -495,7 +483,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualStrokesTool("arrowTool");
                   STROKES_TOOLS["arrowTool"].onClick();
                 }}
@@ -580,7 +567,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen((prev) => !prev);
-                  setSidebarsMenuOpen(false);
                 }}
                 label={
                   <div className="flex gap-3 justify-start items-center">
@@ -600,9 +586,9 @@ export function ToolsOverlayMouse() {
                 setImagesMenuOpen(false);
               }}
               align="start"
-              side="bottom"
+              side="top"
               alignOffset={0}
-              sideOffset={3}
+              sideOffset={10}
               className="font-inter rounded-none shadow-none"
             >
               <DropdownMenuItem
@@ -614,7 +600,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imageTool");
                   IMAGES_TOOLS["imageTool"].onClick();
                 }}
@@ -632,7 +617,6 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
                   setActualImagesTool("imagesTool");
                   IMAGES_TOOLS["imagesTool"].onClick();
                 }}
@@ -648,7 +632,6 @@ export function ToolsOverlayMouse() {
                     setShapesMenuOpen(false);
                     setStrokesMenuOpen(false);
                     setImagesMenuOpen(false);
-                    setSidebarsMenuOpen(false);
 
                     setActualImagesTool("generateImageTool");
                     setImagesLLMPopupType("create");
@@ -671,7 +654,6 @@ export function ToolsOverlayMouse() {
                     setShapesMenuOpen(false);
                     setStrokesMenuOpen(false);
                     setImagesMenuOpen(false);
-                    setSidebarsMenuOpen(false);
 
                     setActualImagesTool("generateImageTool");
                     sidebarToggle(null);
@@ -706,7 +688,6 @@ export function ToolsOverlayMouse() {
             setShapesMenuOpen(false);
             setStrokesMenuOpen(false);
             setImagesMenuOpen(false);
-            setSidebarsMenuOpen(false);
             triggerTool("videoTool");
             setShowSelectFileVideo(true);
           }}
@@ -811,198 +792,6 @@ export function ToolsOverlayMouse() {
             tooltipAlign="center"
           />
         )}
-        <DropdownMenu modal={false} open={sidebarsMenuOpen}>
-          <DropdownMenuTrigger
-            disabled={
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            className={cn(
-              "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-              {
-                ["font-normal"]: sidebarsMenuOpen,
-                ["font-extralight"]: !sidebarsMenuOpen,
-                ["disabled:cursor-default disabled:opacity-50"]:
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-              }
-            )}
-            asChild
-          >
-            <ToolbarButton
-              className="rounded-full !w-[40px]"
-              icon={<PencilRuler className="px-2" size={40} strokeWidth={1} />}
-              disabled={
-                weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-              }
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen((prev) => !prev);
-              }}
-              label={
-                <div className="flex gap-3 justify-start items-center">
-                  <p>Toolbars</p>
-                  <ShortcutElement
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌘ Z",
-                      [SYSTEM_OS.OTHER]: "Ctrl Z",
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="top"
-              tooltipAlign="center"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            onCloseAutoFocus={(e) => {
-              e.preventDefault();
-            }}
-            onFocusOutside={() => {
-              setSidebarsMenuOpen(false);
-            }}
-            align="start"
-            side="bottom"
-            alignOffset={0}
-            sideOffset={8}
-            className="font-inter rounded-none shadow-none"
-          >
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.images);
-              }}
-            >
-              <Images strokeWidth={1} /> Images
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.videos);
-              }}
-            >
-              <Film strokeWidth={1} /> Videos
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl I"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.frames);
-              }}
-            >
-              <Projector strokeWidth={1} /> Frames
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.templates);
-              }}
-            >
-              <LayoutPanelTop strokeWidth={1} /> Templates
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-              }}
-            >
-              <SwatchBook strokeWidth={1} /> Color tokens
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ C" : "Alt Ctrl C"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            {threadsEnabled && (
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
-                  sidebarToggle(SIDEBAR_ELEMENTS.comments);
-                }}
-              >
-                <MessageSquare strokeWidth={1} /> Comments
-                <DropdownMenuShortcut>
-                  {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-              }}
-            >
-              <ListTree strokeWidth={1} /> Elements tree
-              <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {/* <ToolbarDivider />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          active={showMinimap}
-          onClick={() => {
-            setShowMinimap(!showMinimap);
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Minimap</p>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "H",
-                  [SYSTEM_OS.OTHER]: "H",
-                }}
-              />
-            </div>
-          }
-          tooltipSide="top"
-          tooltipAlign="center"
-        /> */}
         <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"

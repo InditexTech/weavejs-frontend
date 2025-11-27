@@ -17,7 +17,7 @@ import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { CropProperties } from "../node-properties/crop-properties";
-import { EyeOff, Lock, X } from "lucide-react";
+import { EyeOff, Lock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { MetaProperties } from "../node-properties/meta-properties";
@@ -28,6 +28,9 @@ import { RegularPolygonProperties } from "../node-properties/regular-polygon-pro
 import { AlignProperties } from "../node-properties/align-properties";
 import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ImageTemplateProperties } from "../node-properties/image-template-properties";
+// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { SidebarSelector } from "../sidebar-selector";
+import { SidebarHeader } from "../sidebar-header";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -36,9 +39,7 @@ export const NodeProperties = () => {
   const nodes = useWeave((state) => state.selection.nodes);
   const setNode = useWeave((state) => state.setNode);
 
-  const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
@@ -50,11 +51,11 @@ export const NodeProperties = () => {
     (state) => state.nodeProperties.action
   );
 
-  React.useEffect(() => {
-    if (!node || !nodes || (nodes && nodes.length === 0)) {
-      setSidebarActive(null, "right");
-    }
-  }, [node, nodes, setSidebarActive]);
+  // React.useEffect(() => {
+  //   if (!node || !nodes || (nodes && nodes.length === 0)) {
+  //     setSidebarActive(SIDEBAR_ELEMENTS.nodesTree);
+  //   }
+  // }, [node, nodes, setSidebarActive]);
 
   React.useEffect(() => {
     if (
@@ -79,11 +80,11 @@ export const NodeProperties = () => {
       return;
     }
 
-    if (!actualAction || !node) {
-      setNodePropertiesAction(undefined);
-      setSidebarActive(null, "right");
-      return;
-    }
+    // if (!actualAction || !node) {
+    //   setNodePropertiesAction(undefined);
+    //   setSidebarActive(SIDEBAR_ELEMENTS.nodesTree);
+    //   return;
+    // }
 
     if (node) {
       setNodePropertiesAction("update");
@@ -107,89 +108,83 @@ export const NodeProperties = () => {
 
   const title = useNodeActionName();
 
-  if (sidebarRightActive !== "nodeProperties") {
+  if (sidebarActive !== "nodeProperties") {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex justify-between font-inter font-light text-[24px] items-center text-md pl-2 uppercase">
-          {title}
-        </div>
-        <div className="flex justify-end items-center gap-1">
-          {nodePropertiesAction === "update" && (
-            <>
-              <button
-                className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-                onPointerDown={() => {
-                  if (!instance) return;
+      <SidebarHeader
+        actions={
+          <div className="flex justify-end items-center gap-1">
+            {nodePropertiesAction === "update" && (
+              <>
+                <button
+                  className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+                  onPointerDown={() => {
+                    if (!instance) return;
 
-                  for (const node of nodes) {
-                    const isVisible = instance.allNodesVisible([node.instance]);
+                    for (const node of nodes) {
+                      const isVisible = instance.allNodesVisible([
+                        node.instance,
+                      ]);
 
-                    if (!isVisible) {
-                      instance.showNode(node.instance);
-                      continue;
+                      if (!isVisible) {
+                        instance.showNode(node.instance);
+                        continue;
+                      }
+                      if (isVisible) {
+                        instance.hideNode(node.instance);
+                      }
                     }
-                    if (isVisible) {
-                      instance.hideNode(node.instance);
-                    }
-                  }
-                }}
-                onClick={() => {
-                  if (!instance) return;
+                  }}
+                  onClick={() => {
+                    if (!instance) return;
 
-                  for (const node of nodes) {
-                    const isVisible = instance.allNodesVisible([node.instance]);
+                    for (const node of nodes) {
+                      const isVisible = instance.allNodesVisible([
+                        node.instance,
+                      ]);
 
-                    if (!isVisible) {
-                      instance.showNode(node.instance);
-                      continue;
+                      if (!isVisible) {
+                        instance.showNode(node.instance);
+                        continue;
+                      }
+                      if (isVisible) {
+                        instance.hideNode(node.instance);
+                      }
                     }
-                    if (isVisible) {
-                      instance.hideNode(node.instance);
-                    }
-                  }
-                }}
-              >
-                <EyeOff size={16} strokeWidth={1} />
-              </button>
-              <button
-                className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-                onClick={() => {
-                  if (!instance) return;
+                  }}
+                >
+                  <EyeOff size={16} strokeWidth={1} />
+                </button>
+                <button
+                  className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
+                  onClick={() => {
+                    if (!instance) return;
 
-                  for (const node of nodes) {
-                    const isLocked = instance.allNodesLocked([node.instance]);
+                    for (const node of nodes) {
+                      const isLocked = instance.allNodesLocked([node.instance]);
 
-                    if (!isLocked) {
-                      instance.lockNode(node.instance);
-                      continue;
+                      if (!isLocked) {
+                        instance.lockNode(node.instance);
+                        continue;
+                      }
+                      if (isLocked) {
+                        instance.unlockNode(node.instance);
+                      }
                     }
-                    if (isLocked) {
-                      instance.unlockNode(node.instance);
-                    }
-                  }
-                }}
-              >
-                <Lock size={16} strokeWidth={1} />
-              </button>
-            </>
-          )}
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-            onPointerDown={() => {
-              setSidebarActive(null, "right");
-            }}
-            onClick={() => {
-              setSidebarActive(null, "right");
-            }}
-          >
-            <X size={16} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+                  }}
+                >
+                  <Lock size={16} strokeWidth={1} />
+                </button>
+              </>
+            )}
+          </div>
+        }
+      >
+        <SidebarSelector title={title} />
+      </SidebarHeader>
       <ScrollArea className="w-full h-[calc(100%-95px)]">
         <div className="w-full flex flex-col">
           <MetaProperties />

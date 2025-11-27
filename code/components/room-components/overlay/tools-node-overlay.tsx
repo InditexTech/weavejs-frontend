@@ -233,7 +233,7 @@ export function ToolsNodeOverlay() {
 
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
-      setSidebarActive(null, "right");
+      setSidebarActive(SIDEBAR_ELEMENTS.aiChat);
       return;
     }
 
@@ -2084,7 +2084,7 @@ export function ToolsNodeOverlay() {
             setNodeStrokeMenuOpen(false);
             setNodeStrokeWidthMenuOpen(false);
             setNodeStrokeStyleMenuOpen(false);
-            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
           }}
           label={
             <div className="flex gap-3 justify-start items-center">

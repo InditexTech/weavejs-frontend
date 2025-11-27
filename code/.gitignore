@@ -54,3 +54,7 @@ node_modules/
 /playwright/.cache/
 
 env.sh
+
+.mastra
+_chats
+mastra.db*

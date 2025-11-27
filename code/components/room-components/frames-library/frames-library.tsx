@@ -18,7 +18,6 @@ import {
   SquareCheck,
   StepBack,
   StepForward,
-  X,
   XIcon,
 } from "lucide-react";
 import { generatePresentation, PresentationImage, toImageAsync } from "./utils";
@@ -33,17 +32,13 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
+import { SidebarHeader } from "../sidebar-header";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
@@ -159,108 +154,101 @@ export const FramesLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
 
   return (
     <>
       <div className="w-full h-full">
-        <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
-          <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
-            <SidebarSelector title="Frames" />
-          </div>
-          <div className="flex justify-end items-center gap-4">
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-                    disabled={selectedFrames.length === 0}
-                    onClick={() => {
-                      setActualFrame(0);
-                      setPresentationMode((prev) => !prev);
-                    }}
+        <SidebarHeader
+          actions={
+            <>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      disabled={selectedFrames.length === 0}
+                      onClick={() => {
+                        setActualFrame(0);
+                        setPresentationMode((prev) => !prev);
+                      }}
+                    >
+                      <Presentation
+                        className="group-disabled:text-[#cccccc]"
+                        size={20}
+                        strokeWidth={1}
+                      />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="center"
+                    className="rounded-none"
                   >
-                    <Presentation
-                      className="group-disabled:text-[#cccccc]"
-                      size={20}
-                      strokeWidth={1}
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="rounded-none"
-                >
-                  Presentation mode
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-                    onClick={() => {
-                      if (selectedFrames.length === 0) {
-                        const frames = framesAvailable.map((frame) => {
-                          const attrs = frame.getAttrs();
-                          return attrs.id ?? "";
-                        });
-                        setSelectedFrames(frames);
-                      } else {
-                        setSelectedFrames([]);
-                      }
-                    }}
+                    Presentation mode
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      onClick={() => {
+                        if (selectedFrames.length === 0) {
+                          const frames = framesAvailable.map((frame) => {
+                            const attrs = frame.getAttrs();
+                            return attrs.id ?? "";
+                          });
+                          setSelectedFrames(frames);
+                        } else {
+                          setSelectedFrames([]);
+                        }
+                      }}
+                    >
+                      <SquareCheck size={20} strokeWidth={1} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="center"
+                    className="rounded-none"
                   >
-                    <SquareCheck size={20} strokeWidth={1} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="rounded-none"
-                >
-                  Select all frames
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-                    disabled={selectedFrames.length === 0}
-                    onClick={exportFramesHandler}
+                    Select all frames
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      disabled={selectedFrames.length === 0}
+                      onClick={exportFramesHandler}
+                    >
+                      <Download
+                        className="group-disabled:text-[#cccccc]"
+                        size={20}
+                        strokeWidth={1}
+                      />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="center"
+                    className="rounded-none"
                   >
-                    <Download
-                      className="group-disabled:text-[#cccccc]"
-                      size={20}
-                      strokeWidth={1}
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="rounded-none"
-                >
-                  Export as PDF
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <button
-              className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-              onClick={() => {
-                setSidebarActive(null);
-              }}
-            >
-              <X size={20} strokeWidth={1} />
-            </button>
-          </div>
-        </div>
+                    Export as PDF
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          }
+        >
+          <SidebarSelector title="Frames" />
+        </SidebarHeader>
         <ScrollArea className="w-full h-[calc(100%-95px)]">
           <div className="flex flex-col gap-[24px] w-full h-full p-[24px]">
             {framesAvailable.length === 0 && (
