@@ -84,8 +84,6 @@ import { throttle } from "lodash";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { IMAGE_TEMPLATE_FIT } from "@/components/nodes/image-template/constants";
 
-const positionCache = {};
-
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
   const observerRef = React.useRef<ResizeObserver | null>(null);
@@ -336,7 +334,6 @@ export const NodeToolbar = () => {
         const konvaNode = stage?.findOne(`#${nodeId}`);
         if (konvaNode && toolbarRef.current) {
           nodesRect = konvaNode.getClientRect();
-          positionCache[nodeId] = nodesRect;
           hasNodes = true;
         }
       }
