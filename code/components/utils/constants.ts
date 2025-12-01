@@ -89,7 +89,6 @@ import {
 import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 import { getImageBase64 } from "./images";
-
 const FONTS = async (): Promise<WeaveFont[]> => {
   const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
     weight: "400",
