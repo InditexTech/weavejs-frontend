@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PromptInputMessage } from "@/components/ai-elements/prompt-input";
-import { ChatMetadata } from "@/mastra/manager/chat";
-import { ChatRequestOptions } from "ai";
-import { v4 as uuidv4 } from "uuid";
+import { ChatRequestOptions, ChatStatus } from "ai";
 import { create } from "zustand";
 
 export type ImageSize = "1K" | "2K" | "4K";
@@ -27,11 +25,10 @@ export type ImageOptions = {
 
 interface IAChatState {
   enabled: boolean;
-  status: any;
+  status: ChatStatus | undefined;
   defined: boolean;
   threadId: string;
   resourceId: string;
-  metadata: ChatMetadata | undefined;
   loaded: boolean;
   view: "chat" | "chats";
   imageOptions: ImageOptions;
@@ -42,11 +39,10 @@ interface IAChatState {
       ) => Promise<void>)
     | null;
   setEnabled: (newEnabled: boolean) => void;
-  setStatus: (newStatus: any) => void;
+  setStatus: (newStatus: ChatStatus) => void;
   setDefined: (newDefined: boolean) => void;
   setThreadId: (newThreadId: string) => void;
   setResourceId: (newResourceId: string) => void;
-  setMetadata: (newMetadata: ChatMetadata) => void;
   setLoaded: (newLoaded: boolean) => void;
   setView: (newView: "chat" | "chats") => void;
   setSendMessage: (
@@ -61,7 +57,7 @@ interface IAChatState {
 
 export const useIAChat = create<IAChatState>()((set) => ({
   enabled: sessionStorage.getItem("weave_ai_enabled") === "true",
-  status: null,
+  status: undefined,
   sendMessage: null,
   defined: false,
   threadId: "undefined",
@@ -97,11 +93,6 @@ export const useIAChat = create<IAChatState>()((set) => ({
     set((state) => ({
       ...state,
       resourceId: newResourceId,
-    })),
-  setMetadata: (newMetadata) =>
-    set((state) => ({
-      ...state,
-      metadata: newMetadata,
     })),
   setLoaded: (newLoaded) =>
     set((state) => ({

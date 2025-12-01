@@ -1,55 +1,79 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
 import { useIAChat } from "@/store/ia-chat";
 import { getChats } from "@/api/get-chats";
 import { OrbitProgress } from "react-loading-indicators";
 import { ArrowRight, MessagesSquare } from "lucide-react";
 import { ConversationEmptyState } from "@/components/ai-elements/conversation";
+import { useCollaborationRoom } from "@/store/store";
+import { Chat } from "@/mastra/manager/chat";
+
+type ChatMessagesPage = {
+  chats: Chat[];
+  limit: number;
+  offset: number;
+  total: number;
+};
+
+const CHATS_LIMIT = 50;
 
 export const ChatBotChats = () => {
+  const room = useCollaborationRoom((state) => state.room);
+
   const resourceId = useIAChat((state) => state.resourceId);
   const setThreadId = useIAChat((state) => state.setThreadId);
   const setAiView = useIAChat((state) => state.setView);
 
-  const { data: chats, isFetching } = useQuery({
-    queryKey: ["getChats", resourceId],
-    queryFn: () => {
-      if (!resourceId) return [];
+  const { data: chats, isFetching } = useInfiniteQuery<ChatMessagesPage>({
+    queryKey: ["getChats", room, resourceId],
+    initialPageParam: 0 as number,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.chats.length > 0 ? allPages.length + 1 : undefined,
+    queryFn: ({ pageParam = 0 }) => {
+      if (!resourceId || !room) return [];
 
-      return getChats(resourceId);
+      return getChats(
+        room,
+        resourceId,
+        CHATS_LIMIT,
+        (pageParam as number) * CHATS_LIMIT
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any;
     },
-    enabled: !!resourceId,
+    enabled: !!resourceId && !!room,
   });
+
+  const allChats = chats?.pages.flatMap((page) => page.chats) || [];
 
   if (isFetching) {
     return (
       <div className="w-full h-full flex flex-col gap-3 justify-center items-center">
         <OrbitProgress color="#000000" size="small" text="" textColor="" />
-        <div className="font-inter text-sm">Loading assistant chats</div>
+        <div className="font-inter text-sm">Loading chats</div>
       </div>
     );
   }
 
   return (
     <div className="w-full h-full flex flex-col overflow-auto">
-      {chats.length === 0 && (
+      {allChats.length === 0 && (
         <ConversationEmptyState
           description="Ask the bot a question to start a new chat. Or create it by clicking on the create chat button."
           icon={<MessagesSquare className="size-6" />}
-          title="AI Assistant"
+          title="Chats"
         />
       )}
 
       {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        chats.map((chat: any) => (
+        allChats.map((chat: any) => (
           <button
-            key={chat.threadId}
+            key={chat.chatId}
             className="w-full flex justify-between items-center p-2 px-[24px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
             onClick={() => {
-              setThreadId(chat.threadId);
+              setThreadId(chat.chatId);
               setAiView("chat");
             }}
           >
@@ -58,7 +82,7 @@ export const ChatBotChats = () => {
                 {chat.title || "Untitled Chat"}
               </h3>
               <p className="font-inter text-xs text-gray-600">
-                Created at: {new Date(chat.createdAt).toLocaleString()}
+                Created at: {new Date(chat.updatedAt).toLocaleString()}
               </p>
             </div>
             <ArrowRight strokeWidth={1} size={20} />

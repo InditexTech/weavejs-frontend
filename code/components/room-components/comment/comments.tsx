@@ -215,7 +215,7 @@ export const Comments = () => {
         actions={
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]">
+              <button className="cursor-pointer flex justify-center items-center w-[20px] h-[32px] text-center bg-transparent hover:text-[#c9c9c9]">
                 <Ellipsis size={20} strokeWidth={1} />
               </button>
             </DropdownMenuTrigger>
@@ -271,7 +271,7 @@ export const Comments = () => {
         </div>
       )}
       {!isLoading && data.items.length > 0 && (
-        <ScrollArea className="w-full h-[calc(100%-95px-40px)] overflow-auto">
+        <ScrollArea className="w-full h-[calc(100%-65px-73px-40px)] overflow-auto">
           <div className="flex flex-col gap-3 w-full p-5">
             {data.items.map((thread: ThreadEntity, index: number) => {
               return (

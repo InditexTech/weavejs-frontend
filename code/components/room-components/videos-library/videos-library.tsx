@@ -285,8 +285,8 @@ export const VideosLibrary = () => {
       )}
       <ScrollArea
         className={cn("w-full overflow-auto", {
-          ["h-[calc(100%-95px-40px-40px)]"]: showSelection,
-          ["h-[calc(100%-95px)]"]: !showSelection,
+          ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
+          ["h-[calc(100%-65px-73px)]"]: !showSelection,
         })}
       >
         <div

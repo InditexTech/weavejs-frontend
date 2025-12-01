@@ -31,6 +31,7 @@ const ChatBotPrompt = () => {
 
   const status = useIAChat((state) => state.status);
   const sendMessage = useIAChat((state) => state.sendMessage);
+  const setAiView = useIAChat((state) => state.setView);
 
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
@@ -41,9 +42,13 @@ const ChatBotPrompt = () => {
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files?.length);
 
+      console.log("Submitting prompt input message:", message, hasAttachments);
+
       if (!(hasText || hasAttachments)) {
         return;
       }
+
+      console.log("Sending message to AI chat:", message);
 
       if (!sendMessage) {
         console.warn("sendMessage function is not set.");
@@ -59,9 +64,17 @@ const ChatBotPrompt = () => {
           },
         },
       });
+      setAiView("chat");
       setSidebarActive(SIDEBAR_ELEMENTS.aiChat);
     },
-    [imageAspectRatio, imagesSize, sendMessage, setSidebarActive]
+    [
+      imagesAmount,
+      imageAspectRatio,
+      imagesSize,
+      sendMessage,
+      setAiView,
+      setSidebarActive,
+    ]
   );
 
   const attachments = usePromptInputAttachments();
@@ -98,35 +111,38 @@ const ChatBotPrompt = () => {
           <PromptInputFooter>
             <PromptInputTools className="gap-4">
               <div className="flex justify-start items-center gap-2">
-                <Label>Amount</Label>
+                <Label className="font-inter text-xs">Amount</Label>
                 <PromptInputSelect
                   value={imagesAmount}
                   onValueChange={setImagesAmount}
                 >
-                  <PromptInputSelectTrigger className="cursor-pointer font-inter">
-                    <PromptInputSelectValue placeholder="Amount" />
+                  <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs">
+                    <PromptInputSelectValue
+                      placeholder="Amount"
+                      className="font-inter text-xs"
+                    />
                   </PromptInputSelectTrigger>
                   <PromptInputSelectContent className="rounded-none">
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="1"
                     >
                       1
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="2"
                     >
                       2
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="3"
                     >
                       3
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="4"
                     >
                       4
@@ -135,59 +151,62 @@ const ChatBotPrompt = () => {
                 </PromptInputSelect>
               </div>
               <div className="flex justify-start items-center gap-2">
-                <Label>Aspect Ratio</Label>
+                <Label className="font-inter text-xs">Aspect Ratio</Label>
                 <PromptInputSelect
                   value={imageAspectRatio}
                   onValueChange={setImageAspectRatio}
                 >
-                  <PromptInputSelectTrigger className="cursor-pointer font-inter">
-                    <PromptInputSelectValue placeholder="Aspect Ratio" />
+                  <PromptInputSelectTrigger className="cursor-pointer font-inter  text-xs">
+                    <PromptInputSelectValue
+                      placeholder="Aspect Ratio"
+                      className="font-inter  text-xs"
+                    />
                   </PromptInputSelectTrigger>
                   <PromptInputSelectContent className="rounded-none">
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="1:1"
                     >
                       1:1
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="2:3"
                     >
                       2:3
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="3:2"
                     >
                       3:2
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="3:4"
                     >
                       3:4
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="4:3"
                     >
                       4:3
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="9:16"
                     >
                       9:16
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="16:9"
                     >
                       16:9
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer rounded-none font-inter"
+                      className="cursor-pointer rounded-none font-inter text-xs"
                       value="21:9"
                     >
                       21:9
@@ -196,29 +215,32 @@ const ChatBotPrompt = () => {
                 </PromptInputSelect>
               </div>
               <div className="flex justify-start items-center gap-2">
-                <Label>Size</Label>
+                <Label className="font-inter text-xs">Size</Label>
                 <PromptInputSelect
                   value={imagesSize}
                   onValueChange={setImagesSize}
                 >
-                  <PromptInputSelectTrigger className="cursor-pointer font-inter">
-                    <PromptInputSelectValue placeholder="Size" />
+                  <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs">
+                    <PromptInputSelectValue
+                      placeholder="Size"
+                      className="font-inter  text-xs"
+                    />
                   </PromptInputSelectTrigger>
                   <PromptInputSelectContent className="rounded-none">
                     <PromptInputSelectItem
-                      className="cursor-pointer font-inter rounded-none"
+                      className="cursor-pointer font-inter rounded-none text-xs"
                       value="1K"
                     >
                       1K
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer font-inter rounded-none"
+                      className="cursor-pointer font-inter rounded-none text-xs"
                       value="2K"
                     >
                       2K
                     </PromptInputSelectItem>
                     <PromptInputSelectItem
-                      className="cursor-pointer font-inter rounded-none"
+                      className="cursor-pointer font-inter rounded-none text-xs"
                       value="4K"
                     >
                       4K

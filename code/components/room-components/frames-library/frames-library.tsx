@@ -168,7 +168,7 @@ export const FramesLibrary = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
                       disabled={selectedFrames.length === 0}
                       onClick={() => {
                         setActualFrame(0);
@@ -195,7 +195,7 @@ export const FramesLibrary = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      className="cursor-pointer bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
                       onClick={() => {
                         if (selectedFrames.length === 0) {
                           const frames = framesAvailable.map((frame) => {
@@ -224,7 +224,7 @@ export const FramesLibrary = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
+                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
                       disabled={selectedFrames.length === 0}
                       onClick={exportFramesHandler}
                     >
@@ -249,7 +249,7 @@ export const FramesLibrary = () => {
         >
           <SidebarSelector title="Frames" />
         </SidebarHeader>
-        <ScrollArea className="w-full h-[calc(100%-95px)]">
+        <ScrollArea className="w-full h-[calc(100%-65px-73px)]">
           <div className="flex flex-col gap-[24px] w-full h-full p-[24px]">
             {framesAvailable.length === 0 && (
               <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">

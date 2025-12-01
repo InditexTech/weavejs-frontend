@@ -28,6 +28,7 @@ import React from "react";
 import { useIAChat } from "@/store/ia-chat";
 import { ThreeDot } from "react-loading-indicators";
 import { GeneratedImage } from "@google/genai";
+import { useCollaborationRoom } from "@/store/store";
 
 type ChatBotConversationProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,6 +38,8 @@ type ChatBotConversationProps = {
 export const ChatBotConversation = ({
   initialMessages,
 }: ChatBotConversationProps) => {
+  const room = useCollaborationRoom((state) => state.room);
+
   const threadId = useIAChat((state) => state.threadId);
   const resourceId = useIAChat((state) => state.resourceId);
   const setStatus = useIAChat((state) => state.setStatus);
@@ -47,6 +50,7 @@ export const ChatBotConversation = ({
     transport: new DefaultChatTransport({
       api: `https://localhost:3000/api/ai/chats/${threadId}`,
       headers: {
+        ai_room_id: room ?? "",
         ai_resource_id: resourceId,
       },
     }),
@@ -58,6 +62,8 @@ export const ChatBotConversation = ({
   }, [status, sendMessage]);
 
   if (!messages) return null;
+
+  console.log("AQUI? chat", messages, status);
 
   return (
     <Conversation className="relative size-full">
@@ -85,7 +91,6 @@ export const ChatBotConversation = ({
           return (
             <React.Fragment key={message.id}>
               {message.parts.map((part, i) => {
-                console.log("part", part.type, part);
                 switch (part.type) {
                   case "tool-extractGenerationParametersTool":
                     if (

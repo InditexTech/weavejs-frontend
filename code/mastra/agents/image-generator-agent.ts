@@ -30,6 +30,7 @@ export type ImageOptions = {
 };
 
 export type ImageGeneratorRuntimeContext = {
+  roomId: string;
   threadId: string;
   resourceId: string;
   referenceImages: ReferenceImage[];

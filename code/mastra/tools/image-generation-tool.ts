@@ -6,7 +6,6 @@ import { ImagesPersistenceHandler } from "../manager/images";
 import {
   ImageAspectRatio,
   ImageGeneratorRuntimeContext,
-  ImageOptions,
   ImageSize,
   ReferenceImage,
 } from "../agents/image-generator-agent";
@@ -44,6 +43,7 @@ export const imageGenerationTool = createTool({
   ),
   execute: async ({ runtimeContext, context }) => {
     const { prompt, samples, aspectRatio, size } = context;
+    const roomId = runtimeContext.get("roomId") as string;
     const threadId = runtimeContext.get("threadId") as string;
     const resourceId = runtimeContext.get("resourceId") as string;
     const referenceImages = runtimeContext.get(
@@ -51,6 +51,7 @@ export const imageGenerationTool = createTool({
     ) as ReferenceImage[];
 
     return await generateImages(prompt, {
+      roomId,
       threadId,
       resourceId,
       referenceImages,
@@ -84,6 +85,7 @@ const generateImages = async (
     })
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const imageGenerationPrompt: any[] = [{ text: prompt }];
   const referencedImages = context.referenceImages ?? [];
   if (referencedImages.length > 0) {
@@ -102,7 +104,7 @@ const generateImages = async (
 
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-image-preview",
-      contents: imageGenerationPrompt,
+      contents: `${imageGenerationPrompt}. Only generate a single image.`,
       config: {
         imageConfig: {
           aspectRatio: context.imageOptions.aspectRatio,
@@ -123,9 +125,10 @@ const generateImages = async (
     for (const part of response.candidates[0].content?.parts || []) {
       if (part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
         const buffer = base64ToUint8Array(part.inlineData.data);
+        const roomId = context.roomId;
         const threadId = context.threadId;
         const imageId = uuidv4();
-        const imageName = `${threadId}/${imageId}`;
+        const imageName = `${roomId}/${threadId}/${imageId}`;
 
         await imageHandler?.persist(
           imageName,
@@ -137,7 +140,7 @@ const generateImages = async (
         );
 
         actualImage.status = "generated";
-        actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/chatId/${threadId}/images/${imageId}`;
+        actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
       }
     }
   }

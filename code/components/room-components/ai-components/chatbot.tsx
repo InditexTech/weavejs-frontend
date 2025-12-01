@@ -2,7 +2,7 @@
 
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
 import { ChatBotConversation } from "./chatbot.conversation";
@@ -13,32 +13,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  MessageCircleMore,
-  MessageCirclePlus,
-  MessageCircleX,
-} from "lucide-react";
+import { MessageCirclePlus } from "lucide-react";
 import { useIAChat } from "@/store/ia-chat";
 import { ChatBotChats } from "./chatbot.chats";
 import { useCollaborationRoom } from "@/store/store";
 import { cn } from "@/lib/utils";
 import { OrbitProgress } from "react-loading-indicators";
-import { ChatBotDialogDeleteChat } from "./chatbot.dialog.delete-chat";
+import { postChat } from "@/api/post-chat";
+import { ChatBotChatInfo } from "./chatbot.chat-info";
+import { createChat } from "@/mastra/manager/chat";
 
 export const ChatBot = () => {
-  const [threadToDelete, setThreadToDelete] = React.useState<string | null>(
-    null
-  );
-  const [openThreadDelete, setOpenThreadDelete] =
-    React.useState<boolean>(false);
-
   const threadId = useIAChat((state) => state.threadId);
   const resourceId = useIAChat((state) => state.resourceId);
-  const metadata = useIAChat((state) => state.metadata);
   const aiView = useIAChat((state) => state.view);
   const setThreadId = useIAChat((state) => state.setThreadId);
   const setResourceId = useIAChat((state) => state.setResourceId);
-  const setMetadata = useIAChat((state) => state.setMetadata);
   const setAiView = useIAChat((state) => state.setView);
 
   const user = useCollaborationRoom((state) => state.user);
@@ -46,19 +36,56 @@ export const ChatBot = () => {
 
   const queryClient = useQueryClient();
 
+  const mutationCreateChat = useMutation({
+    mutationFn: async ({
+      roomId,
+      chatId,
+      resourceId,
+    }: {
+      roomId: string;
+      chatId: string;
+      resourceId: string;
+    }) => {
+      return await postChat(roomId, chatId, resourceId, {
+        status: "active",
+        title: "Untitled chat",
+      });
+    },
+  });
+
   const {
     data: chatData,
     isFetched,
     isFetching,
   } = useQuery({
-    queryKey: ["getChat", threadId],
+    queryKey: ["getChat", room, threadId, resourceId],
     queryFn: () => {
-      if (!threadId || !resourceId) return [];
+      if (!room || !threadId || !resourceId) return [];
 
-      return getChat(threadId, resourceId);
+      return getChat(room, threadId, resourceId);
     },
+    refetchOnWindowFocus: false,
     enabled: threadId !== "undefined" && resourceId !== "undefined",
   });
+
+  React.useEffect(() => {
+    async function createDefaultChat() {
+      console.log("No chat data found, creating default chat.");
+      await mutationCreateChat.mutate({
+        roomId: room ?? "",
+        chatId: threadId,
+        resourceId: resourceId ?? "",
+      });
+
+      const queryKey = ["getChat", room, threadId, resourceId];
+      queryClient.invalidateQueries({ queryKey });
+    }
+
+    console.log("Chat data fetched:", { isFetched, chatData });
+    if (!isFetching && isFetched && !chatData) {
+      createDefaultChat();
+    }
+  }, [isFetched, isFetching, chatData, room, threadId, resourceId]);
 
   React.useEffect(() => {
     if (!user) return;
@@ -92,17 +119,6 @@ export const ChatBot = () => {
     }
   }, [user, room, threadId, resourceId]);
 
-  React.useEffect(() => {
-    if (
-      isFetched &&
-      chatData &&
-      threadId !== "undefined" &&
-      resourceId !== "undefined"
-    ) {
-      setMetadata(chatData.metadata);
-    }
-  }, [isFetched, chatData, threadId, resourceId]);
-
   return (
     <>
       <div className="w-full h-full">
@@ -126,6 +142,11 @@ export const ChatBot = () => {
                           `weave.js_${room}_${user.id}_ai_thread_id`,
                           newTreadId
                         );
+
+                        await createChat(room, newTreadId, resourceId, {
+                          status: "active",
+                          title: "Untitled chat",
+                        });
 
                         setThreadId(newTreadId);
                         setAiView("chat");
@@ -153,65 +174,7 @@ export const ChatBot = () => {
         >
           <SidebarSelector title="AI Assistant" />
         </SidebarHeader>
-        {aiView === "chat" && isFetched && (
-          <div className="w-full flex justify-between items-center px-[24px] py-[12px] gap-1 border-b-[0.5px] border-[#c9c9c9]">
-            <div className="w-full flex flex-col text-left">
-              <div className="truncate text-base font-inter uppercase">
-                {metadata?.title || "Untitled Chat"}
-              </div>
-              <div className="w-full text-xs font-inter uppercase truncate">
-                {new Date(metadata?.createdAt || "").toLocaleString()}
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end items-center">
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:text-[#c9c9c9]"
-                      onClick={() => {
-                        setAiView("chats");
-                      }}
-                    >
-                      <MessageCircleMore size={20} strokeWidth={1} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    sideOffset={8}
-                    side="bottom"
-                    align="end"
-                    className="rounded-none"
-                  >
-                    Change chat
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:text-[#c9c9c9]"
-                      onClick={() => {
-                        setThreadToDelete(threadId);
-                        setOpenThreadDelete(true);
-                      }}
-                    >
-                      <MessageCircleX color="red" size={20} strokeWidth={1} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    sideOffset={8}
-                    side="bottom"
-                    align="end"
-                    className="rounded-none"
-                  >
-                    Delete chat
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        )}
+        <ChatBotChatInfo chat={chatData?.chat} />
         <div
           className={cn("", {
             ["h-[calc(100%-65px-80px-65px)]"]: aiView === "chat",
@@ -235,13 +198,6 @@ export const ChatBot = () => {
           {!isFetching && aiView === "chats" && <ChatBotChats />}
         </div>
       </div>
-      {threadToDelete && (
-        <ChatBotDialogDeleteChat
-          threadId={threadToDelete}
-          open={openThreadDelete}
-          setOpen={setOpenThreadDelete}
-        />
-      )}
     </>
   );
 };

@@ -6,7 +6,7 @@ import {
   convertToModelMessages,
 } from "ai";
 import { toAISdkFormat } from "@mastra/ai-sdk";
-import { deleteChat, loadChat, saveChat } from "@/mastra/manager/chat";
+import { deleteChat, loadChat, saveChatMessages } from "@/mastra/manager/chat";
 import z from "zod";
 import { RuntimeContext } from "@mastra/core/runtime-context";
 import { ImageGeneratorRuntimeContext } from "@/mastra/agents/image-generator-agent";
@@ -16,8 +16,15 @@ export async function GET(
   context: { params: { threadId: string } }
 ) {
   const { threadId } = context.params;
+  const roomId = req.headers.get("ai_room_id");
   const resourceId = req.headers.get("ai_resource_id");
 
+  if (!roomId) {
+    return NextResponse.json(
+      { error: "Missing ai_room_id header" },
+      { status: 400 }
+    );
+  }
   if (!resourceId) {
     return NextResponse.json(
       { error: "Missing ai_resource_id header" },
@@ -26,12 +33,12 @@ export async function GET(
   }
 
   try {
-    const chat = await loadChat(threadId, resourceId);
+    const chat = await loadChat(roomId, threadId, resourceId);
 
     return NextResponse.json(chat);
   } catch (ex) {
-    console.warn(`Error loading chat with threadId [${threadId}].`, ex);
-    return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    console.warn(`Error loading chat with chatId [${threadId}].`, ex);
+    return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }
 }
 
@@ -40,7 +47,15 @@ export async function POST(
   context: { params: { threadId: string } }
 ) {
   const { threadId } = context.params;
+  const roomId = req.headers.get("ai_room_id");
   const resourceId = req.headers.get("ai_resource_id");
+
+  if (!roomId) {
+    return NextResponse.json(
+      { error: "Missing ai_room_id header" },
+      { status: 400 }
+    );
+  }
 
   if (!resourceId) {
     return NextResponse.json(
@@ -67,7 +82,13 @@ export async function POST(
     }
   }
 
+  console.log("Starting image generation with options:", {
+    imageOptions,
+    referenceImages,
+  });
+
   const runtimeContext = new RuntimeContext<ImageGeneratorRuntimeContext>();
+  runtimeContext.set("roomId", roomId);
   runtimeContext.set("threadId", threadId);
   runtimeContext.set("resourceId", resourceId);
   runtimeContext.set("referenceImages", referenceImages);
@@ -98,7 +119,7 @@ export async function POST(
 
   // Transform stream into AI SDK format and create UI messages stream
   const uiMessageStream = createUIMessageStream({
-    originalMessages: messages,
+    originalMessages: [messages[messages.length - 1]],
     execute: async ({ writer }) => {
       for await (const part of toAISdkFormat(stream, {
         from: "agent",
@@ -108,7 +129,8 @@ export async function POST(
       }
     },
     onFinish: ({ messages }) => {
-      saveChat(threadId, resourceId, messages);
+      console.log("Saving generated images to chat messages.", messages);
+      saveChatMessages(roomId, threadId, resourceId, messages);
     },
   });
 
@@ -123,7 +145,15 @@ export async function DELETE(
   context: { params: { threadId: string } }
 ) {
   const { threadId } = context.params;
+  const roomId = req.headers.get("ai_room_id");
   const resourceId = req.headers.get("ai_resource_id");
+
+  if (!roomId) {
+    return NextResponse.json(
+      { error: "Missing ai_room_id header" },
+      { status: 400 }
+    );
+  }
 
   if (!resourceId) {
     return NextResponse.json(
@@ -133,7 +163,7 @@ export async function DELETE(
   }
 
   try {
-    const chatDeleted = await deleteChat(threadId, resourceId);
+    const chatDeleted = await deleteChat(roomId, threadId, resourceId);
     if (chatDeleted) {
       return NextResponse.json({ success: true });
     } else {
@@ -143,7 +173,7 @@ export async function DELETE(
       );
     }
   } catch (ex) {
-    console.warn(`Error loading chat with threadId [${threadId}].`, ex);
-    return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    console.warn(`Error loading chat with chatId [${threadId}].`, ex);
+    return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }
 }

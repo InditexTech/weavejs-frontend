@@ -45,8 +45,11 @@ export const ChatBotDialogDeleteChat = ({
       threadId: string;
       resourceId: string;
     }) => {
+      if (!room) throw new Error("No room available");
+
       setDeleting(true);
-      return await delChat(threadId, resourceId);
+
+      return await delChat(room, threadId, resourceId);
     },
     onSettled() {
       setDeleting(false);

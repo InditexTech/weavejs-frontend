@@ -2,18 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const getChats = async (resourceId: string) => {
-  const endpoint = `/api/ai/chats`;
+export const getChats = async (
+  roomId: string,
+  resourceId: string,
+  limit: number,
+  offset: number
+) => {
+  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats?limit=${limit}&offset=${offset}`;
   const response = await fetch(endpoint, {
     headers: {
-      ai_resource_id: resourceId,
+      ["x-weave-user-id"]: resourceId,
     },
   });
 
   if (!response.ok && response.status === 404) {
-    throw new Error(`Chat doesn't exist`);
+    return null;
   }
 
   const data = await response.json();
-  return data.chats;
+  return data;
 };
