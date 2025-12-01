@@ -24,15 +24,12 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
-  ImagePlus,
   ChevronDown,
   ChevronUp,
   MessageSquare,
   // MapPinned,
   Video,
-  // Film,
   LayoutPanelTop,
-  // ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -49,8 +46,6 @@ import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { MoveToolTrigger } from "./tools-triggers/move-tool";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
@@ -85,31 +80,6 @@ export function ToolsOverlayMouse() {
     (state) => state.setSidebarActive
   );
   const showUI = useCollaborationRoom((state) => state.ui.show);
-
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.type
-  );
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupVisible
-  );
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
@@ -140,7 +110,7 @@ export function ToolsOverlayMouse() {
   const STROKES_TOOLS = useStrokesTools();
   const IMAGES_TOOLS = useImagesTools();
 
-  if (!showUI || imageCroppingEnabled || imagesLLMPopupVisibleV2) {
+  if (!showUI || imageCroppingEnabled) {
     return null;
   }
 
@@ -624,52 +594,6 @@ export function ToolsOverlayMouse() {
                 <Images size={20} strokeWidth={1} /> Images tool
                 <DropdownMenuShortcut>O</DropdownMenuShortcut>
               </DropdownMenuItem>
-              {aiEnabled && !aiEnabledV2 && (
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
-                  disabled={!aiEnabled}
-                  onClick={() => {
-                    setShapesMenuOpen(false);
-                    setStrokesMenuOpen(false);
-                    setImagesMenuOpen(false);
-
-                    setActualImagesTool("generateImageTool");
-                    setImagesLLMPopupType("create");
-                    if (imagesLLMPopupType === "create") {
-                      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-                    } else {
-                      setImagesLLMPopupVisible(true);
-                    }
-                  }}
-                >
-                  <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
-                  <DropdownMenuShortcut>G</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              )}
-              {aiEnabledV2 && (
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
-                  disabled={!aiEnabled && !aiEnabledV2}
-                  onClick={() => {
-                    setShapesMenuOpen(false);
-                    setStrokesMenuOpen(false);
-                    setImagesMenuOpen(false);
-
-                    setActualImagesTool("generateImageTool");
-                    sidebarToggle(null);
-
-                    setImagesLLMPopupTypeV2("create");
-                    if (imagesLLMPopupTypeV2 === "create") {
-                      setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
-                    } else {
-                      setImagesLLMPopupVisibleV2(true);
-                    }
-                  }}
-                >
-                  <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
-                  <DropdownMenuShortcut>G</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

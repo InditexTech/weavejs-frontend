@@ -6,9 +6,11 @@ import { ImagesPersistenceHandler } from "../manager/images";
 import {
   ImageAspectRatio,
   ImageGeneratorRuntimeContext,
+  ImageOptions,
   ImageSize,
   ReferenceImage,
-} from "../agents/image-generator-agent";
+} from "../agents/image-generator-editor-agent";
+import { MastraUnion } from "@mastra/core/action";
 
 type GeneratedImage = {
   imageId: string;
@@ -30,19 +32,23 @@ export const imageGenerationTool = createTool({
   description: "Generate an image based on a description",
   inputSchema: z.object({
     prompt: z.string().describe("What the user wants to see in the image"),
-    samples: z.number(),
-    aspectRatio: z.string(),
-    size: z.string(),
   }),
-  outputSchema: z.array(
-    z.object({
-      imageId: z.string(),
-      status: z.enum(["generating", "generated", "failed"]),
-      url: z.string().optional(),
-    })
-  ),
-  execute: async ({ runtimeContext, context }) => {
-    const { prompt, samples, aspectRatio, size } = context;
+  outputSchema: z.object({
+    images: z.array(
+      z.object({
+        imageId: z.string(),
+        status: z.enum(["generating", "generated", "failed"]),
+        url: z.string().optional(),
+      })
+    ),
+  }),
+  execute: async ({ runtimeContext, mastra, context }) => {
+    const logger = mastra?.getLogger();
+
+    const { prompt } = context;
+
+    logger?.info(`Generating image with prompt: ${prompt}`);
+
     const roomId = runtimeContext.get("roomId") as string;
     const threadId = runtimeContext.get("threadId") as string;
     const resourceId = runtimeContext.get("resourceId") as string;
@@ -50,7 +56,16 @@ export const imageGenerationTool = createTool({
       "referenceImages"
     ) as ReferenceImage[];
 
-    return await generateImages(prompt, {
+    const imageOption: ImageOptions = runtimeContext.get("imageOptions");
+    const samples = imageOption.samples;
+    const aspectRatio = imageOption.aspectRatio;
+    const imageSize = imageOption.imageSize;
+
+    logger?.info(
+      `Generating image with params: samples=${samples}, aspectRatio=${aspectRatio}, imageSize=${imageSize}`
+    );
+
+    const images = await generateImages(mastra, prompt, {
       roomId,
       threadId,
       resourceId,
@@ -58,16 +73,25 @@ export const imageGenerationTool = createTool({
       imageOptions: {
         samples,
         aspectRatio: aspectRatio as unknown as ImageAspectRatio,
-        size: size as unknown as ImageSize,
+        imageSize: imageSize as unknown as ImageSize,
       },
     });
+
+    logger?.info(
+      `Generated [${images.length}] images: ${JSON.stringify(images, null, 2)}`
+    );
+
+    return { images };
   },
 });
 
 const generateImages = async (
+  mastra: MastraUnion | undefined,
   prompt: string,
   context: ImageGenerationToolContext
 ) => {
+  const logger = mastra?.getLogger();
+
   if (!imageHandler) {
     await initImageGenerationTool();
   }
@@ -86,7 +110,9 @@ const generateImages = async (
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const imageGenerationPrompt: any[] = [{ text: prompt }];
+  const imageGenerationPrompt: any[] = [
+    { text: `${prompt}. Only generate a single image.` },
+  ];
   const referencedImages = context.referenceImages ?? [];
   if (referencedImages.length > 0) {
     for (const refImage of referencedImages) {
@@ -102,13 +128,18 @@ const generateImages = async (
   for (let i = 0; i < generatedImages.length; i++) {
     const actualImage = generatedImages[i];
 
+    logger?.info(`Generating image ${i + 1} of ${generatedImages.length}`);
+    logger?.info(
+      `Generating image prompt: ${prompt}. Only generate a single image.`
+    );
+
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-image-preview",
-      contents: `${imageGenerationPrompt}. Only generate a single image.`,
+      contents: imageGenerationPrompt,
       config: {
         imageConfig: {
           aspectRatio: context.imageOptions.aspectRatio,
-          imageSize: context.imageOptions.size,
+          imageSize: context.imageOptions.imageSize,
         },
         responseModalities: ["Image"],
       },

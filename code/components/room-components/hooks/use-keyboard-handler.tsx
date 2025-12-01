@@ -18,8 +18,6 @@ import {
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -27,8 +25,6 @@ export function useKeyboardHandler() {
   const instance = useWeave((state) => state.instance);
   const selectedNodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
-
-  const aiEnabled = useIACapabilities((state) => state.enabled);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
@@ -41,36 +37,9 @@ export function useKeyboardHandler() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
-  const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
-  );
 
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
-
-  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
-
-  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.type
-  );
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupVisible
-  );
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -518,36 +487,6 @@ export function useKeyboardHandler() {
         handlePrintToConsoleState();
       }
 
-      /* IA Utilities */
-
-      if (event.code === "KeyG") {
-        if (aiEnabled && !workloadsEnabled) {
-          setImagesLLMPopupType("create");
-          if (imagesLLMPopupType === "create") {
-            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-          } else {
-            setImagesLLMPopupVisible(true);
-          }
-        }
-
-        if (aiEnabled && workloadsEnabled) {
-          setImagesLLMPopupTypeV2("create");
-          if (imagesLLMPopupTypeV2 === "create") {
-            setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
-          } else {
-            setImagesLLMPopupVisibleV2(true);
-          }
-        }
-      }
-
-      if (event.code === "KeyQ" && aiEnabled) {
-        triggerTool("fuzzyMaskTool");
-      }
-
-      if (event.code === "KeyW" && aiEnabled) {
-        triggerTool("maskTool");
-      }
-
       /* Other tools */
 
       if (event.code === "KeyH" && threadsEnabled) {
@@ -579,21 +518,11 @@ export function useKeyboardHandler() {
     [
       selectedNodes,
       actualAction,
-      aiEnabled,
       showUI,
       threadsEnabled,
-      workloadsEnabled,
       os,
       instance,
       isZoomingAllowed,
-      imagesLLMPopupType,
-      imagesLLMPopupVisible,
-      setImagesLLMPopupType,
-      setImagesLLMPopupVisible,
-      imagesLLMPopupTypeV2,
-      imagesLLMPopupVisibleV2,
-      setImagesLLMPopupTypeV2,
-      setImagesLLMPopupVisibleV2,
       showMinimap,
       setShowMinimap,
       setShowUi,

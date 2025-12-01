@@ -70,7 +70,6 @@ export const ChatBot = () => {
 
   React.useEffect(() => {
     async function createDefaultChat() {
-      console.log("No chat data found, creating default chat.");
       await mutationCreateChat.mutate({
         roomId: room ?? "",
         chatId: threadId,
@@ -81,11 +80,19 @@ export const ChatBot = () => {
       queryClient.invalidateQueries({ queryKey });
     }
 
-    console.log("Chat data fetched:", { isFetched, chatData });
     if (!isFetching && isFetched && !chatData) {
       createDefaultChat();
     }
-  }, [isFetched, isFetching, chatData, room, threadId, resourceId]);
+  }, [
+    isFetched,
+    queryClient,
+    mutationCreateChat,
+    isFetching,
+    chatData,
+    room,
+    threadId,
+    resourceId,
+  ]);
 
   React.useEffect(() => {
     if (!user) return;

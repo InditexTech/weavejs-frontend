@@ -313,7 +313,6 @@ export const MessageResponse = memo(
       {...props}
       components={{
         img: (imgProps) => {
-          console.log("img", imgProps);
           return (
             <img
               className="max-w-full rounded-none border border-[#c9c9c9]"

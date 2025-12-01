@@ -42,13 +42,9 @@ const ChatBotPrompt = () => {
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files?.length);
 
-      console.log("Submitting prompt input message:", message, hasAttachments);
-
       if (!(hasText || hasAttachments)) {
         return;
       }
-
-      console.log("Sending message to AI chat:", message);
 
       if (!sendMessage) {
         console.warn("sendMessage function is not set.");

@@ -28,16 +28,11 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
-import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
-import { LLMPredictionsSelectionPopup } from "../room-components/overlay/llm-predictions-selection";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
-import { LLMReferenceSelectionPopup } from "../room-components/overlay/llm-reference-selection";
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
 import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
-import { LLMGenerationPopupV2 } from "../room-components/overlay/llm-popup-v2";
 import { Comments } from "../room-components/comment/comments";
-import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-reference-selection-v2";
 import { ExportConfigDialog } from "../room-components/overlay/export-config";
 import { NodeToolbar } from "../room-components/overlay/node-toolbar";
 import { VideosLibrary } from "../room-components/videos-library/videos-library";
@@ -50,6 +45,7 @@ import { TemplatesLibrary } from "../room-components/templates-library/templates
 import { RoomHeaderRight } from "../room-components/overlay/room-header.right";
 import { ChatBot } from "../room-components/ai-components/chatbot";
 import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
+import { useIAChat } from "@/store/ia-chat";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -118,6 +114,8 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const backgroundColor = useCollaborationRoom(
     (state) => state.backgroundColor
   );
+
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const handleReconnectRoom = React.useCallback(async () => {
     if (!instance) {
@@ -319,9 +317,8 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </>
           )}
         </section>
-        {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
-          <ChatBotPrompt />
-        )}
+        {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
+          aiChatEnabled && <ChatBotPrompt />}
         {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
         {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
           <section className="fixed bg-white top-0 right-0 bottom-0 w-[480px] h-full border-l border-l-[#c9c9c9]">
@@ -400,11 +397,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <ManageIdleDisconnection />
             <MaskSlider />
             <SaveTemplateDialog />
-            <LLMGenerationPopup />
-            <LLMGenerationPopupV2 />
-            <LLMPredictionsSelectionPopup />
-            <LLMReferenceSelectionPopup />
-            <LLMReferenceSelectionPopupV2 />
             <RemoveBackgroundActionPopup />
             <ExportConfigDialog />
           </>

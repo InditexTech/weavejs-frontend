@@ -31,6 +31,7 @@ import {
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useWeave } from "@inditextech/weave-react";
+import { useIAChat } from "@/store/ia-chat";
 
 type SidebarSelectorProps = {
   title: string;
@@ -47,6 +48,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
+
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -172,7 +175,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          {threadsEnabled && (
+          {aiChatEnabled && (
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={() => {

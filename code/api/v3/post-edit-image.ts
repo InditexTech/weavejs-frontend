@@ -26,7 +26,7 @@ export const postEditImageV2 = async (
     size: ImageSize;
   }
 ) => {
-  const password = sessionStorage.getItem("weave_ai_password");
+  const password = sessionStorage.getItem("weave_ai_chat_password");
   const endpoint = `${process.env.NEXT_PUBLIC_API_V3_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
 
   const response = await fetch(endpoint, {

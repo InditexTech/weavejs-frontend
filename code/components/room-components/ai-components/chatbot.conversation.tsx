@@ -23,12 +23,14 @@ import {
   MessageAttachments,
   MessageAttachment,
 } from "@/components/ai-elements/message";
-import { Bot, CopyIcon, RefreshCcwIcon } from "lucide-react";
+import { Bot, CopyIcon, Paperclip, RefreshCcwIcon } from "lucide-react";
 import React from "react";
 import { useIAChat } from "@/store/ia-chat";
 import { ThreeDot } from "react-loading-indicators";
 import { GeneratedImage } from "@google/genai";
 import { useCollaborationRoom } from "@/store/store";
+import { Button } from "@/components/ui/button";
+import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 
 type ChatBotConversationProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +47,8 @@ export const ChatBotConversation = ({
   const setStatus = useIAChat((state) => state.setStatus);
   const setSendMessage = useIAChat((state) => state.setSendMessage);
 
+  const promptInputAttachmentsController = usePromptInputAttachments();
+
   const { messages, status, regenerate, sendMessage } = useChat({
     messages: initialMessages,
     transport: new DefaultChatTransport({
@@ -59,11 +63,9 @@ export const ChatBotConversation = ({
   React.useEffect(() => {
     setStatus(status);
     setSendMessage(sendMessage);
-  }, [status, sendMessage]);
+  }, [status, setStatus, sendMessage, setSendMessage]);
 
   if (!messages) return null;
-
-  console.log("AQUI? chat", messages, status);
 
   return (
     <Conversation className="relative size-full">
@@ -78,7 +80,7 @@ export const ChatBotConversation = ({
       >
         {messages.length === 0 && (
           <ConversationEmptyState
-            description="Messages will appear here as the conversation progresses."
+            description="Messages will appear here as the conversation with the agent progresses."
             icon={<Bot className="size-6" />}
             title="AI Assistant"
           />
@@ -89,8 +91,9 @@ export const ChatBotConversation = ({
           );
 
           return (
-            <React.Fragment key={message.id}>
+            <React.Fragment key={`${message.id}-${messageIndex}`}>
               {message.parts.map((part, i) => {
+                // console.log("Rendering message part:", part);
                 switch (part.type) {
                   case "tool-extractGenerationParametersTool":
                     if (
@@ -164,16 +167,53 @@ export const ChatBotConversation = ({
                               <>
                                 <div>Here are the results:</div>
                                 <div className="grid grid-cols-1 gap-1">
-                                  {((part.output ?? []) as GeneratedImage[])
+                                  {(
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    (part.output as any)?.images ??
+                                    ([] as GeneratedImage[])
+                                  )
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     .map((image: any) => (
-                                      <img
+                                      <div
                                         key={image.imageId}
-                                        src={image.url}
-                                        alt="Generated Image"
-                                        className="max-h-64 object-contain cursor-pointer border border-[#c9c9c9]"
-                                        data-image-id={image.imageId}
-                                      />
+                                        className="relative"
+                                      >
+                                        <img
+                                          src={image.url}
+                                          alt="Generated Image"
+                                          className="max-h-64 object-contain cursor-pointer border border-[#c9c9c9]"
+                                          data-image-id={image.imageId}
+                                        />
+                                        <div className="absolute bottom-[12px] right-[12px]">
+                                          <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="rounded-none !cursor-pointer uppercase !text-xs w-[40px]"
+                                            onClick={async () => {
+                                              const blob = await fetch(
+                                                image.url
+                                              ).then((res) => res.blob());
+
+                                              const file = new File(
+                                                [blob],
+                                                "image.png",
+                                                {
+                                                  type: "image/png",
+                                                }
+                                              );
+
+                                              promptInputAttachmentsController.add(
+                                                [file]
+                                              );
+                                            }}
+                                          >
+                                            <Paperclip
+                                              strokeWidth={1}
+                                              size={20}
+                                            />
+                                          </Button>
+                                        </div>
+                                      </div>
                                     ))}
                                 </div>
                               </>

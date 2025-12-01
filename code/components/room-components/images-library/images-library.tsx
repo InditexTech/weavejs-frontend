@@ -17,12 +17,10 @@ import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
   BrushCleaning,
   Info,
-  Link,
   SquareCheck,
   SquareX,
   Trash,
   Trash2,
-  Unlink,
 } from "lucide-react";
 import {
   WeaveStateElement,
@@ -40,8 +38,6 @@ import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { UploadedImage } from "./uploaded.image";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { GeneratedImage } from "./generated-image.image";
 import {
   ContextMenu,
@@ -54,7 +50,7 @@ import { cn } from "@/lib/utils";
 import { ImageEntity } from "./types";
 import { ImagesLibraryActions } from "./images-library.actions";
 import { SidebarHeader } from "../sidebar-header";
-// import { eventBus } from "@/components/utils/events-bus";
+import { useIAChat } from "@/store/ia-chat";
 
 function isRelativeUrl(url: string) {
   try {
@@ -83,20 +79,7 @@ export const ImagesLibrary = () => {
     (state) => state.features.workloads
   );
 
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const imagesReferences = useIACapabilitiesV2(
-    (state) => state.references.images
-  );
-  const setImagesReferences = useIACapabilitiesV2(
-    (state) => state.setImagesLLMReferences
-  );
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   // const queryClient = useQueryClient();
 
@@ -172,66 +155,6 @@ export const ImagesLibrary = () => {
       mutationDelete.mutate(image.imageId);
     },
     [instance, mutationDelete]
-  );
-
-  const handleSetImageReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (image: any) => {
-      const element = document.querySelector(
-        `img[id="${image.imageId}"]`
-      ) as HTMLImageElement | null;
-
-      if (!element) {
-        return;
-      }
-
-      const newReferences = [...imagesReferences];
-      const existsReference = newReferences.find(
-        (ele) => ele.id === image.imageId
-      );
-
-      if (typeof existsReference !== "undefined") {
-        return;
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.width = element.naturalWidth;
-      canvas.height = element.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(element, 0, 0);
-
-        const dataURL = canvas.toDataURL("image/png");
-        newReferences.push({
-          id: image.imageId,
-          aspectRatio: image.aspectRatio,
-          base64Image: dataURL,
-        });
-      }
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
-  const handleRemoveImageReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (image: any) => {
-      const element = document.querySelector(
-        `img[id="${image.imageId}"]`
-      ) as HTMLImageElement | null;
-
-      if (!element) {
-        return;
-      }
-
-      let newReferences = [...imagesReferences];
-
-      newReferences = newReferences.filter((ele) => ele.id !== image.imageId);
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
   );
 
   const handleRemoveBackground = React.useCallback(
@@ -458,7 +381,7 @@ export const ImagesLibrary = () => {
                 <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                   <b className="font-normal text-[18px]">No images</b>
                   <span className="text-[14px]">
-                    {aiEnabled || aiEnabledV2 ? (
+                    {aiChatEnabled ? (
                       <>
                         Add an image to the room, or
                         <br />
@@ -493,11 +416,7 @@ export const ImagesLibrary = () => {
                         <img
                           key={imageId}
                           className="w-full h-full object-cover"
-                          draggable={
-                            imagesLLMPopupVisible || imagesLLMPopupVisibleV2
-                              ? "false"
-                              : "true"
-                          }
+                          draggable="true"
                           src={imageUrl}
                           data-image-id={imageId}
                           alt="An image"
@@ -579,11 +498,6 @@ export const ImagesLibrary = () => {
           <div
             className="w-full weaveDraggable p-0"
             onDragStart={(e) => {
-              if (imagesLLMPopupVisible || imagesLLMPopupVisibleV2) {
-                e.preventDefault();
-                return;
-              }
-
               if (e.target instanceof HTMLImageElement) {
                 window.weaveDragImageURL = e.target.src;
                 window.weaveDragImageId = e.target.dataset.imageId;
@@ -594,7 +508,7 @@ export const ImagesLibrary = () => {
               <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                 <b className="font-normal text-[18px]">No images</b>
                 <span className="text-[14px]">
-                  {aiEnabled || aiEnabledV2 ? (
+                  {aiChatEnabled ? (
                     <>
                       Add an image to the room, or
                       <br />
@@ -611,10 +525,6 @@ export const ImagesLibrary = () => {
                 images.map((image) => {
                   const appImage = appImages.find(
                     (appImage) => appImage.props.imageId === image.imageId
-                  );
-
-                  const isReference = imagesReferences.find(
-                    (ele) => ele.id === image.imageId
                   );
 
                   const isChecked = realSelectedImages.includes(image);
@@ -702,16 +612,6 @@ export const ImagesLibrary = () => {
                                 </Badge>
                               </div>
                             )}
-                            {typeof isReference !== "undefined" && (
-                              <div className="absolute top-0 left-0 flex gap-1 justify-start items-end p-2">
-                                <Badge
-                                  className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-                                  variant="secondary"
-                                >
-                                  REFERENCED
-                                </Badge>
-                              </div>
-                            )}
                           </div>
                         </ContextMenuTrigger>
                         <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
@@ -731,40 +631,6 @@ export const ImagesLibrary = () => {
                               <ContextMenuSeparator />
                             </>
                           )}
-                          {imagesLLMPopupVisibleV2 &&
-                            ["completed"].includes(image.status) && (
-                              <>
-                                <ContextMenuItem
-                                  className="rounded-none uppercase font-inter text-xs"
-                                  onClick={() => {
-                                    handleSetImageReference(image);
-                                  }}
-                                  disabled={typeof isReference !== "undefined"}
-                                >
-                                  <Link
-                                    strokeWidth={1}
-                                    size={16}
-                                    className="mr-2"
-                                  />
-                                  Set as reference
-                                </ContextMenuItem>
-                                <ContextMenuItem
-                                  className="rounded-none uppercase font-inter text-xs"
-                                  onClick={() => {
-                                    handleRemoveImageReference(image);
-                                  }}
-                                  disabled={typeof isReference === "undefined"}
-                                >
-                                  <Unlink
-                                    strokeWidth={1}
-                                    size={16}
-                                    className="mr-2"
-                                  />
-                                  Remove as reference
-                                </ContextMenuItem>
-                                <ContextMenuSeparator />
-                              </>
-                            )}
                           {["completed"].includes(image.status) && (
                             <ContextMenuItem
                               className="rounded-none uppercase font-inter text-xs"

@@ -53,10 +53,10 @@ import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useIACapabilities } from "@/store/ia";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+import { useIAChat } from "@/store/ia-chat";
 
 export function RoomHeaderShadowDom() {
   const os = useGetOs();
@@ -68,8 +68,8 @@ export function RoomHeaderShadowDom() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
 
-  const iaEnabled = useIACapabilities((state) => state.enabled);
-  const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
+  const aiChatEnabled = useIAChat((state) => state.enabled);
+  const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
@@ -266,7 +266,7 @@ export function RoomHeaderShadowDom() {
                   Room
                 </DropdownMenuLabel>
                 <DropdownMenuItem
-                  disabled={iaEnabled}
+                  disabled={aiChatEnabled}
                   className="block md:hidden text-foreground cursor-pointer hover:rounded-none"
                 >
                   {room}
@@ -277,26 +277,26 @@ export function RoomHeaderShadowDom() {
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
                   <DropdownMenuItem
-                    disabled={iaEnabled}
+                    disabled={aiChatEnabled}
                     className="text-foreground cursor-pointer hover:rounded-none"
                     onPointerDown={() => {
-                      setIASetupVisible(true);
+                      setAiChatSetupVisible(true);
                       setMenuOpen(false);
                     }}
                     onClick={() => {
-                      setIASetupVisible(true);
+                      setAiChatSetupVisible(true);
                       setMenuOpen(false);
                     }}
                   >
                     <div className="w-full flex justify-between items-center">
                       <div className="w-full flex justify-start items-center gap-2">
-                        {iaEnabled && (
+                        {aiChatEnabled && (
                           <>
                             <ShieldCheck size={16} />
                             Enabled
                           </>
                         )}
-                        {!iaEnabled && (
+                        {!aiChatEnabled && (
                           <>
                             <MonitorCog size={16} />
                             Setup

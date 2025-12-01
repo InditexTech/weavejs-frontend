@@ -14,8 +14,6 @@ export const postChatMessages = async (
   const server = `${process.env.BACKEND_ENDPOINT}/api/v1`;
   const endpoint = `${relative ? process.env.NEXT_PUBLIC_API_ENDPOINT : server}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats/${chatId}/messages`;
 
-  console.log("Posting chat messages to endpoint:", endpoint);
-
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -26,12 +24,6 @@ export const postChatMessages = async (
       messages,
     }),
   });
-
-  console.log(
-    "Response from posting chat messages:",
-    response.status,
-    response.statusText
-  );
 
   if (!response.ok) {
     throw new Error(`Error creating chat messages: ${response.statusText}`);

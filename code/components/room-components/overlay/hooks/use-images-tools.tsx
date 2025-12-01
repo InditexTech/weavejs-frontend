@@ -6,24 +6,12 @@ import React from "react";
 import { ShortcutElement } from "../../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
-import { Image, ImagePlus, Images } from "lucide-react";
-import { useIACapabilities } from "@/store/ia";
+import { Image, Images } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
 
 export const useImagesTools = () => {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
-
-  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
 
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
@@ -93,36 +81,9 @@ export const useImagesTools = () => {
         },
         active: () => actualAction === "imagesTool",
       },
-      generateImageTool: {
-        icon: <ImagePlus className="px-2" size={40} strokeWidth={1} />,
-        label: (
-          <div className="flex gap-3 justify-start items-center">
-            <p>Generate Image tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "G",
-                [SYSTEM_OS.OTHER]: "G",
-              }}
-            />
-          </div>
-        ),
-        onClick: () => {
-          setImagesLLMPopupType("create");
-          if (imagesLLMPopupType === "create") {
-            setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-          } else {
-            setImagesLLMPopupVisible(true);
-          }
-        },
-        active: () => imagesLLMPopupVisible && imagesLLMPopupType === "create",
-      },
     }),
     [
       actualAction,
-      imagesLLMPopupType,
-      imagesLLMPopupVisible,
-      setImagesLLMPopupType,
-      setImagesLLMPopupVisible,
       setShowSelectFileImage,
       setShowSelectFilesImages,
       triggerTool,

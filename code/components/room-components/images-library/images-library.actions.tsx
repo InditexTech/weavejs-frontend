@@ -8,14 +8,13 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { BrushCleaning, Link, Trash, Unlink } from "lucide-react";
+import { BrushCleaning, Trash } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { ImageEntity } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -36,16 +35,6 @@ export const ImagesLibraryActions = ({
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
-
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const imagesReferences = useIACapabilitiesV2(
-    (state) => state.references.images
-  );
-  const setImagesReferences = useIACapabilitiesV2(
-    (state) => state.setImagesLLMReferences
-  );
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
@@ -121,71 +110,6 @@ export const ImagesLibraryActions = ({
     [instance, mutationDelete]
   );
 
-  const handleSetImagesReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (images: any[]) => {
-      const newReferences = [...imagesReferences];
-
-      for (const image of images) {
-        const element = document.querySelector(
-          `img[id="${image.imageId}"]`
-        ) as HTMLImageElement | null;
-
-        if (!element) {
-          return;
-        }
-
-        const existsReference = newReferences.find(
-          (ele) => ele.id === image.imageId
-        );
-
-        if (typeof existsReference !== "undefined") {
-          continue;
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = element.naturalWidth;
-        canvas.height = element.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(element, 0, 0);
-
-          const dataURL = canvas.toDataURL("image/png");
-          newReferences.push({
-            id: image.imageId,
-            aspectRatio: image.aspectRatio,
-            base64Image: dataURL,
-          });
-        }
-      }
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
-  const handleRemoveImagesReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (images: any[]) => {
-      let newReferences = [...imagesReferences];
-
-      for (const image of images) {
-        const element = document.querySelector(
-          `img[id="${image.imageId}"]`
-        ) as HTMLImageElement | null;
-
-        if (!element) {
-          continue;
-        }
-
-        newReferences = newReferences.filter((ele) => ele.id !== image.imageId);
-      }
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
   const handleRemoveBackground = React.useCallback(
     (image: ImageEntity) => {
       if (!instance) {
@@ -244,25 +168,6 @@ export const ImagesLibraryActions = ({
     return inUse;
   }, [realSelectedImages, appImages]);
 
-  const [unreferencedSelectedImages, referencedSelectedImages] =
-    React.useMemo(() => {
-      const unreferenced = [];
-      const referenced = [];
-
-      for (const image of realSelectedImages) {
-        const referenceImage = imagesReferences.find(
-          (appImage) => appImage.id === image.imageId
-        );
-        if (typeof referenceImage !== "undefined") {
-          referenced.push(image);
-        } else {
-          unreferenced.push(image);
-        }
-      }
-
-      return [unreferenced, referenced];
-    }, [realSelectedImages, imagesReferences]);
-
   const allRealImages = React.useMemo(() => {
     return realSelectedImages.every((image) =>
       ["completed"].includes(image.status)
@@ -304,56 +209,11 @@ export const ImagesLibraryActions = ({
       );
     }
 
-    if (
-      imagesLLMPopupVisibleV2 &&
-      realSelectedImages.length > 0 &&
-      realSelectedImages.length === referencedSelectedImages.length &&
-      allRealImages
-    ) {
-      selectionActions.push(
-        <button
-          key="remove-image-ref-selected"
-          className="cursor-pointer flex gap-2 justify-center items-center h-[40px] font-inter text-xs text-center bg-transparent hover:text-[#c9c9c9]"
-          onClick={() => {
-            handleRemoveImagesReference(realSelectedImages);
-          }}
-        >
-          <Unlink strokeWidth={1} size={16} />
-        </button>
-      );
-    }
-
-    if (
-      imagesLLMPopupVisibleV2 &&
-      realSelectedImages.length > 0 &&
-      realSelectedImages.length === unreferencedSelectedImages.length &&
-      realSelectedImages.length <= 4 - imagesReferences.length &&
-      allRealImages
-    ) {
-      selectionActions.push(
-        <button
-          key="set-images-reference-selected"
-          className="cursor-pointer flex gap-2 justify-center items-center h-[40px] font-inter text-xs text-center bg-transparent hover:text-[#c9c9c9]"
-          onClick={() => {
-            handleSetImagesReference(realSelectedImages);
-          }}
-        >
-          <Link strokeWidth={1} size={16} />
-        </button>
-      );
-    }
-
     return selectionActions;
   }, [
     handleDeleteImage,
     handleRemoveBackground,
-    handleRemoveImagesReference,
-    handleSetImagesReference,
-    imagesLLMPopupVisibleV2,
-    referencedSelectedImages.length,
     inUseSelectedImages.length,
-    imagesReferences.length,
-    unreferencedSelectedImages.length,
     realSelectedImages,
     allRealImages,
   ]);

@@ -21,6 +21,7 @@ const CHATS_LIMIT = 50;
 
 export const ChatBotChats = () => {
   const room = useCollaborationRoom((state) => state.room);
+  const user = useCollaborationRoom((state) => state.user);
 
   const resourceId = useIAChat((state) => state.resourceId);
   const setThreadId = useIAChat((state) => state.setThreadId);
@@ -71,21 +72,28 @@ export const ChatBotChats = () => {
         allChats.map((chat: any) => (
           <button
             key={chat.chatId}
-            className="w-full flex justify-between items-center p-2 px-[24px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
+            className="w-full flex justify-between items-center px-[24px] py-[12px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
             onClick={() => {
+              if (!user) return;
+              if (!room) return;
+
               setThreadId(chat.chatId);
+              sessionStorage.setItem(
+                `weave.js_${room}_${user.id}_ai_thread_id`,
+                chat.chatId
+              );
               setAiView("chat");
             }}
           >
             <div className="w-full flex flex-col justify-center items-start">
               <h3 className="font-inter text-base truncate w-full">
-                {chat.title || "Untitled Chat"}
+                {(chat.title || "Untitled Chat").toUpperCase()}
               </h3>
               <p className="font-inter text-xs text-gray-600">
                 Created at: {new Date(chat.updatedAt).toLocaleString()}
               </p>
             </div>
-            <ArrowRight strokeWidth={1} size={20} />
+            <ArrowRight strokeWidth={1} size={20} className="h-[40px]" />
           </button>
         ))
       }

@@ -22,13 +22,13 @@ import {
   Star,
   ArrowUpRight,
   Hexagon,
-  ImagePlus,
   ChevronRight,
   ChevronLeft,
   MessageSquare,
   // MapPinned,
   Frame,
   Video,
+  PenLine,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -43,18 +43,16 @@ import { leftElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { cn } from "@/lib/utils";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useIACapabilities } from "@/store/ia";
 import { MoveToolTrigger } from "./tools-triggers/move-tool";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { useShapesTools } from "./hooks/use-shapes-tools";
 import { useStrokesTools } from "./hooks/use-strokes-tools";
 import { useImagesTools } from "./hooks/use-images-tools";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 
 export function ToolsOverlayTouch() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
-  const [actualStrokesTool, setActualStrokesTool] = React.useState("penTool");
+  const [actualStrokesTool, setActualStrokesTool] = React.useState("lineTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
@@ -77,30 +75,6 @@ export function ToolsOverlayTouch() {
   );
   const showUI = useCollaborationRoom((state) => state.ui.show);
 
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const imagesLLMPopupType = useIACapabilities((state) => state.llmPopup.type);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const imagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.type
-  );
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupVisible
-  );
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
@@ -382,6 +356,21 @@ export function ToolsOverlayTouch() {
             >
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
+                  setShapesMenuOpen(false);
+                  setStrokesMenuOpen(false);
+                  setImagesMenuOpen(false);
+                  setActualStrokesTool("lineTool");
+                  STROKES_TOOLS["lineTool"].onClick();
+                }}
+              >
+                <PenLine size={20} strokeWidth={1} /> Line tool
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
@@ -513,36 +502,6 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                disabled={!aiEnabled}
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setActualImagesTool("generateImageTool");
-
-                  if (aiEnabled) {
-                    setImagesLLMPopupType("create");
-                    if (imagesLLMPopupType === "create") {
-                      setImagesLLMPopupVisible(!imagesLLMPopupVisible);
-                    } else {
-                      setImagesLLMPopupVisible(true);
-                    }
-                  }
-
-                  if (aiEnabledV2) {
-                    setImagesLLMPopupTypeV2("create");
-                    if (imagesLLMPopupTypeV2 === "create") {
-                      setImagesLLMPopupVisibleV2(!imagesLLMPopupVisibleV2);
-                    } else {
-                      setImagesLLMPopupVisibleV2(true);
-                    }
-                  }
-                }}
-              >
-                <ImagePlus size={20} strokeWidth={1} /> Generate Image tool
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

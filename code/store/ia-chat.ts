@@ -25,6 +25,10 @@ export type ImageOptions = {
 
 interface IAChatState {
   enabled: boolean;
+  setup: {
+    state: "idle" | "validating";
+    visible: boolean;
+  };
   status: ChatStatus | undefined;
   defined: boolean;
   threadId: string;
@@ -53,10 +57,16 @@ interface IAChatState {
   ) => void;
   setImageSize: (newSize: ImageSize) => void;
   setImageAspectRatio: (newAspectRatio: ImageAspectRatio) => void;
+  setSetupState: (newState: "idle" | "validating") => void;
+  setSetupVisible: (newVisible: boolean) => void;
 }
 
 export const useIAChat = create<IAChatState>()((set) => ({
-  enabled: sessionStorage.getItem("weave_ai_enabled") === "true",
+  enabled: sessionStorage.getItem("weave_ai_chat_enabled") === "true",
+  setup: {
+    state: "idle",
+    visible: false,
+  },
   status: undefined,
   sendMessage: null,
   defined: false,
@@ -118,5 +128,15 @@ export const useIAChat = create<IAChatState>()((set) => ({
     set((state) => ({
       ...state,
       imageOptions: { ...state.imageOptions, aspectRatio: newAspectRatio },
+    })),
+  setSetupState: (newState) =>
+    set((state) => ({
+      ...state,
+      setup: { ...state.setup, state: newState },
+    })),
+  setSetupVisible: (newVisible) =>
+    set((state) => ({
+      ...state,
+      setup: { ...state.setup, visible: newVisible },
     })),
 }));

@@ -6,7 +6,6 @@ import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
-import { useIACapabilities } from "@/store/ia";
 
 export const useNodeActionName = () => {
   const instance = useWeave((state) => state.instance);
@@ -14,10 +13,6 @@ export const useNodeActionName = () => {
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
   const setNode = useWeave((state) => state.setNode);
-
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
 
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
@@ -50,7 +45,7 @@ export const useNodeActionName = () => {
       case "image-template":
         return "Image Template";
       case "image":
-        return imagesLLMPopupVisible ? "Unknown" : "Image";
+        return "Image";
       case "star":
         return "Star";
       case "arrow":
@@ -66,7 +61,7 @@ export const useNodeActionName = () => {
       default:
         return "Unknown";
     }
-  }, [node, imagesLLMPopupVisible]);
+  }, [node]);
 
   const actionType = React.useMemo(() => {
     switch (actualAction) {
@@ -97,13 +92,13 @@ export const useNodeActionName = () => {
       case "fuzzyMaskTool":
         return "Mask";
       case "moveTool":
-        return imagesLLMPopupVisible ? "Move" : "Unknown";
+        return "Move";
       case "maskEraserTool":
         return "Eraser";
       default:
         return "Unknown";
     }
-  }, [actualAction, imagesLLMPopupVisible]);
+  }, [actualAction]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -127,17 +122,8 @@ export const useNodeActionName = () => {
     if (nodePropertiesAction === "create") {
       return actionType;
     }
-    if (imagesLLMPopupVisible) {
-      return actionType;
-    }
     return nodeType;
-  }, [
-    nodes,
-    nodeType,
-    actionType,
-    imagesLLMPopupVisible,
-    nodePropertiesAction,
-  ]);
+  }, [nodes, nodeType, actionType, nodePropertiesAction]);
 
   return name;
 };

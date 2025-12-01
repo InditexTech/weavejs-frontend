@@ -9,7 +9,7 @@ import { toAISdkFormat } from "@mastra/ai-sdk";
 import { deleteChat, loadChat, saveChatMessages } from "@/mastra/manager/chat";
 import z from "zod";
 import { RuntimeContext } from "@mastra/core/runtime-context";
-import { ImageGeneratorRuntimeContext } from "@/mastra/agents/image-generator-agent";
+import { ImageGeneratorRuntimeContext } from "@/mastra/agents/image-generator-editor-agent";
 
 export async function GET(
   req: Request,
@@ -82,11 +82,6 @@ export async function POST(
     }
   }
 
-  console.log("Starting image generation with options:", {
-    imageOptions,
-    referenceImages,
-  });
-
   const runtimeContext = new RuntimeContext<ImageGeneratorRuntimeContext>();
   runtimeContext.set("roomId", roomId);
   runtimeContext.set("threadId", threadId);
@@ -94,8 +89,10 @@ export async function POST(
   runtimeContext.set("referenceImages", referenceImages);
   runtimeContext.set("imageOptions", imageOptions);
 
-  const imageGenerationAgent = mastra.getAgent("imageGeneratorAgent");
-  const stream = await imageGenerationAgent.stream(
+  const imageGenerationEditorAgent = mastra.getAgent(
+    "imageGeneratorEditorAgent"
+  );
+  const stream = await imageGenerationEditorAgent.stream(
     convertToModelMessages(messages),
     {
       runtimeContext,
@@ -103,11 +100,13 @@ export async function POST(
         thread: threadId,
         resource: resourceId,
       },
+      maxSteps: 1,
       structuredOutput: {
         schema: z.object({
           images: z.array(
             z.object({
               imageId: z.string(),
+              status: z.enum(["generating", "generated", "failed"]),
               url: z.string(),
             })
           ),
@@ -117,9 +116,20 @@ export async function POST(
     }
   );
 
+  const userMessage = messages[messages.length - 1];
+  const removedImagesParts = [
+    {
+      ...userMessage,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      parts: userMessage.parts.filter((part: any) => part.type !== "file"),
+    },
+  ];
+
+  console.log("message", JSON.stringify(removedImagesParts, null, 2));
+
   // Transform stream into AI SDK format and create UI messages stream
   const uiMessageStream = createUIMessageStream({
-    originalMessages: [messages[messages.length - 1]],
+    originalMessages: removedImagesParts,
     execute: async ({ writer }) => {
       for await (const part of toAISdkFormat(stream, {
         from: "agent",
@@ -129,7 +139,6 @@ export async function POST(
       }
     },
     onFinish: ({ messages }) => {
-      console.log("Saving generated images to chat messages.", messages);
       saveChatMessages(roomId, threadId, resourceId, messages);
     },
   });

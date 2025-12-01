@@ -50,7 +50,6 @@ import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useIACapabilities } from "@/store/ia";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
@@ -58,6 +57,7 @@ import {
   getSessionConfig,
   setSessionConfig,
 } from "@/components/utils/session-config";
+import { useIAChat } from "@/store/ia-chat";
 
 export function RoomHeader() {
   const os = useGetOs();
@@ -89,8 +89,8 @@ export function RoomHeader() {
     (state) => state.setConnectionTestsShow
   );
 
-  const iaEnabled = useIACapabilities((state) => state.enabled);
-  const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
+  const aiChatEnabled = useIAChat((state) => state.enabled);
+  const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
@@ -674,14 +674,14 @@ export function RoomHeader() {
                             WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED ||
                           (weaveConnectionStatus !==
                             WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
-                            iaEnabled)
+                            aiChatEnabled)
                         }
                         onPointerDown={() => {
-                          setIASetupVisible(true);
+                          setAiChatSetupVisible(true);
                           setMenuOpen(false);
                         }}
                       >
-                        {iaEnabled ? (
+                        {aiChatEnabled ? (
                           <Check size={16} strokeWidth={1} />
                         ) : (
                           <div className="w-[16px] h-[16px]" />

@@ -22,8 +22,6 @@ export const putChat = async (
   const server = `${process.env.BACKEND_ENDPOINT}/api/v1`;
   const endpoint = `${relative ? process.env.NEXT_PUBLIC_API_ENDPOINT : server}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats/${chatId}`;
 
-  console.log("Updating chat to endpoint:", endpoint);
-
   const response = await fetch(endpoint, {
     method: "PUT",
     headers: {
@@ -36,21 +34,6 @@ export const putChat = async (
       updatedAt,
     }),
   });
-
-  console.log(
-    "Updating chat to endpoint body:",
-    JSON.stringify({
-      title,
-      status,
-      updatedAt,
-    })
-  );
-
-  console.log(
-    "Response from updating chat:",
-    response.status,
-    response.statusText
-  );
 
   if (!response.ok) {
     throw new Error(`Error updating the chat: ${response.statusText}`);

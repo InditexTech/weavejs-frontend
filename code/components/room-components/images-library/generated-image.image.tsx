@@ -9,8 +9,6 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { cn } from "@/lib/utils";
 import { CircleOff } from "lucide-react";
 
@@ -26,13 +24,6 @@ export const GeneratedImage = ({
   const instance = useWeave((state) => state.instance);
 
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
-
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
 
   const imageUrl = React.useMemo(() => {
     return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${image.roomId}/images/${image.imageId}`;
@@ -101,11 +92,7 @@ export const GeneratedImage = ({
             }}
             id={image.imageId}
             data-image-id={image.imageId}
-            draggable={
-              imagesLLMPopupVisible || imagesLLMPopupVisibleV2 || selected
-                ? undefined
-                : "true"
-            }
+            draggable={selected ? undefined : "true"}
             src={imageUrl}
             alt="A generated image"
           />
