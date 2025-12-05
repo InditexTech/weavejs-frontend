@@ -11,25 +11,18 @@ import {
   WeaveSelectionToolAction,
   WeaveEraserToolAction,
   WeaveBrushToolAction,
-  WeaveFrameToolAction,
   WeaveImageToolAction,
-  WeavePenToolAction,
   WeaveLineToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
   WeaveTextToolAction,
-  WeaveStarToolAction,
   WeaveArrowToolAction,
-  WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
-  WeaveAlignNodesToolAction,
   WeaveCommentToolAction,
   WeaveExportNodesToolAction,
-  WeaveVideoToolAction,
-  // WeaveConnectorToolAction,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -45,23 +38,13 @@ import {
   WeaveStrokeNode,
   WeaveCommentNode,
   WeaveVideoNode,
-  // WeaveConnectorNode,
-  WeaveStageGridPlugin,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
   WeaveStageResizePlugin,
   WeaveStageZoomPlugin,
-  WeaveConnectedUsersPlugin,
-  WeaveUsersPointersPlugin,
-  WeaveUsersSelectionPlugin,
-  WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveContextMenuPlugin,
-  WeaveNodesEdgeSnappingPlugin,
-  WeaveNodesDistanceSnappingPlugin,
   WeaveCommentsRendererPlugin,
-  // WeaveStageMinimapPlugin,
-  WeaveNodesMultiSelectionFeedbackPlugin,
   WeaveStageKeyboardMovePlugin,
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
@@ -76,20 +59,15 @@ import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
-import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
-import { ImagesToolAction } from "../actions/images-tool/images-tool";
-import { ImageTemplateToolAction } from "../actions/image-template-tool/image-template-tool";
-import { MaskToolAction } from "../actions/mask-tool/mask-tool";
-import { FuzzyMaskToolAction } from "../actions/fuzzy-mask-tool/fuzzy-mask-tool";
-import { MaskEraserToolAction } from "../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
+import { getUserShort } from "@/components/utils/users";
+import { ThreadEntity } from "@/components/room-components/hooks/types";
+import { getImageBase64 } from "@/components/utils/images";
 import {
   createCommentDOM,
   viewCommentDOM,
-} from "../room-components/comment/comment-dom";
-import { getUserShort } from "./users";
-import { ThreadEntity } from "../room-components/hooks/types";
-import { getImageBase64 } from "./images";
+} from "./components/comment/comment-dom";
+
 const FONTS = async (): Promise<WeaveFont[]> => {
   const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
     weight: "400",
@@ -370,14 +348,12 @@ const NODES = () => [
       },
     },
   }),
-  // new WeaveConnectorNode(),
   new ColorTokenNode(),
   new ImageTemplateNode(),
   new PantoneNode(),
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
-  new WeaveStageGridPlugin(),
   new WeaveStagePanningPlugin(),
   new WeaveStageResizePlugin(),
   new WeaveStageZoomPlugin({
@@ -471,18 +447,6 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  new WeaveNodesEdgeSnappingPlugin(),
-  new WeaveNodesDistanceSnappingPlugin({
-    config: {
-      ui: {
-        label: {
-          fontSize: 12,
-          fontFamily: "'Inter', sans-serif",
-        },
-      },
-    },
-  }),
-  new WeaveStageDropAreaPlugin(),
   new WeaveCopyPasteNodesPlugin({
     config: {
       paddingOnPaste: {
@@ -503,28 +467,6 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         console.error("Error getting image base64:", error);
         throw error;
       }
-    },
-  }),
-  new WeaveConnectedUsersPlugin({
-    config: {
-      getUser,
-    },
-  }),
-  new WeaveUsersPointersPlugin({
-    config: {
-      getUser,
-      getUserBackgroundColor: (user: WeaveUser) =>
-        stringToColor(user?.name ?? "#000000"),
-      getUserForegroundColor: (user: WeaveUser) => {
-        const bgColor = stringToColor(user?.name ?? "#ffffff");
-        return getContrastTextColor(bgColor);
-      },
-    },
-  }),
-  new WeaveUsersSelectionPlugin({
-    config: {
-      getUser,
-      getUserColor: (user: WeaveUser) => stringToColor(user?.name ?? "#000000"),
     },
   }),
   new WeaveContextMenuPlugin({
@@ -553,17 +495,6 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  new WeaveNodesMultiSelectionFeedbackPlugin(),
-  // new WeaveStageMinimapPlugin({
-  //   config: {
-  //     getContainer: () => {
-  //       return document?.getElementById("minimap") as HTMLElement;
-  //     },
-  //     id: "weave_stage_minimap",
-  //     width: window.innerWidth * 0.2,
-  //     fitToContentPadding: 5,
-  //   },
-  // }),
   new WeaveStageKeyboardMovePlugin({
     config: {
       movementDelta: 5,
@@ -577,29 +508,16 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveEraserToolAction(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
-  new WeavePenToolAction(),
   new WeaveLineToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),
-  new WeaveFrameToolAction(),
-  new WeaveStarToolAction(),
   new WeaveArrowToolAction(),
-  new WeaveRegularPolygonToolAction(),
-  new ColorTokenToolAction(),
-  new ImageTemplateToolAction(),
   new WeaveTextToolAction(),
-  new WeaveVideoToolAction(),
-  // new WeaveConnectorToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
-  new WeaveAlignNodesToolAction(),
   new WeaveExportNodesToolAction(),
-  new ImagesToolAction(),
-  new MaskToolAction(),
-  new FuzzyMaskToolAction(),
-  new MaskEraserToolAction(),
   new WeaveCommentToolAction({
     config: {
       style: {
