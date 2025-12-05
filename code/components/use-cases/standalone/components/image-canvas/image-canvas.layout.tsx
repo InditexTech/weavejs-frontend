@@ -94,7 +94,7 @@ export const ImageCanvasLayout = () => {
         style={{
           background: "#d6d6d6",
         }}
-        className={cn("w-full h-full relative overflow-hidden", {
+        className={cn("w-full h-full overflow-hidden", {
           ["pointer-events-none"]:
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
             status !== WEAVE_INSTANCE_STATUS.RUNNING ||

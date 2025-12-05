@@ -102,7 +102,6 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
 
   React.useEffect(() => {
     const handleCommentChanged = () => {
-      console.log("Comment changed event received");
       handleRefreshComment();
       handleRefreshComments();
     };

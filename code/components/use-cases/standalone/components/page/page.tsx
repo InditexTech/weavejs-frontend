@@ -86,9 +86,12 @@ export const StandalonePage = () => {
             <Images />
           </div>
           <div
-            className={cn("col-span-10 w-full h-full relative", {
-              ["col-span-8"]: showComments,
-            })}
+            className={cn(
+              "col-span-10 w-full h-full flex justify-center items-center relative",
+              {
+                ["col-span-8"]: showComments,
+              }
+            )}
           >
             {managingImageId !== null && <ImageCanvas key={managingImageId} />}
             {managingImageId === null && (

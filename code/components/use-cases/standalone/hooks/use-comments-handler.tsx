@@ -40,12 +40,9 @@ export const useCommentsHandler = () => {
 
   const { handleRefreshComments } = useComment({ node: null });
 
-  console.log("Comments Handler", instance, instanceId, managingImageId);
-
   const { data, error, isLoading } = useQuery({
     queryKey: ["standaloneComments", instanceId, managingImageId],
     queryFn: () => {
-      console.log("Fetching comments 2...");
       if (!instanceId || !managingImageId) {
         return Promise.resolve({ items: [], total: 0 });
       }

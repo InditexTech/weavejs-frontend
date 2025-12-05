@@ -51,12 +51,9 @@ export const Comments = () => {
 
   const { handleRefreshComments } = useComment({ node: null });
 
-  console.log("Comments", instance, instanceId, managingImageId);
-
   const { data, refetch, error, isLoading } = useQuery({
     queryKey: ["standaloneComments", instanceId, managingImageId],
     queryFn: () => {
-      console.log("Fetching comments 1...");
       if (!instanceId || !managingImageId) {
         return Promise.resolve({ items: [], total: 0 });
       }
@@ -282,17 +279,23 @@ export const Comments = () => {
                       </AvatarUI>
                     </div>
                     <div className="flex gap-1 justify-end items-center hidden group-hover:block">
-                      <Button
-                        className="rounded-none w-[20px] h-[20px] cursor-pointer"
-                        variant="link"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDeleteComment(thread.threadId);
-                        }}
-                      >
-                        <Trash strokeWidth={1} size={16} className="text-red" />
-                      </Button>
+                      {thread.userMetadata.name === user?.name && (
+                        <Button
+                          className="rounded-none w-[20px] h-[20px] cursor-pointer"
+                          variant="link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteComment(thread.threadId);
+                          }}
+                        >
+                          <Trash
+                            strokeWidth={1}
+                            size={16}
+                            className="text-red"
+                          />
+                        </Button>
+                      )}
                       {thread.status === "pending" && (
                         <Button
                           className="rounded-none w-[20px] h-[20px] cursor-pointer"

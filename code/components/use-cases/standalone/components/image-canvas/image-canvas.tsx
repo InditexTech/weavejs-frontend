@@ -46,7 +46,7 @@ export const ImageCanvas = () => {
 
   if (isFetching) {
     return (
-      <div className="w-full h-full flex flex-col gap-1 justify-center items-center">
+      <div className="w-full max-w-[400px] h-full flex flex-col gap-1 justify-center items-center">
         <ScaleLoader />
         <div className="font-inter text-xl">loading image...</div>
       </div>
