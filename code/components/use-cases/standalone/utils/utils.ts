@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import * as Y from "yjs";
 
 export function uint8ToBase64(uint8: Uint8Array): string {
