@@ -9,8 +9,6 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { cn } from "@/lib/utils";
 import { CircleOff } from "lucide-react";
 
@@ -25,16 +23,7 @@ export const GeneratedImage = ({
 }: Readonly<GeneratedImageProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const imageUrl = React.useMemo(() => {
     return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${image.roomId}/images/${image.imageId}`;
@@ -48,7 +37,7 @@ export const GeneratedImage = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
@@ -97,17 +86,13 @@ export const GeneratedImage = ({
           <div className="absolute inset-0 checkered transition-transform duration-500 group-hover:opacity-60"></div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
+            className="w-full block border border-[#c9c9c9] object-cover relative transition-transform duration-500 group-hover:opacity-60"
             style={{
               aspectRatio: `${image.aspectRatio}`,
             }}
             id={image.imageId}
             data-image-id={image.imageId}
-            draggable={
-              imagesLLMPopupVisible || imagesLLMPopupVisibleV2 || selected
-                ? undefined
-                : "true"
-            }
+            draggable={selected ? undefined : "true"}
             src={imageUrl}
             alt="A generated image"
           />

@@ -114,7 +114,7 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
         handleCommentChanged
       );
     };
-  }, [handleRefreshComments]);
+  }, [handleRefreshComment, handleRefreshComments]);
 
   return {
     commentId,

@@ -17,13 +17,10 @@ import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
   BrushCleaning,
   Info,
-  Link,
   SquareCheck,
   SquareX,
   Trash,
   Trash2,
-  Unlink,
-  X,
 } from "lucide-react";
 import {
   WeaveStateElement,
@@ -41,8 +38,6 @@ import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { UploadedImage } from "./uploaded.image";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { GeneratedImage } from "./generated-image.image";
 import {
   ContextMenu,
@@ -54,7 +49,8 @@ import {
 import { cn } from "@/lib/utils";
 import { ImageEntity } from "./types";
 import { ImagesLibraryActions } from "./images-library.actions";
-// import { eventBus } from "@/components/utils/events-bus";
+import { SidebarHeader } from "../sidebar-header";
+import { useIAChat } from "@/store/ia-chat";
 
 function isRelativeUrl(url: string) {
   try {
@@ -78,30 +74,12 @@ export const ImagesLibrary = () => {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
 
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const imagesReferences = useIACapabilitiesV2(
-    (state) => state.references.images
-  );
-  const setImagesReferences = useIACapabilitiesV2(
-    (state) => state.setImagesLLMReferences
-  );
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   // const queryClient = useQueryClient();
 
@@ -179,66 +157,6 @@ export const ImagesLibrary = () => {
     [instance, mutationDelete]
   );
 
-  const handleSetImageReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (image: any) => {
-      const element = document.querySelector(
-        `img[id="${image.imageId}"]`
-      ) as HTMLImageElement | null;
-
-      if (!element) {
-        return;
-      }
-
-      const newReferences = [...imagesReferences];
-      const existsReference = newReferences.find(
-        (ele) => ele.id === image.imageId
-      );
-
-      if (typeof existsReference !== "undefined") {
-        return;
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.width = element.naturalWidth;
-      canvas.height = element.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(element, 0, 0);
-
-        const dataURL = canvas.toDataURL("image/png");
-        newReferences.push({
-          id: image.imageId,
-          aspectRatio: image.aspectRatio,
-          base64Image: dataURL,
-        });
-      }
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
-  const handleRemoveImageReference = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (image: any) => {
-      const element = document.querySelector(
-        `img[id="${image.imageId}"]`
-      ) as HTMLImageElement | null;
-
-      if (!element) {
-        return;
-      }
-
-      let newReferences = [...imagesReferences];
-
-      newReferences = newReferences.filter((ele) => ele.id !== image.imageId);
-
-      setImagesReferences(newReferences);
-    },
-    [imagesReferences, setImagesReferences]
-  );
-
   const handleRemoveBackground = React.useCallback(
     (image: ImageEntity) => {
       if (!instance) {
@@ -308,7 +226,7 @@ export const ImagesLibrary = () => {
       }
       return undefined; // no more pages
     },
-    enabled: sidebarLeftActive === "images",
+    enabled: sidebarActive === "images",
   });
 
   const appImages = React.useMemo(() => {
@@ -417,43 +335,36 @@ export const ImagesLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
-          <SidebarSelector title="Images" />
-        </div>
-        <div className="flex justify-end items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="selection-mode"
-              checked={showSelection}
-              onCheckedChange={(checked) => {
-                setShowSelection(checked);
-              }}
-              className="w-[32px] cursor-pointer"
-            />
-            <Label
-              htmlFor="selection-mode"
-              className="!font-inter !text-xs cursor-pointer"
-            >
-              SELECTION
-            </Label>
+      <SidebarHeader
+        actions={
+          <div className="flex justify-end items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="selection-mode"
+                checked={showSelection}
+                onCheckedChange={(checked) => {
+                  setShowSelection(checked);
+                }}
+                className="w-[32px] cursor-pointer"
+              />
+              <Label
+                htmlFor="selection-mode"
+                className="!font-inter !text-xs cursor-pointer"
+              >
+                SELECTION
+              </Label>
+            </div>
           </div>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+        }
+      >
+        <SidebarSelector title="Images" />
+      </SidebarHeader>
       {!workloadsEnabled && (
         <ScrollArea className="w-full h-[calc(100%-95px)] overflow-auto">
           <div className="flex flex-col gap-2 w-full">
@@ -470,7 +381,7 @@ export const ImagesLibrary = () => {
                 <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                   <b className="font-normal text-[18px]">No images</b>
                   <span className="text-[14px]">
-                    {aiEnabled || aiEnabledV2 ? (
+                    {aiChatEnabled ? (
                       <>
                         Add an image to the room, or
                         <br />
@@ -505,11 +416,7 @@ export const ImagesLibrary = () => {
                         <img
                           key={imageId}
                           className="w-full h-full object-cover"
-                          draggable={
-                            imagesLLMPopupVisible || imagesLLMPopupVisibleV2
-                              ? "false"
-                              : "true"
-                          }
+                          draggable="true"
                           src={imageUrl}
                           data-image-id={imageId}
                           alt="An image"
@@ -584,18 +491,13 @@ export const ImagesLibrary = () => {
       {workloadsEnabled && (
         <ScrollArea
           className={cn("w-full overflow-auto", {
-            ["h-[calc(100%-95px-40px-40px)]"]: showSelection,
-            ["h-[calc(100%-95px)]"]: !showSelection,
+            ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
+            ["h-[calc(100%-65px-73px)]"]: !showSelection,
           })}
         >
           <div
             className="w-full weaveDraggable p-0"
             onDragStart={(e) => {
-              if (imagesLLMPopupVisible || imagesLLMPopupVisibleV2) {
-                e.preventDefault();
-                return;
-              }
-
               if (e.target instanceof HTMLImageElement) {
                 window.weaveDragImageURL = e.target.src;
                 window.weaveDragImageId = e.target.dataset.imageId;
@@ -606,7 +508,7 @@ export const ImagesLibrary = () => {
               <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                 <b className="font-normal text-[18px]">No images</b>
                 <span className="text-[14px]">
-                  {aiEnabled || aiEnabledV2 ? (
+                  {aiChatEnabled ? (
                     <>
                       Add an image to the room, or
                       <br />
@@ -623,10 +525,6 @@ export const ImagesLibrary = () => {
                 images.map((image) => {
                   const appImage = appImages.find(
                     (appImage) => appImage.props.imageId === image.imageId
-                  );
-
-                  const isReference = imagesReferences.find(
-                    (ele) => ele.id === image.imageId
                   );
 
                   const isChecked = realSelectedImages.includes(image);
@@ -698,11 +596,8 @@ export const ImagesLibrary = () => {
                                     className="bg-white rounded-none cursor-pointer"
                                     value={image.imageId}
                                     checked={isChecked}
-                                    onCheckedChange={(checked) => {
-                                      handleCheckboxChange(
-                                        checked as boolean,
-                                        image
-                                      );
+                                    onCheckedChange={(checked: boolean) => {
+                                      handleCheckboxChange(checked, image);
                                     }}
                                   />
                                 </div>
@@ -714,16 +609,6 @@ export const ImagesLibrary = () => {
                                   variant="default"
                                 >
                                   IN USE
-                                </Badge>
-                              </div>
-                            )}
-                            {typeof isReference !== "undefined" && (
-                              <div className="absolute top-0 left-0 flex gap-1 justify-start items-end p-2">
-                                <Badge
-                                  className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-                                  variant="secondary"
-                                >
-                                  REFERENCED
                                 </Badge>
                               </div>
                             )}
@@ -746,40 +631,6 @@ export const ImagesLibrary = () => {
                               <ContextMenuSeparator />
                             </>
                           )}
-                          {imagesLLMPopupVisibleV2 &&
-                            ["completed"].includes(image.status) && (
-                              <>
-                                <ContextMenuItem
-                                  className="rounded-none uppercase font-inter text-xs"
-                                  onClick={() => {
-                                    handleSetImageReference(image);
-                                  }}
-                                  disabled={typeof isReference !== "undefined"}
-                                >
-                                  <Link
-                                    strokeWidth={1}
-                                    size={16}
-                                    className="mr-2"
-                                  />
-                                  Set as reference
-                                </ContextMenuItem>
-                                <ContextMenuItem
-                                  className="rounded-none uppercase font-inter text-xs"
-                                  onClick={() => {
-                                    handleRemoveImageReference(image);
-                                  }}
-                                  disabled={typeof isReference === "undefined"}
-                                >
-                                  <Unlink
-                                    strokeWidth={1}
-                                    size={16}
-                                    className="mr-2"
-                                  />
-                                  Remove as reference
-                                </ContextMenuItem>
-                                <ContextMenuSeparator />
-                              </>
-                            )}
                           {["completed"].includes(image.status) && (
                             <ContextMenuItem
                               className="rounded-none uppercase font-inter text-xs"

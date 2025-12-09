@@ -28,16 +28,11 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
-import { LLMGenerationPopup } from "../room-components/overlay/llm-popup";
-import { LLMPredictionsSelectionPopup } from "../room-components/overlay/llm-predictions-selection";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
-import { LLMReferenceSelectionPopup } from "../room-components/overlay/llm-reference-selection";
 import { useToolsEvents } from "../room-components/hooks/use-tools-events";
 import { RemoveBackgroundActionPopup } from "../room-components/overlay/remove-background-action-popup";
 import { RoomHeaderShadowDom } from "../room-components/overlay/room-header-shadow-dom";
-import { LLMGenerationPopupV2 } from "../room-components/overlay/llm-popup-v2";
 import { Comments } from "../room-components/comment/comments";
-import { LLMReferenceSelectionPopupV2 } from "../room-components/overlay/llm-reference-selection-v2";
 import { ExportConfigDialog } from "../room-components/overlay/export-config";
 import { NodeToolbar } from "../room-components/overlay/node-toolbar";
 import { VideosLibrary } from "../room-components/videos-library/videos-library";
@@ -47,6 +42,10 @@ import { ManageIdleDisconnection } from "../room-components/manage-idle-disconne
 import { useKeyboardHandler } from "../room-components/hooks/use-keyboard-handler";
 import { SaveTemplateDialog } from "../room-components/overlay/save-template";
 import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
+import { RoomHeaderRight } from "../room-components/overlay/room-header.right";
+import { ChatBot } from "../room-components/ai-components/chatbot";
+import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
+import { useIAChat } from "@/store/ia-chat";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -78,12 +77,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const room = useCollaborationRoom((state) => state.room);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active
-  );
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
   );
@@ -121,6 +114,8 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const backgroundColor = useCollaborationRoom(
     (state) => state.backgroundColor
   );
+
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const handleReconnectRoom = React.useCallback(async () => {
     if (!instance) {
@@ -186,7 +181,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         }}
         className="w-full h-full flex flex-col relative overflow-hidden"
       >
-        <section
+        {/* <section
           id="sidebar-left"
           className={cn(
             "bg-white absolute top-[calc(72px+32px)] left-[16px] bottom-[16px] border-[0.5px] border-[#c9c9c9] z-[10] overflow-hidden",
@@ -211,8 +206,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
               </div>
             )}
           </AnimatePresence>
-        </section>
-        <section className="w-full h-full flex z-0 overflow-hidden">
+        </section> */}
+        <section className="w-[calc(100%-480px)] h-full flex z-0 overflow-hidden">
+          {/* <section className="w-full h-full flex z-0 overflow-hidden"> */}
           <div
             id="weave"
             tabIndex={0}
@@ -231,7 +227,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           >
             <NodeToolbar />
           </div>
-          {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
           {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
               <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none">
@@ -293,6 +288,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           )}
           {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
             <>
+              {aiChatEnabled && <ChatBotPrompt />}
               <ContextMenuRender
                 show={contextMenuShow}
                 onChanged={(show: boolean) => {
@@ -322,24 +318,28 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </>
           )}
         </section>
-        <section
-          id="sidebar-right"
-          className={cn(
-            "bg-white absolute top-[calc(72px+32px)] right-[16px] bottom-[16px] border-[0.5px] border-[#c9c9c9] z-[10] overflow-hidden",
-            {
-              ["w-0 h-0"]: sidebarRightActive === null,
-              ["w-[370px]"]: sidebarRightActive !== null,
-            }
-          )}
-        >
-          <NodeProperties />
-          {weaveConnectionStatus !==
-            WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
-            <div className="absolute top-0 left-0 right-0 bottom-0">
-              <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none"></div>
-            </div>
-          )}
-        </section>
+        {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
+        {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
+          <section className="fixed bg-white top-0 right-0 bottom-0 w-[480px] h-full border-l border-l-[#c9c9c9]">
+            <RoomHeaderRight />
+            <AnimatePresence>
+              {WEAVE_STORE_CONNECTION_STATUS.CONNECTED ===
+                weaveConnectionStatus && (
+                <>
+                  <NodeProperties />
+                  <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+                  <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
+                  <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
+                  <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
+                  <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
+                  <Comments key={SIDEBAR_ELEMENTS.comments} />
+                  <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
+                  {aiChatEnabled && <ChatBot key={SIDEBAR_ELEMENTS.aiChat} />}
+                </>
+              )}
+            </AnimatePresence>
+          </section>
+        )}
         {uploadingImage && (
           <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
@@ -396,11 +396,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <ManageIdleDisconnection />
             <MaskSlider />
             <SaveTemplateDialog />
-            <LLMGenerationPopup />
-            <LLMGenerationPopupV2 />
-            <LLMPredictionsSelectionPopup />
-            <LLMReferenceSelectionPopup />
-            <LLMReferenceSelectionPopupV2 />
             <RemoveBackgroundActionPopup />
             <ExportConfigDialog />
           </>

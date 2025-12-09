@@ -14,7 +14,6 @@ import {
   Square,
   Tag,
   Type,
-  X,
   Trash,
   LockOpen,
   Lock,
@@ -33,6 +32,7 @@ import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
+import { SidebarHeader } from "../sidebar-header";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -183,12 +183,7 @@ export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
     []
@@ -230,7 +225,7 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sidebarLeftActive]);
+  }, [sidebarActive]);
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
@@ -254,7 +249,7 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sidebarLeftActive]);
+  }, [sidebarActive]);
 
   const treeData = React.useMemo<TreeDataItem[]>(() => {
     if (!instance) return [];
@@ -266,27 +261,15 @@ export const ElementsTree = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.nodesTree) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.nodesTree) {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
-          <SidebarSelector title="Elements Tree" />
-        </div>
-        <div className="flex justify-end items-center gap-1">
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-2"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+      <SidebarHeader>
+        <SidebarSelector title="Elements Tree" />
+      </SidebarHeader>
       <ScrollArea className="w-full h-[calc(100%-95px-33px)]">
         <div className="flex flex-col gap-2 w-full h-full">
           {elementsTree.length === 0 && (

@@ -32,9 +32,7 @@ export const VideosLibraryActions = ({
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const mutationDelete = useMutation({
     mutationFn: async (videoId: string) => {
@@ -117,7 +115,7 @@ export const VideosLibraryActions = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.videos) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
     return null;
   }
 

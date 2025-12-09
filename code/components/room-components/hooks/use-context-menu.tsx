@@ -10,7 +10,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
 import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
-import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
@@ -20,7 +20,6 @@ import {
   ClipboardCopy,
   ClipboardPaste,
   Group,
-  Bot,
   Ungroup,
   Trash,
   SendToBack,
@@ -31,25 +30,22 @@ import {
   Lock,
   EyeOff,
   Link,
-  HardDriveUpload,
   PackagePlus,
   PackageOpen,
+  Paperclip,
 } from "lucide-react";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { useExportToImageServerSide } from "./use-export-to-image-server-side";
 import { getImageBase64 } from "@/components/utils/images";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { setTemplateOnPosition } from "@/components/utils/templates";
 import { useTemplates } from "@/store/templates";
+import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
+import { useIAChat } from "@/store/ia-chat";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
-  const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
-  );
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show
   );
@@ -62,80 +58,23 @@ function useContextMenu() {
   const setContextMenuOptions = useCollaborationRoom(
     (state) => state.setContextMenuOptions
   );
-  // const setTransformingImage = useCollaborationRoom(
-  //   (state) => state.setTransformingImage
-  // );
-  // const setRemoveBackgroundPopupShow = useCollaborationRoom(
-  //   (state) => state.setRemoveBackgroundPopupShow
-  // );
-  // const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
-  //   (state) => state.setRemoveBackgroundPopupOriginNodeId
-  // );
-  // const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
-  //   (state) => state.setRemoveBackgroundPopupOriginImage
-  // );
-  // const setRemoveBackgroundPopupImageId = useCollaborationRoom(
-  //   (state) => state.setRemoveBackgroundPopupImageId
-  // );
-  // const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
-  //   (state) => state.setRemoveBackgroundPopupImageURL
-  // );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
     (state) => state.setExportConfigVisible
-  );
-  const setImageExporting = useCollaborationRoom(
-    (state) => state.setImageExporting
   );
 
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
   const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
 
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const setImagesLLMPopupSelectedNodes = useIACapabilities(
-    (state) => state.setImagesLLMPopupSelectedNodes
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const setImagesLLMPopupImage = useIACapabilities(
-    (state) => state.setImagesLLMPopupImage
-  );
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const imagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.llmPopup.visible
-  );
-  const setImagesLLMPopupSelectedNodesV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupSelectedNodes
-  );
-  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupImage
-  );
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const setSaveDialogVisible = useTemplates(
     (state) => state.setSaveDialogVisible
   );
 
-  const sidebarToggle = React.useCallback(
-    (element: SidebarActive) => {
-      setSidebarActive(element);
-    },
-    [setSidebarActive]
-  );
-
   const { isExporting } = useExportToImageServerSide();
+
+  const promptInputAttachmentsController = usePromptInputAttachments();
 
   // const mutationUpload = useMutation({
   //   mutationFn: async ({
@@ -217,93 +156,56 @@ function useContextMenu() {
       const hasLinkedImageNode =
         linkedNode !== null && linkedNode.getAttrs().nodeType === "image";
 
-      if (nodes.length > 0) {
-        // EDIT IMAGE WITH A PROMPT
-        if (!singleLocked) {
-          if (!workloadsEnabled) {
-            options.push({
-              id: "editIAImage",
-              type: "button",
-              disabled: !aiEnabled,
-              label: "Edit with AI",
-              icon: <Bot size={16} />,
-              onClick: async () => {
-                setContextMenuShow(false);
+      if (nodes.length > 0 && aiChatEnabled) {
+        // LINK IMAGE AS ATTACHMENT TOOLS
+        // if (isSingleImage) {
+        options.push({
+          id: "set-prompt-attachment-image",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Set as prompt attachment</div>
+            </div>
+          ),
+          icon: <Paperclip size={16} />,
+          onClick: async () => {
+            setContextMenuShow(false);
 
-                setImageExporting(true);
+            const id = toast.loading("Generating attachment...");
 
-                try {
-                  const { url } = await getImageBase64({
-                    instance,
-                    nodes: nodes.map((n) => n.node?.key ?? ""),
-                    options: {
-                      padding: 0,
-                      pixelRatio: 1,
-                    },
-                  });
-
-                  setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-                  setImagesLLMPopupType("edit-prompt");
-                  setImagesLLMPopupImage(url);
-                  setImagesLLMPopupVisible(true);
-                } catch (error) {
-                  console.error(error);
-                  toast.error("Error exporting image.");
-                } finally {
-                  setImageExporting(false);
-                }
+            const selectionImage = await getImageBase64({
+              instance,
+              nodes: nodes.map((n) => n.node?.key ?? ""),
+              options: {
+                format: "image/png",
+                padding: 0,
+                backgroundColor: "transparent",
+                pixelRatio: 1,
               },
             });
-            options.push({
-              id: "div--1",
-              type: "divider",
+
+            const [header, base64] = selectionImage.url.split(",");
+            const mime = header.match(/:(.*?);/)![1];
+
+            const binary = atob(base64);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+
+            for (let i = 0; i < len; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+
+            const selectionBlob = new Blob([bytes], { type: mime });
+
+            const file = new File([selectionBlob], "image.png", {
+              type: mime,
             });
-          }
-          if (workloadsEnabled) {
-            options.push({
-              id: "editIAImage",
-              type: "button",
-              disabled: !aiEnabledV2,
-              label: "Edit with AI",
-              icon: <Bot size={16} />,
-              onClick: async () => {
-                setContextMenuShow(false);
 
-                setImageExporting(true);
+            promptInputAttachmentsController.add([file]);
 
-                try {
-                  const { url } = await getImageBase64({
-                    instance,
-                    nodes: nodes.map((n) => n.node?.key ?? ""),
-                    options: {
-                      padding: 0,
-                      pixelRatio: 1,
-                    },
-                  });
-
-                  sidebarToggle(null);
-
-                  setImagesLLMPopupSelectedNodesV2(
-                    nodes.map((n) => n.instance)
-                  );
-                  setImagesLLMPopupTypeV2("edit-prompt");
-                  setImagesLLMPopupImageV2(url);
-                  setImagesLLMPopupVisibleV2(true);
-                } catch (error) {
-                  console.error(error);
-                  toast.error("Error exporting image.");
-                } finally {
-                  setImageExporting(false);
-                }
-              },
-            });
-            options.push({
-              id: "div--1",
-              type: "divider",
-            });
-          }
-        }
-
+            toast.dismiss(id);
+          },
+        });
         // LINK IMAGE TOOLS
         if (isSingleImage) {
           options.push({
@@ -314,7 +216,7 @@ function useContextMenu() {
                 <div>Set as template link</div>
               </div>
             ),
-            icon: <HardDriveUpload size={16} />,
+            icon: <Link size={16} />,
             onClick: async () => {
               setLinkedNode(nodes[0].instance);
               setContextMenuShow(false);
@@ -766,34 +668,15 @@ function useContextMenu() {
       return options;
     },
     [
-      // user?.name,
-      workloadsEnabled,
       instance,
-      // clientId,
-      // mutationUpload,
-      // mutationUploadV2,
-      aiEnabled,
-      aiEnabledV2,
+      aiChatEnabled,
+      promptInputAttachmentsController,
+      setLinkedNode,
+      setSaveDialogVisible,
       setExportConfigVisible,
       setExportNodes,
       isExporting,
-      setImagesLLMPopupSelectedNodes,
-      setImagesLLMPopupType,
-      setImagesLLMPopupVisible,
-      setImagesLLMPopupImage,
-      setImagesLLMPopupSelectedNodesV2,
-      setImagesLLMPopupTypeV2,
-      setImagesLLMPopupVisibleV2,
-      setImagesLLMPopupImageV2,
-      // setTransformingImage,
       setContextMenuShow,
-      setImageExporting,
-      // setRemoveBackgroundPopupImageId,
-      // setRemoveBackgroundPopupImageURL,
-      // setRemoveBackgroundPopupOriginNodeId,
-      // setRemoveBackgroundPopupOriginImage,
-      // setRemoveBackgroundPopupShow,
-      sidebarToggle,
       room,
       linkedNode,
     ]
@@ -826,7 +709,7 @@ function useContextMenu() {
         stageClickPoint,
       });
 
-      if (contextMenu.length > 0 && !imagesLLMPopupVisibleV2) {
+      if (contextMenu.length > 0) {
         setContextMenuShow(visible);
         setContextMenuPosition(contextMenuPoint);
         setContextMenuOptions(contextMenu);
@@ -842,7 +725,6 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
-      imagesLLMPopupVisibleV2,
     ]
   );
 

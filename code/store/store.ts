@@ -76,12 +76,8 @@ interface CollaborationRoomState {
     };
   };
   sidebar: {
-    left: {
-      active: SidebarActive;
-    };
-    right: {
-      active: SidebarActive;
-    };
+    previouslyActive: SidebarActive;
+    active: SidebarActive;
   };
   clientId: string | undefined;
   user: ShowcaseUser | undefined;
@@ -166,10 +162,7 @@ interface CollaborationRoomState {
   setNodePropertiesCreateProps: (
     newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
-  setSidebarActive: (
-    newSidebarActive: SidebarActive,
-    position?: "left" | "right"
-  ) => void;
+  setSidebarActive: (newSidebarActive: SidebarActive) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
   setRemoveBackgroundPopupAction: (
     newAction: "replace" | "new" | undefined
@@ -220,12 +213,8 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   user: undefined,
   room: undefined,
   sidebar: {
-    left: {
-      active: null,
-    },
-    right: {
-      active: null,
-    },
+    previouslyActive: null,
+    active: SIDEBAR_ELEMENTS.nodesTree,
   },
   fonts: {
     loaded: false,
@@ -421,15 +410,12 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         createProps: newNodePropertiesCreateProps,
       },
     })),
-  setSidebarActive: (newSidebarActive, position = "left") =>
+  setSidebarActive: (newSidebarActive) =>
     set((state) => ({
       ...state,
       sidebar: {
-        ...state.sidebar,
-        [position]: {
-          ...state.sidebar[position],
-          active: newSidebarActive,
-        },
+        previouslyActive: state.sidebar.active,
+        active: newSidebarActive,
       },
     })),
   setShowDrawer: (drawerKey, newOpen) =>

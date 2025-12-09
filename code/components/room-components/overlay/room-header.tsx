@@ -8,6 +8,7 @@ import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { ConnectionStatus } from "../connection-status";
 import { useWeave } from "@inditextech/weave-react";
 import {
   BACKGROUND_COLOR,
@@ -43,16 +44,12 @@ import {
   WeaveStageGridType,
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
-import { ConnectionStatus } from "../connection-status";
 import { bottomElementVariants, topElementVariants } from "./variants";
-import { ConnectedUsers } from "../connected-users";
 import { Divider } from "./divider";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useIACapabilities } from "@/store/ia";
-import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
@@ -60,6 +57,7 @@ import {
   getSessionConfig,
   setSessionConfig,
 } from "@/components/utils/session-config";
+import { useIAChat } from "@/store/ia-chat";
 
 export function RoomHeader() {
   const os = useGetOs();
@@ -91,8 +89,8 @@ export function RoomHeader() {
     (state) => state.setConnectionTestsShow
   );
 
-  const iaEnabled = useIACapabilities((state) => state.enabled);
-  const setIASetupVisible = useIACapabilities((state) => state.setSetupVisible);
+  const aiChatEnabled = useIAChat((state) => state.enabled);
+  const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
@@ -300,7 +298,7 @@ export function RoomHeader() {
         >
           <div
             className={cn(
-              "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]",
+              "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]",
               {
                 ["pointer-events-none"]: selectionActive,
                 ["pointer-events-auto"]: !selectionActive,
@@ -324,7 +322,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
               open={menuOpen}
@@ -676,14 +674,14 @@ export function RoomHeader() {
                             WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED ||
                           (weaveConnectionStatus !==
                             WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
-                            iaEnabled)
+                            aiChatEnabled)
                         }
                         onPointerDown={() => {
-                          setIASetupVisible(true);
+                          setAiChatSetupVisible(true);
                           setMenuOpen(false);
                         }}
                       >
-                        {iaEnabled ? (
+                        {aiChatEnabled ? (
                           <Check size={16} strokeWidth={1} />
                         ) : (
                           <div className="w-[16px] h-[16px]" />
@@ -743,45 +741,11 @@ export function RoomHeader() {
                 <div className="font-inter text-[24px] font-light">{room}</div>
               </div>
             </div>
+            <Divider className="hidden lg:block" />
+            <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
           </div>
         </div>
       </motion.div>
-      {![
-        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ].includes(weaveConnectionStatus as any) && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={topElementVariants}
-          className={cn(
-            "w-auto z-1 flex gap-1 justify-center items-center absolute top-[16px] right-[16px]",
-            {
-              ["pointer-events-none"]: selectionActive,
-              ["pointer-events-auto"]: !selectionActive,
-            }
-          )}
-        >
-          <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
-            <div className="flex justify-end items-center gap-[16px]">
-              <div className="flex justify-end items-center gap-[16px]">
-                <ConnectionStatus
-                  weaveConnectionStatus={weaveConnectionStatus}
-                />
-                <div className="max-w-[320px]">
-                  <ConnectedUsers />
-                </div>
-              </div>
-              <div className="hidden 2xl:flex justify-end items-center gap-[16px]">
-                <Divider />
-                <ZoomToolbar />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-      <LlmSetupDialog />
     </>
   );
 }

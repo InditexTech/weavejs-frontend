@@ -18,7 +18,7 @@ import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { useCollaborationRoom } from "@/store/store";
-import { Trash, CircleCheckBig, X, Ellipsis, Check, Clock } from "lucide-react";
+import { Trash, CircleCheckBig, Ellipsis, Check, Clock } from "lucide-react";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { getThreads } from "@/api/get-threads";
 import { useWeave } from "@inditextech/weave-react";
@@ -33,6 +33,7 @@ import {
   WeaveCommentNode,
   WeaveCommentsRendererPlugin,
 } from "@inditextech/weave-sdk";
+import { SidebarHeader } from "../sidebar-header";
 
 export const Comments = () => {
   const instance = useWeave((state) => state.instance);
@@ -42,12 +43,7 @@ export const Comments = () => {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const commentsStatus = useCollaborationRoom((state) => state.comments.status);
   const setCommentsStatus = useCollaborationRoom(
     (state) => state.setCommentsStatus
@@ -209,20 +205,17 @@ export const Comments = () => {
     }
   }, [instance, status, roomLoaded, data?.items, error, isLoading]);
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.comments) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.comments) {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex gap-2 justify-between font-inter font-light items-center text-[24px] uppercase">
-          <SidebarSelector title="Comments" />
-        </div>
-        <div className="flex justify-end items-center gap-4">
+      <SidebarHeader
+        actions={
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]">
+              <button className="cursor-pointer flex justify-center items-center w-[20px] h-[32px] text-center bg-transparent hover:text-[#c9c9c9]">
                 <Ellipsis size={20} strokeWidth={1} />
               </button>
             </DropdownMenuTrigger>
@@ -263,16 +256,10 @@ export const Comments = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+        }
+      >
+        <SidebarSelector title="Comments" />
+      </SidebarHeader>
       {isLoading && (
         <div className="w-full h-[calc(100%-95px)] font-inter text-sm flex justify-center items-center">
           Loading...
@@ -284,7 +271,7 @@ export const Comments = () => {
         </div>
       )}
       {!isLoading && data.items.length > 0 && (
-        <ScrollArea className="w-full h-[calc(100%-95px-40px)] overflow-auto">
+        <ScrollArea className="w-full h-[calc(100%-65px-73px-40px)] overflow-auto">
           <div className="flex flex-col gap-3 w-full p-5">
             {data.items.map((thread: ThreadEntity, index: number) => {
               return (

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
   DropdownMenuGroup,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import {
@@ -23,9 +24,14 @@ import {
   ChevronUp,
   MessageCircle,
   LayoutPanelTop,
+  SquareMousePointer,
+  Video,
+  BotMessageSquare,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useWeave } from "@inditextech/weave-react";
+import { useIAChat } from "@/store/ia-chat";
 
 type SidebarSelectorProps = {
   title: string;
@@ -34,12 +40,16 @@ type SidebarSelectorProps = {
 export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
+  const selectedNodes = useWeave((state) => state.selection.nodes);
+
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
   );
+
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -52,7 +62,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
       <DropdownMenuTrigger
         className={cn(
-          "flex gap-2 rounded-none h-[40px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
+          "flex gap-2 rounded-none h-[32px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
@@ -74,6 +84,28 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         className="font-inter rounded-none"
       >
         <DropdownMenuGroup>
+          {selectedNodes.length > 0 && (
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onPointerDown={() => {
+                sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
+              }}
+            >
+              <SquareMousePointer strokeWidth={1} /> Selection
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            onPointerDown={() => {
+              sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+            }}
+          >
+            <ListTree strokeWidth={1} /> Elements
+            <DropdownMenuShortcut>
+              {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={() => {
@@ -91,7 +123,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.videos);
             }}
           >
-            <Images strokeWidth={1} /> Videos
+            <Video strokeWidth={1} /> Videos
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl V"}
             </DropdownMenuShortcut>
@@ -142,17 +174,19 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
-              sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-            }}
-          >
-            <ListTree strokeWidth={1} /> Elements tree
-            <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {aiChatEnabled && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onPointerDown={() => {
+                  sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
+                }}
+              >
+                <BotMessageSquare strokeWidth={1} /> AI Assistant
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

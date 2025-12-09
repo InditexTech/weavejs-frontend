@@ -4,7 +4,6 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
-import { useIACapabilities } from "@/store/ia";
 import { ToolbarButton } from "../../toolbar/toolbar-button";
 import { Hand } from "lucide-react";
 import { ShortcutElement } from "../../help/shortcut-element";
@@ -23,10 +22,6 @@ export const MoveToolTrigger = ({
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);
-
-  const imagesLLMPopupVisible = useIACapabilities(
-    (state) => state.llmPopup.visible
-  );
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -50,13 +45,7 @@ export const MoveToolTrigger = ({
       }
       active={actualAction === "moveTool"}
       onClick={() => {
-        if (imagesLLMPopupVisible) {
-          triggerTool("moveTool", {
-            triggerSelectionTool: false,
-          });
-        } else {
-          triggerTool("moveTool");
-        }
+        triggerTool("moveTool");
       }}
       label={
         <div className="flex gap-3 justify-start items-center">

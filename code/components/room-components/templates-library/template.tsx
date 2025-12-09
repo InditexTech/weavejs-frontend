@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import React from "react";
@@ -27,15 +29,13 @@ export const Template = ({
 }: Readonly<TemplateProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   if (!instance) {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.templates) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
     return null;
   }
 
@@ -54,6 +54,7 @@ export const Template = ({
       <img
         className="bg-[#d6d6d6] w-full aspect-video block object-contain relative transition-transform duration-500 group-hover:opacity-60"
         src={template.templateImage}
+        alt="A template"
         data-template-data={template.templateData}
       />
       <div className="w-full flex p-3 justify-between items-center gap-3 border-t border-[#c9c9c9]">
@@ -64,7 +65,7 @@ export const Template = ({
             className="bg-white rounded-none cursor-pointer"
             value={template.templateId}
             checked={selected}
-            onCheckedChange={(checked) => {
+            onCheckedChange={(checked: boolean) => {
               onChange(checked);
             }}
           />

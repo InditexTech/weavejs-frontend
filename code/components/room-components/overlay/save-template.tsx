@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -235,6 +237,7 @@ export function SaveTemplateDialog() {
                 )}
                 {!generatingImagePreview && (
                   <img
+                    alt="Template preview"
                     className="aspect-video border max-w-[375px] h-[300px] border-[#c9c9c9] bg-[#d6d6d6] w-full object-contain"
                     src={templateImage}
                   />

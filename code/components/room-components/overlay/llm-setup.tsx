@@ -17,22 +17,20 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useIACapabilities } from "@/store/ia";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import { postValidatePassword } from "@/api/post-validate-password";
 import { X } from "lucide-react";
+import { useIAChat } from "@/store/ia-chat";
 
 export function LlmSetupDialog() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [password, setPassword] = React.useState<string>("");
 
-  const setupVisible = useIACapabilities((state) => state.setup.visible);
-  const setAIEnabled = useIACapabilities((state) => state.setEnabled);
-  const setSetupVisible = useIACapabilities((state) => state.setSetupVisible);
-  const setSetupState = useIACapabilities((state) => state.setSetupState);
-  const setAIEnabledV2 = useIACapabilitiesV2((state) => state.setEnabled);
+  const setAiChatEnabled = useIAChat((state) => state.setEnabled);
+  const setupVisible = useIAChat((state) => state.setup.visible);
+  const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
+  const setAiChatSetupState = useIAChat((state) => state.setSetupState);
 
   React.useEffect(() => {
     if (setupVisible) {
@@ -44,30 +42,28 @@ export function LlmSetupDialog() {
 
   const mutationGenerate = useMutation({
     mutationFn: async (password: string) => {
-      setSetupState("validating");
+      setAiChatSetupState("validating");
       return await postValidatePassword(password);
     },
     onSettled: () => {
-      setSetupState("idle");
+      setAiChatSetupState("idle");
     },
     onSuccess: () => {
       toast.success("Setup AI capabilities", {
         description: "You have successfully enabled AI capabilities.",
       });
-      sessionStorage.setItem("weave_ai_enabled", "true");
-      sessionStorage.setItem("weave_ai_password", password);
-      setSetupVisible(false);
-      setAIEnabled(true);
-      setAIEnabledV2(true);
+      sessionStorage.setItem("weave_ai_chat_enabled", "true");
+      sessionStorage.setItem("weave_ai_chat_password", password);
+      setAiChatSetupVisible(false);
+      setAiChatEnabled(true);
     },
     onError() {
       toast.error("Setup AI capabilities", {
         description:
           "Failed to enable AI capabilities. Please check and try again.",
       });
-      sessionStorage.setItem("weave_ai_enabled", "false");
-      setAIEnabled(false);
-      setAIEnabledV2(false);
+      sessionStorage.setItem("weave_ai_chat_enabled", "false");
+      setAiChatEnabled(false);
     },
   });
 
@@ -91,7 +87,10 @@ export function LlmSetupDialog() {
   }, [onKeyDown]);
 
   return (
-    <Dialog open={setupVisible} onOpenChange={(open) => setSetupVisible(open)}>
+    <Dialog
+      open={setupVisible}
+      onOpenChange={(open) => setAiChatSetupVisible(open)}
+    >
       <form>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -103,7 +102,7 @@ export function LlmSetupDialog() {
                 <button
                   className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
                   onClick={() => {
-                    setSetupVisible(false);
+                    setAiChatSetupVisible(false);
                   }}
                 >
                   <X size={16} strokeWidth={1} />

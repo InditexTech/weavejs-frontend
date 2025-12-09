@@ -11,6 +11,7 @@ import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import { ShortcutElement } from "../help/shortcut-element";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { Divider } from "./divider";
 
 export function ZoomToolbar() {
   const instance = useWeave((state) => state.instance);
@@ -159,8 +160,11 @@ export function ZoomToolbar() {
               tooltipAlign="end"
             />
           </div>
-          <div className="w-[75px] px-4 pr-0 font-inter flex justify-center items-center text-muted-foreground">
-            {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
+          <div className="font-inter flex justify-end items-center text-sm text-muted-foreground">
+            <Divider className="hidden lg:block ml-[16px]" />
+            <div className="pl-[16px] pr-0">
+              {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
+            </div>
           </div>
         </div>
       </div>

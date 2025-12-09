@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
-import { Info, SquareCheck, SquareX, Trash2, X } from "lucide-react";
+import { Info, SquareCheck, SquareX, Trash2 } from "lucide-react";
 import {
   WeaveStateElement,
   WeaveElementAttributes,
@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { VideoEntity } from "./types";
 import { VideosLibraryActions } from "./videos-ibrary.actions";
 import { getVideos } from "@/api/get-videos";
+import { SidebarHeader } from "../sidebar-header";
 
 const VIDEOS_LIMIT = 20;
 
@@ -49,12 +50,7 @@ export const VideosLibrary = () => {
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads
   );
@@ -119,7 +115,7 @@ export const VideosLibrary = () => {
       }
       return undefined; // no more pages
     },
-    enabled: sidebarLeftActive === "videos",
+    enabled: sidebarActive === "videos",
   });
 
   const appVideos = React.useMemo(() => {
@@ -228,43 +224,36 @@ export const VideosLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.videos) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
     return null;
   }
 
   return (
     <div className="w-full h-full">
-      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
-        <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
-          <SidebarSelector title="Videos" />
-        </div>
-        <div className="flex justify-end items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="selection-mode"
-              checked={showSelection}
-              onCheckedChange={(checked) => {
-                setShowSelection(checked);
-              }}
-              className="w-[32px] cursor-pointer"
-            />
-            <Label
-              htmlFor="selection-mode"
-              className="!font-inter !text-xs cursor-pointer"
-            >
-              SELECTION
-            </Label>
+      <SidebarHeader
+        actions={
+          <div className="flex justify-end items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="selection-mode"
+                checked={showSelection}
+                onCheckedChange={(checked) => {
+                  setShowSelection(checked);
+                }}
+                className="w-[32px] cursor-pointer"
+              />
+              <Label
+                htmlFor="selection-mode"
+                className="!font-inter !text-xs cursor-pointer"
+              >
+                SELECTION
+              </Label>
+            </div>
           </div>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
-        </div>
-      </div>
+        }
+      >
+        <SidebarSelector title="Videos" />
+      </SidebarHeader>
       {showSelection && (
         <div className="w-full h-[40px] p-0 px-6 bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
           <div className="flex gap-1 justify-start items-center font-inter font-light text-xs">
@@ -296,8 +285,8 @@ export const VideosLibrary = () => {
       )}
       <ScrollArea
         className={cn("w-full overflow-auto", {
-          ["h-[calc(100%-95px-40px-40px)]"]: showSelection,
-          ["h-[calc(100%-95px)]"]: !showSelection,
+          ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
+          ["h-[calc(100%-65px-73px)]"]: !showSelection,
         })}
       >
         <div
@@ -377,11 +366,8 @@ export const VideosLibrary = () => {
                                   className="bg-white rounded-none cursor-pointer"
                                   value={video.videoId}
                                   checked={isChecked}
-                                  onCheckedChange={(checked) => {
-                                    handleCheckboxChange(
-                                      checked as boolean,
-                                      video
-                                    );
+                                  onCheckedChange={(checked: boolean) => {
+                                    handleCheckboxChange(checked, video);
                                   }}
                                 />
                               </div>

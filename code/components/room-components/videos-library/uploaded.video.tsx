@@ -20,9 +20,7 @@ export const UploadedVideo = ({
 }: Readonly<UploadedVideoProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const videoUrl = React.useMemo(() => {
     return `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${video.roomId}/videos/${video.videoId}`;
@@ -36,7 +34,7 @@ export const UploadedVideo = ({
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.videos) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
     return null;
   }
 

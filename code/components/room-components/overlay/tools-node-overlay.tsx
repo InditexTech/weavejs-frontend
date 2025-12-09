@@ -23,7 +23,6 @@ import {
   Ungroup,
   X,
   BrushCleaning,
-  Bot,
   Crop,
   Check,
 } from "lucide-react";
@@ -49,17 +48,15 @@ import {
   WEAVE_IMAGE_CROP_END_TYPE,
   WeaveBrushToolAction,
   WeaveCopyPasteNodesPlugin,
-  WeaveExportNodesActionParams,
 } from "@inditextech/weave-sdk";
 import { Button } from "@/components/ui/button";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/post-remove-background";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
-import { useIACapabilities } from "@/store/ia";
 import { ColorPickerInput } from "../inputs/color-picker";
-import { useIACapabilitiesV2 } from "@/store/ia-v2";
 import { getImageBase64 } from "@/components/utils/images";
+import { useIAChat } from "@/store/ia-chat";
 
 export function ToolsNodeOverlay() {
   const [onEraserMode, setOnEraserMode] = React.useState(false);
@@ -124,37 +121,8 @@ export function ToolsNodeOverlay() {
   const setNodePropertiesAction = useCollaborationRoom(
     (state) => state.setNodePropertiesAction
   );
-  const setImageExporting = useCollaborationRoom(
-    (state) => state.setImageExporting
-  );
 
-  const aiEnabled = useIACapabilities((state) => state.enabled);
-  const setImagesLLMPopupSelectedNodes = useIACapabilities(
-    (state) => state.setImagesLLMPopupSelectedNodes
-  );
-  const setImagesLLMPopupType = useIACapabilities(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisible = useIACapabilities(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const setImagesLLMPopupImage = useIACapabilities(
-    (state) => state.setImagesLLMPopupImage
-  );
-
-  const aiEnabledV2 = useIACapabilitiesV2((state) => state.enabled);
-  const setImagesLLMPopupSelectedNodesV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupSelectedNodes
-  );
-  const setImagesLLMPopupTypeV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupType
-  );
-  const setImagesLLMPopupVisibleV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupVisible
-  );
-  const setImagesLLMPopupImageV2 = useIACapabilitiesV2(
-    (state) => state.setImagesLLMPopupImage
-  );
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -233,14 +201,22 @@ export function ToolsNodeOverlay() {
 
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
-      setSidebarActive(null, "right");
+      setSidebarActive(
+        aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.nodesTree
+      );
       return;
     }
 
     if (node) {
       setNodePropertiesAction("update");
     }
-  }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
+  }, [
+    aiChatEnabled,
+    actualAction,
+    node,
+    setSidebarActive,
+    setNodePropertiesAction,
+  ]);
 
   const actualNode = React.useMemo(() => {
     if (!node && actualAction && nodePropertiesAction === "create") {
@@ -492,118 +468,19 @@ export function ToolsNodeOverlay() {
               tooltipAlign="center"
             />
           )}
-          {aiEnabled && !aiEnabledV2 && (
-            <ToolbarButton
-              className="rounded-full !w-[40px]"
-              icon={<Bot className="px-2" size={40} strokeWidth={1} />}
-              disabled={
-                weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !aiEnabled
-              }
-              onClick={async () => {
-                if (!instance) {
-                  return;
-                }
-
-                const image = await instance.triggerAction<
-                  WeaveExportNodesActionParams,
-                  Promise<HTMLImageElement>
-                >("exportNodesTool", {
-                  nodes: nodes.map((n) => n.instance),
-                  options: {
-                    padding: 0,
-                    pixelRatio: 1,
-                  },
-                });
-
-                const base64URL: unknown = instance.imageToBase64(
-                  image,
-                  "image/png"
-                );
-
-                setImagesLLMPopupSelectedNodes(nodes.map((n) => n.instance));
-                setImagesLLMPopupType("edit-prompt");
-                setImagesLLMPopupImage(base64URL as string);
-                setImagesLLMPopupVisible(true);
-              }}
-              label={
-                <div className="flex gap-3 justify-start items-center">
-                  <p>Edit with AI</p>
-                </div>
-              }
-              tooltipSide="left"
-              tooltipAlign="center"
-            />
-          )}
-          {aiEnabledV2 && (
-            <ToolbarButton
-              className="rounded-full !w-[40px]"
-              icon={<Bot className="px-2" size={40} strokeWidth={1} />}
-              disabled={
-                weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !aiEnabledV2
-              }
-              onClick={async () => {
-                if (!instance) {
-                  return;
-                }
-
-                setImageExporting(true);
-
-                try {
-                  const { url } = await getImageBase64({
-                    instance,
-                    nodes: nodes.map((n) => n.node?.key ?? ""),
-                    options: {
-                      padding: 0,
-                      pixelRatio: 1,
-                    },
-                  });
-
-                  sidebarToggle(null);
-
-                  setImagesLLMPopupSelectedNodesV2(
-                    nodes.map((n) => n.instance)
-                  );
-                  setImagesLLMPopupTypeV2("edit-prompt");
-                  setImagesLLMPopupImageV2(url);
-                  setImagesLLMPopupVisibleV2(true);
-                } catch (error) {
-                  console.error(error);
-                  toast.error("Error exporting image.");
-                } finally {
-                  setImageExporting(false);
-                }
-              }}
-              label={
-                <div className="flex gap-3 justify-start items-center">
-                  <p>Edit with AI</p>
-                </div>
-              }
-              tooltipSide="left"
-              tooltipAlign="center"
-            />
-          )}
         </React.Fragment>
       );
     }
 
     return actualNodeTools;
   }, [
-    aiEnabled,
-    aiEnabledV2,
     clientId,
     mutationUploadV2,
     instance,
     mutationUpload,
     nodes,
     actualNode,
-    setImagesLLMPopupImage,
-    setImagesLLMPopupSelectedNodes,
-    setImagesLLMPopupType,
-    setImagesLLMPopupVisible,
     setTransformingImage,
-    setImageExporting,
     singleLocked,
     weaveConnectionStatus,
     setRemoveBackgroundPopupImageId,
@@ -611,10 +488,6 @@ export function ToolsNodeOverlay() {
     setRemoveBackgroundPopupImageURL,
     setRemoveBackgroundPopupOriginImage,
     setRemoveBackgroundPopupOriginNodeId,
-    setImagesLLMPopupImageV2,
-    setImagesLLMPopupSelectedNodesV2,
-    setImagesLLMPopupTypeV2,
-    setImagesLLMPopupVisibleV2,
     sidebarToggle,
     user?.name,
     workloadsEnabled,
@@ -2084,7 +1957,7 @@ export function ToolsNodeOverlay() {
             setNodeStrokeMenuOpen(false);
             setNodeStrokeWidthMenuOpen(false);
             setNodeStrokeStyleMenuOpen(false);
-            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+            setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
           }}
           label={
             <div className="flex gap-3 justify-start items-center">

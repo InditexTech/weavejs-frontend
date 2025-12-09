@@ -28,3 +28,14 @@ export const getImageBase64 = async ({
 
   return data;
 };
+
+export function fileToDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result as string); // Data URL string
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file); // <--- this converts File → data URL
+  });
+}
