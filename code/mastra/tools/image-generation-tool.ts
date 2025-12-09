@@ -262,13 +262,13 @@ const generateImagesFromChatGPT = async ({
         output_format: "png",
       };
 
-      const endpoint = `${process.env.AZURE_CS_ENDPOINT}/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`;
+      const endpoint = `${process.env.AZURE_CS_ENDPOINT ?? ""}/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`;
       console.log(endpoint);
 
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
-          "Api-Key": process.env.AZURE_CS_API_KEY,
+          "Api-Key": process.env.AZURE_CS_API_KEY ?? "",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
