@@ -1,9 +1,13 @@
-"use client"
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import * as React from "react"
-import * as SeparatorPrimitive from "@radix-ui/react-separator"
+"use client";
 
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
+
+import { cn } from "@/lib/utils";
 
 function Separator({
   className,
@@ -22,7 +26,7 @@ function Separator({
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Separator }
+export { Separator };
