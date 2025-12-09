@@ -152,9 +152,11 @@ export const NodeToolbar = () => {
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
   const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
 
-  const imagesAmount = useIAChat((state) => state.imageOptions.amount);
+  const imageModel = useIAChat((state) => state.imageOptions.model);
+  const imageSamples = useIAChat((state) => state.imageOptions.samples);
   const imageAspectRatio = useIAChat((state) => state.imageOptions.aspectRatio);
-  const imagesSize = useIAChat((state) => state.imageOptions.size);
+  const imageSize = useIAChat((state) => state.imageOptions.size);
+  const imageQuality = useIAChat((state) => state.imageOptions.quality);
   const sendMessage = useIAChat((state) => state.sendMessage);
   const setAiView = useIAChat((state) => state.setView);
   const promptInputAttachmentsController = usePromptInputAttachments();
@@ -2745,10 +2747,12 @@ export const NodeToolbar = () => {
                     },
                     {
                       body: {
-                        imageOptions: {
-                          samples: imagesAmount,
+                        imageOption: {
+                          model: imageModel,
+                          samples: imageSamples,
                           aspectRatio: imageAspectRatio,
-                          imageSize: imagesSize,
+                          quality: imageQuality,
+                          size: imageSize,
                         },
                       },
                     }
