@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NextResponse } from "next/server";
-import { mastra } from "@/mastra";
+import { getMastra } from "@/mastra";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
@@ -91,6 +91,8 @@ export async function POST(
   runtimeContext.delete("referenceImages");
   runtimeContext.set("referenceImages", referenceImages);
   runtimeContext.set("imageOption", imageOption);
+
+  const mastra = await getMastra();
 
   const imageGenerationEditorAgent = mastra.getAgent(
     "imageGeneratorEditorAgent"

@@ -34,9 +34,12 @@ export type ImageGeneratorRuntimeContext = {
   imageOption: ImageOptions;
 };
 
-export const imageGeneratorEditorAgent = new Agent({
-  name: "Image Generator / Editor Agent",
-  instructions: `
+export const getImageGeneratorEditorAgent = async () => {
+  const memory = await getMemory();
+
+  return new Agent({
+    name: "Image Generator / Editor Agent",
+    instructions: `
       You are a helpful assistant that can:
       
       - Help users generate images based on the user prompt.
@@ -58,9 +61,10 @@ export const imageGeneratorEditorAgent = new Agent({
       without any changes, finally provide a brief resume of what you did and DON'T showcase
       any images.
   `,
-  model: "google/gemini-2.5-pro",
-  tools: {
-    imageGenerationTool,
-  },
-  memory: getMemory(),
-});
+    model: "google/gemini-2.5-pro",
+    tools: {
+      imageGenerationTool,
+    },
+    memory,
+  });
+};

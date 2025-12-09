@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { DefaultAzureCredential } from "@azure/identity";
 import {
   BlobServiceClient,
   ContainerClient,
@@ -23,10 +24,17 @@ export class ImagesPersistenceHandler {
 
   async setup() {
     const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME!;
-    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME!;
-    const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY!;
+    const containerName =
+      process.env.AZURE_STORAGE_GENERATED_IMAGES_CONTAINER_NAME!;
 
-    const credential = new StorageSharedKeyCredential(accountName, accountKey);
+    let credential = null;
+    if (!process.env.AZURE_STORAGE_ACCOUNT_KEY) {
+      credential = new DefaultAzureCredential();
+    } else {
+      const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY!;
+      credential = new StorageSharedKeyCredential(accountName, accountKey);
+    }
+
     const storageAccountUrl = `https://${accountName}.blob.core.windows.net`;
 
     this._blobServiceClient = new BlobServiceClient(

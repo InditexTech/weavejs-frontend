@@ -113,8 +113,6 @@ export const ChatBot = () => {
         `weave.js_${room}_${user.id}_ai_thread_id`
       );
 
-      console.log("STORED THREAD ID:", storedThreadId);
-
       if (storedThreadId) {
         actualThreadId = storedThreadId;
       } else {
@@ -127,12 +125,6 @@ export const ChatBot = () => {
 
       defineThreadId = true;
     }
-
-    console.log("AI CHAT - Setting threadId/resourceId:", {
-      defineThreadId,
-      actualThreadId,
-      actualResourceId,
-    });
 
     if (defineThreadId) {
       setThreadId(actualThreadId);
