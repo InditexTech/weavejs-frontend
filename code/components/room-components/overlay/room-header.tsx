@@ -298,7 +298,7 @@ export function RoomHeader() {
         >
           <div
             className={cn(
-              "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]",
+              "bg-white flex rounded-full justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]",
               {
                 ["pointer-events-none"]: selectionActive,
                 ["pointer-events-auto"]: !selectionActive,
@@ -322,7 +322,7 @@ export function RoomHeader() {
           }
         )}
       >
-        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
+        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-start items-center gap-3">
             <DropdownMenu
               open={menuOpen}

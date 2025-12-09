@@ -44,7 +44,7 @@ export function RoomHeaderRight() {
             }
           )}
         >
-          <div className="w-full bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[12px] 2xl:px-[32px] border-b-[0.5px] border-[#c9c9c9]">
+          <div className="w-full bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[12px] 2xl:px-[24px] border-b-[0.5px] border-[#c9c9c9]">
             <div className="w-full flex justify-end items-center gap-[16px]">
               <div className="w-full flex justify-start items-center gap-[16px]">
                 {/* <ConnectionStatus

@@ -54,7 +54,15 @@ export function useGetStandaloneStore({
 
       setStore(store);
     }
-  }, [getUser, store, instanceId, imageId, data]);
+  }, [
+    getUser,
+    store,
+    instanceId,
+    imageId,
+    data,
+    imageSize.height,
+    imageSize.width,
+  ]);
 
   return store;
 }

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -72,7 +76,7 @@ export const ChatBotChats = () => {
         allChats.map((chat: any) => (
           <button
             key={chat.chatId}
-            className="w-full flex justify-between items-center px-[24px] py-[12px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
+            className="w-full flex justify-between min-h-[67px] items-center px-[24px] py-[12px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
             onClick={() => {
               if (!user) return;
               if (!room) return;

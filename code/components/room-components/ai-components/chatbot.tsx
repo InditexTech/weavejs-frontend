@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -57,7 +61,8 @@ export const ChatBot = () => {
     data: chatData,
     isFetched,
     isFetching,
-  } = useQuery({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = useQuery<any>({
     queryKey: ["getChat", room, threadId, resourceId],
     queryFn: () => {
       if (!room || !threadId || !resourceId) return [];
@@ -108,6 +113,8 @@ export const ChatBot = () => {
         `weave.js_${room}_${user.id}_ai_thread_id`
       );
 
+      console.log("STORED THREAD ID:", storedThreadId);
+
       if (storedThreadId) {
         actualThreadId = storedThreadId;
       } else {
@@ -117,14 +124,21 @@ export const ChatBot = () => {
           actualThreadId
         );
       }
+
       defineThreadId = true;
     }
+
+    console.log("AI CHAT - Setting threadId/resourceId:", {
+      defineThreadId,
+      actualThreadId,
+      actualResourceId,
+    });
 
     if (defineThreadId) {
       setThreadId(actualThreadId);
       setResourceId(actualResourceId);
     }
-  }, [user, room, threadId, resourceId]);
+  }, [user, room, threadId, resourceId, setThreadId, setResourceId]);
 
   return (
     <>
@@ -184,8 +198,8 @@ export const ChatBot = () => {
         <ChatBotChatInfo chat={chatData?.chat} />
         <div
           className={cn("", {
-            ["h-[calc(100%-65px-80px-65px)]"]: aiView === "chat",
-            ["h-[calc(100%-65px-80px)]"]: aiView === "chats",
+            ["h-[calc(100%-67px-80px-65px)]"]: aiView === "chat",
+            ["h-[calc(100%-67px-80px)]"]: aiView === "chats",
           })}
         >
           {isFetching && aiView === "chat" && (

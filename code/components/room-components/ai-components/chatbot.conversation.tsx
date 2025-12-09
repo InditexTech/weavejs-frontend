@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import { DefaultChatTransport } from "ai";
@@ -7,11 +13,13 @@ import {
   ConversationContent,
   ConversationEmptyState,
   ConversationScrollButton,
+  useConversationScroll,
 } from "@/components/ai-elements/conversation";
 import {
   Tool,
   ToolContent,
   ToolHeader,
+  ToolInput,
   ToolOutput,
 } from "@/components/ai-elements/tool";
 import {
@@ -69,6 +77,7 @@ export const ChatBotConversation = ({
 
   return (
     <Conversation className="relative size-full">
+      <ConversationState />
       <ConversationContent
         className="gap-4"
         onDragStart={(e) => {
@@ -95,41 +104,6 @@ export const ChatBotConversation = ({
               {message.parts.map((part, i) => {
                 // console.log("Rendering message part:", part);
                 switch (part.type) {
-                  case "tool-extractGenerationParametersTool":
-                    if (
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (part.output as any)?.code === "TOOL_EXECUTION_FAILED"
-                    ) {
-                      return (
-                        <React.Fragment key={`${message.id}-${i}`}>
-                          <Message from={message.role}>
-                            <MessageContent>
-                              ❌ Image generation failed. Please try again.
-                            </MessageContent>
-                          </Message>
-                        </React.Fragment>
-                      );
-                    }
-
-                    return (
-                      <React.Fragment key={`${message.id}-${i}`}>
-                        <Message from={message.role}>
-                          <Tool defaultOpen={false}>
-                            <ToolHeader
-                              state={part.state}
-                              title="generation parameters"
-                              type={part.type}
-                            />
-                            <ToolContent>
-                              <ToolOutput
-                                errorText={part.errorText}
-                                output={part.output}
-                              />
-                            </ToolContent>
-                          </Tool>
-                        </Message>
-                      </React.Fragment>
-                    );
                   case "tool-imageGenerationTool":
                     if (
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,6 +120,12 @@ export const ChatBotConversation = ({
                       );
                     }
 
+                    let images = [];
+                    if (part.state === "output-available") {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      images = (part.output as any)?.images ?? [];
+                    }
+
                     return (
                       <React.Fragment key={`${message.id}-${i}`}>
                         <Message from={message.role}>
@@ -153,9 +133,11 @@ export const ChatBotConversation = ({
                             <ToolHeader
                               state={part.state}
                               title="image generation"
+                              className="cursor-pointer"
                               type={part.type}
                             />
                             <ToolContent>
+                              <ToolInput input={part.input} />
                               <ToolOutput
                                 errorText={part.errorText}
                                 output={part.output}
@@ -167,11 +149,7 @@ export const ChatBotConversation = ({
                               <>
                                 <div>Here are the results:</div>
                                 <div className="grid grid-cols-1 gap-1">
-                                  {(
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    (part.output as any)?.images ??
-                                    ([] as GeneratedImage[])
-                                  )
+                                  {(images ?? ([] as GeneratedImage[]))
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     .map((image: any) => (
                                       <div
@@ -297,4 +275,16 @@ export const ChatBotConversation = ({
       <ConversationScrollButton />
     </Conversation>
   );
+};
+
+const ConversationState = () => {
+  const setScrollToBottom = useIAChat((state) => state.setScrollToBottom);
+
+  const { scrollToBottom } = useConversationScroll();
+
+  React.useEffect(() => {
+    setScrollToBottom(scrollToBottom);
+  }, [setScrollToBottom, scrollToBottom]);
+
+  return null;
 };

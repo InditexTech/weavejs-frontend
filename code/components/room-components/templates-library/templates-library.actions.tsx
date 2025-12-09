@@ -85,7 +85,7 @@ export const TemplatesLibraryActions = ({
     }
 
     return selectionActions;
-  }, [handleDeleteTemplate]);
+  }, [handleDeleteTemplate, selectedTemplates]);
 
   if (!instance) {
     return null;

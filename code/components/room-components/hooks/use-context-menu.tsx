@@ -30,7 +30,6 @@ import {
   Lock,
   EyeOff,
   Link,
-  HardDriveUpload,
   PackagePlus,
   PackageOpen,
   Paperclip,
@@ -207,13 +206,6 @@ function useContextMenu() {
             toast.dismiss(id);
           },
         });
-        // SEPARATOR
-        options.push({
-          id: "div-link-image-template-tools",
-          type: "divider",
-        });
-        // }
-
         // LINK IMAGE TOOLS
         if (isSingleImage) {
           options.push({
@@ -224,7 +216,7 @@ function useContextMenu() {
                 <div>Set as template link</div>
               </div>
             ),
-            icon: <HardDriveUpload size={16} />,
+            icon: <Link size={16} />,
             onClick: async () => {
               setLinkedNode(nodes[0].instance);
               setContextMenuShow(false);

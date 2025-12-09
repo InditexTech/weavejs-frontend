@@ -1,3 +1,9 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -152,7 +158,7 @@ export const QueueItemImage = ({
   ...props
 }: QueueItemImageProps) => (
   <img
-    alt=""
+    alt="A queued image"
     className={cn("h-8 w-8 rounded border object-cover", className)}
     height={32}
     width={32}

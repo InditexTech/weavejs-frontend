@@ -7,7 +7,6 @@ import {
 } from "ai";
 import { toAISdkFormat } from "@mastra/ai-sdk";
 import { deleteChat, loadChat, saveChatMessages } from "@/mastra/manager/chat";
-import z from "zod";
 import { RuntimeContext } from "@mastra/core/runtime-context";
 import { ImageGeneratorRuntimeContext } from "@/mastra/agents/image-generator-editor-agent";
 
@@ -64,21 +63,20 @@ export async function POST(
     );
   }
 
-  const { messages, imageOptions } = await req.json();
+  const { messages, imageOption } = await req.json();
 
   const referenceImages = [];
+  const latestMessage = messages[messages.length - 1];
   let index = 1;
-  for (const msg of messages) {
-    for (const part of msg.parts) {
-      if (part.type === "file") {
-        referenceImages.push({
-          index: index,
-          name: `image ${index}`,
-          dataBase64: part.url.replace(/^data:image\/\w+;base64,/, ""),
-          mimeType: part.mediaType,
-        });
-        index++;
-      }
+  for (const part of latestMessage.parts) {
+    if (part.type === "file") {
+      referenceImages.push({
+        index: index,
+        name: `image ${index}`,
+        dataBase64: part.url.replace(/^data:image\/\w+;base64,/, ""),
+        mimeType: part.mediaType,
+      });
+      index++;
     }
   }
 
@@ -86,8 +84,9 @@ export async function POST(
   runtimeContext.set("roomId", roomId);
   runtimeContext.set("threadId", threadId);
   runtimeContext.set("resourceId", resourceId);
+  runtimeContext.delete("referenceImages");
   runtimeContext.set("referenceImages", referenceImages);
-  runtimeContext.set("imageOptions", imageOptions);
+  runtimeContext.set("imageOption", imageOption);
 
   const imageGenerationEditorAgent = mastra.getAgent(
     "imageGeneratorEditorAgent"
@@ -95,24 +94,24 @@ export async function POST(
   const stream = await imageGenerationEditorAgent.stream(
     convertToModelMessages(messages),
     {
+      context: [
+        {
+          role: "system",
+          content: `
+            You're using the model ${imageOption.model}, and the generation parameters to use are:
+            
+            - Size: ${imageOption.size}
+            - Samples: ${imageOption.samples}
+            - Aspect Ratio: ${imageOption.aspectRatio}
+          `,
+        },
+      ],
       runtimeContext,
       memory: {
         thread: threadId,
         resource: resourceId,
       },
-      maxSteps: 1,
-      structuredOutput: {
-        schema: z.object({
-          images: z.array(
-            z.object({
-              imageId: z.string(),
-              status: z.enum(["generating", "generated", "failed"]),
-              url: z.string(),
-            })
-          ),
-        }),
-        jsonPromptInjection: true,
-      },
+      maxSteps: 5,
     }
   );
 
@@ -124,8 +123,6 @@ export async function POST(
       parts: userMessage.parts.filter((part: any) => part.type !== "file"),
     },
   ];
-
-  console.log("message", JSON.stringify(removedImagesParts, null, 2));
 
   // Transform stream into AI SDK format and create UI messages stream
   const uiMessageStream = createUIMessageStream({

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -28,7 +32,7 @@ export const ConversationContent = ({
   ...props
 }: ConversationContentProps) => (
   <StickToBottom.Content
-    className={cn("w-full flex flex-col gap-8 p-4", className)}
+    className={cn("w-full flex flex-col gap-8 p-4 !p-[24px]", className)}
     {...props}
   />
 );
@@ -69,6 +73,15 @@ export const ConversationEmptyState = ({
 );
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
+
+export const useConversationScroll = () => {
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext();
+
+  return {
+    isAtBottom,
+    scrollToBottom,
+  };
+};
 
 export const ConversationScrollButton = ({
   className,

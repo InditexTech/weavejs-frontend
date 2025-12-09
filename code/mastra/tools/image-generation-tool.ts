@@ -4,13 +4,11 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { ImagesPersistenceHandler } from "../manager/images";
 import {
-  ImageAspectRatio,
   ImageGeneratorRuntimeContext,
-  ImageOptions,
-  ImageSize,
   ReferenceImage,
 } from "../agents/image-generator-editor-agent";
 import { MastraUnion } from "@mastra/core/action";
+import { ImageOptions } from "@/store/ia-chat";
 
 type GeneratedImage = {
   imageId: string;
@@ -47,8 +45,6 @@ export const imageGenerationTool = createTool({
 
     const { prompt } = context;
 
-    logger?.info(`Generating image with prompt: ${prompt}`);
-
     const roomId = runtimeContext.get("roomId") as string;
     const threadId = runtimeContext.get("threadId") as string;
     const resourceId = runtimeContext.get("resourceId") as string;
@@ -56,13 +52,17 @@ export const imageGenerationTool = createTool({
       "referenceImages"
     ) as ReferenceImage[];
 
-    const imageOption: ImageOptions = runtimeContext.get("imageOptions");
+    const imageOption: ImageOptions = runtimeContext.get("imageOption");
+    const model = imageOption.model;
     const samples = imageOption.samples;
     const aspectRatio = imageOption.aspectRatio;
-    const imageSize = imageOption.imageSize;
+    const quality = imageOption.quality;
+    const size = imageOption.size;
 
+    logger?.info(`Generating image prompt: ${prompt}`);
+    logger?.info(`Related images: ${referenceImages.length ?? 0}`);
     logger?.info(
-      `Generating image with params: samples=${samples}, aspectRatio=${aspectRatio}, imageSize=${imageSize}`
+      `With options: model=${model}, samples=${samples}, aspectRatio=${aspectRatio}, quality=${quality ? quality : "-"}, imageSize=${size}`
     );
 
     const images = await generateImages(mastra, prompt, {
@@ -70,11 +70,7 @@ export const imageGenerationTool = createTool({
       threadId,
       resourceId,
       referenceImages,
-      imageOptions: {
-        samples,
-        aspectRatio: aspectRatio as unknown as ImageAspectRatio,
-        imageSize: imageSize as unknown as ImageSize,
-      },
+      imageOption,
     });
 
     logger?.info(
@@ -90,10 +86,37 @@ const generateImages = async (
   prompt: string,
   context: ImageGenerationToolContext
 ) => {
-  const logger = mastra?.getLogger();
-
   if (!imageHandler) {
     await initImageGenerationTool();
+  }
+
+  const model = context.imageOption.model;
+
+  if (model === "openai/gpt-image-1") {
+    return await generateImagesFromChatGPT({ mastra, prompt, context });
+  }
+  if (model === "gemini/gemini-3-pro-image-preview") {
+    return await generateImagesFromGemini({ mastra, prompt, context });
+  }
+
+  throw new Error(`Image model [${model}] not supported yet.`);
+};
+
+const generateImagesFromGemini = async ({
+  mastra,
+  prompt,
+  context,
+}: {
+  mastra: MastraUnion | undefined;
+  prompt: string;
+  context: ImageGenerationToolContext;
+}) => {
+  const logger = mastra?.getLogger();
+
+  if (context.imageOption.model !== "gemini/gemini-3-pro-image-preview") {
+    throw new Error(
+      `Image model [${context.imageOption.model}] not supported in Gemini generator.`
+    );
   }
 
   const ai = new GoogleGenAI({
@@ -101,7 +124,7 @@ const generateImages = async (
   });
 
   const generatedImages: GeneratedImage[] = Array.from(
-    { length: context.imageOptions.samples },
+    { length: context.imageOption.samples },
     () => ({
       imageId: uuidv4(),
       status: "generating",
@@ -129,17 +152,15 @@ const generateImages = async (
     const actualImage = generatedImages[i];
 
     logger?.info(`Generating image ${i + 1} of ${generatedImages.length}`);
-    logger?.info(
-      `Generating image prompt: ${prompt}. Only generate a single image.`
-    );
+    logger?.info(`Generating image prompt: ${imageGenerationPrompt[0].text}`);
 
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-image-preview",
       contents: imageGenerationPrompt,
       config: {
         imageConfig: {
-          aspectRatio: context.imageOptions.aspectRatio,
-          imageSize: context.imageOptions.imageSize,
+          aspectRatio: context.imageOption.aspectRatio,
+          imageSize: context.imageOption.size,
         },
         responseModalities: ["Image"],
       },
@@ -173,6 +194,120 @@ const generateImages = async (
         actualImage.status = "generated";
         actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
       }
+    }
+  }
+
+  return generatedImages;
+};
+
+const generateImagesFromChatGPT = async ({
+  mastra,
+  prompt,
+  context,
+}: {
+  mastra: MastraUnion | undefined;
+  prompt: string;
+  context: ImageGenerationToolContext;
+}) => {
+  const logger = mastra?.getLogger();
+
+  if (context.imageOption.model !== "openai/gpt-image-1") {
+    throw new Error(
+      `Image model [${context.imageOption.model}] not supported in ChatGPT generator.`
+    );
+  }
+
+  const generatedImages: GeneratedImage[] = Array.from(
+    { length: context.imageOption.samples },
+    () => ({
+      imageId: uuidv4(),
+      status: "generating",
+      url: undefined,
+    })
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const imageGenerationPrompt: any[] = [
+    { text: `${prompt}. Only generate a single image.` },
+  ];
+  const referencedImages = context.referenceImages ?? [];
+  if (referencedImages.length > 0) {
+    for (const refImage of referencedImages) {
+      imageGenerationPrompt.push({
+        inlineData: {
+          mimeType: refImage.mimeType,
+          data: refImage.dataBase64,
+        },
+      });
+    }
+  }
+
+  for (let i = 0; i < generatedImages.length; i++) {
+    try {
+      const actualImage = generatedImages[i];
+
+      logger?.info(`Generating image ${i + 1} of ${generatedImages.length}`);
+      logger?.info(`Generating image prompt: ${imageGenerationPrompt[0].text}`);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2 * 60 * 1000); // 2 minutes
+
+      const requestBody = {
+        model: "gpt-image-1",
+        prompt,
+        n: context.imageOption.samples,
+        size: 1,
+        quality: context.imageOption.quality,
+        moderation: "auto",
+        output_format: "png",
+      };
+
+      const endpoint = `${process.env.AZURE_CS_ENDPOINT}/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`;
+      console.log(endpoint);
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Api-Key": process.env.AZURE_CS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      console.log("GTP RES", response.status);
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const jsonData = await response.json();
+        console.log("GTP ERROR", jsonData);
+        throw new Error("Error generating the images");
+      }
+
+      const jsonData = await response.json();
+
+      for (let i = 0; i < jsonData.data.length; i++) {
+        const buffer = base64ToUint8Array(jsonData.data[i].b64_json);
+        const roomId = context.roomId;
+        const threadId = context.threadId;
+        const imageId = uuidv4();
+        const imageName = `${roomId}/${threadId}/${imageId}`;
+
+        await imageHandler?.persist(
+          imageName,
+          {
+            mimeType: "image/png",
+            size: buffer.length,
+          },
+          buffer
+        );
+
+        actualImage.status = "generated";
+        actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
+      }
+    } catch (ex) {
+      console.log("GTP EXCEPTION", ex);
     }
   }
 

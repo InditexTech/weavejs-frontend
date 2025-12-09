@@ -174,16 +174,18 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
-          <DropdownMenuSeparator />
           {aiChatEnabled && (
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
-              }}
-            >
-              <BotMessageSquare strokeWidth={1} /> AI Assistant
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onPointerDown={() => {
+                  sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
+                }}
+              >
+                <BotMessageSquare strokeWidth={1} /> AI Assistant
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -288,6 +288,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           )}
           {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
             <>
+              {aiChatEnabled && <ChatBotPrompt />}
               <ContextMenuRender
                 show={contextMenuShow}
                 onChanged={(show: boolean) => {
@@ -317,8 +318,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </>
           )}
         </section>
-        {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
-          aiChatEnabled && <ChatBotPrompt />}
         {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
         {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
           <section className="fixed bg-white top-0 right-0 bottom-0 w-[480px] h-full border-l border-l-[#c9c9c9]">
@@ -335,7 +334,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                   <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
                   <Comments key={SIDEBAR_ELEMENTS.comments} />
                   <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-                  <ChatBot key={SIDEBAR_ELEMENTS.aiChat} />
+                  {aiChatEnabled && <ChatBot key={SIDEBAR_ELEMENTS.aiChat} />}
                 </>
               )}
             </AnimatePresence>

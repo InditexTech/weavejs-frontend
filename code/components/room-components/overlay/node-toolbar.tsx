@@ -29,6 +29,7 @@ import {
   X,
   Group,
   Ungroup,
+  Paperclip,
   Layers,
   Lock,
   EyeOff,
@@ -60,8 +61,8 @@ import {
   RectangleCircle,
   Unlink,
   Link,
-  HardDriveUpload,
   ImageUpscale,
+  WandSparkles,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -76,13 +77,15 @@ import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ColorPickerInput } from "../inputs/color-picker";
 import { Button } from "@/components/ui/button";
-import { getImageBase64 } from "@/components/utils/images";
+import { fileToDataURL, getImageBase64 } from "@/components/utils/images";
 import { postNegateImage } from "@/api/post-negate-image";
 import { postFlipImage } from "@/api/post-flip-image";
 import { postGrayscaleImage } from "@/api/post-grayscale-image";
 import { throttle } from "lodash";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { IMAGE_TEMPLATE_FIT } from "@/components/nodes/image-template/constants";
+import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
+import { useIAChat } from "@/store/ia-chat";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -148,6 +151,13 @@ export const NodeToolbar = () => {
 
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
   const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
+
+  const imagesAmount = useIAChat((state) => state.imageOptions.amount);
+  const imageAspectRatio = useIAChat((state) => state.imageOptions.aspectRatio);
+  const imagesSize = useIAChat((state) => state.imageOptions.size);
+  const sendMessage = useIAChat((state) => state.sendMessage);
+  const setAiView = useIAChat((state) => state.setView);
+  const promptInputAttachmentsController = usePromptInputAttachments();
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
@@ -2169,9 +2179,61 @@ export const NodeToolbar = () => {
             <>
               <ToolbarButton
                 className="rounded-full !w-[32px] !h-[32px]"
-                icon={
-                  <HardDriveUpload className="px-2" size={32} strokeWidth={1} />
+                icon={<Paperclip className="px-2" size={32} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                 }
+                onClick={async () => {
+                  if (!instance) {
+                    return;
+                  }
+
+                  const id = toast.loading("Generating attachment...");
+
+                  const selectionImage = await getImageBase64({
+                    instance,
+                    nodes: nodes.map((n) => n.node?.key ?? ""),
+                    options: {
+                      format: "image/png",
+                      padding: 0,
+                      backgroundColor: "transparent",
+                      pixelRatio: 1,
+                    },
+                  });
+
+                  const [header, base64] = selectionImage.url.split(",");
+                  const mime = header.match(/:(.*?);/)![1];
+
+                  const binary = atob(base64);
+                  const len = binary.length;
+                  const bytes = new Uint8Array(len);
+
+                  for (let i = 0; i < len; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                  }
+
+                  const selectionBlob = new Blob([bytes], { type: mime });
+
+                  const file = new File([selectionBlob], "image.png", {
+                    type: mime,
+                  });
+
+                  promptInputAttachmentsController.add([file]);
+
+                  toast.dismiss(id);
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Set as prompt attachment</p>
+                  </div>
+                }
+                tooltipSide="bottom"
+                tooltipAlign="center"
+              />
+              <ToolbarButton
+                className="rounded-full !w-[32px] !h-[32px]"
+                icon={<Link className="px-2" size={32} strokeWidth={1} />}
                 disabled={
                   weaveConnectionStatus !==
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -2191,7 +2253,7 @@ export const NodeToolbar = () => {
                 }}
                 label={
                   <div className="flex gap-3 justify-start items-center">
-                    <p>Set as link</p>
+                    <p>Set as template link</p>
                   </div>
                 }
                 tooltipSide="bottom"
@@ -2622,6 +2684,89 @@ export const NodeToolbar = () => {
           )}
           {isMultiNodesSelected && (
             <>
+              <ToolbarButton
+                className="rounded-full !w-[32px] !h-[32px]"
+                icon={
+                  <WandSparkles className="px-2" size={32} strokeWidth={1} />
+                }
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                onClick={async () => {
+                  if (!instance || !sendMessage) {
+                    return;
+                  }
+
+                  const id = toast.loading("Processing...");
+
+                  const selectionImage = await getImageBase64({
+                    instance,
+                    nodes: nodes.map((n) => n.node?.key ?? ""),
+                    options: {
+                      format: "image/png",
+                      padding: 0,
+                      backgroundColor: "transparent",
+                      pixelRatio: 1,
+                    },
+                  });
+
+                  const [header, base64] = selectionImage.url.split(",");
+                  const mime = header.match(/:(.*?);/)![1];
+
+                  const binary = atob(base64);
+                  const len = binary.length;
+                  const bytes = new Uint8Array(len);
+
+                  for (let i = 0; i < len; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                  }
+
+                  const selectionBlob = new Blob([bytes], { type: mime });
+
+                  const file = new File([selectionBlob], "selection.png", {
+                    type: mime,
+                  });
+                  const dataURL = await fileToDataURL(file);
+
+                  // promptInputAttachmentsController.add([file]);
+
+                  sendMessage(
+                    {
+                      text: "Follow the instructions on the image and generate the result, don't change anything else.",
+                      files: [
+                        {
+                          type: "file",
+                          mediaType: mime,
+                          filename: "selection.png",
+                          url: dataURL,
+                        },
+                      ],
+                    },
+                    {
+                      body: {
+                        imageOptions: {
+                          samples: imagesAmount,
+                          aspectRatio: imageAspectRatio,
+                          imageSize: imagesSize,
+                        },
+                      },
+                    }
+                  );
+                  setAiView("chat");
+                  setSidebarActive(SIDEBAR_ELEMENTS.aiChat);
+
+                  toast.dismiss(id);
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Magic image</p>
+                  </div>
+                }
+                tooltipSide="bottom"
+                tooltipAlign="center"
+              />
+              <ToolbarDivider orientation="vertical" className="!h-[28px]" />
               <DropdownMenu
                 modal={false}
                 open={nodesAlignmentHorizontalMenuOpen}

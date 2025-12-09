@@ -28,7 +28,6 @@ export function ToolsNodeOverlayV2() {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
-  const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction: "create" | "update" | undefined =
     useCollaborationRoom((state) => state.nodeProperties.action);
@@ -80,7 +79,7 @@ export function ToolsNodeOverlayV2() {
       return node;
     }
     return undefined;
-  }, [actualAction, node, nodePropertiesAction]);
+  }, [node, nodePropertiesAction]);
 
   const isImageTemplate = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "image-template",
@@ -146,7 +145,14 @@ export function ToolsNodeOverlayV2() {
     }
 
     return actualNodeTools;
-  }, [instance, nodes, actualNode, singleLocked, weaveConnectionStatus]);
+  }, [
+    instance,
+    nodes,
+    actualNode,
+    singleLocked,
+    imageTemplateFit,
+    weaveConnectionStatus,
+  ]);
 
   const imageTools = React.useMemo(() => {
     const actualNodeTools = [];

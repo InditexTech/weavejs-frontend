@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   MessageSquare,
   // MapPinned,
+  LayoutPanelTop,
   Frame,
   Video,
   PenLine,
@@ -552,6 +553,22 @@ export function ToolsOverlayTouch() {
             </div>
           }
           tooltipSide="right"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<LayoutPanelTop className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTemplateTool"}
+          onClick={() => triggerTool("imageTemplateTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Image Template Tool</p>
+            </div>
+          }
+          tooltipSide="top"
           tooltipAlign="center"
         />
         {threadsEnabled && (

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import React from "react";
@@ -52,6 +54,7 @@ export const Template = ({
       <img
         className="bg-[#d6d6d6] w-full aspect-video block object-contain relative transition-transform duration-500 group-hover:opacity-60"
         src={template.templateImage}
+        alt="A template"
         data-template-data={template.templateData}
       />
       <div className="w-full flex p-3 justify-between items-center gap-3 border-t border-[#c9c9c9]">
