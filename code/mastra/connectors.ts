@@ -18,9 +18,10 @@ export async function getDatabaseCloudCredentialsToken(): Promise<AccessToken> {
 
 export const getStorage = async (): Promise<PostgresStore> => {
   if (!storage) {
-    let password = process.env.DATABASE_PASSWORD;
+    let password: string = process.env.DATABASE_PASSWORD ?? "";
     if (process.env.DATABASE_CLOUD_CREDENTIALS === "true") {
-      password = await getDatabaseCloudCredentialsToken();
+      password =
+        (await getDatabaseCloudCredentialsToken()) as unknown as string;
     }
 
     storage = new PostgresStore({
@@ -38,9 +39,10 @@ export const getStorage = async (): Promise<PostgresStore> => {
 
 export const getMemory = async (): Promise<Memory> => {
   if (!memory) {
-    let password = process.env.DATABASE_PASSWORD;
+    let password: string = process.env.DATABASE_PASSWORD ?? "";
     if (process.env.DATABASE_CLOUD_CREDENTIALS === "true") {
-      password = await getDatabaseCloudCredentialsToken();
+      password =
+        (await getDatabaseCloudCredentialsToken()) as unknown as string;
     }
 
     memory = new Memory({
