@@ -196,7 +196,7 @@ const generateImagesFromGemini = async ({
         );
 
         actualImage.status = "generated";
-        actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
+        actualImage.url = `${process.env.NEXT_PUBLIC_APP_HOST}/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
       }
     }
   }
@@ -308,7 +308,7 @@ const generateImagesFromChatGPT = async ({
         );
 
         actualImage.status = "generated";
-        actualImage.url = `https://localhost:3000/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
+        actualImage.url = `${process.env.NEXT_PUBLIC_APP_HOST}/weavebff/api/v1/weavejs/rooms/${roomId}/chats/${threadId}/images/${imageId}`;
       }
     } catch (ex) {
       console.log("GTP EXCEPTION", ex);

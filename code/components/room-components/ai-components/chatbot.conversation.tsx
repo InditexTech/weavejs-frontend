@@ -60,7 +60,7 @@ export const ChatBotConversation = ({
   const { messages, status, regenerate, sendMessage } = useChat({
     messages: initialMessages,
     transport: new DefaultChatTransport({
-      api: `https://localhost:3000/api/ai/chats/${threadId}`,
+      api: `${process.env.NEXT_PUBLIC_APP_HOST}/api/ai/chats/${threadId}`,
       headers: {
         ai_room_id: room ?? "",
         ai_resource_id: resourceId,
