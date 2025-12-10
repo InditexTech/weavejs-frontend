@@ -14,14 +14,14 @@ import {
 import { toast } from "sonner";
 import { Check, MessageCircleMore, MessageCircleX, Pencil } from "lucide-react";
 import { useIAChat } from "@/store/ia-chat";
-import { Chat } from "@/mastra/manager/chat";
 import { ChatBotDialogDeleteChat } from "./chatbot.dialog.delete-chat";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { putChat } from "@/api/put-chat";
 import { useCollaborationRoom } from "@/store/store";
 
 type ChatBotChatInfoProps = {
-  chat?: Chat;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chat?: any;
 };
 
 export const ChatBotChatInfo = ({ chat }: ChatBotChatInfoProps) => {

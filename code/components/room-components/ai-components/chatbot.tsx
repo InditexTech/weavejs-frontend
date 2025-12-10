@@ -25,7 +25,6 @@ import { cn } from "@/lib/utils";
 import { OrbitProgress } from "react-loading-indicators";
 import { postChat } from "@/api/post-chat";
 import { ChatBotChatInfo } from "./chatbot.chat-info";
-import { createChat } from "@/mastra/manager/chat";
 
 export const ChatBot = () => {
   const threadId = useIAChat((state) => state.threadId);
@@ -106,11 +105,11 @@ export const ChatBot = () => {
     let actualThreadId = "undefined";
     let defineThreadId = false;
 
-    const actualResourceId = `${room}-${user.id ?? "unknown"}`;
+    const actualResourceId = `${room}-${user.name ?? "unknown"}`;
 
     if (threadId === "undefined") {
       const storedThreadId = sessionStorage.getItem(
-        `weave.js_${room}_${user.id}_ai_thread_id`
+        `weave.js_${room}_${user.name}_ai_thread_id`
       );
 
       if (storedThreadId) {
@@ -118,7 +117,7 @@ export const ChatBot = () => {
       } else {
         actualThreadId = uuidv4();
         sessionStorage.setItem(
-          `weave.js_${room}_${user.id}_ai_thread_id`,
+          `weave.js_${room}_${user.name}_ai_thread_id`,
           actualThreadId
         );
       }
@@ -156,7 +155,7 @@ export const ChatBot = () => {
                           newTreadId
                         );
 
-                        await createChat(room, newTreadId, resourceId, {
+                        await postChat(room, newTreadId, resourceId, {
                           status: "active",
                           title: "Untitled chat",
                         });

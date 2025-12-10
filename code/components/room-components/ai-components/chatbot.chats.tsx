@@ -12,10 +12,10 @@ import { OrbitProgress } from "react-loading-indicators";
 import { ArrowRight, MessagesSquare } from "lucide-react";
 import { ConversationEmptyState } from "@/components/ai-elements/conversation";
 import { useCollaborationRoom } from "@/store/store";
-import { Chat } from "@/mastra/manager/chat";
 
 type ChatMessagesPage = {
-  chats: Chat[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chats: any[];
   limit: number;
   offset: number;
   total: number;

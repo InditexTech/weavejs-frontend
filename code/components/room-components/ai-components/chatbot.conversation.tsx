@@ -57,10 +57,13 @@ export const ChatBotConversation = ({
 
   const promptInputAttachmentsController = usePromptInputAttachments();
 
+  const apiEndpoint = `${process.env.NEXT_PUBLIC_APP_HOST}/api/ai/chats/${threadId}`;
+  console.log(apiEndpoint);
+
   const { messages, status, regenerate, sendMessage } = useChat({
     messages: initialMessages,
     transport: new DefaultChatTransport({
-      api: `${process.env.NEXT_PUBLIC_APP_HOST}/api/ai/chats/${threadId}`,
+      api: apiEndpoint,
       headers: {
         ai_room_id: room ?? "",
         ai_resource_id: resourceId,
