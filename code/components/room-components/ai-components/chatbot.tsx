@@ -151,7 +151,7 @@ export const ChatBot = () => {
                         const newTreadId = uuidv4();
 
                         sessionStorage.setItem(
-                          `weave.js_${room}_${user.id}_ai_thread_id`,
+                          `weave.js_${room}_${user.name}_ai_thread_id`,
                           newTreadId
                         );
 

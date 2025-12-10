@@ -62,17 +62,17 @@ export const ChatBotDialogDeleteChat = ({
       if (!user || !room) return;
 
       const actualChat = sessionStorage.getItem(
-        `weave.js_${room}_${user.id}_ai_thread_id`
+        `weave.js_${room}_${user.name}_ai_thread_id`
       );
 
       if (threadId === actualChat) {
-        sessionStorage.removeItem(`weave.js_${room}_${user.id}_ai_thread_id`);
+        sessionStorage.removeItem(`weave.js_${room}_${user.name}_ai_thread_id`);
       }
 
       const queryKey = ["getChats", resourceId];
       await queryClient.invalidateQueries({ queryKey });
 
-      sessionStorage.removeItem(`weave.js_${room}_${user.id}_ai_thread_id`);
+      sessionStorage.removeItem(`weave.js_${room}_${user.name}_ai_thread_id`);
       setOpen(false);
       setAiView("chats");
 
