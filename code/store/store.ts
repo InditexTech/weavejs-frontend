@@ -217,8 +217,12 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     },
   };
 
-  const savedConfiguration = sessionStorage.getItem("weave_ai_configuration");
-  const configurationFromStorage = JSON.parse(savedConfiguration || "{}");
+  let configurationFromStorage = {};
+  if (typeof sessionStorage !== "undefined") {
+    configurationFromStorage = JSON.parse(
+      sessionStorage.getItem("weave_ai_configuration") || "{}"
+    );
+  }
 
   const finalConfiguration = merge(
     defaultConfiguration,

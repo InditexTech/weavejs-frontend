@@ -87,168 +87,175 @@ interface IAChatState {
   setSetupVisible: (newVisible: boolean) => void;
 }
 
-export const useIAChat = create<IAChatState>()((set) => ({
-  enabled: sessionStorage.getItem("weave_ai_chat_enabled") === "true",
-  setup: {
-    state: "idle",
-    visible: false,
-  },
-  status: undefined,
-  sendMessage: null,
-  scrollToBottom: null,
-  defined: false,
-  threadId: "undefined",
-  resourceId: "undefined",
-  metadata: undefined,
-  loaded: false,
-  view: "chat",
-  imageOptions: {
-    model: "gemini/gemini-3-pro-image-preview",
-    samples: 1,
-    aspectRatio: "1:1",
-    quality: undefined,
-    size: "1K",
-  },
-  setEnabled: (newEnabled) =>
-    set((state) => ({
-      ...state,
-      enabled: newEnabled,
-    })),
-  setStatus: (newStatus) =>
-    set((state) => ({
-      ...state,
-      status: newStatus,
-    })),
-  setDefined: (newDefined) =>
-    set((state) => ({
-      ...state,
-      defined: newDefined,
-    })),
-  setThreadId: (newThreadId) =>
-    set((state) => ({
-      ...state,
-      threadId: newThreadId,
-    })),
-  setResourceId: (newResourceId) =>
-    set((state) => ({
-      ...state,
-      resourceId: newResourceId,
-    })),
-  setLoaded: (newLoaded) =>
-    set((state) => ({
-      ...state,
-      loaded: newLoaded,
-    })),
-  setView: (newView) =>
-    set((state) => ({
-      ...state,
-      view: newView,
-    })),
-  setScrollToBottom: (newScrollToBottom) =>
-    set((state) => ({
-      ...state,
-      scrollToBottom: newScrollToBottom,
-    })),
-  setSendMessage: (newSendMessage) =>
-    set((state) => ({
-      ...state,
-      sendMessage: newSendMessage,
-    })),
-  setImageModel: (newModel) =>
-    set((state) => {
-      if (newModel === "openai/gpt-image-1") {
+export const useIAChat = create<IAChatState>()((set) => {
+  let aiEnabled: boolean = false;
+  if (typeof sessionStorage !== "undefined") {
+    aiEnabled = sessionStorage.getItem("weave_ai_chat_enabled") === "true";
+  }
+
+  return {
+    enabled: aiEnabled,
+    setup: {
+      state: "idle",
+      visible: false,
+    },
+    status: undefined,
+    sendMessage: null,
+    scrollToBottom: null,
+    defined: false,
+    threadId: "undefined",
+    resourceId: "undefined",
+    metadata: undefined,
+    loaded: false,
+    view: "chat",
+    imageOptions: {
+      model: "gemini/gemini-3-pro-image-preview",
+      samples: 1,
+      aspectRatio: "1:1",
+      quality: undefined,
+      size: "1K",
+    },
+    setEnabled: (newEnabled) =>
+      set((state) => ({
+        ...state,
+        enabled: newEnabled,
+      })),
+    setStatus: (newStatus) =>
+      set((state) => ({
+        ...state,
+        status: newStatus,
+      })),
+    setDefined: (newDefined) =>
+      set((state) => ({
+        ...state,
+        defined: newDefined,
+      })),
+    setThreadId: (newThreadId) =>
+      set((state) => ({
+        ...state,
+        threadId: newThreadId,
+      })),
+    setResourceId: (newResourceId) =>
+      set((state) => ({
+        ...state,
+        resourceId: newResourceId,
+      })),
+    setLoaded: (newLoaded) =>
+      set((state) => ({
+        ...state,
+        loaded: newLoaded,
+      })),
+    setView: (newView) =>
+      set((state) => ({
+        ...state,
+        view: newView,
+      })),
+    setScrollToBottom: (newScrollToBottom) =>
+      set((state) => ({
+        ...state,
+        scrollToBottom: newScrollToBottom,
+      })),
+    setSendMessage: (newSendMessage) =>
+      set((state) => ({
+        ...state,
+        sendMessage: newSendMessage,
+      })),
+    setImageModel: (newModel) =>
+      set((state) => {
+        if (newModel === "openai/gpt-image-1") {
+          return {
+            ...state,
+            imageOptions: {
+              ...state.imageOptions,
+              model: newModel,
+              quality: "medium",
+              size: "1024x1024",
+              aspectRatio: "1:1",
+              samples: 1,
+            },
+          };
+        }
+
         return {
           ...state,
           imageOptions: {
             ...state.imageOptions,
             model: newModel,
-            quality: "medium",
-            size: "1024x1024",
+            size: "1K",
+            quality: undefined,
             aspectRatio: "1:1",
             samples: 1,
           },
         };
-      }
-
-      return {
+      }),
+    setImageSamples: (newSamples) =>
+      set((state) => ({
         ...state,
-        imageOptions: {
-          ...state.imageOptions,
-          model: newModel,
-          size: "1K",
-          quality: undefined,
-          aspectRatio: "1:1",
-          samples: 1,
-        },
-      };
-    }),
-  setImageSamples: (newSamples) =>
-    set((state) => ({
-      ...state,
-      imageOptions: { ...state.imageOptions, samples: newSamples },
-    })),
-  setImageQuality: (newQuality) =>
-    set((state) => {
-      if (state.imageOptions.model === "openai/gpt-image-1") {
+        imageOptions: { ...state.imageOptions, samples: newSamples },
+      })),
+    setImageQuality: (newQuality) =>
+      set((state) => {
+        if (state.imageOptions.model === "openai/gpt-image-1") {
+          return {
+            ...state,
+            imageOptions: {
+              ...state.imageOptions,
+              quality: newQuality as ImageQualityChatGTP,
+            },
+          };
+        }
+
+        return state;
+      }),
+    setImageSize: (newSize) =>
+      set((state) => {
+        if (state.imageOptions.model === "openai/gpt-image-1") {
+          return {
+            ...state,
+            imageOptions: {
+              ...state.imageOptions,
+              size: newSize as ImageSizeChatGTP,
+            },
+          };
+        }
+
         return {
           ...state,
           imageOptions: {
             ...state.imageOptions,
-            quality: newQuality as ImageQualityChatGTP,
+            size: newSize as ImageSizeGemini,
           },
         };
-      }
+      }),
+    setImageAspectRatio: (newAspectRatio) =>
+      set((state) => {
+        if (state.imageOptions.model === "openai/gpt-image-1") {
+          return {
+            ...state,
+            imageOptions: {
+              ...state.imageOptions,
+              aspectRatio: newAspectRatio as ImageAspectRatioChatGTP,
+            },
+          };
+        }
 
-      return state;
-    }),
-  setImageSize: (newSize) =>
-    set((state) => {
-      if (state.imageOptions.model === "openai/gpt-image-1") {
         return {
           ...state,
           imageOptions: {
             ...state.imageOptions,
-            size: newSize as ImageSizeChatGTP,
+            aspectRatio: newAspectRatio as ImageAspectRatioGemini,
           },
         };
-      }
-
-      return {
+      }),
+    setSetupState: (newState) =>
+      set((state) => ({
         ...state,
-        imageOptions: {
-          ...state.imageOptions,
-          size: newSize as ImageSizeGemini,
-        },
-      };
-    }),
-  setImageAspectRatio: (newAspectRatio) =>
-    set((state) => {
-      if (state.imageOptions.model === "openai/gpt-image-1") {
-        return {
-          ...state,
-          imageOptions: {
-            ...state.imageOptions,
-            aspectRatio: newAspectRatio as ImageAspectRatioChatGTP,
-          },
-        };
-      }
-
-      return {
+        setup: { ...state.setup, state: newState },
+      })),
+    setSetupVisible: (newVisible) =>
+      set((state) => ({
         ...state,
-        imageOptions: {
-          ...state.imageOptions,
-          aspectRatio: newAspectRatio as ImageAspectRatioGemini,
-        },
-      };
-    }),
-  setSetupState: (newState) =>
-    set((state) => ({
-      ...state,
-      setup: { ...state.setup, state: newState },
-    })),
-  setSetupVisible: (newVisible) =>
-    set((state) => ({
-      ...state,
-      setup: { ...state.setup, visible: newVisible },
-    })),
-}));
+        setup: { ...state.setup, visible: newVisible },
+      })),
+  };
+});
