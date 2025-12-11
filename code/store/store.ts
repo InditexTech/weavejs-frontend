@@ -8,7 +8,6 @@ import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { WeaveElementAttributes } from "@inditextech/weave-types";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { boolean } from "zod/v4";
 import { merge } from "lodash";
 
 type ShowcaseUser = {
@@ -621,10 +620,12 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         ...state,
         configuration: {
           ...state.configuration,
-          upscale,
-          baseWidth,
-          baseHeight,
-          multiplier,
+          upscale: {
+            enabled: upscale,
+            baseWidth,
+            baseHeight,
+            multiplier,
+          },
         },
       })),
   };
