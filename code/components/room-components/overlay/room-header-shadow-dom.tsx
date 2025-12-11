@@ -53,6 +53,7 @@ import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { AppConfigurationDialog } from "./app-configuration";
 import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
@@ -530,6 +531,7 @@ export function RoomHeaderShadowDom() {
         </div>
       </motion.div>
       <LlmSetupDialog />
+      <AppConfigurationDialog />
     </>
   );
 }

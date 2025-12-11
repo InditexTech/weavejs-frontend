@@ -367,19 +367,30 @@ export const NodeToolbar = () => {
         const nodeHeight = nodesRect.height;
         const domElementBounds = toolbarRef.current.getBoundingClientRect();
 
+        const stage = instance.getStage();
+        const upscaleScale = stage.getAttr("upscaleScale");
+
         const paddingY = 8;
         const topPos = nodesRect.y + nodeHeight + paddingY;
         let leftPos = nodesRect.x;
         if (domElementBounds.width >= nodeWidth) {
-          const amountOverflow = domElementBounds.width - nodeWidth;
+          const amountOverflow =
+            domElementBounds.width / upscaleScale - nodeWidth;
           leftPos = leftPos - amountOverflow / 2;
         } else {
-          const amountOverflow = nodeWidth - domElementBounds.width;
+          const amountOverflow =
+            nodeWidth - domElementBounds.width / upscaleScale;
           leftPos = leftPos + amountOverflow / 2;
         }
 
-        toolbarRef.current.style.setProperty("top", `${topPos}px`);
-        toolbarRef.current.style.setProperty("left", `${leftPos}px`);
+        toolbarRef.current.style.setProperty(
+          "top",
+          `${topPos * upscaleScale}px`
+        );
+        toolbarRef.current.style.setProperty(
+          "left",
+          `${leftPos * upscaleScale}px`
+        );
       }
     }
 

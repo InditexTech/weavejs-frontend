@@ -14,6 +14,7 @@ import { ConnectedUsers } from "../connected-users";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { LlmSetupDialog } from "./llm-setup";
+import { AppConfigurationDialog } from "./app-configuration";
 
 export function RoomHeaderRight() {
   const selectionActive = useWeave((state) => state.selection.active);
@@ -62,6 +63,7 @@ export function RoomHeaderRight() {
         </motion.div>
       )}
       <LlmSetupDialog />
+      <AppConfigurationDialog />
     </>
   );
 }

@@ -8,6 +8,8 @@ import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { WeaveElementAttributes } from "@inditextech/weave-types";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { boolean } from "zod/v4";
+import { merge } from "lodash";
 
 type ShowcaseUser = {
   id: string;
@@ -47,6 +49,15 @@ export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
 interface CollaborationRoomState {
   backgroundColor: BackgroundColor;
+  configuration: {
+    open: boolean;
+    upscale: {
+      enabled: boolean;
+      baseWidth: number;
+      baseHeight: number;
+      multiplier: number;
+    };
+  };
   features: {
     workloads: boolean;
     threads: boolean;
@@ -187,379 +198,434 @@ interface CollaborationRoomState {
   setConnectionTestsShow: (newShow: boolean) => void;
   setBackgroundColor: (newBackgroundColor: BackgroundColor) => void;
   setLinkedNode: (newLinkedNode: Konva.Node | null) => void;
+  setConfigurationOpen: (newOpen: boolean) => void;
+  setConfiguration: (
+    upscale: boolean,
+    baseWidth: number,
+    baseHeight: number,
+    multiplier: number
+  ) => void;
 }
 
-export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
-  backgroundColor: BACKGROUND_COLOR.GRAY,
-  linkedNode: null,
-  features: {
-    workloads: true,
-    threads: true,
-  },
-  connection: {
-    tests: {
-      show: false,
-    },
-  },
-  ui: {
-    show: true,
-    minimap: false,
-  },
-  fetchConnectionUrl: {
-    loading: false,
-    error: null,
-  },
-  clientId: undefined,
-  user: undefined,
-  room: undefined,
-  sidebar: {
-    previouslyActive: null,
-    active: SIDEBAR_ELEMENTS.nodesTree,
-  },
-  fonts: {
-    loaded: false,
-    values: [],
-  },
-  drawer: {
-    keyboardShortcuts: {
-      visible: false,
-    },
-  },
-  contextMenu: {
-    show: false,
-    position: { x: 0, y: 0 },
-    options: [],
-  },
-  nodeProperties: {
-    action: undefined,
-    visible: false,
-    createProps: undefined,
-  },
-  commBus: {
-    connected: false,
-  },
-  export: {
-    nodes: [],
-    config: {
-      visible: false,
-    },
-  },
-  videos: {
-    showSelectFile: false,
-    uploading: false,
-  },
-  images: {
-    showSelectFiles: false,
-    showSelectFile: false,
-    transforming: false,
-    transformingOperation: undefined,
-    cropping: {
+export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
+  const defaultConfiguration = {
+    open: false,
+    upscale: {
       enabled: false,
-      node: undefined,
+      baseWidth: 1920,
+      baseHeight: 1080,
+      multiplier: 1,
     },
-    exporting: false,
-    uploading: false,
-    loading: false,
-    finishUploadCallback: null,
-    removeBackgroundPopup: {
-      originNodeId: undefined,
-      imageId: undefined,
-      imageURL: undefined,
-      action: undefined,
+  };
+
+  const savedConfiguration = sessionStorage.getItem("weave_ai_configuration");
+  const configurationFromStorage = JSON.parse(savedConfiguration || "{}");
+
+  const finalConfiguration = merge(
+    defaultConfiguration,
+    configurationFromStorage
+  );
+
+  return {
+    backgroundColor: BACKGROUND_COLOR.GRAY,
+    configuration: finalConfiguration,
+    linkedNode: null,
+    features: {
+      workloads: true,
+      threads: true,
+    },
+    connection: {
+      tests: {
+        show: false,
+      },
+    },
+    ui: {
+      show: true,
+      minimap: false,
+    },
+    fetchConnectionUrl: {
+      loading: false,
+      error: null,
+    },
+    clientId: undefined,
+    user: undefined,
+    room: undefined,
+    sidebar: {
+      previouslyActive: null,
+      active: SIDEBAR_ELEMENTS.nodesTree,
+    },
+    fonts: {
+      loaded: false,
+      values: [],
+    },
+    drawer: {
+      keyboardShortcuts: {
+        visible: false,
+      },
+    },
+    contextMenu: {
       show: false,
+      position: { x: 0, y: 0 },
+      options: [],
     },
-  },
-  frames: {
-    library: {
+    nodeProperties: {
+      action: undefined,
+      visible: false,
+      createProps: undefined,
+    },
+    commBus: {
+      connected: false,
+    },
+    export: {
+      nodes: [],
+      config: {
+        visible: false,
+      },
+    },
+    videos: {
+      showSelectFile: false,
+      uploading: false,
+    },
+    images: {
+      showSelectFiles: false,
+      showSelectFile: false,
+      transforming: false,
+      transformingOperation: undefined,
+      cropping: {
+        enabled: false,
+        node: undefined,
+      },
+      exporting: false,
+      uploading: false,
+      loading: false,
+      finishUploadCallback: null,
+      removeBackgroundPopup: {
+        originNodeId: undefined,
+        imageId: undefined,
+        imageURL: undefined,
+        action: undefined,
+        show: false,
+      },
+    },
+    frames: {
+      library: {
+        visible: false,
+      },
+    },
+    colorToken: {
+      library: {
+        visible: false,
+      },
+    },
+    comments: {
+      status: "pending",
+    },
+    nodesTree: {
       visible: false,
     },
-  },
-  colorToken: {
-    library: {
-      visible: false,
+    setShowUi: (newShowUI) =>
+      set((state) => ({
+        ...state,
+        ui: { ...state.ui, show: newShowUI },
+      })),
+    setShowMinimap: (newShowMinimap) =>
+      set((state) => ({
+        ...state,
+        ui: { ...state.ui, minimap: newShowMinimap },
+      })),
+    setFetchConnectionUrlLoading: (newLoading) =>
+      set((state) => ({
+        ...state,
+        fetchConnectionUrl: {
+          ...state.fetchConnectionUrl,
+          loading: newLoading,
+        },
+      })),
+    setFetchConnectionUrlError: (newFetchConnectionUrlError) =>
+      set((state) => ({
+        ...state,
+        fetchConnectionUrl: {
+          ...state.fetchConnectionUrl,
+          error: newFetchConnectionUrlError,
+        },
+      })),
+    setClientId: (newClientId) =>
+      set((state) => ({
+        ...state,
+        clientId: newClientId,
+      })),
+    setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
+    setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
+    setContextMenuShow: (newContextMenuShow) =>
+      set((state) => ({
+        ...state,
+        contextMenu: { ...state.contextMenu, show: newContextMenuShow },
+      })),
+    setContextMenuPosition: (newContextMenuPosition) =>
+      set((state) => ({
+        ...state,
+        contextMenu: { ...state.contextMenu, position: newContextMenuPosition },
+      })),
+    setContextMenuOptions: (newContextMenuOptions) =>
+      set((state) => ({
+        ...state,
+        contextMenu: { ...state.contextMenu, options: newContextMenuOptions },
+      })),
+    setTransformingImage: (newTransformingImage, operation) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          transforming: newTransformingImage,
+          transformingOperation:
+            !newTransformingImage && operation ? undefined : operation,
+        },
+      })),
+    setCroppingImage: (newCroppingImage) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          cropping: { ...state.images.cropping, enabled: newCroppingImage },
+        },
+      })),
+    setCroppingNode: (newCroppingNode) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          cropping: { ...state.images.cropping, node: newCroppingNode },
+        },
+      })),
+    setUploadingImage: (newUploadingImage) =>
+      set((state) => ({
+        ...state,
+        images: { ...state.images, uploading: newUploadingImage },
+      })),
+    setShowSelectFileImage: (newShowSelectFileImage) =>
+      set((state) => ({
+        ...state,
+        images: { ...state.images, showSelectFile: newShowSelectFileImage },
+      })),
+    setShowSelectFilesImages: (newShowSelectFilesImages) =>
+      set((state) => ({
+        ...state,
+        images: { ...state.images, showSelectFiles: newShowSelectFilesImages },
+      })),
+    setLoadingImage: (newLoadingImage) =>
+      set((state) => ({
+        ...state,
+        images: { ...state.images, loading: newLoadingImage },
+      })),
+    setFinishUploadCallbackImage: (newFinishUploadCallbackImage) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          finishUploadCallback: newFinishUploadCallbackImage,
+        },
+      })),
+    setUploadingVideo: (newUploadingVideo) =>
+      set((state) => ({
+        ...state,
+        videos: { ...state.videos, uploading: newUploadingVideo },
+      })),
+    setShowSelectFileVideo: (newShowSelectFileVideo) =>
+      set((state) => ({
+        ...state,
+        videos: { ...state.videos, showSelectFile: newShowSelectFileVideo },
+      })),
+    setNodePropertiesAction: (newNodePropertiesAction) =>
+      set((state) => ({
+        ...state,
+        nodeProperties: {
+          ...state.nodeProperties,
+          action: newNodePropertiesAction,
+        },
+      })),
+    setNodePropertiesCreateProps: (newNodePropertiesCreateProps) =>
+      set((state) => ({
+        ...state,
+        nodeProperties: {
+          ...state.nodeProperties,
+          createProps: newNodePropertiesCreateProps,
+        },
+      })),
+    setSidebarActive: (newSidebarActive) =>
+      set((state) => ({
+        ...state,
+        sidebar: {
+          previouslyActive: state.sidebar.active,
+          active: newSidebarActive,
+        },
+      })),
+    setShowDrawer: (drawerKey, newOpen) =>
+      set((state) => ({
+        ...state,
+        drawer: {
+          ...state.drawer,
+          [drawerKey]: {
+            ...state.drawer[drawerKey],
+            visible: newOpen,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupAction: (newAction) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            action: newAction,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupShow: (newShow) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            show: newShow,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupOriginNodeId: (newOriginNodeId) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            originNodeId: newOriginNodeId,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupImageId: (newImageId) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            imageId: newImageId,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupImageURL: (newImageURL) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            imageURL: newImageURL,
+          },
+        },
+      })),
+    setRemoveBackgroundPopupOriginImage: (newOriginImage) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          removeBackgroundPopup: {
+            ...state.images.removeBackgroundPopup,
+            originImage: newOriginImage,
+          },
+        },
+      })),
+    setCommBusConnected: (newConnected) =>
+      set((state) => ({
+        ...state,
+        commBus: { ...state.commBus, connected: newConnected },
+      })),
+    setImageExporting(newExportingImage) {
+      set((state) => ({
+        ...state,
+        images: { ...state.images, exporting: newExportingImage },
+      }));
     },
-  },
-  comments: {
-    status: "pending",
-  },
-  nodesTree: {
-    visible: false,
-  },
-  setShowUi: (newShowUI) =>
-    set((state) => ({
-      ...state,
-      ui: { ...state.ui, show: newShowUI },
-    })),
-  setShowMinimap: (newShowMinimap) =>
-    set((state) => ({
-      ...state,
-      ui: { ...state.ui, minimap: newShowMinimap },
-    })),
-  setFetchConnectionUrlLoading: (newLoading) =>
-    set((state) => ({
-      ...state,
-      fetchConnectionUrl: { ...state.fetchConnectionUrl, loading: newLoading },
-    })),
-  setFetchConnectionUrlError: (newFetchConnectionUrlError) =>
-    set((state) => ({
-      ...state,
-      fetchConnectionUrl: {
-        ...state.fetchConnectionUrl,
-        error: newFetchConnectionUrlError,
-      },
-    })),
-  setClientId: (newClientId) =>
-    set((state) => ({
-      ...state,
-      clientId: newClientId,
-    })),
-  setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
-  setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
-  setContextMenuShow: (newContextMenuShow) =>
-    set((state) => ({
-      ...state,
-      contextMenu: { ...state.contextMenu, show: newContextMenuShow },
-    })),
-  setContextMenuPosition: (newContextMenuPosition) =>
-    set((state) => ({
-      ...state,
-      contextMenu: { ...state.contextMenu, position: newContextMenuPosition },
-    })),
-  setContextMenuOptions: (newContextMenuOptions) =>
-    set((state) => ({
-      ...state,
-      contextMenu: { ...state.contextMenu, options: newContextMenuOptions },
-    })),
-  setTransformingImage: (newTransformingImage, operation) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        transforming: newTransformingImage,
-        transformingOperation:
-          !newTransformingImage && operation ? undefined : operation,
-      },
-    })),
-  setCroppingImage: (newCroppingImage) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        cropping: { ...state.images.cropping, enabled: newCroppingImage },
-      },
-    })),
-  setCroppingNode: (newCroppingNode) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        cropping: { ...state.images.cropping, node: newCroppingNode },
-      },
-    })),
-  setUploadingImage: (newUploadingImage) =>
-    set((state) => ({
-      ...state,
-      images: { ...state.images, uploading: newUploadingImage },
-    })),
-  setShowSelectFileImage: (newShowSelectFileImage) =>
-    set((state) => ({
-      ...state,
-      images: { ...state.images, showSelectFile: newShowSelectFileImage },
-    })),
-  setShowSelectFilesImages: (newShowSelectFilesImages) =>
-    set((state) => ({
-      ...state,
-      images: { ...state.images, showSelectFiles: newShowSelectFilesImages },
-    })),
-  setLoadingImage: (newLoadingImage) =>
-    set((state) => ({
-      ...state,
-      images: { ...state.images, loading: newLoadingImage },
-    })),
-  setFinishUploadCallbackImage: (newFinishUploadCallbackImage) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        finishUploadCallback: newFinishUploadCallbackImage,
-      },
-    })),
-  setUploadingVideo: (newUploadingVideo) =>
-    set((state) => ({
-      ...state,
-      videos: { ...state.videos, uploading: newUploadingVideo },
-    })),
-  setShowSelectFileVideo: (newShowSelectFileVideo) =>
-    set((state) => ({
-      ...state,
-      videos: { ...state.videos, showSelectFile: newShowSelectFileVideo },
-    })),
-  setNodePropertiesAction: (newNodePropertiesAction) =>
-    set((state) => ({
-      ...state,
-      nodeProperties: {
-        ...state.nodeProperties,
-        action: newNodePropertiesAction,
-      },
-    })),
-  setNodePropertiesCreateProps: (newNodePropertiesCreateProps) =>
-    set((state) => ({
-      ...state,
-      nodeProperties: {
-        ...state.nodeProperties,
-        createProps: newNodePropertiesCreateProps,
-      },
-    })),
-  setSidebarActive: (newSidebarActive) =>
-    set((state) => ({
-      ...state,
-      sidebar: {
-        previouslyActive: state.sidebar.active,
-        active: newSidebarActive,
-      },
-    })),
-  setShowDrawer: (drawerKey, newOpen) =>
-    set((state) => ({
-      ...state,
-      drawer: {
-        ...state.drawer,
-        [drawerKey]: {
-          ...state.drawer[drawerKey],
-          visible: newOpen,
+    setCommentsStatus: (newStatus: CommentsStatus) =>
+      set((state) => ({
+        ...state,
+        comments: {
+          ...state.comments,
+          status: newStatus,
         },
-      },
-    })),
-  setRemoveBackgroundPopupAction: (newAction) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          action: newAction,
+      })),
+    setExportNodes: (newNodes: string[]) =>
+      set((state) => ({
+        ...state,
+        export: {
+          ...state.export,
+          nodes: newNodes,
         },
-      },
-    })),
-  setRemoveBackgroundPopupShow: (newShow) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          show: newShow,
+      })),
+    setExportConfigVisible: (newVisible: boolean) =>
+      set((state) => ({
+        ...state,
+        export: {
+          ...state.export,
+          config: {
+            ...state.export.config,
+            visible: newVisible,
+          },
         },
-      },
-    })),
-  setRemoveBackgroundPopupOriginNodeId: (newOriginNodeId) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          originNodeId: newOriginNodeId,
+      })),
+    setFontsLoaded: (newLoaded) =>
+      set((state) => ({
+        ...state,
+        fonts: { ...state.fonts, loaded: newLoaded },
+      })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setFontsValues: (newValues: { id: string; name: string }[]) =>
+      set((state) => ({
+        ...state,
+        fonts: { ...state.fonts, values: newValues },
+      })),
+    setConnectionTestsShow: (newShow: boolean) =>
+      set((state) => ({
+        ...state,
+        connection: {
+          ...state.connection,
+          tests: { ...state.connection.tests, show: newShow },
         },
-      },
-    })),
-  setRemoveBackgroundPopupImageId: (newImageId) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          imageId: newImageId,
+      })),
+    setBackgroundColor: (newBackgroundColor) =>
+      set((state) => ({
+        ...state,
+        backgroundColor: newBackgroundColor,
+      })),
+    setLinkedNode: (newLinkedNode) =>
+      set((state) => ({
+        ...state,
+        linkedNode: newLinkedNode,
+      })),
+    setConfigurationOpen: (newOpen: boolean) =>
+      set((state) => ({
+        ...state,
+        configuration: {
+          ...state.configuration,
+          open: newOpen,
         },
-      },
-    })),
-  setRemoveBackgroundPopupImageURL: (newImageURL) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          imageURL: newImageURL,
+      })),
+    setConfiguration: (
+      upscale: boolean,
+      baseWidth: number,
+      baseHeight: number,
+      multiplier: number
+    ) =>
+      set((state) => ({
+        ...state,
+        configuration: {
+          ...state.configuration,
+          upscale,
+          baseWidth,
+          baseHeight,
+          multiplier,
         },
-      },
-    })),
-  setRemoveBackgroundPopupOriginImage: (newOriginImage) =>
-    set((state) => ({
-      ...state,
-      images: {
-        ...state.images,
-        removeBackgroundPopup: {
-          ...state.images.removeBackgroundPopup,
-          originImage: newOriginImage,
-        },
-      },
-    })),
-  setCommBusConnected: (newConnected) =>
-    set((state) => ({
-      ...state,
-      commBus: { ...state.commBus, connected: newConnected },
-    })),
-  setImageExporting(newExportingImage) {
-    set((state) => ({
-      ...state,
-      images: { ...state.images, exporting: newExportingImage },
-    }));
-  },
-  setCommentsStatus: (newStatus: CommentsStatus) =>
-    set((state) => ({
-      ...state,
-      comments: {
-        ...state.comments,
-        status: newStatus,
-      },
-    })),
-  setExportNodes: (newNodes: string[]) =>
-    set((state) => ({
-      ...state,
-      export: {
-        ...state.export,
-        nodes: newNodes,
-      },
-    })),
-  setExportConfigVisible: (newVisible: boolean) =>
-    set((state) => ({
-      ...state,
-      export: {
-        ...state.export,
-        config: {
-          ...state.export.config,
-          visible: newVisible,
-        },
-      },
-    })),
-  setFontsLoaded: (newLoaded) =>
-    set((state) => ({
-      ...state,
-      fonts: { ...state.fonts, loaded: newLoaded },
-    })),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setFontsValues: (newValues: { id: string; name: string }[]) =>
-    set((state) => ({
-      ...state,
-      fonts: { ...state.fonts, values: newValues },
-    })),
-  setConnectionTestsShow: (newShow: boolean) =>
-    set((state) => ({
-      ...state,
-      connection: {
-        ...state.connection,
-        tests: { ...state.connection.tests, show: newShow },
-      },
-    })),
-  setBackgroundColor: (newBackgroundColor) =>
-    set((state) => ({
-      ...state,
-      backgroundColor: newBackgroundColor,
-    })),
-  setLinkedNode: (newLinkedNode) =>
-    set((state) => ({
-      ...state,
-      linkedNode: newLinkedNode,
-    })),
-}));
+      })),
+  };
+});

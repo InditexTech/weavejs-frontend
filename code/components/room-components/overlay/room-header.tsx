@@ -88,6 +88,9 @@ export function RoomHeader() {
   const setConnectionTestsShow = useCollaborationRoom(
     (state) => state.setConnectionTestsShow
   );
+  const setConfigurationOpen = useCollaborationRoom(
+    (state) => state.setConfigurationOpen
+  );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
   const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
@@ -726,6 +729,19 @@ export function RoomHeader() {
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onPointerDown={() => {
+                    setConfigurationOpen(true);
+                    setMenuOpen(false);
+                  }}
+                >
+                  Configuration
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-foreground cursor-pointer hover:rounded-none"

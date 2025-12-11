@@ -66,6 +66,21 @@ export const Room = () => {
     return user as WeaveUser;
   }, [user]);
 
+  const upscaleConfiguration = useCollaborationRoom(
+    (state) => state.configuration.upscale
+  );
+
+  const performanceConfiguration = React.useMemo(() => {
+    return {
+      upscale: {
+        enabled: upscaleConfiguration.enabled,
+        baseWidth: upscaleConfiguration.baseWidth,
+        baseHeight: upscaleConfiguration.baseHeight,
+        multiplier: upscaleConfiguration.multiplier,
+      },
+    };
+  }, [upscaleConfiguration]);
+
   React.useEffect(() => {
     if (room && !user) {
       const userStorage = sessionStorage.getItem(`weave.js_${room}`);
@@ -206,6 +221,7 @@ export const Room = () => {
             plugins={PLUGINS(getUser) as any[]}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             actions={ACTIONS(getUser) as any[]}
+            performance={performanceConfiguration}
           >
             <UploadImage />
             <UploadImages />

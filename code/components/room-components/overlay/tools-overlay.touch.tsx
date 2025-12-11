@@ -30,6 +30,7 @@ import {
   Frame,
   Video,
   PenLine,
+  // RulerDimensionLine,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -78,6 +79,9 @@ export function ToolsOverlayTouch() {
 
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
+  );
+  const setShowSelectFileVideo = useCollaborationRoom(
+    (state) => state.setShowSelectFileVideo
   );
   // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
@@ -514,7 +518,10 @@ export function ToolsOverlayTouch() {
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
           active={actualAction === "videoTool"}
-          onClick={() => triggerTool("videoTool")}
+          onClick={() => {
+            triggerTool("videoTool");
+            setShowSelectFileVideo(true);
+          }}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add video</p>
@@ -592,6 +599,26 @@ export function ToolsOverlayTouch() {
             tooltipAlign="center"
           />
         )}
+        {/* <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={
+            <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
+          }
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "measureTool"}
+          onClick={() => {
+            triggerTool("measureTool", nodeCreateProps);
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Measure tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        /> */}
         {/* <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
