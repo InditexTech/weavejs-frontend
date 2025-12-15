@@ -57,6 +57,11 @@ interface CollaborationRoomState {
       multiplier: number;
     };
   };
+  measurement: {
+    units: string;
+    referenceMeasureUnits: number;
+    referenceMeasurePixels: number | null;
+  };
   features: {
     workloads: boolean;
     threads: boolean;
@@ -204,6 +209,8 @@ interface CollaborationRoomState {
     baseHeight: number,
     multiplier: number
   ) => void;
+  setMeasurement: (units: string, referenceMeasureUnits: number) => void;
+  setReferenceMeasurePixels: (referenceMeasurePixels: number | null) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -231,6 +238,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
 
   return {
     backgroundColor: BACKGROUND_COLOR.GRAY,
+    measurement: {
+      units: "cms",
+      referenceMeasureUnits: 10,
+      referenceMeasurePixels: null,
+    },
     configuration: finalConfiguration,
     linkedNode: null,
     features: {
@@ -630,6 +642,23 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
             baseHeight,
             multiplier,
           },
+        },
+      })),
+    setMeasurement: (units: string, referenceMeasureUnits: number) =>
+      set((state) => ({
+        ...state,
+        measurement: {
+          ...state.measurement,
+          units,
+          referenceMeasureUnits,
+        },
+      })),
+    setReferenceMeasurePixels: (referenceMeasurePixels: number | null) =>
+      set((state) => ({
+        ...state,
+        measurement: {
+          ...state.measurement,
+          referenceMeasurePixels,
         },
       })),
   };

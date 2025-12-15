@@ -59,6 +59,10 @@ export const Room = () => {
     (state) => state.setFetchConnectionUrlError
   );
   const setUser = useCollaborationRoom((state) => state.setUser);
+  const setMeasurement = useCollaborationRoom((state) => state.setMeasurement);
+  const setReferenceMeasurePixels = useCollaborationRoom(
+    (state) => state.setReferenceMeasurePixels
+  );
 
   const { loadedParams } = useHandleRouteParams();
 
@@ -80,6 +84,25 @@ export const Room = () => {
       },
     };
   }, [upscaleConfiguration]);
+
+  React.useEffect(() => {
+    if (room) {
+      const actualSavedConfig = JSON.parse(
+        sessionStorage.getItem(`weave_measurement_config_${room}`) || "{}"
+      );
+
+      console.log("Loaded measurement config:", actualSavedConfig);
+
+      setMeasurement(
+        actualSavedConfig?.units ?? "cms",
+        Number.parseFloat(actualSavedConfig?.referenceMeasureUnits ?? "10")
+      );
+
+      setReferenceMeasurePixels(
+        actualSavedConfig?.referenceMeasurePixels ?? null
+      );
+    }
+  }, [room, setMeasurement, setReferenceMeasurePixels]);
 
   React.useEffect(() => {
     if (room && !user) {

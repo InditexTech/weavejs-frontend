@@ -20,6 +20,8 @@ export const useNodeActionName = () => {
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
+      case "measure":
+        return "Measure";
       case "group":
         return "Group";
       case "rectangle":
@@ -58,6 +60,7 @@ export const useNodeActionName = () => {
         return "Mask";
       case "fuzzy-mask":
         return "Mask";
+
       default:
         return "Unknown";
     }
@@ -65,6 +68,8 @@ export const useNodeActionName = () => {
 
   const actionType = React.useMemo(() => {
     switch (actualAction) {
+      case "measureTool":
+        return "Measure";
       case "rectangleTool":
         return "Rectangle";
       case "ellipseTool":

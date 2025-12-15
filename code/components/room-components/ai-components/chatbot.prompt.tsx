@@ -38,7 +38,8 @@ import { useIAChat } from "@/store/ia-chat";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { Label } from "@/components/ui/label";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, PanelBottomOpen, PanelTopOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const GEMINI_IMAGE_ASPECT_RATIOS = [
   "1:1",
@@ -77,6 +78,7 @@ const MODELS = [
 
 const ChatBotPrompt = () => {
   const [open, setOpen] = React.useState(false);
+  const [hidden, setHidden] = React.useState(false);
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -150,8 +152,24 @@ const ChatBotPrompt = () => {
   const attachments = usePromptInputAttachments();
 
   return (
-    <div className="pointer-events-none fixed bottom-[10px] left-[20px] right-[500px] flex justify-center items-center">
-      <div className="w-[900px] pointer-events-auto border border-[#c9c9c9]">
+    <div
+      className={cn(
+        "pointer-events-none fixed bottom-[10px] left-[20px] right-[500px] flex justify-center items-center",
+        {
+          ["bottom-[-124px]"]: hidden,
+          ["bottom-[10px]"]: !hidden,
+        }
+      )}
+    >
+      <div className="relative w-[900px] pointer-events-auto border border-[#c9c9c9]">
+        {hidden && (
+          <button
+            className="absolute top-[-40px] right-0 px-5 py-3 bg-white rounded-none border border-[#c9c9c9] cursor-pointer"
+            onClick={() => setHidden(false)}
+          >
+            <PanelBottomOpen strokeWidth={1} size={16} />
+          </button>
+        )}
         {attachments.files.length > 0 && (
           <div className="w-full bg-white border-b border-[#c9c9c9] p-3">
             <PromptInputAttachments>
@@ -379,6 +397,12 @@ const ChatBotPrompt = () => {
                   </PromptInputSelectContent>
                 </PromptInputSelect>
               )}
+              <button
+                className="bg-white px-5 py-3 border border-[#c9c9c9] cursor-pointer rounded-none"
+                onClick={() => setHidden(true)}
+              >
+                <PanelTopOpen strokeWidth={1} size={16} />
+              </button>
             </PromptInputTools>
             <PromptInputSubmit
               className="cursor-pointer rounded-none"
