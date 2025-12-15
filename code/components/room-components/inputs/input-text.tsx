@@ -50,7 +50,7 @@ export const InputText = ({
   }, [editing]);
 
   return (
-    <div className="flex flex-col items-start justify-start relative">
+    <div className="w-full flex flex-col items-start justify-start relative">
       {label && (
         <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
           {label}

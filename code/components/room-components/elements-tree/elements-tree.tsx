@@ -27,6 +27,7 @@ import {
   LineSquiggle,
   LayoutPanelTop,
   ChevronsLeftRightEllipsis,
+  Ruler,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -50,6 +51,7 @@ const iconsMap: Record<string, any> = {
   ellipse: Circle,
   star: Star,
   arrow: MoveUpRight,
+  measure: Ruler,
 };
 
 function mapElementsToTree(

@@ -30,7 +30,7 @@ import {
   Frame,
   Video,
   PenLine,
-  // RulerDimensionLine,
+  RulerDimensionLine,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -76,6 +76,16 @@ export function ToolsOverlayTouch() {
     (state) => state.setSidebarActive
   );
   const showUI = useCollaborationRoom((state) => state.ui.show);
+
+  const measurementUnits = useCollaborationRoom(
+    (state) => state.measurement.units
+  );
+  const measurementReferenceMeasureUnits = useCollaborationRoom(
+    (state) => state.measurement.referenceMeasureUnits
+  );
+  const measurementReferenceMeasurePixels = useCollaborationRoom(
+    (state) => state.measurement.referenceMeasurePixels
+  );
 
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads
@@ -599,7 +609,7 @@ export function ToolsOverlayTouch() {
             tooltipAlign="center"
           />
         )}
-        {/* <ToolbarButton
+        <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={
             <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
@@ -609,7 +619,19 @@ export function ToolsOverlayTouch() {
           }
           active={actualAction === "measureTool"}
           onClick={() => {
+            if (!instance) {
+              return;
+            }
             triggerTool("measureTool", nodeCreateProps);
+            const scale = measurementReferenceMeasurePixels
+              ? measurementReferenceMeasurePixels /
+                measurementReferenceMeasureUnits
+              : 1;
+            instance.updatePropsAction("measureTool", {
+              color: "#FF3366",
+              unit: measurementUnits,
+              unitPerPixel: scale,
+            });
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
@@ -618,7 +640,7 @@ export function ToolsOverlayTouch() {
           }
           tooltipSide="top"
           tooltipAlign="center"
-        /> */}
+        />
         {/* <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
