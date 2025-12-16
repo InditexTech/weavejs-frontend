@@ -25,6 +25,7 @@ import {
   ChevronRight,
   ChevronLeft,
   MessageSquare,
+  ChevronsLeftRightEllipsis,
   // MapPinned,
   LayoutPanelTop,
   Frame,
@@ -424,6 +425,28 @@ export function ToolsOverlayTouch() {
           </DropdownMenu>
         </div>
 
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={
+            <ChevronsLeftRightEllipsis
+              className="px-2"
+              size={40}
+              strokeWidth={1}
+            />
+          }
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "connectorTool"}
+          onClick={() => triggerTool("connectorTool", nodeCreateProps)}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Connector Tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"
@@ -660,146 +683,6 @@ export function ToolsOverlayTouch() {
           tooltipAlign="center"
         />
         <ToolbarDivider orientation="horizontal" /> */}
-        {/* <DropdownMenu modal={false} open={sidebarsMenuOpen}>
-          <DropdownMenuTrigger
-            disabled={
-              weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-            }
-            className={cn(
-              "rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-              {
-                ["font-normal"]: sidebarsMenuOpen,
-                ["font-extralight"]: !sidebarsMenuOpen,
-                ["disabled:cursor-default disabled:opacity-50"]:
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-              }
-            )}
-            asChild
-          >
-            <ToolbarButton
-              className="rounded-full !w-[40px]"
-              icon={<PencilRuler className="px-2" size={40} strokeWidth={1} />}
-              disabled={
-                weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-              }
-              onClick={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen((prev) => !prev);
-              }}
-              label={
-                <div className="flex gap-3 justify-start items-center">
-                  <p>Toolbars</p>
-                </div>
-              }
-              tooltipSide="right"
-              tooltipAlign="center"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            onCloseAutoFocus={(e) => {
-              e.preventDefault();
-            }}
-            onFocusOutside={() => {
-              setSidebarsMenuOpen(false);
-            }}
-            align="start"
-            side="left"
-            alignOffset={0}
-            sideOffset={8}
-            className="font-inter rounded-none shadow-none"
-          >
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.images);
-              }}
-            >
-              <Images /> Images
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.videos);
-              }}
-            >
-              <Film /> Videos
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.frames);
-              }}
-            >
-              <LayoutPanelTop /> Frames
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.templates);
-              }}
-            >
-              <Projector /> Templates
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-              }}
-            >
-              <SwatchBook /> Color tokens
-            </DropdownMenuItem>
-            {threadsEnabled && (
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setSidebarsMenuOpen(false);
-                  sidebarToggle(SIDEBAR_ELEMENTS.comments);
-                }}
-              >
-                <MessageSquare /> Comments
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                setShapesMenuOpen(false);
-                setStrokesMenuOpen(false);
-                setImagesMenuOpen(false);
-                setSidebarsMenuOpen(false);
-                sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-              }}
-            >
-              <ListTree /> Elements tree
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
         <ToolbarDivider orientation="horizontal" />
         <ToolbarButton
           className="rounded-full !w-[40px]"

@@ -65,6 +65,7 @@ import {
   WandSparkles,
   FlipVertical2,
   Ruler,
+  Spline,
 } from "lucide-react";
 import { ShortcutElement } from "../help/shortcut-element";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -75,6 +76,8 @@ import {
   WeaveAlignNodesToolActionTriggerParams,
   WeaveVideoNode,
   WeaveMeasureNode,
+  WEAVE_CONNECTOR_NODE_LINE_TYPE,
+  WeaveConnectorNode,
 } from "@inditextech/weave-sdk";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -119,6 +122,8 @@ export const NodeToolbar = () => {
   const [nodesAlignmentVerticalMenuOpen, setNodesAlignmentVerticalMenuOpen] =
     React.useState(false);
   const [templateFitMenuOpen, setTemplateFitMenuOpen] = React.useState(false);
+  const [connectorTypeMenuOpen, setConnectorTypeMenuOpen] =
+    React.useState(false);
 
   const [isSelecting, setIsSelecting] = React.useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
@@ -664,6 +669,11 @@ export const NodeToolbar = () => {
     [actualNode]
   );
 
+  const isConnectorNode = React.useMemo(
+    () => actualNode && (actualNode.type ?? "") === "connector",
+    [actualNode]
+  );
+
   const isImage = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "image",
     [actualNode]
@@ -911,6 +921,181 @@ export const NodeToolbar = () => {
                 tooltipAlign="center"
               />
               <ToolbarDivider orientation="vertical" className="!h-[28px]" />
+            </>
+          )}
+          {isConnectorNode && (
+            <>
+              <DropdownMenu modal={false} open={connectorTypeMenuOpen}>
+                <DropdownMenuTrigger
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  className={cn(
+                    "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                    {
+                      ["disabled:cursor-default disabled:opacity-50"]:
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                    }
+                  )}
+                  asChild
+                >
+                  <ToolbarButton
+                    className="rounded-full !w-[32px] !h-[32px]"
+                    icon={<Spline className="px-2" size={32} strokeWidth={1} />}
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    active={nodeStyleMenuOpen}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setConnectorTypeMenuOpen((prev) => !prev);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Connector type</p>
+                      </div>
+                    }
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  onCloseAutoFocus={(e) => {
+                    e.preventDefault();
+                  }}
+                  align="center"
+                  side="bottom"
+                  alignOffset={0}
+                  sideOffset={8}
+                  className="min-w-auto !p-0 font-inter rounded-2xl !border-zinc-200 shadow-none flex flex-row"
+                >
+                  <div className="grid grid-cols-1 gap-1justify-start items-center py-1 px-1">
+                    <button
+                      onClick={() => {
+                        if (!instance || !node) {
+                          return;
+                        }
+
+                        const connectorHandler =
+                          instance?.getNodeHandler<WeaveConnectorNode>(
+                            "connector"
+                          );
+
+                        if (!connectorHandler) {
+                          return;
+                        }
+
+                        const nodeInstance = instance
+                          .getStage()
+                          .findOne(`#${node?.key ?? ""}`);
+
+                        if (!nodeInstance) {
+                          return;
+                        }
+
+                        connectorHandler.changeConnectorType(
+                          nodeInstance as Konva.Group,
+                          WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT
+                        );
+
+                        setConnectorTypeMenuOpen(false);
+                      }}
+                      className={cn(
+                        "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3 rounded-t-lg",
+                        {
+                          ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                            imageTemplateFit === IMAGE_TEMPLATE_FIT.FILL,
+                        }
+                      )}
+                    >
+                      Straight
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!instance || !node) {
+                          return;
+                        }
+
+                        const connectorHandler =
+                          instance?.getNodeHandler<WeaveConnectorNode>(
+                            "connector"
+                          );
+
+                        if (!connectorHandler) {
+                          return;
+                        }
+
+                        const nodeInstance = instance
+                          .getStage()
+                          .findOne(`#${node?.key ?? ""}`);
+
+                        if (!nodeInstance) {
+                          return;
+                        }
+
+                        connectorHandler.changeConnectorType(
+                          nodeInstance as Konva.Group,
+                          WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW
+                        );
+
+                        setConnectorTypeMenuOpen(false);
+                      }}
+                      className={cn(
+                        "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3",
+                        {
+                          ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                            imageTemplateFit === IMAGE_TEMPLATE_FIT.CONTAIN,
+                        }
+                      )}
+                    >
+                      Elbow
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!instance || !node) {
+                          return;
+                        }
+
+                        const connectorHandler =
+                          instance?.getNodeHandler<WeaveConnectorNode>(
+                            "connector"
+                          );
+
+                        if (!connectorHandler) {
+                          return;
+                        }
+
+                        const nodeInstance = instance
+                          .getStage()
+                          .findOne(`#${node?.key ?? ""}`);
+
+                        if (!nodeInstance) {
+                          return;
+                        }
+
+                        connectorHandler.changeConnectorType(
+                          nodeInstance as Konva.Group,
+                          WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+                        );
+
+                        setConnectorTypeMenuOpen(false);
+                      }}
+                      className={cn(
+                        "w-full text-[10px] px-2 py-1 cursor-pointer hover:bg-[#c9c9c9] font-inter uppercase px-3 rounded-b-lg",
+                        {
+                          ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
+                            imageTemplateFit === IMAGE_TEMPLATE_FIT.COVER,
+                        }
+                      )}
+                    >
+                      Curved
+                    </button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
           {isMeasureNode && (
