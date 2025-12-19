@@ -2493,7 +2493,7 @@ export const NodeToolbar = () => {
                     ) && (
                       <>
                         {!["stroke", "line", "connector"].includes(
-                          actualNode.type
+                          actualNode?.type ?? ""
                         ) && (
                           <>
                             <div className="w-full flex justify-end items-center py-1">
