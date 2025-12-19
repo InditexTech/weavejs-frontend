@@ -123,11 +123,11 @@ export const useExportToImageServerSide = () => {
     [instance, mutateExport]
   );
 
-  const isExporting = React.useCallback(() => exporting, [exporting]);
+  // const isExporting = React.useCallback(() => exporting, [exporting]);
 
   return {
     handlePrintStateSnapshotToClipboard,
     handleExportToImageServerSide,
-    isExporting,
+    isExporting: exporting,
   };
 };

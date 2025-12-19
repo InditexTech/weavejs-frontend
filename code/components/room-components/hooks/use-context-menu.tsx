@@ -282,7 +282,7 @@ function useContextMenu() {
               </div>
             ),
             icon: <ImageDown size={16} />,
-            disabled: nodes.length <= 0 || isExporting(),
+            disabled: nodes.length <= 0 || isExporting,
             onClick: async () => {
               setExportNodes(nodes.map((n) => n.node?.key ?? ""));
               setExportConfigVisible(true);

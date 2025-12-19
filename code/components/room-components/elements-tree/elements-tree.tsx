@@ -28,6 +28,7 @@ import {
   LayoutPanelTop,
   ChevronsLeftRightEllipsis,
   Ruler,
+  Video,
 } from "lucide-react";
 import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -42,6 +43,7 @@ const iconsMap: Record<string, any> = {
   image: Image,
   frame: Frame,
   group: Group,
+  video: Video,
   "color-token": Tag,
   connector: ChevronsLeftRightEllipsis,
   line: Spline,

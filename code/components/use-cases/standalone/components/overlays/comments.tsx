@@ -24,7 +24,11 @@ export function Comments() {
       >
         <MessagesSquareIcon strokeWidth={1} size={16} /> COMMENTS
       </button>
-      <Comments />
+      {commentsShow && (
+        <div className="absolute top-">
+          <Comments />
+        </div>
+      )}
     </>
   );
 }

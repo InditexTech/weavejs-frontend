@@ -91,8 +91,6 @@ export const Room = () => {
         sessionStorage.getItem(`weave_measurement_config_${room}`) || "{}"
       );
 
-      console.log("Loaded measurement config:", actualSavedConfig);
-
       setMeasurement(
         actualSavedConfig?.units ?? "cms",
         Number.parseFloat(actualSavedConfig?.referenceMeasureUnits ?? "10")

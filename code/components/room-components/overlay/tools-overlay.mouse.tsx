@@ -27,6 +27,7 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
+  ChevronsLeftRightEllipsis,
   // MapPinned,
   Video,
   LayoutPanelTop,
@@ -463,7 +464,7 @@ export function ToolsOverlayMouse() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {/* <ToolbarButton
+        <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={
             <ChevronsLeftRightEllipsis
@@ -490,7 +491,7 @@ export function ToolsOverlayMouse() {
           }
           tooltipSide="top"
           tooltipAlign="center"
-        /> */}
+        />
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"
