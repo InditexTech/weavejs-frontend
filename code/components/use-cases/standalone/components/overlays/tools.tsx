@@ -15,13 +15,14 @@ import {
   Redo,
   Eraser,
   MessageSquare,
+  RulerDimensionLine,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "@/components/room-components/toolbar/toolbar";
 import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-divider";
-import { useCollaborationRoom } from "@/store/store";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { MoveToolTrigger } from "@/components/room-components/overlay/tools-triggers/move-tool";
+import { useStandaloneUseCase } from "../../store/store";
 
 export function Tools() {
   const instance = useWeave((state) => state.instance);
@@ -30,10 +31,15 @@ export function Tools() {
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+  const measurementUnits = useStandaloneUseCase(
+    (state) => state.measurement.units
   );
-  const showUI = useCollaborationRoom((state) => state.ui.show);
+  const measurementReferenceMeasureUnits = useStandaloneUseCase(
+    (state) => state.measurement.referenceMeasureUnits
+  );
+  const measurementReferenceMeasurePixels = useStandaloneUseCase(
+    (state) => state.measurement.referenceMeasurePixels
+  );
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -47,10 +53,6 @@ export function Tools() {
     },
     [instance, actualAction]
   );
-
-  if (!showUI) {
-    return null;
-  }
 
   return (
     <div className="pointer-events-none absolute left-5 right-5 bottom-5 flex flex-col gap-2 justify-center items-center">
@@ -145,7 +147,7 @@ export function Tools() {
           }
           active={actualAction === "commentTool"}
           onClick={() => {
-            triggerTool("commentTool", nodeCreateProps);
+            triggerTool("commentTool", {});
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
@@ -153,6 +155,38 @@ export function Tools() {
             </div>
           }
           tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={
+            <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
+          }
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "measureTool"}
+          onClick={() => {
+            if (!instance) {
+              return;
+            }
+            triggerTool("measureTool", {});
+            const scale = measurementReferenceMeasurePixels
+              ? measurementReferenceMeasurePixels /
+                measurementReferenceMeasureUnits
+              : 1;
+            instance.updatePropsAction("measureTool", {
+              color: "#FF3366",
+              unit: measurementUnits,
+              unitPerPixel: scale,
+            });
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Measure tool</p>
+            </div>
+          }
+          tooltipSide="right"
           tooltipAlign="center"
         />
         <ToolbarDivider />

@@ -40,7 +40,13 @@ function safeParseInt(value: unknown, fallback = 0): number {
   return fallback;
 }
 
-export function ExportConfigDialog() {
+type ExportConfigDialogProps = {
+  onIsExportingChange?: (isExporting: boolean) => void;
+};
+
+export function ExportConfigDialog({
+  onIsExportingChange,
+}: ExportConfigDialogProps) {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   const [format, setFormat] = React.useState<string>("image/png");
@@ -67,6 +73,10 @@ export function ExportConfigDialog() {
 
   const { handleExportToImageServerSide, isExporting } =
     useExportToImageServerSide();
+
+  React.useEffect(() => {
+    onIsExportingChange?.(isExporting);
+  }, [isExporting, onIsExportingChange]);
 
   const handleExport = React.useCallback(() => {
     handleExportToImageServerSide({
@@ -142,7 +152,7 @@ export function ExportConfigDialog() {
                 <Select
                   value={format}
                   onValueChange={setFormat}
-                  disabled={isExporting()}
+                  disabled={isExporting}
                 >
                   <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                     <SelectValue placeholder="Amount" />
@@ -177,7 +187,7 @@ export function ExportConfigDialog() {
                 <Input
                   className="w-[100px] font-inter !py-1 !pt-[2px] text-right text-xs rounded-none !h-[30px] !border-black !shadow-none"
                   value={padding}
-                  disabled={isExporting()}
+                  disabled={isExporting}
                   onFocus={() => {
                     window.weaveOnFieldFocus = true;
                   }}
@@ -197,7 +207,7 @@ export function ExportConfigDialog() {
                 <Select
                   value={backgroundColor}
                   onValueChange={setBackgroundColor}
-                  disabled={isExporting()}
+                  disabled={isExporting}
                 >
                   <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                     <SelectValue placeholder="Amount" />
@@ -244,7 +254,7 @@ export function ExportConfigDialog() {
                 <Select
                   value={pixelRatio}
                   onValueChange={setPixelRatio}
-                  disabled={isExporting()}
+                  disabled={isExporting}
                 >
                   <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
                     <SelectValue placeholder="Amount" />

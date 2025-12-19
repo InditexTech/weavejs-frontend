@@ -113,7 +113,7 @@ export const ToolbarButton = React.forwardRef<
 
     return (
       <TooltipProvider delayDuration={300}>
-        <Tooltip>
+        <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>{ButtonElement}</TooltipTrigger>
           <TooltipContent
             side={tooltipSide}

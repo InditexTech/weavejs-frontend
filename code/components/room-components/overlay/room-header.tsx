@@ -434,7 +434,7 @@ export function RoomHeader() {
                           weaveConnectionStatus !==
                             WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
                           !instance?.isEmpty() &&
-                          !isExporting()
+                          !isExporting
                         }
                         onPointerDown={async () => {
                           setExportNodes([]);

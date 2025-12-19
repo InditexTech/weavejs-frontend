@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Error } from "@/components/error/error";
-import { Suspense } from "react";
+import React from "react";
 
 export default function ErrorPage() {
   return (
-    <Suspense>
+    <React.Suspense fallback={<div>Loading...</div>}>
       <Error />
-    </Suspense>
+    </React.Suspense>
   );
 }

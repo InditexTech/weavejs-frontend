@@ -15,11 +15,15 @@ import { Tools } from "../overlays/tools";
 import { Zoom } from "../overlays/zoom";
 import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
 import { useStandaloneUseCase } from "../../store/store";
-import { SaveIcon, XIcon } from "lucide-react";
+import { Cog, ImageDown, SaveIcon, XIcon } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { putStandaloneInstanceImageData } from "@/api/standalone/put-standalone-instance-image-data";
 import { uint8ToBase64 } from "../../utils/utils";
 import { ScaleLoader } from "react-spinners";
+import { ConfigurationDialog } from "../overlays/configuration";
+import { NodeToolbar } from "../overlays/node-toolbar";
+import { useCollaborationRoom } from "@/store/store";
+import { ExportConfigDialog } from "@/components/room-components/overlay/export-config";
 
 export const ImageCanvasLayout = () => {
   const instance = useWeave((state) => state.instance);
@@ -27,7 +31,13 @@ export const ImageCanvasLayout = () => {
   const status = useWeave((state) => state.status);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
+  const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
+  const setExportConfigVisible = useCollaborationRoom(
+    (state) => state.setExportConfigVisible
+  );
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
+  const exporting = useStandaloneUseCase((state) => state.actions.exporting);
   const saving = useStandaloneUseCase((state) => state.actions.saving);
   const managingImageId = useStandaloneUseCase(
     (state) => state.managing.imageId
@@ -39,6 +49,10 @@ export const ImageCanvasLayout = () => {
   const setCommentsShow = useStandaloneUseCase(
     (state) => state.setCommentsShow
   );
+  const setConfigurationOpen = useStandaloneUseCase(
+    (state) => state.setConfigurationOpen
+  );
+  const setExporting = useStandaloneUseCase((state) => state.setExporting);
 
   useWeaveEvents();
 
@@ -102,7 +116,9 @@ export const ImageCanvasLayout = () => {
           ["pointer-events-auto"]:
             status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
         })}
-      />
+      >
+        <NodeToolbar />
+      </div>
       {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
         <>
           <div className="absolute top-5 right-5 flex justify-end gap-1">
@@ -113,6 +129,23 @@ export const ImageCanvasLayout = () => {
             <div className="font-inter text-xs bg-white px-5 py-3">
               <span className="uppercase">IMAGE:</span> {managingImageId}
             </div>
+            <button
+              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
+              onClick={() => {
+                setExportNodes([]);
+                setExportConfigVisible(true);
+              }}
+            >
+              <ImageDown strokeWidth={1} size={16} /> EXPORT
+            </button>
+            <button
+              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
+              onClick={() => {
+                setConfigurationOpen(true);
+              }}
+            >
+              <Cog strokeWidth={1} size={16} /> SETUP
+            </button>
             <button
               className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
               onClick={() => {
@@ -137,14 +170,24 @@ export const ImageCanvasLayout = () => {
               <XIcon strokeWidth={1} size={16} /> CLOSE
             </button>
           </div>
+          {exporting && (
+            <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
+              <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
+                <ScaleLoader />
+                <div className="font-inter text-xl uppercase">exporting</div>
+              </div>
+            </div>
+          )}
           {saving && (
             <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
               <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
                 <ScaleLoader />
-                <div className="font-inter text-xl">saving</div>
+                <div className="font-inter text-xl uppercase">saving</div>
               </div>
             </div>
           )}
+          <ExportConfigDialog onIsExportingChange={setExporting} />
+          <ConfigurationDialog />
         </>
       )}
     </>

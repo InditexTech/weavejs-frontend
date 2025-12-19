@@ -4,6 +4,9 @@
 
 import { create } from "zustand";
 import { ThreadStatus } from "../components/comment/types";
+import { WeaveElementAttributes } from "@inditextech/weave-types";
+
+type NodePropertiesAction = "create" | "update" | undefined;
 
 type StandaloneUser = {
   id: string;
@@ -14,6 +17,14 @@ type StandaloneUser = {
 interface StandaloneUseCaseState {
   user: StandaloneUser | undefined;
   instanceId: string;
+  configuration: {
+    open: boolean;
+  };
+  measurement: {
+    units: string;
+    referenceMeasureUnits: number;
+    referenceMeasurePixels: number | null;
+  };
   managing: {
     imageId: string | null;
     width: number;
@@ -21,6 +32,7 @@ interface StandaloneUseCaseState {
   };
   actions: {
     saving: boolean;
+    exporting: boolean;
   };
   images: {
     showSelectFile: boolean;
@@ -31,27 +43,50 @@ interface StandaloneUseCaseState {
     show: boolean;
     status: ThreadStatus | "all";
   };
-  setUser: (newUser: StandaloneUser) => void;
+  nodeProperties: {
+    action: NodePropertiesAction;
+    createProps: WeaveElementAttributes | undefined;
+  };
+  setUser: (newUser: StandaloneUser | undefined) => void;
   setInstanceId: (newInstanceId: string) => void;
   setManagingImageId: (newImageId: string | null) => void;
   setManagingImageSize: (newWidth: number, newHeight: number) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
+  setExporting: (newSaving: boolean) => void;
   setSaving: (newSaving: boolean) => void;
   setCommentsShow: (newShow: boolean) => void;
   setCommentsStatus: (newStatus: ThreadStatus | "all") => void;
+  setConfigurationOpen: (newOpen: boolean) => void;
+  setMeasurement: (units: string, referenceMeasureUnits: number) => void;
+  setReferenceMeasurePixels: (referenceMeasurePixels: number | null) => void;
+  setNodePropertiesAction: (
+    newNodePropertiesAction: NodePropertiesAction
+  ) => void;
+  setNodePropertiesCreateProps: (
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
+  ) => void;
 }
 
 export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
   user: undefined,
   instanceId: "undefined",
+  configuration: {
+    open: false,
+  },
+  measurement: {
+    units: "cms",
+    referenceMeasureUnits: 10,
+    referenceMeasurePixels: null,
+  },
   managing: {
     imageId: null,
     width: 0,
     height: 0,
   },
   actions: {
+    exporting: false,
     saving: false,
   },
   images: {
@@ -62,6 +97,10 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
   comments: {
     show: false,
     status: "pending",
+  },
+  nodeProperties: {
+    action: undefined,
+    createProps: undefined,
   },
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setInstanceId: (newInstanceId) =>
@@ -91,6 +130,11 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
       ...state,
       images: { ...state.images, loading: newLoadingImage },
     })),
+  setExporting: (newExporting) =>
+    set((state) => ({
+      ...state,
+      actions: { ...state.actions, exporting: newExporting },
+    })),
   setSaving: (newSaving) =>
     set((state) => ({
       ...state,
@@ -105,5 +149,46 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
     set((state) => ({
       ...state,
       comments: { ...state.comments, status: newStatus },
+    })),
+  setConfigurationOpen: (newOpen: boolean) =>
+    set((state) => ({
+      ...state,
+      configuration: {
+        ...state.configuration,
+        open: newOpen,
+      },
+    })),
+  setMeasurement: (units: string, referenceMeasureUnits: number) =>
+    set((state) => ({
+      ...state,
+      measurement: {
+        ...state.measurement,
+        units,
+        referenceMeasureUnits,
+      },
+    })),
+  setReferenceMeasurePixels: (referenceMeasurePixels: number | null) =>
+    set((state) => ({
+      ...state,
+      measurement: {
+        ...state.measurement,
+        referenceMeasurePixels,
+      },
+    })),
+  setNodePropertiesAction: (newNodePropertiesAction) =>
+    set((state) => ({
+      ...state,
+      nodeProperties: {
+        ...state.nodeProperties,
+        action: newNodePropertiesAction,
+      },
+    })),
+  setNodePropertiesCreateProps: (newNodePropertiesCreateProps) =>
+    set((state) => ({
+      ...state,
+      nodeProperties: {
+        ...state.nodeProperties,
+        createProps: newNodePropertiesCreateProps,
+      },
     })),
 }));

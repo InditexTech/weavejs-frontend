@@ -23,6 +23,7 @@ import {
   WeaveFitToSelectionToolAction,
   WeaveCommentToolAction,
   WeaveExportNodesToolAction,
+  WeaveMeasureToolAction,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -33,6 +34,7 @@ import {
   WeaveImageNode,
   WeaveStarNode,
   WeaveArrowNode,
+  WeaveMeasureNode,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
   WeaveStrokeNode,
@@ -257,6 +259,7 @@ const NODES = () => [
       },
     },
   }),
+  new WeaveMeasureNode(),
   new WeaveCommentNode<ThreadEntity>({
     config: {
       style: {
@@ -518,6 +521,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new WeaveExportNodesToolAction(),
+  new WeaveMeasureToolAction(),
   new WeaveCommentToolAction({
     config: {
       style: {

@@ -14,6 +14,8 @@ import { Images } from "../images/images";
 import { PageLoader } from "./page-loader";
 import UserForm from "./user-form";
 import { ScaleLoader } from "react-spinners";
+import { ImageUpIcon } from "lucide-react";
+import { Menu } from "./menu";
 
 export const StandalonePage = () => {
   useHandleRouteParams();
@@ -28,9 +30,13 @@ export const StandalonePage = () => {
     (state) => state.images.uploading
   );
   const showComments = useStandaloneUseCase((state) => state.comments.show);
+  const setShowSelectFileImage = useStandaloneUseCase(
+    (state) => state.setShowSelectFileImage
+  );
 
   React.useEffect(() => {
-    if (instanceId && !user) {
+    console.log("Instance ID changed:", instanceId, user);
+    if (instanceId !== "undefined" && !user) {
       const userStorage = sessionStorage.getItem(
         `weave.js_standalone_${instanceId}`
       );
@@ -46,7 +52,14 @@ export const StandalonePage = () => {
   }, [instanceId, user]);
 
   if (instanceId === "undefined") {
-    return <div>Loading...</div>;
+    return (
+      <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
+        <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
+          <ScaleLoader />
+          <div className="font-inter text-xl">LOADING</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -58,7 +71,7 @@ export const StandalonePage = () => {
             instanceId={instanceId}
             content={
               <>
-                <div className="text-center">
+                <div className="text-center text-[#cc0000]">
                   <p>STANDALONE EXAMPLE</p>
                 </div>
                 <div className="text-center">
@@ -78,7 +91,10 @@ export const StandalonePage = () => {
         <div className="w-full h-full grid grid-cols-12 border">
           <div className="col-span-2 border-r border-[#c9c9c9] flex flex-col">
             <div className="w-full h-[65px] p-5 py-3 border-b border-[#c9c9c9] flex justify-between items-center">
-              <div className="font-inter text-xl">{instanceId}</div>
+              <div className="flex gap-2 justify-start items-center">
+                <Menu />
+                <div className="font-inter text-xl">{instanceId}</div>
+              </div>
               <div className="font-inter text-sm">
                 {user ? `@${user.name}` : "-"}
               </div>
@@ -95,8 +111,17 @@ export const StandalonePage = () => {
           >
             {managingImageId !== null && <ImageCanvas key={managingImageId} />}
             {managingImageId === null && (
-              <div className="w-full h-full flex justify-center items-center">
-                Select an image to start managing it.
+              <div className="w-full h-full flex flex-col gap-3 justify-center items-center">
+                <div>Select an image to start managing it.</div>
+                <button
+                  className="group cursor-pointer bg-black text-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
+                  onClick={() => {
+                    setShowSelectFileImage(true);
+                  }}
+                >
+                  <ImageUpIcon size={20} strokeWidth={1} />
+                  UPLOAD IMAGE
+                </button>
               </div>
             )}
           </div>
@@ -111,7 +136,7 @@ export const StandalonePage = () => {
         <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
           <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
             <ScaleLoader />
-            <div className="font-inter text-xl">uploading image</div>
+            <div className="font-inter text-xl uppercase">UPLOADING IMAGE</div>
           </div>
         </div>
       )}

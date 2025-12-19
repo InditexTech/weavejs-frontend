@@ -444,7 +444,7 @@ export function ToolsOverlayTouch() {
               <p>Connector Tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
         />
         <div className="relative flex gap-0 justify-start items-center">
@@ -557,7 +557,7 @@ export function ToolsOverlayTouch() {
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add video</p>
+              <p>Video tool</p>
             </div>
           }
           tooltipSide="right"
@@ -573,7 +573,7 @@ export function ToolsOverlayTouch() {
           onClick={() => triggerTool("textTool")}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add text</p>
+              <p>Text tool</p>
             </div>
           }
           tooltipSide="right"
@@ -589,7 +589,7 @@ export function ToolsOverlayTouch() {
           onClick={() => triggerTool("frameTool", nodeCreateProps)}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Add a Frame</p>
+              <p>Frame tool</p>
             </div>
           }
           tooltipSide="right"
@@ -608,7 +608,7 @@ export function ToolsOverlayTouch() {
               <p>Image Template Tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
         />
         {threadsEnabled && (
@@ -628,7 +628,7 @@ export function ToolsOverlayTouch() {
                 <p>Comment tool</p>
               </div>
             }
-            tooltipSide="top"
+            tooltipSide="right"
             tooltipAlign="center"
           />
         )}
@@ -661,7 +661,7 @@ export function ToolsOverlayTouch() {
               <p>Measure tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
         />
         {/* <ToolbarButton
