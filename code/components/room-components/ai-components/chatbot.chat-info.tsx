@@ -51,12 +51,7 @@ export const ChatBotChatInfo = ({ chat }: ChatBotChatInfoProps) => {
       setSaving(true);
       const id = toast.loading("Saving chat title...");
       toastRef.current = id;
-      return await putChat(
-        room ?? "",
-        `${threadId}_${room}_${resourceId}`,
-        resourceId,
-        { title }
-      );
+      return await putChat(room ?? "", threadId, resourceId, { title });
     },
     onSettled() {
       setSaving(false);

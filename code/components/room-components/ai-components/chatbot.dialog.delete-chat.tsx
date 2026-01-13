@@ -53,11 +53,7 @@ export const ChatBotDialogDeleteChat = ({
 
       setDeleting(true);
 
-      return await delChat(
-        room,
-        `${threadId}_${room}_${resourceId}`,
-        resourceId
-      );
+      return await delChat(room, threadId, resourceId);
     },
     onSettled() {
       setDeleting(false);

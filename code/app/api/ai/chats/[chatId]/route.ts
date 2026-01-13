@@ -28,8 +28,7 @@ export async function POST(
 
   const { messages, imageOption } = await req.json();
 
-  const realChatId = `${chatId}_${roomId}_${resourceId}`;
-  const endpoint = `${process.env.BACKEND_ENDPOINT}/api/v1/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/ai/chats/${realChatId}/message`;
+  const endpoint = `${process.env.BACKEND_ENDPOINT}/api/v1/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/ai/chats/${chatId}/message`;
 
   const response = await fetch(endpoint, {
     method: "POST",
