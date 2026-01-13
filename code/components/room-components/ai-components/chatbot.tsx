@@ -49,10 +49,15 @@ export const ChatBot = () => {
       chatId: string;
       resourceId: string;
     }) => {
-      return await postChat(roomId, chatId, resourceId, {
-        status: "active",
-        title: "Untitled chat",
-      });
+      return await postChat(
+        roomId,
+        `${chatId}_${roomId}_${resourceId}`,
+        resourceId,
+        {
+          status: "active",
+          title: "Untitled chat",
+        }
+      );
     },
   });
 
@@ -66,7 +71,7 @@ export const ChatBot = () => {
     queryFn: () => {
       if (!room || !threadId || !resourceId) return [];
 
-      return getChat(room, threadId, resourceId);
+      return getChat(room, `${threadId}_${room}_${resourceId}`, resourceId);
     },
     refetchOnWindowFocus: false,
     enabled: threadId !== "undefined" && resourceId !== "undefined",
@@ -155,10 +160,15 @@ export const ChatBot = () => {
                           newTreadId
                         );
 
-                        await postChat(room, newTreadId, resourceId, {
-                          status: "active",
-                          title: "Untitled chat",
-                        });
+                        await postChat(
+                          room,
+                          `${newTreadId}_${room}_${resourceId}`,
+                          resourceId,
+                          {
+                            status: "active",
+                            title: "Untitled chat",
+                          }
+                        );
 
                         setThreadId(newTreadId);
                         setAiView("chat");
