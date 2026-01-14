@@ -207,7 +207,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             )}
           </AnimatePresence>
         </section> */}
-        <section className="w-[calc(100%-480px)] h-full flex z-0 overflow-hidden">
+        <section className="w-[calc(100%-480px)] h-full flex z-0 overflow-hidden relative">
           {/* <section className="w-full h-full flex z-0 overflow-hidden"> */}
           <div
             id="weave"

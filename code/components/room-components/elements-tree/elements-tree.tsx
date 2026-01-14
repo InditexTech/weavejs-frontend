@@ -3,7 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TreeView, TreeDataItem } from "@/components/ui/tree-view";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
+import {
+  WeaveSelection,
+  WeaveStateElement,
+  WeaveUser,
+  WeaveUserMutexLock,
+} from "@inditextech/weave-types";
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
@@ -29,12 +34,24 @@ import {
   ChevronsLeftRightEllipsis,
   Ruler,
   Video,
+  Focus,
 } from "lucide-react";
-import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  Weave,
+  WeaveNodesSelectionPlugin,
+  WeaveStageZoomPlugin,
+} from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
+import { OPERATIONS_MAP } from "@/components/utils/constants";
+import { stringToColor } from "@/lib/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -59,6 +76,7 @@ const iconsMap: Record<string, any> = {
 function mapElementsToTree(
   instance: Weave,
   elements: WeaveStateElement[],
+  lockedNodes: Record<string, { user: WeaveUser; operation: string }>,
   selectedNodes: string[]
 ) {
   const elementsMapped = elements.map((element) => {
@@ -66,6 +84,8 @@ function mapElementsToTree(
       id: element.key,
       icon: iconsMap[element.props.nodeType ?? "rectangle"],
       name: element.props.nodeName ? element.props.nodeName : element.key,
+      lockInfo: lockedNodes[element.key],
+      disabled: Boolean(lockedNodes[element.key]),
       status: [
         <div key="trash" className="px-1">
           <Trash stroke="transparent" size={16} strokeWidth={1} />
@@ -88,6 +108,67 @@ function mapElementsToTree(
             size={16}
             strokeWidth={1}
           />
+        </div>,
+      ],
+      disabledActions: [
+        <HoverCard key="locked-info">
+          <HoverCardTrigger asChild>
+            <div className="px-1 text-[10px] flex gap-1 justify-end items-center">
+              <div
+                className="w-[16px] h-[16px] border border-[#c9c9c9]"
+                style={{
+                  backgroundColor: stringToColor(
+                    lockedNodes[element.key]?.user.name ?? ""
+                  ),
+                }}
+              ></div>
+              <div>operating</div>
+            </div>
+          </HoverCardTrigger>
+          <HoverCardContent
+            align="end"
+            side="bottom"
+            className="w-auto rounded-none shadow-none border-[#c9c9c9] text-xs font-inter px-3 py-2"
+          >
+            <div className="w-full grid grid-cols-2">
+              <div className="border-b py-2 pr-2">Operated by</div>
+              <div className="flex justify-end items-center gap-2 border-b py-2 pl-2">
+                <div className="text-right">
+                  <b>{lockedNodes[element.key]?.user.name}</b>
+                </div>
+                <div
+                  className="w-[16px] h-[16px] border border-[#c9c9c9]"
+                  style={{
+                    backgroundColor: stringToColor(
+                      lockedNodes[element.key]?.user.name ?? ""
+                    ),
+                  }}
+                ></div>
+              </div>
+              <div className="py-2 pr-2">Operation</div>
+              <div className="text-right py-2 pl-2">
+                <b>{OPERATIONS_MAP[lockedNodes[element.key]?.operation]}</b>
+              </div>
+            </div>
+          </HoverCardContent>
+        </HoverCard>,
+        <div
+          key="focus"
+          tabIndex={0}
+          role="button"
+          className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded-none"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!instance) return;
+
+            const stageZoomPlugin =
+              instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
+            if (stageZoomPlugin) {
+              stageZoomPlugin.fitToNodes([element.key], true);
+            }
+          }}
+        >
+          <Focus size={16} strokeWidth={1} />
         </div>,
       ],
       actions: [
@@ -174,6 +255,7 @@ function mapElementsToTree(
         children: mapElementsToTree(
           instance,
           element.props.children ?? [],
+          lockedNodes,
           selectedNodes
         ),
       }),
@@ -186,6 +268,9 @@ function mapElementsToTree(
 export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
+  const usersLocks = useWeave((state) => state.usersLocks);
+
+  const user = useCollaborationRoom((state) => state.user);
 
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
@@ -255,11 +340,40 @@ export const ElementsTree = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sidebarActive]);
 
+  const lockedNodes: Record<string, { user: WeaveUser; operation: string }> =
+    React.useMemo(() => {
+      const users = Object.keys(usersLocks || {});
+
+      const lockedNodes: Record<
+        string,
+        { user: WeaveUser; operation: string }
+      > = {};
+      for (const userId of users) {
+        if (userId === user?.id) continue;
+
+        const userLock = usersLocks[userId] as WeaveUserMutexLock<unknown>;
+
+        for (const nodeId of userLock.nodeIds) {
+          lockedNodes[nodeId] = {
+            user: userLock.user,
+            operation: userLock.operation,
+          };
+        }
+      }
+
+      return lockedNodes;
+    }, [user, usersLocks]);
+
   const treeData = React.useMemo<TreeDataItem[]>(() => {
     if (!instance) return [];
 
-    return mapElementsToTree(instance, elementsTree, selectedNodes);
-  }, [instance, elementsTree, selectedNodes]);
+    return mapElementsToTree(
+      instance,
+      elementsTree,
+      lockedNodes,
+      selectedNodes
+    );
+  }, [instance, elementsTree, lockedNodes, selectedNodes]);
 
   if (!instance) {
     return null;

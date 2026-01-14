@@ -1,18 +1,14 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+"use client"
 
-"use client";
+import * as React from "react"
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
-import * as React from "react";
-import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
-
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 function HoverCard({
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Root>) {
-  return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />;
+  return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
 }
 
 function HoverCardTrigger({
@@ -20,7 +16,7 @@ function HoverCardTrigger({
 }: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {
   return (
     <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
-  );
+  )
 }
 
 function HoverCardContent({
@@ -42,7 +38,7 @@ function HoverCardContent({
         {...props}
       />
     </HoverCardPrimitive.Portal>
-  );
+  )
 }
 
-export { HoverCard, HoverCardTrigger, HoverCardContent };
+export { HoverCard, HoverCardTrigger, HoverCardContent }

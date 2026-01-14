@@ -55,6 +55,7 @@ import {
   WeaveStageZoomPlugin,
   WeaveConnectedUsersPlugin,
   WeaveUsersPointersPlugin,
+  WeaveUsersPresencePlugin,
   WeaveUsersSelectionPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
@@ -92,6 +93,16 @@ import {
 import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 import { getImageBase64 } from "./images";
+
+export const OPERATIONS_MAP: Record<string, string> = {
+  ["node-transform"]: "transforming element",
+  ["node-drag"]: "dragging element",
+  ["image-crop"]: "cropping image",
+  ["text-edit"]: "editing text",
+  ["nodes-transform"]: "transforming selection",
+  ["nodes-drag"]: "dragging selection",
+};
+
 const FONTS = async (): Promise<WeaveFont[]> => {
   const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
     weight: "400",
@@ -515,13 +526,20 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   }),
   new WeaveUsersPointersPlugin({
     config: {
+      getOperationName: (operation: string) =>
+        OPERATIONS_MAP[operation] ?? operation,
       getUser,
       getUserBackgroundColor: (user: WeaveUser) =>
         stringToColor(user?.name ?? "#000000"),
       getUserForegroundColor: (user: WeaveUser) => {
-        const bgColor = stringToColor(user?.name ?? "#ffffff");
+        const bgColor = stringToColor(user?.name ?? "#000000");
         return getContrastTextColor(bgColor);
       },
+    },
+  }),
+  new WeaveUsersPresencePlugin({
+    config: {
+      getUser,
     },
   }),
   new WeaveUsersSelectionPlugin({

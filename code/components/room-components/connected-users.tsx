@@ -19,11 +19,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
+import { OPERATIONS_MAP } from "../utils/constants";
+import { WeaveUserMutexLock } from "@inditextech/weave-types";
 
 const SHOW_USERS_LIMIT = 4;
 
 export const ConnectedUsers = () => {
   const connectedUsers = useWeave((state) => state.users);
+  const usersLocks = useWeave((state) => state.usersLocks);
 
   const user = useCollaborationRoom((state) => state.user);
 
@@ -229,7 +232,20 @@ export const ConnectedUsers = () => {
                         {getUserShort(userInfo?.name ?? "")}
                       </AvatarFallback>
                     </AvatarUI>
-                    {userInfo?.name}
+                    <div className="flex flex-col gap-0">
+                      <div className="w-full ">{userInfo?.name}</div>
+                      <div className="w-full font-mono text-[10px] text-[#999999] whitespace-nowrap">
+                        {typeof usersLocks[userInfo.id] !== "undefined"
+                          ? OPERATIONS_MAP[
+                              (
+                                usersLocks[
+                                  userInfo.id
+                                ] as WeaveUserMutexLock<unknown>
+                              ).operation
+                            ]
+                          : "idle"}
+                      </div>
+                    </div>
                   </DropdownMenuItem>
                 </React.Fragment>
               );

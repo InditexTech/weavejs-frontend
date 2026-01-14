@@ -9,6 +9,7 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronRight } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { WeaveUser } from "@inditextech/weave-types";
 
 const treeVariants = cva(
   "group hover:before:opacity-100 before:absolute before:rounded-none before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10"
@@ -34,9 +35,12 @@ interface TreeDataItem {
   children?: TreeDataItem[];
   status?: React.ReactNode;
   actions?: React.ReactNode;
+  disabledActions?: React.ReactNode;
+  disabled?: boolean;
   onClick?: () => void;
   draggable?: boolean;
   droppable?: boolean;
+  lockInfo?: { user: WeaveUser; operation: string };
 }
 
 type TreeProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -320,6 +324,7 @@ const TreeNode = ({
             isDragOver && dragOverVariants(),
             "relative"
           )}
+          disabled={item.disabled}
           draggable={!!item.draggable}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
@@ -341,12 +346,20 @@ const TreeNode = ({
               default={defaultNodeIcon}
             />
             <span className="w-full text-[10px] truncate">{item.name}</span>
-            <TreeActions
-              isSelected={selectedItems?.includes(item.id) ?? false}
-              status={item.status}
-            >
-              {item.actions}
-            </TreeActions>
+
+            {!item.disabled && (
+              <TreeActions
+                isSelected={selectedItems?.includes(item.id) ?? false}
+                status={item.status}
+              >
+                {item.actions}
+              </TreeActions>
+            )}
+            {item.disabled && (
+              <div className="flex justify-end items-center gap-1 pointer-events-auto h-[16px]">
+                <>{item.disabledActions}</>
+              </div>
+            )}
           </div>
         </AccordionTrigger>
         <AccordionContent className="ml-4 pl-1 border-l">
@@ -434,9 +447,16 @@ const TreeLeaf = React.forwardRef<
           treeVariants(),
           className,
           selectedItems?.includes(item.id) && selectedTreeVariants(),
-          isDragOver && dragOverVariants()
+          isDragOver && dragOverVariants(),
+          {
+            ["disabled:opacity-50 pointer-events-none cursor-default"]:
+              item.disabled,
+          }
         )}
         onClick={(e) => {
+          if (item.disabled) {
+            return;
+          }
           handleSelectChange(e, item);
           item.onClick?.();
         }}
@@ -455,12 +475,19 @@ const TreeLeaf = React.forwardRef<
         <span className="flex-grow w-full text-[10px] truncate">
           {item.name}
         </span>
-        <TreeActions
-          isSelected={selectedItems?.includes(item.id) ?? false}
-          status={item.status}
-        >
-          {item.actions}
-        </TreeActions>
+        {!item.disabled && (
+          <TreeActions
+            isSelected={selectedItems?.includes(item.id) ?? false}
+            status={item.status}
+          >
+            {item.actions}
+          </TreeActions>
+        )}
+        {item.disabled && (
+          <div className="flex justify-end items-center gap-1 pointer-events-auto h-[16px]">
+            <>{item.disabledActions}</>
+          </div>
+        )}
       </div>
     );
   }
