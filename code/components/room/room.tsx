@@ -243,6 +243,7 @@ export const Room = () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             actions={ACTIONS(getUser) as any[]}
             performance={performanceConfiguration}
+            logModules={[]}
           >
             <UploadImage />
             <UploadImages />
