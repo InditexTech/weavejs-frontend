@@ -46,6 +46,7 @@ import { RoomHeaderRight } from "../room-components/overlay/room-header.right";
 import { ChatBot } from "../room-components/ai-components/chatbot";
 import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
 import { useIAChat } from "@/store/ia-chat";
+import { useUserChanges } from "../room-components/hooks/use-user-changes";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -68,6 +69,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const router = useRouter();
 
   useWeaveEvents();
+  useUserChanges();
   useContextMenu();
   useCopyPaste();
 
