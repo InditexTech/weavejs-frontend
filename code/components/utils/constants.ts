@@ -391,7 +391,12 @@ const NODES = () => [
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
-  new WeaveStageGridPlugin(),
+  new WeaveStageGridPlugin({
+    config: {
+      gridColor: "rgba(0,0,0,0.3)",
+      gridOriginColor: "rgba(255,0,0,0.5)",
+    },
+  }),
   new WeaveStagePanningPlugin(),
   new WeaveStageResizePlugin(),
   new WeaveStageZoomPlugin({
