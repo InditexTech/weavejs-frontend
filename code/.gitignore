@@ -58,4 +58,3 @@ env.sh
 .mastra
 _chats
 mastra.db*
-../mastra.db*
