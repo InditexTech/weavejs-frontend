@@ -22,6 +22,8 @@ export const useNodeActionName = () => {
     switch (node?.type) {
       case "measure":
         return "Measure";
+      case "custom-measure":
+        return "Custom Measure";
       case "group":
         return "Group";
       case "rectangle":

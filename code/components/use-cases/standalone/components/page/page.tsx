@@ -35,7 +35,6 @@ export const StandalonePage = () => {
   );
 
   React.useEffect(() => {
-    console.log("Instance ID changed:", instanceId, user);
     if (instanceId !== "undefined" && !user) {
       const userStorage = sessionStorage.getItem(
         `weave.js_standalone_${instanceId}`

@@ -24,6 +24,7 @@ export const ImageCanvas = () => {
   const setReferenceMeasurePixels = useStandaloneUseCase(
     (state) => state.setReferenceMeasurePixels
   );
+  const setUnit = useStandaloneUseCase((state) => state.setUnit);
 
   React.useEffect(() => {
     if (instanceId) {
@@ -41,6 +42,8 @@ export const ImageCanvas = () => {
       setReferenceMeasurePixels(
         actualSavedConfig?.referenceMeasurePixels ?? null
       );
+
+      setUnit(actualSavedConfig?.customMeasurement?.unit ?? "cms");
     }
   }, [instanceId, managingImageId, setMeasurement, setReferenceMeasurePixels]);
 

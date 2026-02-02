@@ -25,6 +25,13 @@ interface StandaloneUseCaseState {
     referenceMeasureUnits: number;
     referenceMeasurePixels: number | null;
   };
+  customMeasurement: {
+    open: boolean;
+    measureId: string | null;
+    measures: Record<string, { realMeasure?: number; pixelsSize: number }>;
+    unit: string | undefined;
+    unitPerPixel: number | undefined;
+  };
   managing: {
     imageId: string | null;
     width: number;
@@ -67,6 +74,13 @@ interface StandaloneUseCaseState {
   setNodePropertiesCreateProps: (
     newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
+  setMeasureId: (newMeasureId: string | null) => void;
+  setMeasurementDefinitionOpen: (newOpen: boolean) => void;
+  setMeasures: (
+    measures: Record<string, { realMeasure: number; pixelsSize: number }>
+  ) => void;
+  setUnit: (unit: string | undefined) => void;
+  setUnitPerPixel: (unitPerPixel: number | undefined) => void;
 }
 
 export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
@@ -79,6 +93,13 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
     units: "cms",
     referenceMeasureUnits: 10,
     referenceMeasurePixels: null,
+  },
+  customMeasurement: {
+    open: false,
+    measureId: null,
+    measures: {},
+    unit: undefined,
+    unitPerPixel: undefined,
   },
   managing: {
     imageId: null,
@@ -189,6 +210,46 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
       nodeProperties: {
         ...state.nodeProperties,
         createProps: newNodePropertiesCreateProps,
+      },
+    })),
+  setMeasureId: (newMeasureId) =>
+    set((state) => ({
+      ...state,
+      customMeasurement: {
+        ...state.customMeasurement,
+        measureId: newMeasureId,
+      },
+    })),
+  setMeasurementDefinitionOpen: (newOpen) =>
+    set((state) => ({
+      ...state,
+      customMeasurement: {
+        ...state.customMeasurement,
+        open: newOpen,
+      },
+    })),
+  setMeasures: (measures) =>
+    set((state) => ({
+      ...state,
+      customMeasurement: {
+        ...state.customMeasurement,
+        measures,
+      },
+    })),
+  setUnit: (unit) =>
+    set((state) => ({
+      ...state,
+      customMeasurement: {
+        ...state.customMeasurement,
+        unit,
+      },
+    })),
+  setUnitPerPixel: (unitPerPixel) =>
+    set((state) => ({
+      ...state,
+      customMeasurement: {
+        ...state.customMeasurement,
+        unitPerPixel,
       },
     })),
 }));

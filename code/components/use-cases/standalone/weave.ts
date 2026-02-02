@@ -34,12 +34,12 @@ import {
   WeaveImageNode,
   WeaveStarNode,
   WeaveArrowNode,
-  WeaveMeasureNode,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
   WeaveStrokeNode,
   WeaveCommentNode,
   WeaveVideoNode,
+  WeaveMeasureNode,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
   WeaveStageResizePlugin,
@@ -69,6 +69,8 @@ import {
   createCommentDOM,
   viewCommentDOM,
 } from "./components/comment/comment-dom";
+import { MeasureNode } from "./nodes/measure/measure";
+import { MeasureToolAction } from "./actions/measure-tool/measure-tool";
 
 const FONTS = async (): Promise<WeaveFont[]> => {
   const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
@@ -259,7 +261,6 @@ const NODES = () => [
       },
     },
   }),
-  new WeaveMeasureNode(),
   new WeaveCommentNode<ThreadEntity>({
     config: {
       style: {
@@ -354,6 +355,8 @@ const NODES = () => [
   new ColorTokenNode(),
   new ImageTemplateNode(),
   new PantoneNode(),
+  new MeasureNode(),
+  new WeaveMeasureNode(),
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
@@ -521,7 +524,6 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new WeaveExportNodesToolAction(),
-  new WeaveMeasureToolAction(),
   new WeaveCommentToolAction({
     config: {
       style: {
@@ -550,6 +552,8 @@ const ACTIONS = (getUser: () => WeaveUser) => [
       },
     },
   }),
+  new MeasureToolAction(),
+  new WeaveMeasureToolAction(),
 ];
 
 export { FONTS, NODES, ACTIONS, PLUGINS };

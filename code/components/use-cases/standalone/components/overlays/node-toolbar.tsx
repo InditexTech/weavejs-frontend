@@ -285,6 +285,11 @@ export const NodeToolbar = () => {
     [actualNode]
   );
 
+  const isCustomMeasureNode = React.useMemo(
+    () => actualNode && (actualNode.type ?? "") === "custom-measure",
+    [actualNode]
+  );
+
   const canSetNodeStyling = React.useMemo(() => {
     return (
       isSingleNodeSelected &&
@@ -297,6 +302,8 @@ export const NodeToolbar = () => {
         "video",
         "color-token",
         "image-template",
+        "measure",
+        "custom-measure",
       ].includes(actualNode.type as string)
     );
   }, [isSingleNodeSelected, actualNode]);
@@ -326,6 +333,108 @@ export const NodeToolbar = () => {
         <div className="flex flex-col gap-0 justify-start items-center bg-white border rounded-none border-zinc-200">
           <div className="flex flex-col gap-[2px] justify-end items-center px-1 my-1">
             {isMeasureNode && (
+              <>
+                <ToolbarButton
+                  className="rounded-full !w-[40px] !h-[40px]"
+                  icon={
+                    <FlipVertical2 className="px-0" size={20} strokeWidth={1} />
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    if (!instance) {
+                      return;
+                    }
+
+                    const nodeInstance = instance
+                      .getStage()
+                      .findOne(`#${node?.key}`);
+
+                    const measureHandler =
+                      instance.getNodeHandler<WeaveMeasureNode>("measure");
+                    if (nodeInstance && measureHandler) {
+                      measureHandler.flipOrientation(
+                        nodeInstance as Konva.Group
+                      );
+                    }
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>Flip</p>
+                    </div>
+                  }
+                  tooltipSide="left"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-full !w-[40px] !h-[40px]"
+                  icon={<Ruler className="px-0" size={20} strokeWidth={1} />}
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    if (!instance) {
+                      return;
+                    }
+
+                    const nodeInstance = instance
+                      .getStage()
+                      .findOne(`#${node?.key}`);
+
+                    const measureHandler =
+                      instance.getNodeHandler<WeaveMeasureNode>("measure");
+                    if (nodeInstance && measureHandler) {
+                      const distanceInPixels =
+                        measureHandler.getNormalizedDistance(
+                          nodeInstance as Konva.Group
+                        );
+
+                      const actualSavedConfig = JSON.parse(
+                        sessionStorage.getItem(
+                          `weave.js_standalone_${instanceId}_${managingImageId}_config`
+                        ) || "{}"
+                      );
+
+                      const updatedConfig = {
+                        referenceMeasurePixels: distanceInPixels,
+                      };
+
+                      const finalConfiguration = merge(
+                        actualSavedConfig,
+                        updatedConfig
+                      );
+
+                      sessionStorage.setItem(
+                        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+                        JSON.stringify(finalConfiguration)
+                      );
+
+                      setReferenceMeasurePixels(distanceInPixels);
+
+                      const scale =
+                        distanceInPixels /
+                        (actualSavedConfig?.referenceMeasureUnits ?? "10");
+
+                      instance.emitEvent("onMeasureReferenceChange", {
+                        unit: finalConfiguration.units ?? "cms",
+                        unitPerPixel: scale,
+                      });
+                    }
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>Set as reference measure</p>
+                    </div>
+                  }
+                  tooltipSide="left"
+                  tooltipAlign="center"
+                />
+              </>
+            )}
+            {isCustomMeasureNode && (
               <>
                 <ToolbarButton
                   className="rounded-full !w-[40px] !h-[40px]"

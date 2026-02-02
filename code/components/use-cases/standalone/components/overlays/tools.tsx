@@ -170,6 +170,9 @@ export function Tools() {
             if (!instance) {
               return;
             }
+            if (actualAction === "measureTool") {
+              return;
+            }
             triggerTool("measureTool", {});
             const scale = measurementReferenceMeasurePixels
               ? measurementReferenceMeasurePixels /
@@ -184,6 +187,41 @@ export function Tools() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Measure tool</p>
+            </div>
+          }
+          tooltipSide="right"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={
+            <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
+          }
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "customMeasureTool"}
+          onClick={() => {
+            if (!instance) {
+              return;
+            }
+            if (actualAction === "customMeasureTool") {
+              return;
+            }
+            triggerTool("customMeasureTool", {});
+            const scale = measurementReferenceMeasurePixels
+              ? measurementReferenceMeasurePixels /
+                measurementReferenceMeasureUnits
+              : 1;
+            instance.updatePropsAction("customMeasureTool", {
+              color: "#FF3366",
+              unit: measurementUnits,
+              unitPerPixel: scale,
+            });
+          }}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Custom Measure tool</p>
             </div>
           }
           tooltipSide="right"

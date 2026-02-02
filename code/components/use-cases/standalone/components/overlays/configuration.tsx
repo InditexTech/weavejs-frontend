@@ -39,6 +39,10 @@ export function ConfigurationDialog() {
     (state) => state.setConfigurationOpen
   );
   const setMeasurement = useStandaloneUseCase((state) => state.setMeasurement);
+  const setUnit = useStandaloneUseCase((state) => state.setUnit);
+  const customMeasureUnit = useStandaloneUseCase(
+    (state) => state.customMeasurement.unit
+  );
   const measurementUnits = useStandaloneUseCase(
     (state) => state.measurement.units
   );
@@ -49,6 +53,9 @@ export function ConfigurationDialog() {
     (state) => state.measurement.referenceMeasurePixels
   );
 
+  const [customMeasureUnits, setCustomMeasureUnits] = React.useState<string>(
+    `${customMeasureUnit ?? "cms"}`
+  );
   const [units, setUnits] = React.useState<string>(`${measurementUnits}`);
   const [referenceMeasureUnits, setReferenceMeasureUnits] =
     React.useState<string>(`${measurementReferenceMeasureUnits}`);
@@ -90,6 +97,12 @@ export function ConfigurationDialog() {
                     value="measurement"
                   >
                     Measurement
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className="font-inter text-base cursor-pointer rounded-none uppercase"
+                    value="custom-measurement"
+                  >
+                    Custom Measurement
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -171,6 +184,34 @@ export function ConfigurationDialog() {
                   </div>
                 </div>
               </TabsContent>
+              <TabsContent value="custom-measurement">
+                <DialogDescription className="font-inter text-sm my-5">
+                  Setup custom measurement configuration.
+                </DialogDescription>
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="flex flex-col justify-start items-start gap-0">
+                    <Label className="mb-2">Units</Label>
+                    <Input
+                      type="text"
+                      className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
+                      value={customMeasureUnits}
+                      onChange={(e) => {
+                        setCustomMeasureUnits(e.target.value);
+                      }}
+                      onFocus={() => {
+                        window.weaveOnFieldFocus = true;
+                      }}
+                      onBlurCapture={() => {
+                        window.weaveOnFieldFocus = false;
+                      }}
+                    />
+                    <p className="font-inter text-xs mt-2">
+                      Define the units of thee custom measurement (e.g., cms,
+                      meters, inches).
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
             <div className="w-full min-h-[1px] h-[1px] bg-[#c9c9c9] my-3"></div>
             <DialogFooter>
@@ -226,6 +267,32 @@ export function ConfigurationDialog() {
                       units,
                       Number.parseFloat(referenceMeasureUnits)
                     );
+                  }
+
+                  if (selectedTab === "custom-measurement") {
+                    const actualSavedConfig = JSON.parse(
+                      sessionStorage.getItem(
+                        `weave.js_standalone_${instanceId}_${managingImageId}_config`
+                      ) || "{}"
+                    );
+
+                    const updatedConfig = {
+                      customMeasurement: {
+                        unit: customMeasureUnits,
+                      },
+                    };
+
+                    const finalConfiguration = merge(
+                      actualSavedConfig,
+                      updatedConfig
+                    );
+
+                    sessionStorage.setItem(
+                      `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+                      JSON.stringify(finalConfiguration)
+                    );
+
+                    setUnit(customMeasureUnits);
                   }
 
                   setConfigurationOpen(false);
