@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,13 +22,13 @@ export const Measures = () => {
   const instance = useWeave((state) => state.instance);
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const activeSidebar = useStandaloneUseCase((state) => state.sidebar.active);
   const measureUnit = useStandaloneUseCase((state) => state.measurement.unit);
   const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
   const setMeasurementDefinitionOpen = useStandaloneUseCase(
-    (state) => state.setMeasurementDefinitionOpen
+    (state) => state.setMeasurementDefinitionOpen,
   );
 
   const { scale, measures } = useMeasuresInfo();
@@ -101,12 +105,12 @@ export const Measures = () => {
 
                             const measureHandler =
                               instance.getNodeHandler<MeasureNode>(
-                                MEASURE_NODE_TYPE
+                                MEASURE_NODE_TYPE,
                               );
 
                             if (nodeInstance && measureHandler) {
                               setMeasureId(
-                                nodeInstance.getAttrs().id as string
+                                nodeInstance.getAttrs().id as string,
                               );
                               setMeasurementDefinitionOpen(true);
                             }
@@ -139,12 +143,12 @@ export const Measures = () => {
 
                             const measureHandler =
                               instance.getNodeHandler<MeasureNode>(
-                                MEASURE_NODE_TYPE
+                                MEASURE_NODE_TYPE,
                               );
 
                             if (nodeInstance && measureHandler) {
                               setMeasureId(
-                                nodeInstance.getAttrs().id as string
+                                nodeInstance.getAttrs().id as string,
                               );
                               setMeasurementDefinitionOpen(true);
                             }
@@ -165,14 +169,14 @@ export const Measures = () => {
 
                             const measureHandler =
                               instance.getNodeHandler<MeasureNode>(
-                                MEASURE_NODE_TYPE
+                                MEASURE_NODE_TYPE,
                               );
 
                             if (nodeInstance && measureHandler) {
                               const actualSavedConfig = JSON.parse(
                                 sessionStorage.getItem(
-                                  `weave.js_standalone_${instanceId}_${managingImageId}_config`
-                                ) || "{}"
+                                  `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+                                ) || "{}",
                               );
 
                               instance.emitEvent("onMeasureChange", {
@@ -212,12 +216,12 @@ export const Measures = () => {
 
                               const measureHandler =
                                 instance.getNodeHandler<MeasureNode>(
-                                  MEASURE_NODE_TYPE
+                                  MEASURE_NODE_TYPE,
                                 );
 
                               if (nodeInstance && measureHandler) {
                                 setMeasureId(
-                                  nodeInstance.getAttrs().id as string
+                                  nodeInstance.getAttrs().id as string,
                                 );
                                 setMeasurementDefinitionOpen(true);
                               }
