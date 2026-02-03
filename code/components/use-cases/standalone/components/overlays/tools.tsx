@@ -22,7 +22,6 @@ import { Toolbar } from "@/components/room-components/toolbar/toolbar";
 import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-divider";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { MoveToolTrigger } from "@/components/room-components/overlay/tools-triggers/move-tool";
-import { useStandaloneUseCase } from "../../store/store";
 
 export function Tools() {
   const instance = useWeave((state) => state.instance);
@@ -30,16 +29,6 @@ export function Tools() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-
-  const measurementUnits = useStandaloneUseCase(
-    (state) => state.measurement.units
-  );
-  const measurementReferenceMeasureUnits = useStandaloneUseCase(
-    (state) => state.measurement.referenceMeasureUnits
-  );
-  const measurementReferenceMeasurePixels = useStandaloneUseCase(
-    (state) => state.measurement.referenceMeasurePixels
-  );
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -165,41 +154,6 @@ export function Tools() {
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
-          active={actualAction === "measureTool"}
-          onClick={() => {
-            if (!instance) {
-              return;
-            }
-            if (actualAction === "measureTool") {
-              return;
-            }
-            triggerTool("measureTool", {});
-            const scale = measurementReferenceMeasurePixels
-              ? measurementReferenceMeasurePixels /
-                measurementReferenceMeasureUnits
-              : 1;
-            instance.updatePropsAction("measureTool", {
-              color: "#FF3366",
-              unit: measurementUnits,
-              unitPerPixel: scale,
-            });
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Measure tool</p>
-            </div>
-          }
-          tooltipSide="right"
-          tooltipAlign="center"
-        />
-        <ToolbarButton
-          className="rounded-full !w-[40px]"
-          icon={
-            <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
-          }
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
           active={actualAction === "customMeasureTool"}
           onClick={() => {
             if (!instance) {
@@ -209,19 +163,10 @@ export function Tools() {
               return;
             }
             triggerTool("customMeasureTool", {});
-            const scale = measurementReferenceMeasurePixels
-              ? measurementReferenceMeasurePixels /
-                measurementReferenceMeasureUnits
-              : 1;
-            instance.updatePropsAction("customMeasureTool", {
-              color: "#FF3366",
-              unit: measurementUnits,
-              unitPerPixel: scale,
-            });
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
-              <p>Custom Measure tool</p>
+              <p>Measure tool</p>
             </div>
           }
           tooltipSide="right"

@@ -21,6 +21,7 @@ import type { MeasureNodeParams, MeasureNodeProperties } from "./types";
 export class MeasureNode extends WeaveNode {
   private readonly config: MeasureNodeProperties;
   protected nodeType: string = MEASURE_NODE_TYPE;
+  protected eventsInitiated: boolean;
   protected handlePointCircleRadius: number = 6;
 
   constructor(params?: Partial<MeasureNodeParams>) {
@@ -30,12 +31,108 @@ export class MeasureNode extends WeaveNode {
       MEASURE_NODE_DEFAULT_CONFIG,
       params?.config ?? {}
     );
+
+    this.eventsInitiated = false;
+  }
+
+  private initEvents() {
+    if (this.eventsInitiated) {
+      return;
+    }
+
+    this.instance.addEventListener(
+      "onNodeRenderedRemoved",
+      (node: Konva.Node) => {
+        const nodeId = node.getAttrs().id;
+        const nodeType = node.getAttrs().nodeType;
+
+        if (!nodeId) {
+          return;
+        }
+
+        if (nodeType !== MEASURE_NODE_TYPE) {
+          return;
+        }
+
+        const unit = node.getAttrs().unit as string;
+        const newUnitPerPixel = this.calculateUnitPerPixel();
+
+        this.instance.emitEvent("onMeasureReferenceChange", {
+          unit,
+          unitPerPixel: newUnitPerPixel,
+        });
+      }
+    );
+
+    this.instance.addEventListener<{ unit: string; unitPerPixel: number }>(
+      "onMeasureReferenceChange",
+      ({ unit, unitPerPixel }) => {
+        const stage = this.instance.getStage();
+
+        const measureNodes = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
+
+        for (let i = 0; i < measureNodes.length; i++) {
+          const measure = measureNodes[i];
+
+          measure.setAttr("unit", unit);
+          measure.setAttr("unitPerPixel", unitPerPixel);
+
+          this.instance.updateNode(
+            this.serialize(measure as WeaveElementInstance)
+          );
+        }
+      }
+    );
+
+    this.instance.addEventListener<{
+      nodeId: string;
+      unit?: string;
+      realMeasure?: number;
+    }>("onMeasureChange", (data) => {
+      const { nodeId, unit, realMeasure } = data;
+      const stage = this.instance.getStage();
+
+      const measure = stage.findOne<Konva.Group>(`#${nodeId}`);
+
+      if (measure) {
+        if (unit !== undefined) {
+          measure.setAttr("unit", unit);
+        }
+        measure.setAttr("realMeasure", realMeasure);
+
+        const unitPerPixel = this.calculateUnitPerPixel();
+
+        measure.setAttr("unitPerPixel", unitPerPixel);
+
+        this.instance.updateNode(
+          this.serialize(measure as WeaveElementInstance)
+        );
+
+        const measureNodes = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
+
+        for (let i = 0; i < measureNodes.length; i++) {
+          const measure = measureNodes[i];
+          if (measure.getAttrs().id !== nodeId) {
+            if (unit !== undefined) {
+              measure.setAttr("unit", unit);
+            }
+            measure.setAttr("unitPerPixel", unitPerPixel);
+
+            this.instance.updateNode(
+              this.serialize(measure as WeaveElementInstance)
+            );
+          }
+        }
+      }
+    });
+
+    this.eventsInitiated = true;
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const measure = new Konva.Group({
       ...props,
-      name: "node",
+      name: `node ${MEASURE_NODE_TYPE}`,
       draggable: false,
     });
 
@@ -43,8 +140,8 @@ export class MeasureNode extends WeaveNode {
     const toPoint = props.toPoint as { x: number; y: number };
     const separation = props.separation ?? 100;
     const orientation = props.orientation ?? -1;
-    const unit = props.unit ?? "cms";
-    const unitPerPixel = props.unitPerPixel ?? 100;
+    const unit = props.unit as string;
+    const unitPerPixel = props.unitPerPixel as number | undefined;
 
     const measureLine = this.config.style.measureLine;
     const intersectionCircle = this.config.style.intersectionCircle;
@@ -142,9 +239,18 @@ export class MeasureNode extends WeaveNode {
 
     const midPoint = this.midPoint(fromPerp.left, toPerp.left);
     const distance = this.distanceBetweenPoints(fromPoint, toPoint);
-    const units = distance / unitPerPixel;
 
-    const text = `${units.toFixed(2)} ${unit}`;
+    let measureValue = undefined;
+    if (unitPerPixel && props.realMeasure === undefined) {
+      measureValue = distance / unitPerPixel;
+    }
+    if (props.realMeasure !== undefined) {
+      measureValue = props.realMeasure;
+    }
+
+    const text = measureValue
+      ? `${measureValue.toFixed(2)} ${unit}`
+      : `${distance.toFixed(2)} px`;
     const measureText = new Konva.Text({
       id: `measureText-${props.id}`,
       nodeId: props.id,
@@ -293,19 +399,7 @@ export class MeasureNode extends WeaveNode {
       }
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.instance.addEventListener<any>(
-      "onMeasureReferenceChange",
-      ({ unit, unitPerPixel }: { unit: string; unitPerPixel: number }) => {
-        measure.setAttrs({
-          unit,
-          unitPerPixel,
-        });
-        this.instance.updateNode(
-          this.serialize(measure as WeaveElementInstance)
-        );
-      }
-    );
+    this.initEvents();
 
     measure.allowedAnchors = function () {
       return [];
@@ -865,6 +959,12 @@ export class MeasureNode extends WeaveNode {
     };
   }
 
+  getDistance(node: Konva.Group): number {
+    const fromPoint = node.getAttrs().fromPoint as { x: number; y: number };
+    const toPoint = node.getAttrs().toPoint as { x: number; y: number };
+    return this.distanceBetweenPoints(fromPoint, toPoint);
+  }
+
   private distanceBetweenPoints(from: Konva.Vector2d, to: Konva.Vector2d) {
     return Math.hypot(to.x - from.x, to.y - from.y);
   }
@@ -883,8 +983,8 @@ export class MeasureNode extends WeaveNode {
     const toPoint = nextProps.toPoint as { x: number; y: number };
     const separation = nextProps.separation ?? 100;
     const orientation = nextProps.orientation ?? -1;
-    const unit = nextProps.unit ?? "cms";
-    const unitPerPixel = nextProps.unitPerPixel ?? 100;
+    const unit = nextProps.unit as string;
+    const unitPerPixel = nextProps.unitPerPixel as number | undefined;
 
     const separationLine = this.config.style.separationLine;
     const textConfig = this.config.style.text;
@@ -955,9 +1055,18 @@ export class MeasureNode extends WeaveNode {
 
     const midPoint = this.midPoint(fromPerp.left, toPerp.left);
     const distance = this.distanceBetweenPoints(fromPoint, toPoint);
-    const units = distance / unitPerPixel;
 
-    const text = `${units.toFixed(2)} ${unit}`;
+    let measureValue = undefined;
+    if (unitPerPixel && nextProps.realMeasure === undefined) {
+      measureValue = distance / unitPerPixel;
+    }
+    if (nextProps.realMeasure !== undefined) {
+      measureValue = nextProps.realMeasure;
+    }
+
+    const text = measureValue
+      ? `${measureValue.toFixed(2)} ${unit}`
+      : `${distance.toFixed(2)} px`;
 
     const measureText = measure.findOne(
       `#measureText-${nextProps.id}`
@@ -1207,5 +1316,51 @@ export class MeasureNode extends WeaveNode {
     }
 
     return 0;
+  }
+
+  calculateUnitPerPixel(): number | undefined {
+    const stage = this.instance.getStage();
+
+    const measureNodes = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
+
+    let totalRealMeasures = 0;
+    let totalDistancePixels = 0;
+    for (let i = 0; i < measureNodes.length; i++) {
+      const measure = measureNodes[i];
+      const measureData = measure.getAttrs();
+
+      if (measureData.realMeasure !== undefined) {
+        totalRealMeasures += measureData.realMeasure;
+        const fromPoint = measureData.fromPoint as Konva.Vector2d;
+        const toPoint = measureData.toPoint as Konva.Vector2d;
+        const distance = this.distanceBetweenPoints(fromPoint, toPoint);
+        totalDistancePixels += distance;
+      }
+    }
+
+    return totalRealMeasures > 0
+      ? totalDistancePixels / totalRealMeasures
+      : undefined;
+  }
+
+  hasUnitPerPixelDefined(): boolean {
+    const stage = this.instance.getStage();
+
+    if (stage) {
+      const measureNodes = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
+
+      for (let i = 0; i < measureNodes.length; i++) {
+        const measure = measureNodes[i];
+        const measureData = measure.getAttrs();
+
+        if (measureData.unitPerPixel !== undefined) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    return false;
   }
 }

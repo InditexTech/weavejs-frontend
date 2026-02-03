@@ -23,7 +23,6 @@ import {
   WeaveFitToSelectionToolAction,
   WeaveCommentToolAction,
   WeaveExportNodesToolAction,
-  WeaveMeasureToolAction,
   WeaveStageNode,
   WeaveLayerNode,
   WeaveGroupNode,
@@ -39,7 +38,6 @@ import {
   WeaveStrokeNode,
   WeaveCommentNode,
   WeaveVideoNode,
-  WeaveMeasureNode,
   WeaveNodesSelectionPlugin,
   WeaveStagePanningPlugin,
   WeaveStageResizePlugin,
@@ -356,7 +354,6 @@ const NODES = () => [
   new ImageTemplateNode(),
   new PantoneNode(),
   new MeasureNode(),
-  new WeaveMeasureNode(),
 ];
 
 const PLUGINS = (getUser: () => WeaveUser) => [
@@ -553,7 +550,6 @@ const ACTIONS = (getUser: () => WeaveUser) => [
     },
   }),
   new MeasureToolAction(),
-  new WeaveMeasureToolAction(),
 ];
 
 export { FONTS, NODES, ACTIONS, PLUGINS };

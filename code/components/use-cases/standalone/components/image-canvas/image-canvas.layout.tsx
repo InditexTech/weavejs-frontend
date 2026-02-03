@@ -25,8 +25,9 @@ import { NodeToolbar } from "../overlays/node-toolbar";
 import { useCollaborationRoom } from "@/store/store";
 import { ExportConfigDialog } from "@/components/room-components/overlay/export-config";
 import { MeasureDefinitionDialog } from "../overlays/measure-definition";
-import { merge } from "lodash";
-import Konva from "konva";
+import { MeasureNode } from "../../nodes/measure/measure";
+import { useMeasuresInfo } from "../../hooks/use-measures-info";
+import { MEASURE_NODE_TYPE } from "../../nodes/measure/constants";
 
 export const ImageCanvasLayout = () => {
   const instance = useWeave((state) => state.instance);
@@ -56,16 +57,17 @@ export const ImageCanvasLayout = () => {
     (state) => state.setConfigurationOpen
   );
   const setExporting = useStandaloneUseCase((state) => state.setExporting);
-  const measures = useStandaloneUseCase(
-    (state) => state.customMeasurement.measures
-  );
+  const setMeasureUnit = useStandaloneUseCase((state) => state.setMeasureUnit);
   const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
-  const setMeasures = useStandaloneUseCase((state) => state.setMeasures);
   const setMeasurementDefinitionOpen = useStandaloneUseCase(
     (state) => state.setMeasurementDefinitionOpen
   );
 
   useWeaveEvents();
+
+  const [loaded, setLoaded] = React.useState(false);
+
+  const { scale } = useMeasuresInfo();
 
   React.useEffect(() => {
     if (!instance) return;
@@ -91,89 +93,82 @@ export const ImageCanvasLayout = () => {
   React.useEffect(() => {
     if (!instance) return;
 
-    const defineMeasureHandler = (data: {
-      nodeId: string;
-      pixelsSize: number;
-    }) => {
-      console.log("Measure created", {
-        measures,
-        nodeId: data.nodeId,
-        pixelsSize: data.pixelsSize,
-      });
+    const actualSavedConfig = JSON.parse(
+      sessionStorage.getItem(
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`
+      ) || "{}"
+    );
 
-      const actualSavedConfig = JSON.parse(
-        sessionStorage.getItem(
-          `weave.js_standalone_${instanceId}_${managingImageId}_config`
-        ) || "{}"
-      );
-
-      const newMeasures = { ...measures };
-
-      newMeasures[data.nodeId] = {
-        ...(newMeasures?.[data.nodeId] ?? {}),
-        pixelsSize: data.pixelsSize,
-      };
-
-      const updatedConfig = {
-        customMeasurement: {
-          measures: newMeasures,
-        },
-      };
-
-      const finalConfiguration = merge(actualSavedConfig, updatedConfig);
-
+    if (!loaded && !actualSavedConfig.measurement) {
       sessionStorage.setItem(
         `weave.js_standalone_${instanceId}_${managingImageId}_config`,
-        JSON.stringify(finalConfiguration)
+        JSON.stringify({
+          ...actualSavedConfig,
+          measurement: {
+            unit: "cms",
+          },
+        })
       );
 
-      setMeasureId(data.nodeId);
-      setMeasurementDefinitionOpen(true);
-    };
+      setLoaded(true);
+      return;
+    }
 
-    const removeMeasureHandler = (node: Konva.Node) => {
-      const nodeId = node.getAttrs().id;
-      const nodeType = node.getAttrs().nodeType;
-      if (!nodeId) {
+    if (!loaded && actualSavedConfig.measurement) {
+      setLoaded(true);
+    }
+  }, [instance, instanceId, managingImageId, loaded]);
+
+  React.useEffect(() => {
+    if (!loaded) return;
+
+    if (!instance) return;
+
+    const actualSavedConfig = JSON.parse(
+      sessionStorage.getItem(
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`
+      ) || "{}"
+    );
+
+    setMeasureUnit(actualSavedConfig.measurement.unit || "cms");
+
+    instance.emitEvent("onMeasureReferenceChange", {
+      unit: actualSavedConfig.measurement.unit,
+      unitPerPixel: scale,
+    });
+  }, [instance, instanceId, managingImageId, loaded, scale, setMeasureUnit]);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const defineMeasureHandler = (data: { nodeId: string }) => {
+      const measureHandler =
+        instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
+
+      if (!measureHandler) {
         return;
       }
 
-      if (nodeType !== "custom-measure") {
-        return;
+      const hasUnitPerPixelDefined = measureHandler.hasUnitPerPixelDefined();
+
+      if (!hasUnitPerPixelDefined) {
+        setMeasureId(data.nodeId);
+        setMeasurementDefinitionOpen(true);
       }
-
-      console.log("Measure removed", { measures, nodeId });
-
-      const actualSavedConfig = JSON.parse(
-        sessionStorage.getItem(
-          `weave.js_standalone_${instanceId}_${managingImageId}_config`
-        ) || "{}"
-      );
-
-      const newMeasures = { ...measures };
-
-      delete newMeasures[nodeId];
-
-      const finalConfiguration = merge(actualSavedConfig, {});
-      finalConfiguration.customMeasurement.measures = newMeasures;
-
-      sessionStorage.setItem(
-        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
-        JSON.stringify(finalConfiguration)
-      );
     };
 
-    instance.addEventListener("onDefineMeasure", defineMeasureHandler);
-    instance.addEventListener("onNodeRenderedRemoved", removeMeasureHandler);
+    instance.addEventListener("onCreateMeasure", defineMeasureHandler);
 
     return () => {
-      instance.removeEventListener("onDefineMeasure", defineMeasureHandler);
-      instance.removeEventListener(
-        "onNodeRenderedRemoved",
-        removeMeasureHandler
-      );
+      instance.removeEventListener("onCreateMeasure", defineMeasureHandler);
     };
-  }, [instance, measures, setMeasures]);
+  }, [
+    instance,
+    instanceId,
+    managingImageId,
+    setMeasureId,
+    setMeasurementDefinitionOpen,
+  ]);
 
   const mutationSave = useMutation({
     mutationFn: async (data: string) => {

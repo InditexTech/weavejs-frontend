@@ -10,7 +10,6 @@ export const MEASURE_TOOL_STATE = {
   ["IDLE"]: "idle",
   ["SET_FROM"]: "set_from",
   ["SET_TO"]: "set_to",
-  ["DEFINE_MEASURE"]: "define_measure",
   ["FINISHED"]: "finished",
 } as const;
 

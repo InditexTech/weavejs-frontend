@@ -23,6 +23,7 @@ import {
   MEASURE_TOOL_DEFAULT_CONFIG,
 } from "./constants";
 import { MeasureNode } from "../../nodes/measure/measure";
+import { MEASURE_NODE_TYPE } from "../../nodes/measure/constants";
 
 export class MeasureToolAction extends WeaveAction {
   private readonly config!: MeasureToolProperties;
@@ -69,7 +70,6 @@ export class MeasureToolAction extends WeaveAction {
       orientation: -1,
       separation: 0,
       unit: "cm",
-      unitPerPixel: 10,
     };
   }
 
@@ -246,10 +246,17 @@ export class MeasureToolAction extends WeaveAction {
     this.container = container;
 
     const nodeHandler =
-      this.instance.getNodeHandler<MeasureNode>("custom-measure");
+      this.instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
 
     if (nodeHandler && this.firstPoint) {
       this.measureId = uuidv4();
+
+      const measures = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
+
+      let unitPerPixel = undefined;
+      if (measures.length > 0) {
+        unitPerPixel = measures[0].getAttr("unitPerPixel");
+      }
 
       const node = nodeHandler.create(this.measureId, {
         ...this.props,
@@ -264,6 +271,7 @@ export class MeasureToolAction extends WeaveAction {
           x: this.clickPoint?.x ?? 0,
           y: this.clickPoint?.y ?? 0,
         },
+        unitPerPixel,
         draggable: true,
       });
 
@@ -291,6 +299,20 @@ export class MeasureToolAction extends WeaveAction {
                 moveNodeToContainer(this.instance, nodeInstance, realContainer);
               }
             }
+
+            const nodeInstance = this.instance
+              .getStage()
+              .findOne(`#${this.measureId}`);
+
+            const distance = nodeHandler.getDistance(
+              nodeInstance as Konva.Group
+            );
+            this.instance.emitEvent("onCreateMeasure", {
+              nodeId: this.measureId,
+              pixelsSize: distance,
+            });
+
+            this.cancelAction();
           }
         }
       );
@@ -298,14 +320,7 @@ export class MeasureToolAction extends WeaveAction {
       this.instance.addNode(node, "mainLayer");
 
       this.setState(MEASURE_TOOL_STATE.FINISHED);
-      this.handleDefineMeasure();
     }
-  }
-
-  private handleDefineMeasure() {
-    this.instance.emitEvent("onDefineMeasure", { nodeId: this.measureId });
-
-    this.cleanup();
   }
 
   trigger(cancelAction: () => void): void {
