@@ -6,6 +6,7 @@ import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
+import { MEASURE_NODE_TYPE } from "@/components/use-cases/standalone/nodes/measure/constants";
 
 export const useNodeActionName = () => {
   const instance = useWeave((state) => state.instance);
@@ -21,6 +22,8 @@ export const useNodeActionName = () => {
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
       case "measure":
+        return "Measure";
+      case MEASURE_NODE_TYPE:
         return "Measure";
       case "group":
         return "Group";
