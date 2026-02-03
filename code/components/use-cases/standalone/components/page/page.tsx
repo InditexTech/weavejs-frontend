@@ -16,6 +16,7 @@ import UserForm from "./user-form";
 import { ScaleLoader } from "react-spinners";
 import { ImageUpIcon } from "lucide-react";
 import { Menu } from "./menu";
+import { Measures } from "../measure/measures";
 
 export const StandalonePage = () => {
   useHandleRouteParams();
@@ -35,7 +36,6 @@ export const StandalonePage = () => {
   );
 
   React.useEffect(() => {
-    console.log("Instance ID changed:", instanceId, user);
     if (instanceId !== "undefined" && !user) {
       const userStorage = sessionStorage.getItem(
         `weave.js_standalone_${instanceId}`
@@ -126,8 +126,9 @@ export const StandalonePage = () => {
             )}
           </div>
           {managingImageId && (
-            <div className="col-span-2 border-l border-[#c9c9c9] flex flex-col">
+            <div className="col-span-2 w-full h-full">
               <Comments />
+              <Measures />
             </div>
           )}
         </div>

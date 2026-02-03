@@ -31,6 +31,7 @@ import { putStandaloneThread } from "@/api/standalone/put-standalone-thread";
 import { delStandaloneThread } from "@/api/standalone/del-standalone-thread";
 import { getStandaloneThreads } from "@/api/standalone/get-standalone-threads";
 import { useComment } from "../../hooks/use-comment";
+import { RightSidebarTitle } from "../page/right-sidebar-title";
 
 export const Comments = () => {
   const instance = useWeave((state) => state.instance);
@@ -42,6 +43,7 @@ export const Comments = () => {
   const managingImageId = useStandaloneUseCase(
     (state) => state.managing.imageId
   );
+  const activeSidebar = useStandaloneUseCase((state) => state.sidebar.active);
   const commentsStatus = useStandaloneUseCase((state) => state.comments.status);
   const setCommentsStatus = useStandaloneUseCase(
     (state) => state.setCommentsStatus
@@ -196,10 +198,14 @@ export const Comments = () => {
     }
   }, [instance, status, roomLoaded, data?.items, error, isLoading]);
 
+  if (activeSidebar !== "comments") {
+    return null;
+  }
+
   return (
     <div className="w-full h-full">
       <div className="w-full p-5 py-3 border-b border-[#c9c9c9] flex justify-between items-center">
-        <div className="font-inter text-lg">Comments</div>
+        <RightSidebarTitle />
         <div className="flex justify-end items-center gap-4">
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>

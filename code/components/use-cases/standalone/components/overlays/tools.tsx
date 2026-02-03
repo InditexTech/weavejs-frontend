@@ -22,7 +22,6 @@ import { Toolbar } from "@/components/room-components/toolbar/toolbar";
 import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-divider";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { MoveToolTrigger } from "@/components/room-components/overlay/tools-triggers/move-tool";
-import { useStandaloneUseCase } from "../../store/store";
 
 export function Tools() {
   const instance = useWeave((state) => state.instance);
@@ -30,16 +29,6 @@ export function Tools() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-
-  const measurementUnits = useStandaloneUseCase(
-    (state) => state.measurement.units
-  );
-  const measurementReferenceMeasureUnits = useStandaloneUseCase(
-    (state) => state.measurement.referenceMeasureUnits
-  );
-  const measurementReferenceMeasurePixels = useStandaloneUseCase(
-    (state) => state.measurement.referenceMeasurePixels
-  );
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -165,21 +154,15 @@ export function Tools() {
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
-          active={actualAction === "measureTool"}
+          active={actualAction === "customMeasureTool"}
           onClick={() => {
             if (!instance) {
               return;
             }
-            triggerTool("measureTool", {});
-            const scale = measurementReferenceMeasurePixels
-              ? measurementReferenceMeasurePixels /
-                measurementReferenceMeasureUnits
-              : 1;
-            instance.updatePropsAction("measureTool", {
-              color: "#FF3366",
-              unit: measurementUnits,
-              unitPerPixel: scale,
-            });
+            if (actualAction === "customMeasureTool") {
+              return;
+            }
+            triggerTool("customMeasureTool", {});
           }}
           label={
             <div className="flex gap-3 justify-start items-center">
