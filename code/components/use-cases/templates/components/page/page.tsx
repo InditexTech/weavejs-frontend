@@ -5,19 +5,17 @@
 "use client";
 
 import React from "react";
+import { Toaster } from "@/components/ui/sonner";
 import useHandleRouteParams from "../../hooks/use-handle-route-params";
 import { useTemplatesUseCase } from "../../store/store";
 import { PageLoader } from "./page-loader";
 import UserForm from "./user-form";
 import { ScaleLoader } from "react-spinners";
 import { Templates } from "../templates/templates";
-import { Resources } from "../resources/resources";
-import {
-  CloudUpload,
-  //LayoutPanelTop,
-  X,
-} from "lucide-react";
+import { Images } from "../images/images";
+import { ImageUpIcon, LayoutPanelTop, X } from "lucide-react";
 import { Menu } from "./menu";
+import { AddToRoomDialog } from "../add-to-room/add-to-room.dialog";
 
 export const TemplatesPage = () => {
   useHandleRouteParams();
@@ -31,9 +29,11 @@ export const TemplatesPage = () => {
   const setTemplatesManage = useTemplatesUseCase(
     (state) => state.setTemplatesManage,
   );
+  const setShowSelectFileImage = useTemplatesUseCase(
+    (state) => state.setShowSelectFileImage,
+  );
 
   React.useEffect(() => {
-    console.log("Instance ID changed:", instanceId, user);
     if (instanceId !== "undefined" && !user) {
       const userStorage = sessionStorage.getItem(
         `weave.js_standalone_templates_${instanceId}`,
@@ -87,18 +87,34 @@ export const TemplatesPage = () => {
       )}
       <div className="w-full h-full">
         <div className="w-full h-[65px] p-5 py-3 border-b border-[#c9c9c9] flex justify-between items-center">
-          <div className="flex gap-2 justify-start items-center">
+          <div className="flex gap-3 justify-start items-center">
             <Menu />
             <div className="font-inter text-xl">{instanceId}</div>
+            {templatesManage && (
+              <>
+                <div className="h-[20px] w-[1px] bg-black"></div>
+                <div className="font-inter text-xl">templates</div>
+              </>
+            )}
           </div>
           <div className="flex gap-1">
             {!templatesManage && (
               <>
-                {/* <button className="bg-[#2563EB] text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-[#1D4ED8]">
-              CREATE TEMPLATE <LayoutPanelTop size={20} strokeWidth={1} />
-            </button> */}
-                <button className="bg-black text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-gray-800">
-                  UPLOAD RESOURCES <CloudUpload size={20} strokeWidth={1} />
+                <button
+                  className="bg-black font-inter text-sm text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-gray-800"
+                  onClick={() => {
+                    setTemplatesManage(!templatesManage);
+                  }}
+                >
+                  TEMPLATES <LayoutPanelTop size={20} strokeWidth={1} />
+                </button>
+                <button
+                  className="bg-black font-inter text-sm text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-gray-800"
+                  onClick={() => {
+                    setShowSelectFileImage(true);
+                  }}
+                >
+                  UPLOAD IMAGE <ImageUpIcon size={20} strokeWidth={1} />
                 </button>
               </>
             )}
@@ -119,19 +135,36 @@ export const TemplatesPage = () => {
             )}
           </div>
         </div>
-        <div className="w-full h-full grid grid-cols-12 border">
+        <div className="w-full h-[calc(100dvh-65px)] grid grid-cols-12 border">
           {!templatesManage && (
-            <div className="col-span-12">
-              <Resources />
+            <div className="w-full h-full col-span-12">
+              <Images />
             </div>
           )}
           {templatesManage && (
-            <div className="col-span-12">
+            <div className="w-full h-full col-span-12">
               <Templates />
             </div>
           )}
         </div>
       </div>
+      <AddToRoomDialog />
+      <Toaster
+        offset={16}
+        mobileOffset={16}
+        toastOptions={{
+          classNames: {
+            toast: "w-full font-inter font-light text-xs",
+            content: "w-full",
+            title: "w-full font-inter font-semibold text-sm",
+            description: "w-full font-inter font-light text-xs !text-black",
+          },
+          style: {
+            borderRadius: "0px",
+            boxShadow: "none",
+          },
+        }}
+      />
     </>
   );
 };

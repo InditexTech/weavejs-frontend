@@ -12,7 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "@/components/utils/logo";
@@ -25,14 +24,8 @@ export function Menu() {
   const instance = useWeave((state) => state.instance);
 
   const instanceId = useTemplatesUseCase((state) => state.instanceId);
-  const templatesManage = useTemplatesUseCase(
-    (state) => state.templates.manage,
-  );
   const setUser = useTemplatesUseCase((state) => state.setUser);
   const setInstanceId = useTemplatesUseCase((state) => state.setInstanceId);
-  const setTemplatesManage = useTemplatesUseCase(
-    (state) => state.setTemplatesManage,
-  );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
 
@@ -44,10 +37,6 @@ export function Menu() {
     setInstanceId("undefined");
     router.push("/use-cases/templates");
   }, [instance, instanceId, router, setInstanceId, setUser]);
-
-  const handleManageTemplates = React.useCallback(() => {
-    setTemplatesManage(!templatesManage);
-  }, [templatesManage, setTemplatesManage]);
 
   return (
     <>
@@ -84,13 +73,6 @@ export function Menu() {
           sideOffset={9}
           className="font-inter rounded-none"
         >
-          <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={handleManageTemplates}
-          >
-            Manage templates
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none"
             onPointerDown={handleExitRoom}

@@ -16,9 +16,21 @@ interface TemplatesUseCaseState {
   templates: {
     manage: boolean;
   };
+  images: {
+    showSelectFile: boolean;
+    uploading: boolean;
+    selected: string[];
+  };
+  addToRoom: {
+    open: boolean;
+  };
   setUser: (newUser: StandaloneUser | undefined) => void;
   setInstanceId: (newInstanceId: string) => void;
   setTemplatesManage: (manage: boolean) => void;
+  setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
+  setUploadingImage: (newUploadingImage: boolean) => void;
+  setSelectedImages: (newSelectedImages: string[]) => void;
+  setAddToRoomOpen: (open: boolean) => void;
 }
 
 export const useTemplatesUseCase = create<TemplatesUseCaseState>()((set) => ({
@@ -26,6 +38,14 @@ export const useTemplatesUseCase = create<TemplatesUseCaseState>()((set) => ({
   instanceId: "undefined",
   templates: {
     manage: false,
+  },
+  images: {
+    showSelectFile: false,
+    uploading: false,
+    selected: [],
+  },
+  addToRoom: {
+    open: false,
   },
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setInstanceId: (newInstanceId) =>
@@ -37,5 +57,25 @@ export const useTemplatesUseCase = create<TemplatesUseCaseState>()((set) => ({
         ...state.templates,
         manage,
       },
+    })),
+  setUploadingImage: (newUploadingImage) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, uploading: newUploadingImage },
+    })),
+  setShowSelectFileImage: (newShowSelectFileImage) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, showSelectFile: newShowSelectFileImage },
+    })),
+  setSelectedImages: (newSelectedImages) =>
+    set((state) => ({
+      ...state,
+      images: { ...state.images, selected: newSelectedImages },
+    })),
+  setAddToRoomOpen: (open) =>
+    set((state) => ({
+      ...state,
+      addToRoom: { ...state.addToRoom, open },
     })),
 }));
