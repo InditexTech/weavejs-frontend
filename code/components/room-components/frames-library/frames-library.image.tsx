@@ -22,21 +22,15 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
     const loadImage = async () => {
       if (!instance) return;
 
-      const stage = instance.getStage();
       const nodeAttrs = node.getAttrs();
       try {
-        // const box = frameInternal.getClientRect({ relativeTo: stage });
-        const frameBg = stage.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
-        if (!frameBg) {
-          return;
-        }
-        const boxBg = frameBg.getClientRect();
+        const bounds = instance.getExportBoundingBox([nodeAttrs.containerId]);
         const img = await toImageAsync(node, {
-          x: boxBg.x + 4,
-          y: boxBg.y + 4,
-          pixelRatio: 2,
-          width: boxBg.width - 8,
-          height: boxBg.height - 8,
+          x: bounds.x,
+          y: bounds.y,
+          pixelRatio: 1,
+          width: bounds.width,
+          height: bounds.height,
         });
         setImage(
           <Image
@@ -45,7 +39,7 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
             height={225}
             alt="A frame image"
             className="object-fit w-full h-auto"
-          />
+          />,
         );
       } catch (ex) {
         console.error(ex);

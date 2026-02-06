@@ -24,10 +24,9 @@ import {
 } from "@/components/ui/select";
 import React from "react";
 import { X } from "lucide-react";
-import { useExportToImageServerSide } from "../hooks/use-export-to-image-server-side";
 import { useCollaborationRoom } from "@/store/store";
 import { Input } from "@/components/ui/input";
-import { WeaveExportFormats } from "@inditextech/weave-types";
+import { useExportToPDFServerSide } from "../hooks/use-export-to-pdf-server-side";
 
 function safeParseInt(value: unknown, fallback = 0): number {
   if (typeof value === "number") {
@@ -44,70 +43,66 @@ type ExportConfigDialogProps = {
   onIsExportingChange?: (isExporting: boolean) => void;
 };
 
-export function ExportConfigDialog({
+export function ExportPDFConfigDialog({
   onIsExportingChange,
 }: ExportConfigDialogProps) {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-  const [format, setFormat] = React.useState<string>("image/png");
   const [padding, setPadding] = React.useState<string>("20");
   const [backgroundColor, setBackgroundColor] =
     React.useState<string>("#FFFFFF");
   const [pixelRatio, setPixelRatio] = React.useState<string>("1");
 
-  const nodesToExport = useCollaborationRoom((state) => state.export.nodes);
-  const exportConfigVisible = useCollaborationRoom(
-    (state) => state.export.config.visible,
+  const pdfPages = useCollaborationRoom((state) => state.frames.pages);
+  const exportFrameConfigVisible = useCollaborationRoom(
+    (state) => state.frames.export.visible,
   );
-  const exporting = useCollaborationRoom((state) => state.images.exporting);
-  const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible,
+  const setFramesExportVisible = useCollaborationRoom(
+    (state) => state.setFramesExportVisible,
   );
 
   React.useEffect(() => {
-    if (exportConfigVisible) {
+    if (exportFrameConfigVisible) {
       setTimeout(() => {
         buttonRef.current?.focus();
       }, 0);
     }
-  }, [exportConfigVisible]);
+  }, [exportFrameConfigVisible]);
 
-  const { handleExportToImageServerSide, isExporting } =
-    useExportToImageServerSide();
+  const { handleExportToPDFServerSide, isExporting } =
+    useExportToPDFServerSide();
 
   React.useEffect(() => {
     onIsExportingChange?.(isExporting);
   }, [isExporting, onIsExportingChange]);
 
   const handleExport = React.useCallback(() => {
-    handleExportToImageServerSide({
-      nodes: nodesToExport,
-      format: format as WeaveExportFormats,
+    handleExportToPDFServerSide({
+      pages: pdfPages,
       padding: safeParseInt(padding, 0),
       backgroundColor: backgroundColor,
       pixelRatio: safeParseInt(pixelRatio, 1),
     });
-    setExportConfigVisible(false);
+    setFramesExportVisible(false);
   }, [
-    nodesToExport,
-    format,
     padding,
     backgroundColor,
     pixelRatio,
-    handleExportToImageServerSide,
-    setExportConfigVisible,
+    pdfPages,
+    handleExportToPDFServerSide,
+    setFramesExportVisible,
   ]);
 
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      if (!exportConfigVisible) return;
+      if (!exportFrameConfigVisible) return;
 
       if (event.key === "Enter") {
         handleExport();
       }
     },
-    [exportConfigVisible, handleExport],
+    [exportFrameConfigVisible, handleExport],
   );
 
   React.useEffect(() => {
@@ -119,21 +114,21 @@ export function ExportConfigDialog({
 
   return (
     <Dialog
-      open={exportConfigVisible}
-      onOpenChange={(open) => setExportConfigVisible(open)}
+      open={exportFrameConfigVisible}
+      onOpenChange={(open) => setFramesExportVisible(open)}
     >
       <form>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <div className="w-full flex gap-5 justify-between items-center">
               <DialogTitle className="font-inter text-2xl font-normal uppercase">
-                Export to Image
+                Export to PDF
               </DialogTitle>
               <DialogClose asChild>
                 <button
                   className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
                   onClick={() => {
-                    setExportConfigVisible(false);
+                    setFramesExportVisible(false);
                   }}
                 >
                   <X size={16} strokeWidth={1} />
@@ -141,45 +136,10 @@ export function ExportConfigDialog({
               </DialogClose>
             </div>
             <DialogDescription className="font-inter text-sm mt-5">
-              Define the properties of the exported image.
+              Define the properties of the exported PDF.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-1">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex justify-start items-center inter text-xs">
-                Format
-              </div>
-              <div className="flex justify-end items-center">
-                <Select
-                  value={format}
-                  onValueChange={setFormat}
-                  disabled={isExporting}
-                >
-                  <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
-                    <SelectValue placeholder="Amount" />
-                  </SelectTrigger>
-                  <SelectContent
-                    className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
-                    align="end"
-                  >
-                    <SelectGroup>
-                      <SelectItem
-                        value="image/png"
-                        className="font-inter text-xs rounded-none"
-                      >
-                        PNG
-                      </SelectItem>
-                      <SelectItem
-                        value="image/jpeg"
-                        className="font-inter text-xs rounded-none"
-                      >
-                        JPEG
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex justify-start items-center inter text-xs">
                 Padding (px)
@@ -286,7 +246,6 @@ export function ExportConfigDialog({
             <Button
               ref={buttonRef}
               type="button"
-              disabled={exporting}
               className="cursor-pointer font-inter rounded-none"
               onClick={handleExport}
             >

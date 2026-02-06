@@ -5,83 +5,80 @@
 import React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-// import { postExportToImage } from "@/api/post-export-to-image";
-import { postExportToImageAsync } from "@/api/post-export-to-image-async";
-import {
-  WeaveExportFormats,
-  WeaveExportNodesOptions,
-} from "@inditextech/weave-types";
+import { WeaveExportNodesOptions } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
+// import { postExportToPDF } from "@/api/post-export-to-pdf";
+import { postExportToPDFAsync } from "@/api/post-export-to-pdf-async";
 import { useCollaborationRoom } from "@/store/store";
 
-export const useExportToImageServerSide = () => {
+export const useExportToPDFServerSide = () => {
   const instance = useWeave((state) => state.instance);
 
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const exporting = useCollaborationRoom((state) => state.images.exporting);
-  const setImageExporting = useCollaborationRoom(
-    (state) => state.setImageExporting,
+  const exporting = useCollaborationRoom(
+    (state) => state.frames.export.exporting,
+  );
+  const setFramesExporting = useCollaborationRoom(
+    (state) => state.setFramesExporting,
   );
 
   const mutateExport = useMutation({
     mutationFn: async ({
       roomData,
-      nodes,
+      pages,
       options,
     }: {
       roomData: string;
-      nodes: string[];
+      pages: { title: string; nodes: string[] }[];
       options: WeaveExportNodesOptions;
     }) => {
-      return await postExportToImageAsync(
+      return await postExportToPDFAsync(
         user?.id ?? "",
         clientId ?? "",
         room ?? "",
         roomData,
-        nodes,
+        pages,
         options,
       );
-      // return await postExportToImage(roomData, nodes, options);
     },
-    // onMutate: ({ nodes }) => {
+    // onMutate: ({ pages }) => {
     //   const toastId = toast.loading(
-    //     nodes.length === 0
-    //       ? "Requesting export of room to image..."
-    //       : "Requesting export of selected nodes to image...",
+    //     pages.length === 0
+    //       ? "Exporting room to PDF..."
+    //       : "Exporting selected nodes to PDF...",
     //   );
     //   return { toastId };
     // },
     // // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // onSettled: (_, __, ___, context: any) => {
-    //   // setExporting(false);
+    //   setFramesExporting(false);
     //   if (context?.toastId) {
     //     toast.dismiss(context.toastId);
     //   }
     // },
-    // onSuccess: (blob, { nodes }) => {
-    // const url = window.URL.createObjectURL(blob);
-    // const a = document.createElement("a");
-    // a.href = url;
-    // a.download = "export.zip"; // <-- suggested filename
-    // document.body.appendChild(a);
-    // a.click();
-    // a.remove();
-    // window.URL.revokeObjectURL(url);
-    // toast.success(
-    //   nodes.length === 0
-    //     ? "Exported room image requested."
-    //     : "Exported selected nodes image requested.",
-    // );
+    // onSuccess: (blob, { pages }) => {
+    //   const url = window.URL.createObjectURL(blob);
+
+    //   const a = document.createElement("a");
+    //   a.href = url;
+    //   a.download = "export.zip"; // <-- suggested filename
+    //   document.body.appendChild(a);
+    //   a.click();
+
+    //   a.remove();
+    //   window.URL.revokeObjectURL(url);
+
+    //   toast.success(
+    //     pages.length === 0
+    //       ? "Exported room PDF downloaded."
+    //       : "Exported selected nodes PDF downloaded.",
+    //   );
     // },
-    onError(error, { nodes }) {
+    onError(error) {
       console.error(error);
-      toast.error(
-        nodes.length === 0
-          ? "Error requesting export of room to image."
-          : "Error requesting export of selected nodes to image.",
-      );
+      toast.error("Error exporting to PDF.");
     },
   });
 
@@ -97,25 +94,21 @@ export const useExportToImageServerSide = () => {
     }
   }, [instance]);
 
-  const handleExportToImageServerSide = React.useCallback(
+  const handleExportToPDFServerSide = React.useCallback(
     async ({
-      nodes,
-      format,
+      pages,
       padding,
       backgroundColor,
       pixelRatio,
-      quality,
     }: {
-      nodes: string[];
-      format: WeaveExportFormats;
+      pages: { title: string; nodes: string[] }[];
       padding: number;
       backgroundColor: string;
       pixelRatio: number;
-      quality?: number;
     }) => {
       if (!instance) return;
 
-      setImageExporting(true);
+      setFramesExporting(true);
 
       const snapshot: Uint8Array<ArrayBufferLike> = instance
         .getStore()
@@ -123,24 +116,22 @@ export const useExportToImageServerSide = () => {
 
       mutateExport.mutate({
         roomData: Buffer.from(snapshot).toString("base64"),
-        nodes,
+        pages,
         options: {
-          format,
           pixelRatio,
           padding,
           backgroundColor,
-          ...(format === "image/jpeg" && { quality }),
         },
       });
     },
-    [instance, mutateExport, setImageExporting],
+    [instance, mutateExport, setFramesExporting],
   );
 
   // const isExporting = React.useCallback(() => exporting, [exporting]);
 
   return {
     handlePrintStateSnapshotToClipboard,
-    handleExportToImageServerSide,
+    handleExportToPDFServerSide,
     isExporting: exporting,
   };
 };
