@@ -144,11 +144,18 @@ interface CollaborationRoomState {
       show: boolean;
     };
   };
+  frames: {
+    export: {
+      exporting: boolean;
+      visible: boolean;
+    };
+    pages: { title: string; nodes: string[] }[];
+  };
   setShowUi: (newShowUI: boolean) => void;
   setShowMinimap: (newShowMinimap: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
-    newFetchConnectionUrlError: Error | null
+    newFetchConnectionUrlError: Error | null,
   ) => void;
   setClientId: (newClientId: string | undefined) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
@@ -158,7 +165,7 @@ interface CollaborationRoomState {
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (
     newTransformingImage: boolean,
-    operation?: TransformingOperation
+    operation?: TransformingOperation,
   ) => void;
   setCroppingImage: (newCroppingImage: boolean) => void;
   setCroppingNode: (newCroppingNode: Konva.Node | undefined) => void;
@@ -169,25 +176,25 @@ interface CollaborationRoomState {
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
-    newFinishUploadCallbackImage: FinishUploadCallback | null
+    newFinishUploadCallbackImage: FinishUploadCallback | null,
   ) => void;
   setNodePropertiesAction: (
-    newNodePropertiesAction: NodePropertiesAction
+    newNodePropertiesAction: NodePropertiesAction,
   ) => void;
   setNodePropertiesCreateProps: (
-    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined,
   ) => void;
   setSidebarActive: (newSidebarActive: SidebarActive) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
   setRemoveBackgroundPopupAction: (
-    newAction: "replace" | "new" | undefined
+    newAction: "replace" | "new" | undefined,
   ) => void;
   setRemoveBackgroundPopupShow: (newShow: boolean) => void;
   setRemoveBackgroundPopupOriginImage: (
-    newOriginImage: string | undefined
+    newOriginImage: string | undefined,
   ) => void;
   setRemoveBackgroundPopupOriginNodeId: (
-    newOriginNodeId: string | undefined
+    newOriginNodeId: string | undefined,
   ) => void;
   setRemoveBackgroundPopupImageId: (newImageId: string | undefined) => void;
   setRemoveBackgroundPopupImageURL: (newImageURL: string | undefined) => void;
@@ -207,10 +214,13 @@ interface CollaborationRoomState {
     upscale: boolean,
     baseWidth: number,
     baseHeight: number,
-    multiplier: number
+    multiplier: number,
   ) => void;
   setMeasurement: (units: string, referenceMeasureUnits: number) => void;
   setReferenceMeasurePixels: (referenceMeasurePixels: number | null) => void;
+  setFramesExportVisible: (newVisible: boolean) => void;
+  setFramesExporting: (newExporting: boolean) => void;
+  setFramesPages: (newPages: { title: string; nodes: string[] }[]) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -227,13 +237,13 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
   let configurationFromStorage = {};
   if (typeof sessionStorage !== "undefined") {
     configurationFromStorage = JSON.parse(
-      sessionStorage.getItem("weave_ai_configuration") || "{}"
+      sessionStorage.getItem("weave_ai_configuration") || "{}",
     );
   }
 
   const finalConfiguration = merge(
     defaultConfiguration,
-    configurationFromStorage
+    configurationFromStorage,
   );
 
   return {
@@ -323,9 +333,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       },
     },
     frames: {
-      library: {
+      export: {
+        exporting: false,
         visible: false,
       },
+      pages: [],
     },
     colorToken: {
       library: {
@@ -630,7 +642,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       upscale: boolean,
       baseWidth: number,
       baseHeight: number,
-      multiplier: number
+      multiplier: number,
     ) =>
       set((state) => ({
         ...state,
@@ -659,6 +671,36 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         measurement: {
           ...state.measurement,
           referenceMeasurePixels,
+        },
+      })),
+    setFramesExportVisible: (newVisible: boolean) =>
+      set((state) => ({
+        ...state,
+        frames: {
+          ...state.frames,
+          export: {
+            ...state.frames.export,
+            visible: newVisible,
+          },
+        },
+      })),
+    setFramesExporting: (newExporting: boolean) =>
+      set((state) => ({
+        ...state,
+        frames: {
+          ...state.frames,
+          export: {
+            ...state.frames.export,
+            exporting: newExporting,
+          },
+        },
+      })),
+    setFramesPages: (newPages: { title: string; nodes: string[] }[]) =>
+      set((state) => ({
+        ...state,
+        frames: {
+          ...state.frames,
+          pages: newPages,
         },
       })),
   };

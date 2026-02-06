@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { BlendMode, PDFDocument } from "pdf-lib";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import Konva from "konva";
@@ -20,7 +19,7 @@ import {
   StepForward,
   XIcon,
 } from "lucide-react";
-import { generatePresentation, PresentationImage, toImageAsync } from "./utils";
+import { generatePresentation, PresentationImage } from "./utils";
 import { FrameImage } from "./frames-library.image";
 import { FramePresentationImage } from "./frames-library.presentation-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -39,6 +38,13 @@ export const FramesLibrary = () => {
   const appState = useWeave((state) => state.appState);
 
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+  const setFramePages = useCollaborationRoom((state) => state.setFramesPages);
+  const setFramesExportVisible = useCollaborationRoom(
+    (state) => state.setFramesExportVisible,
+  );
+  const exporting = useCollaborationRoom(
+    (state) => state.frames.export.exporting,
+  );
 
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
@@ -63,7 +69,7 @@ export const FramesLibrary = () => {
 
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      "frame"
+      "frame",
     );
 
     const frames: Konva.Node[] = [];
@@ -88,44 +94,29 @@ export const FramesLibrary = () => {
       framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? "");
     }
 
-    const pages: { title: string; image: string }[] = [];
+    const pdfPages: { title: string; nodes: string[] }[] = [];
     for (const frameId of selectedFrames) {
       const node = stage.findOne(`#${frameId}`) as Konva.Group | undefined;
       if (node) {
-        const attrs = node.getAttrs();
-        const frameBg = node.findOne(`#${attrs.id}-bg`) as Konva.Group;
-        const boxBg = frameBg.getClientRect();
-        const img = await toImageAsync(node, {
-          pixelRatio: 2,
-          x: boxBg.x + 4,
-          y: boxBg.y + 4,
-          width: boxBg.width - 8,
-          height: boxBg.height - 8,
+        const containerId = node.getAttrs().containerId;
+        const title = node.getAttrs().title;
+
+        pdfPages.push({
+          title,
+          nodes: [containerId],
         });
-        pages.push({ title: attrs.title, image: img.src });
       }
     }
 
-    const pdfDoc = await PDFDocument.create();
-    for (const page of pages) {
-      const pdfPage = pdfDoc.addPage([1403, 992]);
-      const imageDoc = await pdfDoc.embedPng(page.image);
-      pdfPage.drawImage(imageDoc, {
-        x: 30,
-        y: 30,
-        width: 1403 - 60,
-        height: 992 - 60,
-        blendMode: BlendMode.Normal,
-      });
-    }
-
-    const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
-
-    const link = document.createElement("a");
-    link.href = pdfDataUri;
-    link.download = "test.pdf";
-    link.click();
-  }, [instance, selectedFrames, framesAvailable]);
+    setFramePages(pdfPages);
+    setFramesExportVisible(true);
+  }, [
+    instance,
+    selectedFrames,
+    framesAvailable,
+    setFramePages,
+    setFramesExportVisible,
+  ]);
 
   const actualImagePresentation = React.useMemo(() => {
     return presentationImages[actualFrame];
@@ -225,7 +216,7 @@ export const FramesLibrary = () => {
                   <TooltipTrigger asChild>
                     <button
                       className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
-                      disabled={selectedFrames.length === 0}
+                      disabled={selectedFrames.length === 0 || exporting}
                       onClick={exportFramesHandler}
                     >
                       <Download

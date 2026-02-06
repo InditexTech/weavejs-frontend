@@ -47,6 +47,7 @@ import { ChatBot } from "../room-components/ai-components/chatbot";
 import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
 import { useIAChat } from "@/store/ia-chat";
 import { useUserChanges } from "../room-components/hooks/use-user-changes";
+import { ExportPDFConfigDialog } from "../room-components/overlay/export-pdf-config";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -80,31 +81,28 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show
+    (state) => state.contextMenu.show,
   );
   const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position
+    (state) => state.contextMenu.position,
   );
   const contextMenuOptions = useCollaborationRoom(
-    (state) => state.contextMenu.options
+    (state) => state.contextMenu.options,
   );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
-  );
-  const exportingToImage = useCollaborationRoom(
-    (state) => state.images.exporting
+    (state) => state.setContextMenuShow,
   );
   const transformingImage = useCollaborationRoom(
-    (state) => state.images.transforming
+    (state) => state.images.transforming,
   );
   const transformingOperation = useCollaborationRoom(
-    (state) => state.images.transformingOperation
+    (state) => state.images.transformingOperation,
   );
   const uploadingImage = useCollaborationRoom(
-    (state) => state.images.uploading
+    (state) => state.images.uploading,
   );
   const uploadingVideo = useCollaborationRoom(
-    (state) => state.videos.uploading
+    (state) => state.videos.uploading,
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
@@ -114,7 +112,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const setFontsValues = useCollaborationRoom((state) => state.setFontsValues);
 
   const backgroundColor = useCollaborationRoom(
-    (state) => state.backgroundColor
+    (state) => state.backgroundColor,
   );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
@@ -314,7 +312,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
                   {
                     ["visible"]: showMinimap,
                     ["invisible"]: !showMinimap,
-                  }
+                  },
                 )}
               ></div>
             </>
@@ -382,16 +380,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           </div>
         )}
-        {exportingToImage && (
-          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
-            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-              <Logo kind="large" variant="no-text" />
-              <div className="font-inter text-base">
-                Loading AI UI, please wait...
-              </div>
-            </div>
-          </div>
-        )}
 
         {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
           <>
@@ -400,6 +388,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <SaveTemplateDialog />
             <RemoveBackgroundActionPopup />
             <ExportConfigDialog />
+            <ExportPDFConfigDialog />
           </>
         )}
       </motion.div>
