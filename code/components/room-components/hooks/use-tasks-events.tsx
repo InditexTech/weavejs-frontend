@@ -287,5 +287,7 @@ export const useTasksEvents = () => {
     queryClient,
     clientId,
     user?.id,
+    setFramesExporting,
+    setImageExporting,
   ]);
 };
