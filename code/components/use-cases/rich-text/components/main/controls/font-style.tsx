@@ -3,6 +3,8 @@ import { Toggle } from "@/components/ui/toggle";
 import { useRichText } from "../store";
 import { Bold, Italic, Minus, Strikethrough, Underline } from "lucide-react";
 import { DEFAULT_TEXT_STYLE } from "../constants";
+import { updateStyles } from "../styles";
+import Konva from "konva";
 
 type ToggleState = "on" | "off" | "mixed";
 
@@ -12,6 +14,7 @@ export const FontStyle = () => {
   const [underline, setUnderline] = React.useState<ToggleState>("off");
   const [strikeThrough, setStrikeThrough] = React.useState<ToggleState>("off");
 
+  const stage = useRichText((state) => state.stage);
   const style = useRichText((state) => state.style);
   const styles = useRichText((state) => state.styles);
 
@@ -20,10 +23,10 @@ export const FontStyle = () => {
       setBold(DEFAULT_TEXT_STYLE.style.includes("bold") ? "on" : "off");
       setItalic(DEFAULT_TEXT_STYLE.style.includes("italic") ? "on" : "off");
       setUnderline(
-        DEFAULT_TEXT_STYLE.decoration.includes("underline") ? "on" : "off"
+        DEFAULT_TEXT_STYLE.decoration.includes("underline") ? "on" : "off",
       );
       setStrikeThrough(
-        DEFAULT_TEXT_STYLE.decoration.includes("line-through") ? "on" : "off"
+        DEFAULT_TEXT_STYLE.decoration.includes("line-through") ? "on" : "off",
       );
     }
     if (styles.length === 1) {
@@ -44,7 +47,7 @@ export const FontStyle = () => {
     if (styles.length > 1) {
       let boldState: ToggleState = "mixed";
       const boldStyles = styles.map((s) =>
-        s.style.includes("bold") ? "bold" : ""
+        s.style.includes("bold") ? "bold" : "",
       );
       if (boldStyles.every((s) => s === "bold")) {
         boldState = "on";
@@ -56,7 +59,7 @@ export const FontStyle = () => {
 
       let italicState: ToggleState = "mixed";
       const italicStyles = styles.map((s) =>
-        s.style.includes("italic") ? "italic" : ""
+        s.style.includes("italic") ? "italic" : "",
       );
       if (italicStyles.every((s) => s === "italic")) {
         italicState = "on";
@@ -68,7 +71,7 @@ export const FontStyle = () => {
 
       let underlineState: ToggleState = "mixed";
       const underlineStyles = styles.map((s) =>
-        s.decoration.includes("underline") ? "underline" : ""
+        s.decoration.includes("underline") ? "underline" : "",
       );
       if (underlineStyles.every((s) => s === "underline")) {
         underlineState = "on";
@@ -80,7 +83,7 @@ export const FontStyle = () => {
 
       let strikeThroughState: ToggleState = "mixed";
       const strikeThroughStyles = styles.map((s) =>
-        s.decoration.includes("line-through") ? "line-through" : ""
+        s.decoration.includes("line-through") ? "line-through" : "",
       );
       if (strikeThroughStyles.every((s) => s === "line-through")) {
         strikeThroughState = "on";
@@ -91,12 +94,46 @@ export const FontStyle = () => {
     }
   }, [style, styles]);
 
+  const handleStyleChange = React.useCallback(
+    (value: string) => {
+      if (stage) {
+        const node = stage.findOne("#rich-text-editor") as Konva.Group;
+        if (node) {
+          updateStyles(node, { style: value });
+        }
+      }
+    },
+    [stage],
+  );
+
+  const handleDecorationChange = React.useCallback(
+    (value: string) => {
+      if (stage) {
+        const node = stage.findOne("#rich-text-editor") as Konva.Group;
+        if (node) {
+          updateStyles(node, { decoration: value });
+        }
+      }
+    },
+    [stage],
+  );
+
   return (
     <div className="flex justify-start items-center gap-1">
       <Toggle
         pressed={bold === "on"}
         onPressedChange={(checked: boolean) => {
           setBold(checked ? "on" : "off");
+
+          const newStyle = [];
+          if (checked) {
+            newStyle.push("bold");
+          }
+          if (italic === "on") {
+            newStyle.push("italic");
+          }
+
+          handleStyleChange(newStyle.join(" "));
         }}
         aria-label="Toggle bold"
         className="rounded-none cursor-pointer"
@@ -113,6 +150,16 @@ export const FontStyle = () => {
         pressed={italic === "on"}
         onPressedChange={(checked: boolean) => {
           setItalic(checked ? "on" : "off");
+
+          const newStyle = [];
+          if (bold === "on") {
+            newStyle.push("bold");
+          }
+          if (checked) {
+            newStyle.push("italic");
+          }
+
+          handleStyleChange(newStyle.join(" "));
         }}
         aria-label="Toggle italic"
         className="rounded-none cursor-pointer"
@@ -129,6 +176,16 @@ export const FontStyle = () => {
         pressed={underline === "on"}
         onPressedChange={(checked: boolean) => {
           setUnderline(checked ? "on" : "off");
+
+          const newDecoration = [];
+          if (checked) {
+            newDecoration.push("underline");
+          }
+          if (strikeThrough === "on") {
+            newDecoration.push("line-through");
+          }
+
+          handleDecorationChange(newDecoration.join(" "));
         }}
         aria-label="Toggle underline"
         className="rounded-none cursor-pointer"
@@ -145,6 +202,16 @@ export const FontStyle = () => {
         pressed={strikeThrough === "on"}
         onPressedChange={(checked: boolean) => {
           setStrikeThrough(checked ? "on" : "off");
+
+          const newDecoration = [];
+          if (underline === "on") {
+            newDecoration.push("underline");
+          }
+          if (checked) {
+            newDecoration.push("line-through");
+          }
+
+          handleDecorationChange(newDecoration.join(" "));
         }}
         aria-label="Toggle strike-through"
         className="rounded-none cursor-pointer"

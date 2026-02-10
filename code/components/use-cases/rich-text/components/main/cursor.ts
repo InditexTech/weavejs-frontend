@@ -21,7 +21,7 @@ export function stopCursorBlink() {
 
 export function startCursorBlinkWithDelay(
   caret: Konva.Line,
-  delay: number = 600
+  delay: number = 600,
 ) {
   stopCursorBlink();
 
@@ -60,7 +60,7 @@ export const destroyCursor = () => {
 
 export const moveCursorToLineColumn = (
   instance: Konva.Group,
-  lineCol: LineColumn
+  lineCol: LineColumn,
 ) => {
   instance.setAttr("cursorPosition", lineCol);
   const renderModel: RichTextRenderLine[] =
@@ -72,7 +72,7 @@ export const moveCursorToLineColumn = (
       line: lineCol.line,
       column: lineCol.column,
     },
-    true
+    true,
   );
 
   let x = 0;
@@ -133,7 +133,7 @@ export const moveCursorToLineColumn = (
 export const setCursorAt = (
   instance: Konva.Group,
   newLine: LineColumn,
-  move = true
+  move = true,
 ) => {
   const cursor = instance.findOne(".cursor") as Konva.Line | undefined;
   if (!cursor) return;
@@ -148,7 +148,7 @@ export const setCursorAt = (
 export const getLineColumnFromLineColumn = (
   instance: Konva.Group,
   lineCol: LineColumn,
-  amount: number
+  amount: number,
 ): LineColumn => {
   const renderModel: RichTextRenderLine[] =
     instance.getAttr("renderModel") ?? [];
@@ -238,13 +238,21 @@ export const getLineColumnFromLineColumn = (
     }
   }
 
+  if (
+    newLineCol.column === renderModel[newLineCol.line]?.text.length &&
+    newLineCol.line + 1 < renderModel.length
+  ) {
+    newLineCol.line = newLineCol.line + 1;
+    newLineCol.column = 0;
+  }
+
   return newLineCol;
 };
 
 export const moveCursor = (
   instance: Konva.Group,
   amount: number,
-  action: MoveCursorAction = "none"
+  action: MoveCursorAction = "none",
 ): void => {
   const cursor = instance.findOne(".cursor") as Konva.Line | undefined;
   if (!cursor) return;
@@ -281,7 +289,7 @@ export const moveCursor = (
   const newLineCol: LineColumn = getLineColumnFromLineColumn(
     instance,
     lineCol,
-    amount
+    amount,
   );
 
   moveCursorToLineColumn(instance, newLineCol);

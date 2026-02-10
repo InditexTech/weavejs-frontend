@@ -25,6 +25,7 @@ import { FontAlignment } from "./controls/font-alignment";
 import { TextLayout } from "./controls/text-layout";
 import { Cog } from "lucide-react";
 import { normalizeLineColumn } from "./keyboard";
+import { getRecursiveNode } from "./utils";
 
 export const RichTextPage = () => {
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -42,19 +43,23 @@ export const RichTextPage = () => {
   const [selectionChars, setSelectionChars] = React.useState<number>(0);
   const [change, setChange] = React.useState<string>(uuidv4);
 
+  const stage = useRichText((state) => state.stage);
   const model = useRichText((state) => state.model);
   const guidesBounds = useRichText((state) => state.guides.bounds);
   const guidesBaselines = useRichText((state) => state.guides.baselines);
   const guidesSegments = useRichText((state) => state.guides.segments);
   const editing = useRichText((state) => state.editing);
+  const selected = useRichText((state) => state.selected);
   const setModel = useRichText((state) => state.setModel);
   const setGuidesBounds = useRichText((state) => state.setGuidesBounds);
   const setGuidesBaselines = useRichText((state) => state.setGuidesBaselines);
   const setGuidesSegments = useRichText((state) => state.setGuidesSegments);
   const setEditing = useRichText((state) => state.setEditing);
+  const setSelected = useRichText((state) => state.setSelected);
   const setStyle = useRichText((state) => state.setStyle);
   const setStyles = useRichText((state) => state.setStyles);
   const setStage = useRichText((state) => state.setStage);
+  const setLayout = useRichText((state) => state.setLayout);
 
   React.useEffect(() => {
     if (ref.current && !setuped) {
@@ -81,11 +86,21 @@ export const RichTextPage = () => {
           document.body.style.cursor = "default";
           stage.setAttr("editingMode", "none");
           stage.fire("editingMode:change");
+          setSelected([]);
           tr.nodes([]);
+          stage.fire("selectedNodesChange", { nodes: [] }, true);
           return;
         }
         if (e.target !== stage) {
-          tr.nodes([e.target]);
+          const node = getRecursiveNode(e.target);
+
+          if (!node) {
+            return;
+          }
+
+          setSelected([node.id()]);
+          tr.nodes([node]);
+          stage.fire("selectedNodesChange", { nodes: [node] }, true);
         }
       });
 
@@ -143,17 +158,28 @@ export const RichTextPage = () => {
       });
 
       const pos = { x: 50, y: 50 };
-      const maxWidth = 500;
+      // const layout = "auto";
+      // const createLimits = { width: Infinity, height: Infinity };
+      const layout = "fixed-width";
+      const createLimits = { width: 500, height: Infinity };
+      // const layout = "fixed";
+      // const createLimits = { width: 400, height: 200 };
 
-      const richText = generateRichText(stage, pos, maxWidth, EXAMPLE_MODEL);
+      const richText = generateRichText(stage, EXAMPLE_MODEL, {
+        pos,
+        layout,
+        limits: createLimits,
+      });
       layer.add(richText);
 
       richText.fire("text:change", { model: richText.getAttr("model") }, true);
 
       const tr = new Konva.Transformer({
+        id: "transformer",
         resizeEnabled: false,
       });
       layer.add(tr);
+      tr.nodes([]);
       tr.moveToTop();
 
       konvaStageRef.current = stage;
@@ -162,7 +188,45 @@ export const RichTextPage = () => {
 
       setSetuped(true);
     }
-  }, [setuped, setEditing, setStyle, setModel]);
+  }, [
+    setuped,
+    setEditing,
+    setStyle,
+    setModel,
+    setSelected,
+    setStage,
+    setStyles,
+  ]);
+
+  React.useEffect(() => {
+    if (!stage) {
+      return;
+    }
+
+    const transformer = stage.findOne("#transformer") as
+      | Konva.Transformer
+      | undefined;
+
+    if (!transformer) {
+      return;
+    }
+
+    const handleTransformerNodesChange = () => {
+      if (transformer.nodes().length === 0) {
+        setLayout(null);
+      } else {
+        const node = transformer.nodes()[0];
+        const nodeLayout = node.getAttr("layout");
+        setLayout(nodeLayout);
+      }
+    };
+
+    stage.on("selectedNodesChange", handleTransformerNodesChange);
+
+    return () => {
+      stage.off("selectedNodesChange", handleTransformerNodesChange);
+    };
+  }, [stage, setLayout]);
 
   React.useEffect(() => {
     if (konvaStageRef.current) {
@@ -244,6 +308,10 @@ export const RichTextPage = () => {
                 <div className="w-[1px] h-[40px] bg-[#c9c9c9] mx-3" />
                 <FontAlignment />
                 <div className="w-[1px] h-[40px] bg-[#c9c9c9] mx-3" />
+              </>
+            )}
+            {selected.length > 0 && (
+              <>
                 <div className="w-[150px] min-w-[150px]">
                   <TextLayout />
                 </div>

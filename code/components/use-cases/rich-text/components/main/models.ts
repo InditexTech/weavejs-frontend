@@ -4,6 +4,7 @@ import {
   RichTextElement,
   RichTextModel,
   RichTextRenderLine,
+  TextLimits,
   TextSegment,
   TextStyle,
 } from "./types";
@@ -36,11 +37,13 @@ export const measureLineElements = (lineElements: TextSegment[]): number => {
 
 export const generateRenderModel = (
   origin: Konva.Vector2d,
-  maxWidth: number,
-  model: RichTextModel
+  limits: TextLimits,
+  model: RichTextModel,
 ): RichTextRenderLine[] => {
   const internalModel: RichTextRenderLine[] = [];
 
+  let segmentSplitted = false;
+  let wordStart = undefined;
   let lineText = "";
   let lineBaseline = -Infinity;
   let lineHeight = -Infinity;
@@ -60,8 +63,12 @@ export const generateRenderModel = (
     if (!elementLines) continue;
 
     if (lineText !== "" && previousSegmentStyle) {
-      if (lineText.length > 0) {
+      if (
+        (lineText !== " " && lineText.length > 0) ||
+        (lineText === " " && lineSegments.length > 0)
+      ) {
         lineSegments.push({
+          modelElementIndex: i - 1,
           text: lineText,
           x: cursor.x,
           y: cursor.y,
@@ -101,14 +108,15 @@ export const generateRenderModel = (
 
         lineBaseline = Math.max(
           lineBaseline,
-          size.height + size.emHeightDescent
+          size.height + size.emHeightDescent,
         );
         lineHeight = Math.max(
           lineHeight,
-          (size.height + size.fontBoundingBoxDescent) * actualStyle.lineHeight
+          (size.height + size.fontBoundingBoxDescent) * actualStyle.lineHeight,
         );
 
         lineSegments.push({
+          modelElementIndex: i - 1,
           text: `${lineText}\n`,
           x: cursor.x,
           y: cursor.y,
@@ -134,7 +142,15 @@ export const generateRenderModel = (
       } else {
         const words = line.match(/\S+|[ ]/g) ?? [];
 
-        for (let k = 0; k < words.length; k++) {
+        for (
+          let k = wordStart === undefined ? 0 : wordStart;
+          k < words.length;
+          k++
+        ) {
+          if (wordStart) {
+            wordStart = undefined;
+          }
+
           const word = words[k];
 
           const textToMeasure = `${lineText}${word}`;
@@ -147,33 +163,109 @@ export const generateRenderModel = (
             fill: actualStyle.color,
             align: "left",
           });
-          const size = textMeasurer.measureSize(textToMeasure);
+          const textToMeasureTrailingSpaces =
+            textToMeasure.match(/\s*$/)?.[0] ?? "";
+          let realTextToMeasure = textToMeasure;
+          if (limits?.width !== undefined) {
+            realTextToMeasure = `${textToMeasure.trimEnd()}${textToMeasureTrailingSpaces.length > 0 ? " " : ""}`;
+          }
+          const size = textMeasurer.measureSize(realTextToMeasure);
 
           lineBaseline = Math.max(
             lineBaseline,
-            size.height + size.emHeightDescent
+            size.height + size.emHeightDescent,
           );
           lineHeight = Math.max(
             lineHeight,
-            (size.height + size.fontBoundingBoxDescent) * actualStyle.lineHeight
+            (size.height + size.fontBoundingBoxDescent) *
+              actualStyle.lineHeight,
           );
 
           const lineSize = measureLineElements(lineSegments);
 
-          if (lineSize + cursor.x + size.width > origin.x + maxWidth) {
-            let finalLineText = lineText;
-            let wordOffset = word;
+          if (lineSize + cursor.x + size.width > origin.x + limits.width) {
+            const finalLineText =
+              word === " " ? `${lineText}${word}` : lineText;
+            const wordOffset = word;
 
-            if (finalLineText[finalLineText.length - 1] !== " ") {
-              const index = indexOfPreviousBlankLine(finalLineText);
+            if (lineText === "") {
+              let visited = 1;
+              for (let m = lineSegments.length - 1; m >= 0; m--) {
+                const actSegment = lineSegments[m];
+                let index = indexOfPreviousBlankLine(actSegment.text);
+                if (
+                  actSegment.text[actSegment.text.length - 1] !== " " &&
+                  index === -1
+                ) {
+                  visited++;
+                  continue;
+                }
 
-              if (index !== -1) {
-                wordOffset = finalLineText.slice(index + 1) + word;
-                finalLineText = finalLineText.slice(0, index + 1);
+                let endsInWhitespace = false;
+                if (actSegment.text[actSegment.text.length - 1] === " ") {
+                  index = actSegment.text.length - 1;
+                  endsInWhitespace = true;
+                }
+
+                const segmentToSplitTextWithSpace = actSegment.text.slice(
+                  0,
+                  index + 1,
+                );
+
+                const segmentWords =
+                  segmentToSplitTextWithSpace.match(/\S+|[ ]/g) ?? [];
+
+                lineSegments = [
+                  ...lineSegments.slice(0, m),
+                  {
+                    modelElementIndex: actSegment.modelElementIndex,
+                    text: `${segmentToSplitTextWithSpace}\n`,
+                    x: actSegment.x,
+                    y: actSegment.y,
+                    style: actSegment.style,
+                  },
+                ];
+
+                internalModel.push({
+                  elementIndex: i,
+                  lineBaseline,
+                  lineHeight,
+                  text: lineSegments.map((seg) => seg.text).join(""),
+                  lineSegments: [...lineSegments],
+                  splitted: true,
+                });
+
+                lineSegments = [];
+                lineText = "";
+                cursor.x = origin.x;
+                cursor.y += lineHeight;
+                lineBaseline = -Infinity;
+                lineHeight = -Infinity;
+
+                if (endsInWhitespace) {
+                  i = i - visited;
+                  wordStart = 0;
+                } else {
+                  const words = actSegment.text.match(/\S+|[ ]/g) ?? [];
+                  const offset =
+                    words.length - (words.length - segmentWords.length);
+
+                  i = actSegment.modelElementIndex - 1;
+                  wordStart = offset;
+                }
+
+                segmentSplitted = true;
+
+                break;
               }
             }
 
+            if (segmentSplitted) {
+              break;
+            }
+
             lineSegments.push({
+              modelElementIndex: i - 1,
               text: `${finalLineText}\n`,
               x: cursor.x,
               y: cursor.y,
@@ -198,6 +290,11 @@ export const generateRenderModel = (
             lineText = `${lineText}${word}`;
           }
         }
+      }
+
+      if (segmentSplitted) {
+        segmentSplitted = false;
+        break;
       }
     }
   }
@@ -227,16 +324,17 @@ export const generateRenderModel = (
 
       realLineBaseline = Math.max(
         realLineBaseline,
-        size.height + size.emHeightDescent
+        size.height + size.emHeightDescent,
       );
       realLineHeight = Math.max(
         realLineHeight,
         (size.height + size.fontBoundingBoxDescent) *
-          previousSegmentStyle.lineHeight
+          previousSegmentStyle.lineHeight,
       );
     }
 
     lineSegments.push({
+      modelElementIndex: model.length - 2,
       text: lineText,
       x: cursor.x,
       y: cursor.y,
@@ -246,7 +344,7 @@ export const generateRenderModel = (
     const finalLineText = lineSegments.map((seg) => seg.text).join("");
 
     internalModel.push({
-      elementIndex: model.length - 1,
+      elementIndex: model.length - 2,
       lineBaseline: realLineBaseline,
       lineHeight: realLineHeight,
       text: finalLineText,
@@ -263,6 +361,7 @@ export const generateRenderModel = (
       text: "",
       lineSegments: [
         {
+          modelElementIndex: model.length - 1,
           text: "",
           x: origin.x,
           y: origin.y,
@@ -277,7 +376,7 @@ export const generateRenderModel = (
 };
 
 export const renderInternalModelToModel = (
-  renderModel: RichTextRenderLine[]
+  renderModel: RichTextRenderLine[],
 ): RichTextModel => {
   const model: RichTextModel = [];
 
@@ -303,7 +402,11 @@ export const renderInternalModelToModel = (
       const isSplitted = line.splitted ? true : false;
 
       let textToAdd = segment.text;
-      if (isSplitted && segment.text.endsWith("\n")) {
+      if (
+        isSplitted &&
+        line.lineSegments.length - 1 === j &&
+        segment.text.endsWith("\n")
+      ) {
         textToAdd = segment.text.slice(0, -1);
       }
 
@@ -322,7 +425,9 @@ export const renderInternalModelToModel = (
           ...actualElement,
           ...actualStyles,
         };
-        model.push(actualElement);
+        if (actualElement.text !== "") {
+          model.push(actualElement);
+        }
 
         actualElement = { text: textToAdd };
         actualStyles = { ...segment.style };
@@ -338,7 +443,9 @@ export const renderInternalModelToModel = (
     ...actualElement,
     ...actualStyles,
   };
-  model.push(actualElement);
+  if (actualElement.text !== "") {
+    model.push(actualElement);
+  }
 
   return model;
 };

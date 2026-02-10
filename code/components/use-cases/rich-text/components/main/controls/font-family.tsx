@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/select";
 import { useRichText } from "../store";
 import { DEFAULT_TEXT_STYLE } from "../constants";
+import { updateStyles } from "../styles";
+import Konva from "konva";
 
 const FONT_FAMILIES = [
   {
@@ -34,9 +36,10 @@ const FONT_FAMILIES = [
 
 export const FontFamily = () => {
   const [fontFamily, setFontFamily] = React.useState<string>(
-    DEFAULT_TEXT_STYLE.font
+    DEFAULT_TEXT_STYLE.font,
   );
 
+  const stage = useRichText((state) => state.stage);
   const style = useRichText((state) => state.style);
   const styles = useRichText((state) => state.styles);
 
@@ -46,7 +49,7 @@ export const FontFamily = () => {
     }
     if (styles.length === 1) {
       const fontFamily = FONT_FAMILIES.find(
-        (f) => f.value === (style?.font ?? DEFAULT_TEXT_STYLE.font)
+        (f) => f.value === (style?.font ?? DEFAULT_TEXT_STYLE.font),
       );
 
       setFontFamily(fontFamily?.value ?? DEFAULT_TEXT_STYLE.font);
@@ -66,6 +69,18 @@ export const FontFamily = () => {
     }
   }, [style, styles]);
 
+  const handleFontChange = React.useCallback(
+    (value: string) => {
+      if (stage) {
+        const node = stage.findOne("#rich-text-editor") as Konva.Group;
+        if (node) {
+          updateStyles(node, { font: value });
+        }
+      }
+    },
+    [stage],
+  );
+
   const selectedFontFamily = FONT_FAMILIES.find((f) => f.value === fontFamily);
 
   return (
@@ -73,6 +88,7 @@ export const FontFamily = () => {
       value={fontFamily}
       onValueChange={(value) => {
         setFontFamily(value);
+        handleFontChange(value);
       }}
     >
       <SelectTrigger

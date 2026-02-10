@@ -5,6 +5,8 @@ import {
   LineColumn,
   RichTextModel,
   RichTextRenderLine,
+  TextLayout,
+  TextLimits,
   TextStyle,
 } from "./types";
 import { getNode } from "./utils";
@@ -41,7 +43,7 @@ const renderSegment = (
   segmentIndex: number,
   lineBaseline: number,
   text: string,
-  textStyle: TextStyle
+  textStyle: TextStyle,
 ): Cursor => {
   const textNode = new Konva.Text({
     name: "segmentText",
@@ -78,8 +80,7 @@ const renderSegment = (
 
 export const renderTextModel = (
   instance: Konva.Group,
-  maxWidth: number,
-  renderModel: RichTextRenderLine[]
+  renderModel: RichTextRenderLine[],
 ) => {
   const textNodes: Konva.Text[] = instance.find(".segmentText");
   textNodes.forEach((node) => node.destroy());
@@ -111,7 +112,7 @@ export const renderTextModel = (
         segmentIndex,
         line.lineBaseline,
         segment.text,
-        segment.style
+        segment.style,
       );
       segmentIndex++;
     }
@@ -120,16 +121,16 @@ export const renderTextModel = (
       instance,
       lineStart,
       actualCursor.x - lineStart.x,
-      line.lineHeight
+      line.lineHeight,
     );
 
-    createBaseline(instance, maxWidth, line, actualCursor);
+    createBaseline(instance, line, actualCursor);
 
     actualCursor.x = 0;
     actualCursor.y += line.lineHeight;
   }
 
-  createBoundsRect(instance, maxWidth);
+  createBoundsRect(instance);
 
   updateBackground(instance);
 };
@@ -137,9 +138,10 @@ export const renderTextModel = (
 export const modelToKonvaNodes = (
   stage: Konva.Stage,
   pos: Konva.Vector2d,
-  maxWidth: number,
+  layout: TextLayout,
+  limits: TextLimits,
   initialModel: RichTextModel,
-  renderModel: RichTextRenderLine[]
+  renderModel: RichTextRenderLine[],
 ) => {
   const richText = new Konva.Group({
     id: "rich-text-editor",
@@ -153,10 +155,39 @@ export const modelToKonvaNodes = (
     cursorPosition: undefined,
     selectionStart: undefined,
     selectionEnd: undefined,
-    maxWidth: maxWidth,
+    layout,
+    limits,
+    editing: false,
+    ...(layout === "fixed" && {
+      width: limits.width,
+      height: limits.height,
+      clip: {
+        x: -1,
+        y: -1,
+        width: limits.width + 2,
+        height: limits.height + 2,
+      },
+    }),
   });
 
-  renderTextModel(richText, maxWidth, renderModel);
+  const oldGetClientRect = richText.getClientRect.bind(richText);
+  richText.getClientRect = function (params) {
+    const layout = this.getAttr("layout");
+    const limits = this.getAttr("limits");
+
+    if (layout === "fixed") {
+      return {
+        x: params?.skipTransform ? 0 : this.x(),
+        y: params?.skipTransform ? 0 : this.y(),
+        width: limits.width,
+        height: limits.height,
+      };
+    }
+
+    return oldGetClientRect(params);
+  };
+
+  renderTextModel(richText, renderModel);
 
   const rect = richText.getClientRect();
 
@@ -164,11 +195,12 @@ export const modelToKonvaNodes = (
     name: "background",
     x: 0 - 1,
     y: 0 - 1,
-    width: rect.width + 2,
-    height: rect.height + 2,
+    width: layout === "auto" ? rect.width + 2 : limits.width + 2,
+    height: layout === "fixed" ? limits.height + 2 : rect.height + 2,
     fill: "transparent",
     stroke: "#0D99FF",
     strokeWidth: 0,
+    strokeScaleEnabled: true,
     opacity: 1,
     listening: true,
   });
@@ -206,9 +238,14 @@ export const modelToKonvaNodes = (
     const styles = [];
 
     if (selectionStart && selectionEnd) {
+      selectionEnd = {
+        ...selectionEnd,
+        column: selectionEnd.column - 1,
+      };
+
       const { from: finalFrom, to: finalTo } = normalizeLineColumn(
         selectionStart,
-        selectionEnd
+        selectionEnd,
       );
 
       selectionStart = finalFrom;
@@ -361,7 +398,7 @@ export const modelToKonvaNodes = (
         // first line, first column, use next char style
         actualStyle = mergeStyles(
           DEFAULT_TEXT_STYLE,
-          renderModel[0].lineSegments[0].style
+          renderModel[0].lineSegments[0].style,
         );
       }
       if (lineCol.line > 0 && lineCol.column === 0) {
@@ -388,6 +425,7 @@ export const modelToKonvaNodes = (
     const pointerPos = stage.getPointerPosition();
 
     const editingMode = stage.getAttr("editingMode");
+
     const cursorNode = richText.findOne(".cursor") as Konva.Line | undefined;
     const backgroundNode = richText.findOne(".background") as
       | Konva.Rect
@@ -407,11 +445,11 @@ export const modelToKonvaNodes = (
         document.removeEventListener("keydown", keyboardHandlerRef);
         document.removeEventListener(
           "compositionstart",
-          keyboardCompositionStartHandlerRef
+          keyboardCompositionStartHandlerRef,
         );
         document.removeEventListener(
           "compositionend",
-          keyboardCompositionEndHandlerRef
+          keyboardCompositionEndHandlerRef,
         );
       }
 
@@ -424,11 +462,11 @@ export const modelToKonvaNodes = (
       document.addEventListener("keydown", keyboardHandlerRef);
       document.addEventListener(
         "compositionstart",
-        keyboardCompositionStartHandlerRef
+        keyboardCompositionStartHandlerRef,
       );
       document.addEventListener(
         "compositionend",
-        keyboardCompositionEndHandlerRef
+        keyboardCompositionEndHandlerRef,
       );
 
       initCursor(richText);
@@ -445,7 +483,7 @@ export const modelToKonvaNodes = (
             x: pointerRealRelPos.x,
             y: pointerRealRelPos.y,
           },
-          false
+          false,
         );
 
         moveCursorToLineColumn(richText, actualLineColumn);
@@ -460,6 +498,7 @@ export const modelToKonvaNodes = (
       return;
     }
     if (cursorNode && backgroundNode && editingMode !== "text") {
+      richText.setAttr("editing", false);
       richText.draggable(true);
       cursorNode.visible(false);
       backgroundNode.setAttrs({
@@ -491,6 +530,7 @@ export const modelToKonvaNodes = (
   });
 
   richText.on("pointerdblclick", () => {
+    richText.setAttr("editing", true);
     stage.setAttr("editingMode", "text");
     stage.fire("editingMode:change");
   });
@@ -548,7 +588,7 @@ export const modelToKonvaNodes = (
             x: pointerRealRelPos.x,
             y: pointerRealRelPos.y,
           },
-          isShiftPressed
+          isShiftPressed,
         );
 
         moveCursorToLineColumn(richText, actualLineColumn);
@@ -616,7 +656,7 @@ export const modelToKonvaNodes = (
             x: pointerRealRelPos.x,
             y: pointerRealRelPos.y,
           },
-          isShiftPressed
+          isShiftPressed,
         );
 
         moveCursorToLineColumn(richText, actualLineColumn);
@@ -654,13 +694,12 @@ export const modelToKonvaNodes = (
             x: pointerRealRelPos.x,
             y: pointerRealRelPos.y,
           },
-          isShiftPressed
+          isShiftPressed,
         );
       }
     }
   });
 
-  richText.setAttr("maxWidth", maxWidth);
   richText.setAttr("renderModel", renderModel);
   richText.setAttr("model", initialModel);
 
@@ -671,6 +710,22 @@ export const modelToKonvaNodes = (
 
 export const updateBackground = (instance: Konva.Group) => {
   updateBoundsRect(instance);
+
+  const transformer = instance.getStage()?.findOne("#transformer") as
+    | Konva.Transformer
+    | undefined;
+
+  if (!transformer) {
+    return;
+  }
+
+  if (transformer.nodes().length === 0) {
+    return;
+  }
+
+  const editing = instance.getAttr("editing");
+  const layout = instance.getAttr("layout");
+  const limits = instance.getAttr("limits");
 
   const background = instance.findOne(".background") as Konva.Rect | undefined;
   const cursorNode = instance.findOne(".cursor") as Konva.Line | undefined;
@@ -691,11 +746,17 @@ export const updateBackground = (instance: Konva.Group) => {
       background.setAttr("strokeWidth", 1);
     }
 
-    background.width(rect.width + 2);
-    background.height(rect.height + 2);
+    background.width(layout === "auto" ? rect.width + 2 : limits.width + 2);
+    background.height(layout === "fixed" ? limits.height + 2 : rect.height + 2);
+
+    if (editing) {
+      background.setAttr("strokeWidth", 1);
+      cursorNode.visible(true);
+    } else {
+      background.setAttr("strokeWidth", 0);
+    }
 
     background.visible(true);
-    cursorNode.visible(true);
 
     instance.add(boundsClone);
     boundsClone.moveToBottom();

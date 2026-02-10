@@ -1,26 +1,37 @@
 import Konva from "konva";
-import { RichTextModel, RichTextRenderLine } from "./types";
+import {
+  RichTextModel,
+  RichTextRenderLine,
+  TextLayout,
+  TextLimits,
+} from "./types";
 import { generateRenderModel } from "./models";
 import { modelToKonvaNodes } from "./render";
 
 export const generateRichText = (
   stage: Konva.Stage,
-  pos: Konva.Vector2d,
-  maxWidth: number,
-  initialModel: RichTextModel
+  initialModel: RichTextModel,
+  options: {
+    pos: Konva.Vector2d;
+    layout: TextLayout;
+    limits: TextLimits;
+  },
 ) => {
+  const { pos, layout, limits } = options;
+
   const renderModel: RichTextRenderLine[] = generateRenderModel(
     pos,
-    maxWidth,
-    initialModel
+    limits,
+    initialModel,
   );
 
   const richText = modelToKonvaNodes(
     stage,
     pos,
-    maxWidth,
+    layout,
+    limits,
     initialModel,
-    renderModel
+    renderModel,
   );
 
   return richText;

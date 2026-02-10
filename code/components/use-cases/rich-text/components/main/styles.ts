@@ -14,7 +14,7 @@ import {
 
 export const updateStyles = (
   instance: Konva.Group,
-  style: Partial<TextStyle>
+  style: Partial<TextStyle>,
 ) => {
   let selectionStart = instance.getAttr("selectionStart");
   let selectionEnd = instance.getAttr("selectionEnd");
@@ -26,7 +26,7 @@ export const updateStyles = (
 
     const { from, to, orientation } = normalizeLineColumn(
       selectionStart,
-      selectionEnd
+      selectionEnd,
     );
 
     selectionStart = from;
@@ -104,7 +104,7 @@ export const updateStyles = (
             style: mergeStyles(segment.style, style),
             text: segment.text.slice(
               selectionStart.column - columnIndex,
-              selectionEnd.column - columnIndex
+              selectionEnd.column - columnIndex,
             ),
           };
           const lastSegment = {
@@ -240,7 +240,7 @@ export const updateStyles = (
     let newSelectionEnd = getLineColumnFromLineColumn(
       instance,
       newSelectionStart,
-      amountOfChars
+      amountOfChars,
     );
 
     const newSelectionLines = newSelectionEnd.line - newSelectionStart.line;
@@ -250,7 +250,7 @@ export const updateStyles = (
       newSelectionEnd = getLineColumnFromLineColumn(
         instance,
         newSelectionStart,
-        amountOfChars + (newSelectionLines - originalSelectionLines)
+        amountOfChars + (newSelectionLines - originalSelectionLines),
       );
     }
 
@@ -276,7 +276,7 @@ export const updateStyles = (
 
 export const mergeStyles = (
   baseStyles: TextStyle,
-  newStyles: Partial<TextStyle>
+  newStyles: Partial<TextStyle>,
 ): TextStyle => {
   const resultStyles = { ...baseStyles };
 

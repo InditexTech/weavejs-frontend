@@ -1,4 +1,11 @@
+export type TextLayout = "auto" | "fixed-width" | "fixed";
+
 export type TextAlignment = "left" | "center" | "right";
+
+export type TextLimits = {
+  width: number;
+  height: number;
+};
 
 export type RichTextElement = {
   text: string;
@@ -40,6 +47,7 @@ export type TextStyle = {
 };
 
 export type TextSegment = {
+  modelElementIndex: number;
   text: string;
   x: number;
   y: number;

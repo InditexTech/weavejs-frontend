@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { create } from "zustand";
-import { RichTextModel, TextStyle } from "./types";
+import { RichTextModel, TextLayout, TextStyle } from "./types";
 import { DEFAULT_TEXT_STYLE } from "./constants";
 import Konva from "konva";
 
@@ -17,7 +17,13 @@ interface RichTextState {
     segments: boolean;
   };
   editing: boolean;
+  selected: string[];
   model: RichTextModel | undefined;
+  limits: {
+    width: number;
+    height: number;
+  };
+  layout: TextLayout | null;
   setStyle: (style: TextStyle | null) => void;
   setStyles: (styles: TextStyle[]) => void;
   setStage: (stage: Konva.Stage | null) => void;
@@ -25,7 +31,10 @@ interface RichTextState {
   setGuidesBaselines: (newBaselines: boolean) => void;
   setGuidesSegments: (newSegments: boolean) => void;
   setEditing: (editing: boolean) => void;
+  setSelected: (selected: string[]) => void;
   setModel: (model: RichTextModel | undefined) => void;
+  setLimits: (limits: { width: number; height: number }) => void;
+  setLayout: (layout: TextLayout | null) => void;
 }
 
 export const useRichText = create<RichTextState>()((set) => {
@@ -39,7 +48,13 @@ export const useRichText = create<RichTextState>()((set) => {
       segments: false,
     },
     editing: false,
+    selected: [],
     model: undefined,
+    limits: {
+      width: Infinity,
+      height: Infinity,
+    },
+    layout: null,
     setStyle: (style) =>
       set((state) => ({
         ...state,
@@ -75,10 +90,25 @@ export const useRichText = create<RichTextState>()((set) => {
         ...state,
         editing,
       })),
+    setSelected: (selected) =>
+      set((state) => ({
+        ...state,
+        selected,
+      })),
     setModel: (model) =>
       set((state) => ({
         ...state,
         model,
+      })),
+    setLimits: (limits) =>
+      set((state) => ({
+        ...state,
+        limits,
+      })),
+    setLayout: (layout) =>
+      set((state) => ({
+        ...state,
+        layout,
       })),
   };
 });

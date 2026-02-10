@@ -3,6 +3,7 @@ import {
   LineColumn,
   MoveCursorAction,
   RichTextRenderLine,
+  TextLimits,
   TextSegment,
   TextStyle,
 } from "./types";
@@ -81,8 +82,9 @@ const handleAddText = (
   instance: Konva.Group,
   from: LineColumn,
   to: LineColumn | undefined,
-  text: string
+  text: string,
 ) => {
+  const model = instance.getAttr("model") ?? [];
   const renderModel: RichTextRenderLine[] =
     instance.getAttr("renderModel") ?? [];
 
@@ -129,6 +131,7 @@ const handleAddText = (
         lineBaseline: 0,
         lineSegments: [
           {
+            modelElementIndex: -1,
             text: text,
             x: 0,
             y: 0,
@@ -162,11 +165,11 @@ const handleAddText = (
           modifiedRenderModel[from.line].lineSegments[i].text =
             modifiedRenderModel[from.line].lineSegments[i].text.slice(
               0,
-              from.column - columnIndex
+              from.column - columnIndex,
             ) +
             text +
             modifiedRenderModel[from.line].lineSegments[i].text.slice(
-              from.column - columnIndex
+              from.column - columnIndex,
             );
 
           instance.setAttr("stylesUpdate", undefined);
@@ -182,6 +185,7 @@ const handleAddText = (
             actualSegment.text.slice(0, from.column - columnIndex);
 
           const newSegment = {
+            modelElementIndex: -1,
             text: text,
             x: 0,
             y: 0,
@@ -189,6 +193,7 @@ const handleAddText = (
           };
 
           const lastSegment = {
+            modelElementIndex: -1,
             text: actualSegment.text.slice(from.column - columnIndex),
             x: 0,
             y: 0,
@@ -243,13 +248,14 @@ const handleAddText = (
         }
 
         modifiedRenderModel.push({
-          elementIndex: modifiedRenderModel.length,
-          text: text,
+          elementIndex: model.length,
+          text: "\n",
           lineHeight: 0,
           lineBaseline: 0,
           lineSegments: [
             {
-              text: "",
+              modelElementIndex: -1,
+              text: "\n",
               x: 0,
               y: 0,
               style: newStyle,
@@ -262,24 +268,69 @@ const handleAddText = (
       }
     }
 
+    let firstNonSplittedLineIndex = from.line;
+
+    for (let i = from.line; i >= 0; i--) {
+      const line = renderModel[i];
+      if (
+        (i === 0 && !line.splitted) ||
+        (i > 0 && !line.splitted && !renderModel[i - 1].splitted) ||
+        (i > 0 && line.splitted && renderModel[i - 1].splitted === false)
+      ) {
+        firstNonSplittedLineIndex = i;
+        break;
+      }
+    }
+
+    const amountOfCharsFromFirstLine = amountOfCharsBetween(
+      instance,
+      { line: firstNonSplittedLineIndex, column: 0 },
+      from,
+      true,
+    );
+
     renderModifiedTextModel(instance, [...modifiedRenderModel]);
 
-    let moveAmount = text.length;
+    let moveAmount = amountOfCharsFromFirstLine + 1;
     let action: MoveCursorAction = "none";
     if (text === "\n" && from.line === 0 && from.column === 0) {
       action = "add-line";
+      moveAmount = 0;
     }
     if (text === "\n" && prevChar === "\n") {
       action = "add-line";
+      moveAmount = 0;
     }
     if (text === "\n" && from.column > 0) {
       action = "add-line";
-    }
-    if (text === "\n" && prevChar !== "\n") {
       moveAmount = 0;
     }
+    if (["add-line"].includes(action) && text === "\n" && prevChar !== "\n") {
+      moveAmount = 0;
+    }
+    if (["none"].includes(action) && text === "\n" && prevChar !== "\n") {
+      moveAmount = amountOfCharsFromFirstLine;
+    }
+
+    setSelectionStartChange(instance, from);
+    setSelectionEndChange(instance, undefined);
+
+    const prevCursor = instance.getAttr("cursorPosition");
+
+    instance.setAttr("cursorPosition", {
+      line: ["add-line"].includes(action)
+        ? from.line
+        : firstNonSplittedLineIndex,
+      column: 0,
+    });
 
     moveCursor(instance, moveAmount, action);
+
+    const actualCursor = instance.getAttr("cursorPosition");
+
+    if (prevCursor.line !== actualCursor.line && text !== "\n") {
+      moveCursor(instance, 1);
+    }
   } else {
     const {
       startSegmentIndex,
@@ -305,18 +356,25 @@ const handleAddText = (
     moveCursor(instance, moveAmount, "none");
   }
 
+  const actualCursor = instance.getAttr("cursorPosition");
+  setSelectionStartChange(instance, actualCursor);
+
   instance.fire("text:change", { model: instance.getAttr("model") }, true);
 };
 
 const handleDeleteText = (
   instance: Konva.Group,
   from: LineColumn,
-  to: LineColumn | undefined
+  to: LineColumn | undefined,
 ) => {
   const renderModel: RichTextRenderLine[] =
     instance.getAttr("renderModel") ?? [];
 
+  const prevModelLines = renderModel.length;
+
   const originalFrom = { ...from };
+
+  const originalLine = renderModel[originalFrom.line];
 
   let realFrom: LineColumn = from;
   let realTo: LineColumn = to ?? { line: 0, column: 0 };
@@ -383,7 +441,8 @@ const handleDeleteText = (
   for (let i = realFrom.line; i >= 0; i--) {
     const line = renderModel[i];
     if (
-      !line.splitted ||
+      (i === 0 && !line.splitted) ||
+      (i > 0 && !line.splitted && !renderModel[i - 1].splitted) ||
       (i > 0 && line.splitted && renderModel[i - 1].splitted === false)
     ) {
       firstNonSplittedLineIndex = i;
@@ -391,11 +450,11 @@ const handleDeleteText = (
     }
   }
 
-  let amountOfCharsFromFirstLine = amountOfCharsBetween(
+  const amountOfCharsFromFirstLine = amountOfCharsBetween(
     instance,
     { line: firstNonSplittedLineIndex, column: 0 },
     originalFrom,
-    false
+    true,
   );
 
   const {
@@ -405,12 +464,9 @@ const handleDeleteText = (
     endSegmentOffset,
   } = foundStartEndSegments(renderModel, realFrom, realTo);
 
-  if (
-    startSegmentIndex === endSegmentIndex &&
-    endSegmentOffset - startSegmentOffset === 1
-  ) {
-    amountOfCharsFromFirstLine -= 1;
-  }
+  const moveAmount = amountOfCharsFromFirstLine - (to === undefined ? 1 : 0);
+
+  const prevLine = renderModel[realFrom.line];
 
   let modifiedRenderModel = updateRenderModel(
     renderModel,
@@ -422,7 +478,7 @@ const handleDeleteText = (
       startSegmentOffset,
       endSegmentIndex,
       endSegmentOffset,
-    }
+    },
   );
 
   renderModifiedTextModel(instance, modifiedRenderModel);
@@ -432,20 +488,57 @@ const handleDeleteText = (
   setSelectionStartChange(instance, realFrom);
   setSelectionEndChange(instance, undefined);
 
+  const prevCursor = instance.getAttr("cursorPosition");
+
   instance.setAttr("cursorPosition", {
     line: firstNonSplittedLineIndex,
     column: 0,
   });
-  moveCursor(instance, amountOfCharsFromFirstLine);
+  moveCursor(instance, moveAmount);
 
-  // setCursorAt(instance, {realFrom});
+  let actualCursor = instance.getAttr("cursorPosition");
+
+  const actualLine = modifiedRenderModel[actualCursor.line];
+
+  if (
+    renderModel.length === modifiedRenderModel.length &&
+    actualCursor.line < originalFrom.line &&
+    prevLine.splitted
+  ) {
+    moveCursor(instance, -1);
+  }
+  if (
+    renderModel.length === modifiedRenderModel.length &&
+    actualCursor.line > originalFrom.line &&
+    prevLine.splitted
+  ) {
+    moveCursor(instance, 1);
+  }
+
+  actualCursor = instance.getAttr("cursorPosition");
+
+  if (
+    prevCursor.line !== actualCursor.line &&
+    actualCursor.column === actualLine.text.length - 1 &&
+    originalLine.text !== "\n"
+  ) {
+    moveCursor(instance, 1);
+  }
+
+  if (
+    prevModelLines > modifiedRenderModel.length &&
+    actualCursor.column === 0 &&
+    prevCursor.column !== actualCursor.column
+  ) {
+    moveCursor(instance, -1);
+  }
 
   instance.fire("text:change", { model: instance.getAttr("model") }, true);
 };
 
 export const normalizeLineColumn = (
   from: LineColumn,
-  to: LineColumn | undefined
+  to: LineColumn | undefined,
 ) => {
   let orientation = "forward";
   let realFrom = { ...from };
@@ -471,7 +564,7 @@ export const handleKeyPressed = (
   key: string,
   isMetaPressed: boolean,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isShiftPressed: boolean
+  isShiftPressed: boolean,
 ) => {
   const renderModel: RichTextRenderLine[] =
     instance.getAttr("renderModel") ?? [];
@@ -550,7 +643,7 @@ export const handleKeyPressed = (
 const foundStartEndSegments = (
   renderModel: RichTextRenderLine[],
   from: LineColumn,
-  to: LineColumn
+  to: LineColumn,
 ) => {
   let foundFrom = false;
   let foundTo = false;
@@ -609,7 +702,7 @@ const updateRenderModel = (
     startSegmentOffset: number;
     endSegmentIndex: number;
     endSegmentOffset: number;
-  }
+  },
 ) => {
   const {
     startSegmentIndex,
@@ -694,11 +787,11 @@ const updateRenderModel = (
         newLine.lineSegments[startSegmentIndex].text =
           newLine.lineSegments[startSegmentIndex].text.slice(
             0,
-            startSegmentOffset
+            startSegmentOffset,
           ) +
           text +
           newLine.lineSegments[startSegmentIndex].text.slice(
-            startSegmentOffset
+            startSegmentOffset,
           );
 
         modifiedRenderModel.push(newLine);
@@ -726,19 +819,35 @@ const updateRenderModel = (
 
 export const renderModifiedTextModel = (
   instance: Konva.Group,
-  renderModel: RichTextRenderLine[]
+  renderModel: RichTextRenderLine[],
 ) => {
-  const maxWidth: number = instance.getAttr("maxWidth") ?? -1;
+  const layout = instance.getAttr("layout");
+  const limits: TextLimits = instance.getAttr("limits");
+
+  if (layout === "fixed") {
+    instance.setAttr("width", limits.width + 2);
+    instance.setAttr("height", limits.height + 2);
+    instance.setAttr("clip", {
+      x: -1,
+      y: -1,
+      width: limits.width + 2,
+      height: limits.height + 2,
+    });
+  } else {
+    instance.setAttr("width", undefined);
+    instance.setAttr("height", undefined);
+    instance.setAttr("clip", undefined);
+  }
 
   const newModel = renderInternalModelToModel(renderModel);
   instance.setAttr("model", newModel);
   const newRenderModel: RichTextRenderLine[] = generateRenderModel(
     { x: instance.x(), y: instance.y() },
-    maxWidth,
-    newModel
+    limits,
+    newModel,
   );
   instance.setAttr("renderModel", newRenderModel);
-  renderTextModel(instance, maxWidth, newRenderModel);
+  renderTextModel(instance, newRenderModel);
 };
 
 const handleArrowUp = (e: KeyboardEvent, instance: Konva.Group) => {
@@ -918,26 +1027,28 @@ const handleArrowLeft = (e: KeyboardEvent, instance: Konva.Group) => {
     column: 0,
   };
 
-  if (lineCol.column === 0) {
-    const actLine = lineCol.line;
-    if (actLine > 0) {
-      lineCol.line = actLine - 1;
-      const newLine = renderModel[lineCol.line];
-      if (!isShiftPressed && newLine.text.endsWith("\n")) {
-        lineCol.column = newLine.text.length - 1;
-      } else {
-        lineCol.column = newLine.text.length;
+  if (!isMetaPressed) {
+    if (lineCol.column === 0) {
+      const actLine = lineCol.line;
+      if (actLine > 0) {
+        lineCol.line = actLine - 1;
+        const newLine = renderModel[lineCol.line];
+        if (!isShiftPressed && newLine.text.endsWith("\n")) {
+          lineCol.column = newLine.text.length - 1;
+        } else {
+          lineCol.column = newLine.text.length;
+        }
       }
+      if (actLine === 0) {
+        lineCol.column = 0;
+      }
+    } else {
+      lineCol.column = lineCol.column - 1 >= 0 ? lineCol.column - 1 : 0;
     }
-    if (actLine === 0) {
+
+    if (lineCol.column < 0) {
       lineCol.column = 0;
     }
-  } else {
-    lineCol.column = lineCol.column - 1 >= 0 ? lineCol.column - 1 : 0;
-  }
-
-  if (lineCol.column < 0) {
-    lineCol.column = 0;
   }
 
   if (isMetaPressed) {
@@ -993,53 +1104,51 @@ const handleArrowRight = (e: KeyboardEvent, instance: Konva.Group) => {
     column: 0,
   };
 
-  const originalLineCol = { ...lineCol };
+  if (!isMetaPressed) {
+    const actLine = renderModel[lineCol.line];
 
-  const actLine = renderModel[lineCol.line];
+    if (lineCol.column === actLine.text.length) {
+      if (lineCol.line < renderModel.length - 1) {
+        lineCol.line = lineCol.line + 1;
+        lineCol.column = 0;
+      } else if (lineCol.line === renderModel.length - 1) {
+        lineCol.column = actLine.text.length;
+      }
+    } else if (
+      !isShiftPressed &&
+      lineCol.column === actLine.text.length - 1 &&
+      actLine.text.endsWith("\n")
+    ) {
+      if (lineCol.line < renderModel.length - 1) {
+        lineCol.line = lineCol.line + 1;
+        lineCol.column = 0;
+      } else if (lineCol.line === renderModel.length - 1) {
+        lineCol.column = actLine.text.length;
+      }
+    } else {
+      lineCol.column =
+        lineCol.column + 1 > actLine.text.length
+          ? actLine.text.length
+          : lineCol.column + 1;
+    }
 
-  if (lineCol.column === actLine.text.length) {
-    if (lineCol.line < renderModel.length - 1) {
-      lineCol.line = lineCol.line + 1;
+    if (lineCol.column < 0) {
       lineCol.column = 0;
     }
-    if (lineCol.line === renderModel.length - 1) {
-      lineCol.column = actLine.text.length;
-    }
-  } else if (
-    !isShiftPressed &&
-    lineCol.column === actLine.text.length - 1 &&
-    actLine.text.endsWith("\n")
-  ) {
-    if (lineCol.line < renderModel.length - 1) {
-      lineCol.line = lineCol.line + 1;
-      lineCol.column = 0;
-    }
-    if (lineCol.line === renderModel.length - 1) {
-      lineCol.column = actLine.text.length;
-    }
-  } else {
-    lineCol.column =
-      lineCol.column + 1 > actLine.text.length
-        ? actLine.text.length
-        : lineCol.column + 1;
-  }
-
-  if (lineCol.column < 0) {
-    lineCol.column = 0;
   }
 
   if (isMetaPressed) {
     let columnIndex = 0;
-    for (
-      let i = 0;
-      i < renderModel[originalLineCol.line].lineSegments.length;
-      i++
-    ) {
-      const segment = renderModel[originalLineCol.line].lineSegments[i];
+    for (let i = 0; i < renderModel[lineCol.line].lineSegments.length; i++) {
+      const segment = renderModel[lineCol.line].lineSegments[i];
       columnIndex += segment.text.length;
     }
 
-    lineCol = { line: originalLineCol.line, column: columnIndex };
+    if (renderModel.length - 1 !== lineCol.line) {
+      columnIndex--;
+    }
+
+    lineCol = { line: lineCol.line, column: columnIndex };
   }
 
   moveCursorToLineColumn(instance, lineCol);

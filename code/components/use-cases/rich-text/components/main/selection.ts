@@ -5,7 +5,7 @@ import { normalizeLineColumn } from "./keyboard";
 
 export const setSelectionStartChange = (
   instance: Konva.Group,
-  actualLineColumn: { line: number; column: number } | undefined
+  actualLineColumn: { line: number; column: number } | undefined,
 ) => {
   const selectionStart = actualLineColumn ? { ...actualLineColumn } : undefined;
   instance.setAttr("selectionStart", selectionStart);
@@ -17,13 +17,13 @@ export const setSelectionStartChange = (
           selectionStart,
         }
       : undefined,
-    true
+    true,
   );
 };
 
 export const setSelectionEndChange = (
   instance: Konva.Group,
-  actualLineColumn: { line: number; column: number } | undefined
+  actualLineColumn: { line: number; column: number } | undefined,
 ) => {
   const nodes = instance.find(".selection");
   nodes.forEach((n) => n.destroy());
@@ -43,7 +43,7 @@ export const setSelectionEndChange = (
           selectedCharsAmount,
         }
       : undefined,
-    true
+    true,
   );
 };
 
@@ -108,7 +108,7 @@ export const renderSelection = (instance: Konva.Group) => {
                 ...segment,
                 text: segmentText.slice(
                   0,
-                  selectionStart.column - actualColumn
+                  selectionStart.column - actualColumn,
                 ),
               },
             ]);
@@ -147,7 +147,7 @@ export const renderSelection = (instance: Konva.Group) => {
                 ...segment,
                 text: segmentText.slice(
                   0,
-                  selectionStart.column - actualColumn
+                  selectionStart.column - actualColumn,
                 ),
               },
             ]);
@@ -259,7 +259,7 @@ export const amountOfCharsBetween = (
   instance: Konva.Group,
   from: LineColumn,
   to: LineColumn,
-  withSplittedLinesBreak: boolean
+  withSplittedLinesBreak: boolean,
 ) => {
   let selectionStart = from;
   let selectionEnd = to;
@@ -268,7 +268,7 @@ export const amountOfCharsBetween = (
 
   const { from: finalFrom, to: finalTo } = normalizeLineColumn(
     selectionStart,
-    selectionEnd
+    selectionEnd,
   );
 
   selectionStart = finalFrom;
@@ -286,27 +286,52 @@ export const amountOfCharsBetween = (
 
     for (let j = 0; j < line.lineSegments.length; j++) {
       const segment = line.lineSegments[j];
-      // on start column, without end column
+      // start column and end column are in the same line but not same segment, start column segment
       if (
-        !foundStart &&
         selectionStart.line === i &&
-        selectionStart.column >= columnIndex &&
-        selectionStart.column < columnIndex + segment.text.length &&
-        (selectionEnd.line !== i ||
-          (selectionEnd.line === i &&
-            selectionEnd.column > columnIndex + segment.text.length))
-      ) {
-        amountOfChars +=
-          segment.text.length - (selectionStart.column - columnIndex);
-        foundStart = true;
-      }
-      // on start column, with end column
-      if (
+        selectionStart.line === selectionEnd.line &&
         !foundStart &&
-        selectionStart.line === i &&
         selectionStart.column >= columnIndex &&
         selectionStart.column <= columnIndex + segment.text.length &&
-        selectionEnd.line === i &&
+        selectionEnd.column >= columnIndex + segment.text.length
+      ) {
+        amountOfChars += segment.text.length;
+        foundStart = true;
+      }
+      // start column and end column are in the same line but not same segment, intermediate segment
+      if (
+        selectionStart.line === i &&
+        selectionStart.line === selectionEnd.line &&
+        foundStart &&
+        selectionStart.column < columnIndex &&
+        selectionStart.column < columnIndex + segment.text.length &&
+        selectionEnd.column >= columnIndex &&
+        selectionEnd.column >= columnIndex + segment.text.length
+      ) {
+        amountOfChars += segment.text.length;
+      }
+      // start column and end column are in the same line but not same segment, end column segment
+      if (
+        selectionStart.line === i &&
+        selectionStart.line === selectionEnd.line &&
+        foundStart &&
+        selectionStart.column < columnIndex &&
+        selectionStart.column < columnIndex + segment.text.length &&
+        selectionEnd.column >= columnIndex &&
+        selectionEnd.column <= columnIndex + segment.text.length
+      ) {
+        amountOfChars += selectionEnd.column - columnIndex;
+        foundEnd = true;
+        break;
+      }
+      // start column and end column are in the same line, start column segment and end column in same segment
+      if (
+        selectionStart.line === i &&
+        selectionStart.line === selectionEnd.line &&
+        !foundStart &&
+        !foundEnd &&
+        selectionStart.column >= columnIndex &&
+        selectionStart.column <= columnIndex + segment.text.length &&
         selectionEnd.column >= columnIndex &&
         selectionEnd.column <= columnIndex + segment.text.length
       ) {
@@ -316,8 +341,42 @@ export const amountOfCharsBetween = (
           (selectionStart.column - columnIndex);
         foundStart = true;
         foundEnd = true;
+        break;
       }
-      // in intermediate line
+      // start column and end column are not in the same line, on start line, before start column segments
+      if (
+        selectionStart.line === i &&
+        selectionStart.line !== selectionEnd.line &&
+        !foundStart &&
+        selectionStart.line === i &&
+        selectionStart.column > columnIndex &&
+        selectionStart.column > columnIndex + segment.text.length
+      ) {
+        amountOfChars += segment.text.length;
+      }
+      // start column and end column are not in the same line, on start line, start column segment found
+      if (
+        selectionStart.line === i &&
+        selectionStart.line !== selectionEnd.line &&
+        !foundStart &&
+        selectionStart.column >= columnIndex &&
+        selectionStart.column < columnIndex + segment.text.length
+      ) {
+        amountOfChars +=
+          segment.text.length - (selectionStart.column - columnIndex);
+        foundStart = true;
+      }
+      // start column and end column are not in the same line, on start line, after start column segments
+      if (
+        selectionStart.line === i &&
+        selectionStart.line !== selectionEnd.line &&
+        foundStart &&
+        selectionStart.column < columnIndex &&
+        selectionStart.column < columnIndex + segment.text.length
+      ) {
+        amountOfChars += segment.text.length;
+      }
+      // start column and end column are not in the same line, in intermediate line
       if (
         foundStart &&
         !foundEnd &&
@@ -326,36 +385,29 @@ export const amountOfCharsBetween = (
       ) {
         amountOfChars += segment.text.length;
       }
-      // on end column
+      // start column and end column are not in the same line, on end line, before end column segments
       if (
+        selectionEnd.line === i &&
+        selectionStart.line !== selectionEnd.line &&
         foundStart &&
         !foundEnd &&
+        selectionEnd.column > columnIndex &&
+        selectionEnd.column > columnIndex + segment.text.length
+      ) {
+        amountOfChars += segment.text.length;
+      }
+      // start column and end column are not in the same line, on end line, end column segment found
+      if (
         selectionEnd.line === i &&
+        selectionStart.line !== selectionEnd.line &&
+        foundStart &&
+        !foundEnd &&
         selectionEnd.column >= columnIndex &&
         selectionEnd.column <= columnIndex + segment.text.length
       ) {
         amountOfChars += selectionEnd.column - columnIndex;
         foundEnd = true;
-      }
-      // on start line, after start column
-      if (
-        foundStart &&
-        !foundEnd &&
-        selectionStart.line === i &&
-        selectionStart.column < columnIndex &&
-        selectionStart.column < columnIndex + segment.text.length
-      ) {
-        amountOfChars += segment.text.length;
-      }
-      // before end column
-      if (
-        foundStart &&
-        foundEnd &&
-        selectionEnd.line === i &&
-        selectionEnd.column > columnIndex &&
-        selectionEnd.column > columnIndex + segment.text.length
-      ) {
-        amountOfChars += segment.text.length;
+        break;
       }
       columnIndex += segment.text.length;
     }

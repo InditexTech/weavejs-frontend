@@ -8,11 +8,14 @@ import {
 import { ColorPickerInput } from "@/components/room-components/inputs/color-picker";
 import { useRichText } from "../store";
 import { DEFAULT_TEXT_STYLE } from "../constants";
+import { updateStyles } from "../styles";
+import Konva from "konva";
 
 export const FontColor = () => {
   const [open, setOpen] = React.useState(false);
   const [fontColor, setFontColor] = React.useState<string>("#000000");
 
+  const stage = useRichText((state) => state.stage);
   const style = useRichText((state) => state.style);
   const styles = useRichText((state) => state.styles);
 
@@ -34,7 +37,19 @@ export const FontColor = () => {
 
       setFontColor(fontColorState);
     }
-  }, [style]);
+  }, [style, styles]);
+
+  const handleColorChange = React.useCallback(
+    (value: string) => {
+      if (stage) {
+        const node = stage.findOne("#rich-text-editor") as Konva.Group;
+        if (node) {
+          updateStyles(node, { color: value });
+        }
+      }
+    },
+    [stage],
+  );
 
   return (
     <DropdownMenu modal={false} open={open}>
@@ -72,6 +87,7 @@ export const FontColor = () => {
             value={fontColor === "mixed" ? DEFAULT_TEXT_STYLE.color : fontColor}
             onChange={(color: string) => {
               setFontColor(color);
+              handleColorChange(color);
             }}
           />
           <Button
