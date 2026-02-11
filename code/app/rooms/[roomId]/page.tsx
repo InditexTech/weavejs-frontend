@@ -9,11 +9,11 @@ import dynamic from "next/dynamic";
 
 const NoSsr = dynamic(
   () => import("@/components/room-components/no-ssr").then((mod) => mod.NoSsr),
-  { ssr: false }
+  { ssr: false },
 );
 const Room = dynamic(
   () => import("@/components/room/room").then((mod) => mod.Room),
-  { ssr: false }
+  { ssr: false },
 );
 
 export default function RoomPage() {

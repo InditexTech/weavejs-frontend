@@ -32,7 +32,7 @@ export function ZoomToolbar() {
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const isZoomingAllowed = React.useMemo(() => {
@@ -162,7 +162,7 @@ export function ZoomToolbar() {
           </div>
           <div className="font-inter flex justify-end items-center text-sm text-muted-foreground">
             <Divider className="hidden lg:block ml-[16px]" />
-            <div className="pl-[16px] pr-0">
+            <div className="w-[50px] max-w-[50px] min-w-[50px] pl-[16px] pr-0">
               {parseFloat(`${zoomValue * 100}`).toFixed(0)}%
             </div>
           </div>

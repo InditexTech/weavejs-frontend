@@ -28,7 +28,7 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
         const img = await toImageAsync(node, {
           x: bounds.x,
           y: bounds.y,
-          pixelRatio: 1,
+          pixelRatio: 4,
           width: bounds.width,
           height: bounds.height,
         });

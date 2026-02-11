@@ -121,22 +121,22 @@ export const NodeToolbar = () => {
   const nodePropertiesAction: "create" | "update" | undefined =
     useCollaborationRoom((state) => state.nodeProperties.action);
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
+    (state) => state.setTransformingImage,
   );
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
   const imageCroppingEnabled = useCollaborationRoom(
-    (state) => state.images.cropping.enabled
+    (state) => state.images.cropping.enabled,
   );
   const setReferenceMeasurePixels = useCollaborationRoom(
-    (state) => state.setReferenceMeasurePixels
+    (state) => state.setReferenceMeasurePixels,
   );
 
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
@@ -161,7 +161,7 @@ export const NodeToolbar = () => {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   // Handle drag & transform
@@ -206,21 +206,21 @@ export const NodeToolbar = () => {
 
     instance.addEventListener(
       "onEnterTextNodeEditMode",
-      handleOnEnterTextEditMode
+      handleOnEnterTextEditMode,
     );
     instance.addEventListener(
       "onExitTextNodeEditMode",
-      handleOnExitTextEditMode
+      handleOnExitTextEditMode,
     );
 
     return () => {
       instance.removeEventListener(
         "onEnterTextNodeEditMode",
-        handleOnEnterTextEditMode
+        handleOnEnterTextEditMode,
       );
       instance.removeEventListener(
         "onExitTextNodeEditMode",
-        handleOnExitTextEditMode
+        handleOnExitTextEditMode,
       );
     };
   }, [instance]);
@@ -247,17 +247,17 @@ export const NodeToolbar = () => {
     instance.addEventListener("onImageTemplateFreed", handleImageTemplateFreed);
     instance.addEventListener(
       "onImageTemplateLocked",
-      handleImageTemplateLocked
+      handleImageTemplateLocked,
     );
 
     return () => {
       instance.removeEventListener(
         "onImageTemplateFreed",
-        handleImageTemplateFreed
+        handleImageTemplateFreed,
       );
       instance.removeEventListener(
         "onImageTemplateLocked",
-        handleImageTemplateLocked
+        handleImageTemplateLocked,
       );
     };
   }, [instance, movingImageTemplate]);
@@ -281,7 +281,7 @@ export const NodeToolbar = () => {
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
   });
@@ -303,7 +303,7 @@ export const NodeToolbar = () => {
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
   });
@@ -328,7 +328,7 @@ export const NodeToolbar = () => {
         room ?? "",
         imageId,
         orientation,
-        image
+        image,
       );
     },
   });
@@ -350,7 +350,7 @@ export const NodeToolbar = () => {
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
   });
@@ -359,7 +359,7 @@ export const NodeToolbar = () => {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const actualNode = React.useMemo(() => {
@@ -417,12 +417,12 @@ export const NodeToolbar = () => {
 
   const isGroup = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "group",
-    [actualNode]
+    [actualNode],
   );
 
   const isVideoNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "video",
-    [actualNode]
+    [actualNode],
   );
 
   React.useEffect(() => {
@@ -468,27 +468,27 @@ export const NodeToolbar = () => {
 
   const isFrameNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "frame",
-    [actualNode]
+    [actualNode],
   );
 
   const isTextNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "text",
-    [actualNode]
+    [actualNode],
   );
 
   const isColorTokenNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "color-token",
-    [actualNode]
+    [actualNode],
   );
 
   const isMeasureNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "measure",
-    [actualNode]
+    [actualNode],
   );
 
   const isConnectorNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "connector",
-    [actualNode]
+    [actualNode],
   );
 
   const connectorNodeType = React.useMemo(() => {
@@ -517,12 +517,12 @@ export const NodeToolbar = () => {
 
   const isImage = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "image",
-    [actualNode]
+    [actualNode],
   );
 
   const isImageTemplate = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "image-template",
-    [actualNode]
+    [actualNode],
   );
 
   const imageTemplateFit = React.useMemo(() => {
@@ -589,7 +589,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -611,7 +611,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["colorTokenColor"]
+                        prev.length > 0 ? [] : ["colorTokenColor"],
                       );
                     }}
                     label={
@@ -788,7 +788,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -806,12 +806,12 @@ export const NodeToolbar = () => {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       active={actualMenusOpen.includes(
-                        "connectorStartDecorator"
+                        "connectorStartDecorator",
                       )}
                       onClick={(e) => {
                         e.preventDefault();
                         setActualMenusOpen((prev) =>
-                          prev.length > 0 ? [] : ["connectorStartDecorator"]
+                          prev.length > 0 ? [] : ["connectorStartDecorator"],
                         );
                       }}
                       label={
@@ -844,7 +844,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -862,7 +862,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
                           );
                         }}
                         className={cn(
@@ -871,7 +871,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorStartDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
-                          }
+                          },
                         )}
                       >
                         None
@@ -886,7 +886,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -904,7 +904,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT,
                           );
                         }}
                         className={cn(
@@ -913,7 +913,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorStartDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT,
-                          }
+                          },
                         )}
                       >
                         Dot
@@ -928,7 +928,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -946,7 +946,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW,
                           );
                         }}
                         className={cn(
@@ -955,7 +955,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorStartDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW,
-                          }
+                          },
                         )}
                       >
                         Arrow
@@ -978,7 +978,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -1011,7 +1011,7 @@ export const NodeToolbar = () => {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       active={actualMenusOpen.includes(
-                        "connectorStartDecoratorSize"
+                        "connectorStartDecoratorSize",
                       )}
                       onClick={(e) => {
                         e.preventDefault();
@@ -1025,7 +1025,9 @@ export const NodeToolbar = () => {
                           return;
                         }
                         setActualMenusOpen((prev) =>
-                          prev.length > 0 ? [] : ["connectorStartDecoratorSize"]
+                          prev.length > 0
+                            ? []
+                            : ["connectorStartDecoratorSize"],
                         );
                       }}
                       label={
@@ -1216,7 +1218,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -1237,7 +1239,7 @@ export const NodeToolbar = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         setActualMenusOpen((prev) =>
-                          prev.length > 0 ? [] : ["connectorEndDecorator"]
+                          prev.length > 0 ? [] : ["connectorEndDecorator"],
                         );
                       }}
                       label={
@@ -1270,7 +1272,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1288,7 +1290,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
                           );
                         }}
                         className={cn(
@@ -1297,7 +1299,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorEndDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
-                          }
+                          },
                         )}
                       >
                         None
@@ -1312,7 +1314,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1330,7 +1332,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT,
                           );
                         }}
                         className={cn(
@@ -1339,7 +1341,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorEndDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT,
-                          }
+                          },
                         )}
                       >
                         Dot
@@ -1354,7 +1356,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1372,7 +1374,7 @@ export const NodeToolbar = () => {
                           connectorHandler.changeConnectorDecorator(
                             nodeInstance as Konva.Group,
                             WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END,
-                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW
+                            WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW,
                           );
                         }}
                         className={cn(
@@ -1381,7 +1383,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorEndDecoratorType ===
                               WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW,
-                          }
+                          },
                         )}
                       >
                         Arrow
@@ -1404,7 +1406,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -1436,7 +1438,7 @@ export const NodeToolbar = () => {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       active={actualMenusOpen.includes(
-                        "connectorEndDecoratorSize"
+                        "connectorEndDecoratorSize",
                       )}
                       onClick={(e) => {
                         e.preventDefault();
@@ -1449,7 +1451,7 @@ export const NodeToolbar = () => {
                           return;
                         }
                         setActualMenusOpen((prev) =>
-                          prev.length > 0 ? [] : ["connectorEndDecoratorSize"]
+                          prev.length > 0 ? [] : ["connectorEndDecoratorSize"],
                         );
                       }}
                       label={
@@ -1634,7 +1636,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -1651,7 +1653,7 @@ export const NodeToolbar = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         setActualMenusOpen((prev) =>
-                          prev.length > 0 ? [] : ["connectorType"]
+                          prev.length > 0 ? [] : ["connectorType"],
                         );
                       }}
                       label={
@@ -1684,7 +1686,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1701,7 +1703,7 @@ export const NodeToolbar = () => {
 
                           connectorHandler.changeConnectorType(
                             nodeInstance as Konva.Group,
-                            WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT
+                            WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
                           );
                         }}
                         className={cn(
@@ -1710,7 +1712,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorNodeType ===
                               WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
-                          }
+                          },
                         )}
                       >
                         Straight
@@ -1725,7 +1727,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1742,7 +1744,7 @@ export const NodeToolbar = () => {
 
                           connectorHandler.changeConnectorType(
                             nodeInstance as Konva.Group,
-                            WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW
+                            WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW,
                           );
                         }}
                         className={cn(
@@ -1751,7 +1753,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorNodeType ===
                               WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW,
-                          }
+                          },
                         )}
                       >
                         Elbow
@@ -1766,7 +1768,7 @@ export const NodeToolbar = () => {
 
                           const connectorHandler =
                             instance?.getNodeHandler<WeaveConnectorNode>(
-                              "connector"
+                              "connector",
                             );
 
                           if (!connectorHandler) {
@@ -1783,7 +1785,7 @@ export const NodeToolbar = () => {
 
                           connectorHandler.changeConnectorType(
                             nodeInstance as Konva.Group,
-                            WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+                            WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED,
                           );
                         }}
                         className={cn(
@@ -1792,7 +1794,7 @@ export const NodeToolbar = () => {
                             ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                               connectorNodeType ===
                               WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED,
-                          }
+                          },
                         )}
                       >
                         Curved
@@ -1826,7 +1828,7 @@ export const NodeToolbar = () => {
                       instance.getNodeHandler<WeaveMeasureNode>("measure");
                     if (nodeInstance && measureHandler) {
                       measureHandler.flipOrientation(
-                        nodeInstance as Konva.Group
+                        nodeInstance as Konva.Group,
                       );
                     }
                   }}
@@ -1859,13 +1861,13 @@ export const NodeToolbar = () => {
                     if (nodeInstance && measureHandler) {
                       const distanceInPixels =
                         measureHandler.getNormalizedDistance(
-                          nodeInstance as Konva.Group
+                          nodeInstance as Konva.Group,
                         );
 
                       const actualSavedConfig = JSON.parse(
                         sessionStorage.getItem(
-                          `weave_measurement_config_${room}`
-                        ) || "{}"
+                          `weave_measurement_config_${room}`,
+                        ) || "{}",
                       );
 
                       const updatedConfig = {
@@ -1874,12 +1876,12 @@ export const NodeToolbar = () => {
 
                       const finalConfiguration = merge(
                         actualSavedConfig,
-                        updatedConfig
+                        updatedConfig,
                       );
 
                       sessionStorage.setItem(
                         `weave_measurement_config_${room}`,
-                        JSON.stringify(finalConfiguration)
+                        JSON.stringify(finalConfiguration),
                       );
 
                       setReferenceMeasurePixels(distanceInPixels);
@@ -1922,12 +1924,12 @@ export const NodeToolbar = () => {
 
                       const handler =
                         instance.getNodeHandler<ImageTemplateNode>(
-                          "image-template"
+                          "image-template",
                         );
 
                       const stage = instance.getStage();
                       const nodeInstance = stage.findOne(
-                        `#${actualNode?.key ?? ""}`
+                        `#${actualNode?.key ?? ""}`,
                       );
 
                       if (!handler || !nodeInstance || !linkedNode) {
@@ -1939,7 +1941,7 @@ export const NodeToolbar = () => {
 
                       handler.setImage(
                         nodeInstance as WeaveElementInstance,
-                        linkedNode as WeaveElementInstance
+                        linkedNode as WeaveElementInstance,
                       );
                     }}
                     label={
@@ -1968,7 +1970,7 @@ export const NodeToolbar = () => {
                             ["disabled:cursor-default disabled:opacity-50"]:
                               weaveConnectionStatus !==
                               WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                          }
+                          },
                         )}
                         asChild
                       >
@@ -1989,7 +1991,7 @@ export const NodeToolbar = () => {
                           onClick={(e) => {
                             e.preventDefault();
                             setActualMenusOpen((prev) =>
-                              prev.length > 0 ? [] : ["templateFit"]
+                              prev.length > 0 ? [] : ["templateFit"],
                             );
                           }}
                           label={
@@ -2022,7 +2024,7 @@ export const NodeToolbar = () => {
 
                               const templateHandler =
                                 instance?.getNodeHandler<ImageTemplateNode>(
-                                  "image-template"
+                                  "image-template",
                                 );
 
                               if (!templateHandler) {
@@ -2039,7 +2041,7 @@ export const NodeToolbar = () => {
 
                               templateHandler.changeFit(
                                 nodeInstance as WeaveElementInstance,
-                                IMAGE_TEMPLATE_FIT.FILL
+                                IMAGE_TEMPLATE_FIT.FILL,
                               );
                             }}
                             className={cn(
@@ -2047,7 +2049,7 @@ export const NodeToolbar = () => {
                               {
                                 ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                                   imageTemplateFit === IMAGE_TEMPLATE_FIT.FILL,
-                              }
+                              },
                             )}
                           >
                             Fill
@@ -2062,7 +2064,7 @@ export const NodeToolbar = () => {
 
                               const templateHandler =
                                 instance?.getNodeHandler<ImageTemplateNode>(
-                                  "image-template"
+                                  "image-template",
                                 );
 
                               if (!templateHandler) {
@@ -2079,7 +2081,7 @@ export const NodeToolbar = () => {
 
                               templateHandler.changeFit(
                                 nodeInstance as WeaveElementInstance,
-                                IMAGE_TEMPLATE_FIT.CONTAIN
+                                IMAGE_TEMPLATE_FIT.CONTAIN,
                               );
                             }}
                             className={cn(
@@ -2088,7 +2090,7 @@ export const NodeToolbar = () => {
                                 ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                                   imageTemplateFit ===
                                   IMAGE_TEMPLATE_FIT.CONTAIN,
-                              }
+                              },
                             )}
                           >
                             Contain
@@ -2103,7 +2105,7 @@ export const NodeToolbar = () => {
 
                               const templateHandler =
                                 instance?.getNodeHandler<ImageTemplateNode>(
-                                  "image-template"
+                                  "image-template",
                                 );
 
                               if (!templateHandler) {
@@ -2120,7 +2122,7 @@ export const NodeToolbar = () => {
 
                               templateHandler.changeFit(
                                 nodeInstance as WeaveElementInstance,
-                                IMAGE_TEMPLATE_FIT.COVER
+                                IMAGE_TEMPLATE_FIT.COVER,
                               );
                             }}
                             className={cn(
@@ -2128,7 +2130,7 @@ export const NodeToolbar = () => {
                               {
                                 ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                                   imageTemplateFit === IMAGE_TEMPLATE_FIT.COVER,
-                              }
+                              },
                             )}
                           >
                             Cover
@@ -2143,7 +2145,7 @@ export const NodeToolbar = () => {
 
                               const templateHandler =
                                 instance?.getNodeHandler<ImageTemplateNode>(
-                                  "image-template"
+                                  "image-template",
                                 );
 
                               if (!templateHandler) {
@@ -2160,7 +2162,7 @@ export const NodeToolbar = () => {
 
                               templateHandler.changeFit(
                                 nodeInstance as WeaveElementInstance,
-                                IMAGE_TEMPLATE_FIT.FREE
+                                IMAGE_TEMPLATE_FIT.FREE,
                               );
                             }}
                             className={cn(
@@ -2168,7 +2170,7 @@ export const NodeToolbar = () => {
                               {
                                 ["hover:bg-[#e0e0e0] bg-[#e0e0e0] cursor-auto"]:
                                   imageTemplateFit === IMAGE_TEMPLATE_FIT.FREE,
-                              }
+                              },
                             )}
                           >
                             Free
@@ -2192,12 +2194,12 @@ export const NodeToolbar = () => {
 
                         const handler =
                           instance.getNodeHandler<ImageTemplateNode>(
-                            "image-template"
+                            "image-template",
                           );
 
                         const stage = instance.getStage();
                         const nodeInstance = stage.findOne(
-                          `#${actualNode?.key ?? ""}`
+                          `#${actualNode?.key ?? ""}`,
                         );
 
                         if (!handler || !nodeInstance) {
@@ -2238,7 +2240,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -2255,7 +2257,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["nodeStyle"]
+                        prev.length > 0 ? [] : ["nodeStyle"],
                       );
                     }}
                     label={
@@ -2296,7 +2298,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -2315,7 +2317,7 @@ export const NodeToolbar = () => {
                                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                                 }
                                 active={actualMenusOpen.includes(
-                                  "nodeTextColor"
+                                  "nodeTextColor",
                                 )}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -2399,7 +2401,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -2493,7 +2495,7 @@ export const NodeToolbar = () => {
                     ) && (
                       <>
                         {!["stroke", "line", "connector"].includes(
-                          actualNode?.type ?? ""
+                          actualNode?.type ?? "",
                         ) && (
                           <>
                             <div className="w-full flex justify-end items-center py-1">
@@ -2512,7 +2514,7 @@ export const NodeToolbar = () => {
                                       ["disabled:cursor-default disabled:opacity-50"]:
                                         weaveConnectionStatus !==
                                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                    }
+                                    },
                                   )}
                                   asChild
                                 >
@@ -2531,13 +2533,13 @@ export const NodeToolbar = () => {
                                       WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                                     }
                                     active={actualMenusOpen.includes(
-                                      "nodeFill"
+                                      "nodeFill",
                                     )}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       setActualMenusOpen((prev) => [
                                         ...prev.filter(
-                                          (m) => m === "nodeStyle"
+                                          (m) => m === "nodeStyle",
                                         ),
                                         "nodeFill",
                                       ]);
@@ -2616,7 +2618,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -2712,7 +2714,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -3018,7 +3020,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -3285,7 +3287,7 @@ export const NodeToolbar = () => {
 
                     const stage = instance.getStage();
                     const nodeInstance = stage.findOne(
-                      `#${actualNode?.key ?? ""}`
+                      `#${actualNode?.key ?? ""}`,
                     );
 
                     setLinkedNode(nodeInstance || null);
@@ -3360,13 +3362,13 @@ export const NodeToolbar = () => {
                                 },
                                 onError: () => {
                                   toast.error(
-                                    "Error requesting image background removal."
+                                    "Error requesting image background removal.",
                                   );
                                 },
                                 onSettled: () => {
                                   setTransformingImage(false);
                                 },
-                              }
+                              },
                             );
                           } catch (error) {
                             console.error(error);
@@ -3435,13 +3437,13 @@ export const NodeToolbar = () => {
                                 },
                                 onError: () => {
                                   toast.error(
-                                    "Error requesting image background removal."
+                                    "Error requesting image background removal.",
                                   );
                                 },
                                 onSettled: () => {
                                   setTransformingImage(false);
                                 },
-                              }
+                              },
                             );
                           } catch (error) {
                             console.error(error);
@@ -3515,13 +3517,13 @@ export const NodeToolbar = () => {
                                 },
                                 onError: () => {
                                   toast.error(
-                                    "Error requesting image horizontal flip."
+                                    "Error requesting image horizontal flip.",
                                   );
                                 },
                                 onSettled: () => {
                                   setTransformingImage(false);
                                 },
-                              }
+                              },
                             );
                           } catch (error) {
                             console.error(error);
@@ -3595,13 +3597,13 @@ export const NodeToolbar = () => {
                                 },
                                 onError: () => {
                                   toast.error(
-                                    "Error requesting image vertical flip."
+                                    "Error requesting image vertical flip.",
                                   );
                                 },
                                 onSettled: () => {
                                   setTransformingImage(false);
                                 },
-                              }
+                              },
                             );
                           } catch (error) {
                             console.error(error);
@@ -3674,13 +3676,13 @@ export const NodeToolbar = () => {
                                 },
                                 onError: () => {
                                   toast.error(
-                                    "Error requesting image grayscaling."
+                                    "Error requesting image grayscaling.",
                                   );
                                 },
                                 onSettled: () => {
                                   setTransformingImage(false);
                                 },
-                              }
+                              },
                             );
                           } catch (error) {
                             console.error(error);
@@ -3722,7 +3724,37 @@ export const NodeToolbar = () => {
                   }}
                   label={
                     <div className="flex gap-3 justify-start items-center">
-                      <p>Crop image</p>
+                      <p>Crop</p>
+                    </div>
+                  }
+                  tooltipSide="left"
+                  tooltipAlign="center"
+                />
+                <ToolbarButton
+                  className="rounded-full !w-[40px] !h-[40px]"
+                  icon={
+                    <RotateCcw className="px-0" size={20} strokeWidth={1} />
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    if (!instance || !node) {
+                      return;
+                    }
+
+                    const nodeInstance = instance
+                      .getStage()
+                      .findOne(`#${node.key}`) as Konva.Group | undefined;
+
+                    if (nodeInstance) {
+                      nodeInstance.resetCrop();
+                    }
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>Reset crop</p>
                     </div>
                   }
                   tooltipSide="left"
@@ -3805,7 +3837,7 @@ export const NodeToolbar = () => {
                             size: imageSize,
                           },
                         },
-                      }
+                      },
                     );
                     setAiView("chat");
                     setSidebarActive(SIDEBAR_ELEMENTS.aiChat);
@@ -3839,7 +3871,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -3857,7 +3889,7 @@ export const NodeToolbar = () => {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       active={actualMenusOpen.includes(
-                        "nodesAlignmentHorizontal"
+                        "nodesAlignmentHorizontal",
                       )}
                       onClick={(e) => {
                         e.preventDefault();
@@ -4006,7 +4038,7 @@ export const NodeToolbar = () => {
                         ["disabled:cursor-default disabled:opacity-50"]:
                           weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                      }
+                      },
                     )}
                     asChild
                   >
@@ -4024,7 +4056,7 @@ export const NodeToolbar = () => {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       active={actualMenusOpen.includes(
-                        "nodesAlignmentVertical"
+                        "nodesAlignmentVertical",
                       )}
                       onClick={(e) => {
                         e.preventDefault();
@@ -4176,7 +4208,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -4197,7 +4229,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["composite"]
+                        prev.length > 0 ? [] : ["composite"],
                       );
                     }}
                     label={
@@ -4752,7 +4784,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -4767,7 +4799,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["layering"]
+                        prev.length > 0 ? [] : ["layering"],
                       );
                     }}
                     label={
@@ -4819,7 +4851,7 @@ export const NodeToolbar = () => {
                         }
 
                         instance.bringToFront(
-                          nodeInstance as WeaveElementInstance
+                          nodeInstance as WeaveElementInstance,
                         );
                       }}
                       label={
@@ -4945,7 +4977,7 @@ export const NodeToolbar = () => {
                         }
 
                         instance.sendToBack(
-                          nodeInstance as WeaveElementInstance
+                          nodeInstance as WeaveElementInstance,
                         );
                       }}
                       label={
@@ -4983,7 +5015,7 @@ export const NodeToolbar = () => {
                   instance.group(
                     nodes
                       .map((n) => n?.node)
-                      .filter((node) => typeof node !== "undefined")
+                      .filter((node) => typeof node !== "undefined"),
                   );
                 }}
                 label={
@@ -5143,7 +5175,7 @@ export const NodeToolbar = () => {
 
                 const weaveCopyPasteNodesPlugin =
                   instance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                    "copyPasteNodes"
+                    "copyPasteNodes",
                   );
                 if (weaveCopyPasteNodesPlugin) {
                   await weaveCopyPasteNodesPlugin.copy();

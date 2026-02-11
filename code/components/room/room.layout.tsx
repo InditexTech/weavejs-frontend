@@ -17,7 +17,7 @@ import {
   WeaveFont,
 } from "@inditextech/weave-types";
 import { Logo } from "../utils/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ImagesLibrary } from "../room-components/images-library/images-library";
 import { FramesLibrary } from "../room-components/frames-library/frames-library";
@@ -48,6 +48,7 @@ import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
 import { useIAChat } from "@/store/ia-chat";
 import { useUserChanges } from "../room-components/hooks/use-user-changes";
 import { ExportPDFConfigDialog } from "../room-components/overlay/export-pdf-config";
+import { Progress } from "../ui/progress";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -79,6 +80,11 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const roomLoaded = useWeave((state) => state.room.loaded);
   const room = useCollaborationRoom((state) => state.room);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const asyncElementsLoaded = useWeave((state) => state.asyncElements.loaded);
+  const asyncElementsTotal = useWeave((state) => state.asyncElements.total);
+  const asyncElementsAllLoaded = useWeave(
+    (state) => state.asyncElements.allLoaded,
+  );
 
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show,
@@ -165,50 +171,51 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         previousAction: "selectionTool",
       });
     }
-  }, [instance, status, roomLoaded]);
+  }, [instance, status, roomLoaded, asyncElementsAllLoaded]);
 
   useToolsEvents();
   useKeyboardHandler();
 
+  const roomFullyLoaded = React.useMemo(() => {
+    return (
+      status === WEAVE_INSTANCE_STATUS.RUNNING &&
+      roomLoaded &&
+      asyncElementsAllLoaded
+    );
+  }, [status, roomLoaded, asyncElementsAllLoaded]);
+
+  const controls = useAnimation();
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    if (roomFullyLoaded && asyncElementsAllLoaded) {
+      controls.start({
+        transition: {
+          duration: 0.5,
+          delay: !roomFullyLoaded ? 0 : 0.5,
+        },
+      });
+
+      instance.triggerAction("fitToScreenTool", {
+        previousAction: "selectionTool",
+      });
+    }
+  }, [instance, roomFullyLoaded, asyncElementsAllLoaded, controls]);
+
+  console.log({
+    asyncElementsLoaded,
+    asyncElementsTotal,
+    asyncElementsAllLoaded,
+  });
+
   return (
     <AnimatePresence>
       <motion.div
-        transition={{
-          duration: 0.5,
-          delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-            ? 0
-            : 0.5,
-        }}
+        animate={controls}
         className="w-full h-full flex flex-col relative overflow-hidden"
       >
-        {/* <section
-          id="sidebar-left"
-          className={cn(
-            "bg-white absolute top-[calc(72px+32px)] left-[16px] bottom-[16px] border-[0.5px] border-[#c9c9c9] z-[10] overflow-hidden",
-            {
-              ["w-0 h-0"]: sidebarLeftActive === null,
-              ["w-[370px]"]: sidebarLeftActive !== null,
-            }
-          )}
-        >
-          <AnimatePresence>
-            <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
-            <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
-            <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
-            <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
-            <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
-            <Comments key={SIDEBAR_ELEMENTS.comments} />
-            <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-            {weaveConnectionStatus !==
-              WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
-              <div className="absolute top-0 left-0 right-0 bottom-0">
-                <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none"></div>
-              </div>
-            )}
-          </AnimatePresence>
-        </section> */}
         <section className="w-[calc(100%-480px)] h-full flex z-0 overflow-hidden relative">
-          {/* <section className="w-full h-full flex z-0 overflow-hidden"> */}
           <div
             id="weave"
             tabIndex={0}
@@ -218,14 +225,11 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             className={cn("w-full h-full relative overflow-hidden", {
               ["pointer-events-none"]:
                 weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-                status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-                !roomLoaded,
-              ["pointer-events-auto"]:
-                status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED || !roomFullyLoaded,
+              ["pointer-events-auto"]: roomFullyLoaded,
             })}
           >
-            <NodeToolbar />
+            {roomFullyLoaded && <NodeToolbar />}
           </div>
           {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -286,7 +290,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
               </div>
             </div>
           )}
-          {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+          {roomFullyLoaded && (
             <>
               {aiChatEnabled && <ChatBotPrompt />}
               <ContextMenuRender
@@ -370,6 +374,20 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </div>
           </div>
         )}
+        {!asyncElementsAllLoaded && (
+          <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+            <div className="min-w-[320px] max-w-[320px] flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+              <Logo kind="large" variant="no-text" />
+              <div className="font-inter text-base">Loading resources</div>
+              <div className="w-full flex flex-col gap-1 justify-center items-center">
+                <Progress
+                  value={(asyncElementsLoaded / asyncElementsTotal) * 100}
+                />
+                <div className="font-inter text-xs text-center">{`${asyncElementsLoaded} / ${asyncElementsTotal}`}</div>
+              </div>
+            </div>
+          </div>
+        )}
         {transformingImage && transformingOperation && (
           <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
             <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
@@ -381,7 +399,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           </div>
         )}
 
-        {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+        {roomFullyLoaded && (
           <>
             <ManageIdleDisconnection />
             <MaskSlider />

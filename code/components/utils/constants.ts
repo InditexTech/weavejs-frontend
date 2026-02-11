@@ -128,7 +128,7 @@ const FONTS = async (): Promise<WeaveFont[]> => {
   const interItalicBold = new FontFace(
     "Inter",
     "url(/fonts/inter-italic-bold.ttf)",
-    { weight: "700", style: "italic" }
+    { weight: "700", style: "italic" },
   );
   await interItalicBold.load();
   document.fonts.add(interItalicBold);
@@ -136,7 +136,7 @@ const FONTS = async (): Promise<WeaveFont[]> => {
   const sansitaRegular = new FontFace(
     "Sansita",
     "url(/fonts/sansita-regular.ttf)",
-    { weight: "400", style: "normal" }
+    { weight: "400", style: "normal" },
   );
   await sansitaRegular.load();
   document.fonts.add(sansitaRegular);
@@ -151,7 +151,7 @@ const FONTS = async (): Promise<WeaveFont[]> => {
   const notoSansRegular = new FontFace(
     "NotoSansMono",
     "url(/fonts/NotoSansMono-Regular.ttf)",
-    { weight: "400", style: "normal" }
+    { weight: "400", style: "normal" },
   );
   await notoSansRegular.load();
   document.fonts.add(notoSansRegular);
@@ -260,6 +260,9 @@ const NODES = () => [
   new WeaveTextNode(),
   new WeaveImageNode({
     config: {
+      performance: {
+        caching: true,
+      },
       transform: {
         enabledAnchors: [
           WEAVE_TRANSFORMER_ANCHORS.TOP_LEFT,
@@ -355,8 +358,8 @@ const NODES = () => [
         finish: (
           node: WeaveElementInstance,
           content: string,
-          action: WeaveCommentNodeCreateAction
-        ) => void
+          action: WeaveCommentNodeCreateAction,
+        ) => void,
       ) => {
         createCommentDOM({ ele, node, finish });
       },
@@ -366,8 +369,8 @@ const NODES = () => [
         finish: (
           node: WeaveElementInstance,
           content: string,
-          action: WeaveCommentNodeViewAction
-        ) => void
+          action: WeaveCommentNodeViewAction,
+        ) => void,
       ) => {
         viewCommentDOM({ ele, node, finish });
       },
@@ -440,11 +443,11 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         },
         onMultipleSelection: (nodes: Konva.Node[]) => {
           const containsColorToken = nodes.some(
-            (node) => node.getAttrs().nodeType === "color-token"
+            (node) => node.getAttrs().nodeType === "color-token",
           );
 
           const containsFrame = nodes.some(
-            (node) => node.getAttrs().nodeType === "frame"
+            (node) => node.getAttrs().nodeType === "frame",
           );
 
           if (containsColorToken || containsFrame) {
@@ -456,7 +459,7 @@ const PLUGINS = (getUser: () => WeaveUser) => [
           }
 
           const containsImage = nodes.some(
-            (node) => node.getAttrs().nodeType === "image"
+            (node) => node.getAttrs().nodeType === "image",
           );
 
           if (containsImage) {
