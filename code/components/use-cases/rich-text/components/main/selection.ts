@@ -1,6 +1,10 @@
 import Konva from "konva";
 import { measureLineElements } from "./models";
-import { LineColumn, RichTextRenderLine } from "./types";
+import {
+  LineColumn,
+  //RichTextModel,
+  RichTextRenderLine,
+} from "./types";
 import { normalizeLineColumn } from "./keyboard";
 
 export const setSelectionStartChange = (
@@ -418,4 +422,147 @@ export const amountOfCharsBetween = (
   }
 
   return amountOfChars;
+};
+
+export const getSelectedText = (
+  instance: Konva.Group,
+  // formatted: boolean = false,
+) => {
+  const selectionStart = instance.getAttr("selectionStart");
+  const selectionEnd = instance.getAttr("selectionEnd");
+
+  if (!selectionStart || !selectionEnd) {
+    return "";
+  }
+
+  // const model = instance.getAttr("model") as RichTextModel;
+  const renderModel = instance.getAttr("renderModel") as RichTextRenderLine[];
+
+  const { from: finalFrom, to: finalTo } = normalizeLineColumn(
+    selectionStart,
+    selectionEnd,
+  );
+
+  if (!finalFrom || !finalTo) {
+    return "";
+  }
+
+  const selectedTextLines = [];
+  let foundStart = false;
+  for (let i = finalFrom.line; i <= finalTo.line; i++) {
+    const line = renderModel[i];
+
+    let lineText = "";
+    let columnIndex = 0;
+    for (const segment of line.lineSegments) {
+      // is start line and end line is different than start line, found start column in segment
+      if (
+        !foundStart &&
+        i === finalFrom.line &&
+        finalTo.line !== finalFrom.line &&
+        finalFrom.column >= columnIndex &&
+        finalFrom.column <= columnIndex + segment.text.length
+      ) {
+        lineText += segment.text.slice(finalFrom.column - columnIndex);
+        foundStart = true;
+      }
+      // is start line and end line is different than start line, found start already found
+      if (
+        foundStart &&
+        i === finalFrom.line &&
+        finalTo.line !== finalFrom.line &&
+        finalFrom.column > columnIndex &&
+        finalFrom.column > columnIndex + segment.text.length
+      ) {
+        lineText += segment.text;
+      }
+      // is start line and end line is different than start line, intermediate line
+      if (
+        foundStart &&
+        i !== finalFrom.line &&
+        i !== finalTo.line &&
+        finalTo.line !== finalFrom.line
+      ) {
+        lineText += segment.text;
+      }
+      // is end line and end line is different than start line, not found end column yet
+      if (
+        foundStart &&
+        i === finalTo.line &&
+        finalTo.line !== finalFrom.line &&
+        finalTo.column > columnIndex &&
+        finalTo.column > columnIndex + segment.text.length
+      ) {
+        lineText += segment.text;
+      }
+      // is end line and end line is different than start line, found end column in segment
+      if (
+        foundStart &&
+        i === finalTo.line &&
+        finalTo.line !== finalFrom.line &&
+        finalTo.column >= columnIndex &&
+        finalTo.column <= columnIndex + segment.text.length
+      ) {
+        lineText += segment.text.slice(0, finalTo.column - columnIndex);
+        break;
+      }
+      // is start line and end line is the same, found start and end column in segment
+      if (
+        !foundStart &&
+        i === finalFrom.line &&
+        finalTo.line === finalFrom.line &&
+        finalFrom.column >= columnIndex &&
+        finalFrom.column <= columnIndex + segment.text.length &&
+        finalTo.column >= columnIndex &&
+        finalTo.column <= columnIndex + segment.text.length
+      ) {
+        lineText += segment.text.slice(
+          finalFrom.column - columnIndex,
+          finalTo.column - columnIndex,
+        );
+        break;
+      }
+      // is start line and end line is the same, found start in segment
+      if (
+        !foundStart &&
+        i === finalFrom.line &&
+        finalTo.line === finalFrom.line &&
+        finalFrom.column >= columnIndex &&
+        finalFrom.column <= columnIndex + segment.text.length &&
+        finalTo.column > columnIndex &&
+        finalTo.column > columnIndex + segment.text.length
+      ) {
+        lineText += segment.text.slice(finalFrom.column - columnIndex);
+        foundStart = true;
+      }
+      // is start line and end line is the same, intermediate segment
+      if (
+        foundStart &&
+        i === finalFrom.line &&
+        finalTo.line === finalFrom.line &&
+        finalFrom.column >= columnIndex &&
+        finalFrom.column <= columnIndex + segment.text.length &&
+        finalTo.column > columnIndex &&
+        finalTo.column > columnIndex + segment.text.length
+      ) {
+        lineText += segment.text;
+      }
+      // is start line and end line is the same, found end in segment
+      if (
+        foundStart &&
+        i === finalFrom.line &&
+        finalTo.line === finalFrom.line &&
+        finalTo.column >= columnIndex &&
+        finalTo.column <= columnIndex + segment.text.length
+      ) {
+        lineText += segment.text.slice(0, finalTo.column - columnIndex);
+      }
+
+      columnIndex += segment.text.length;
+    }
+
+    selectedTextLines.push(lineText);
+  }
+
+  return selectedTextLines.join("");
 };

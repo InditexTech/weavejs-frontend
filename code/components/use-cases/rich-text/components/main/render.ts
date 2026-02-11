@@ -18,10 +18,15 @@ import {
   startCursorBlinkWithDelay,
   stopCursorBlink,
 } from "./cursor";
-import { setSelectionEndChange, setSelectionStartChange } from "./selection";
+import {
+  getSelectedText,
+  setSelectionEndChange,
+  setSelectionStartChange,
+} from "./selection";
 import {
   compositionEndHandler,
   compositionStartHandler,
+  handleAddText,
   keyboardHandler,
   normalizeLineColumn,
 } from "./keyboard";
@@ -36,6 +41,8 @@ import { createTextarea, destroyTextarea, focusTextarea } from "./textarea";
 import { getLineColumnFromPointerPosition } from "./pointer";
 import { isEqual } from "lodash";
 import { mergeStyles } from "./styles";
+
+let eventsDefined = false;
 
 const renderSegment = (
   parent: Konva.Container,
@@ -162,13 +169,46 @@ export const modelToKonvaNodes = (
       width: limits.width,
       height: limits.height,
       clip: {
-        x: -1,
-        y: -1,
-        width: limits.width + 2,
-        height: limits.height + 2,
+        x: -2,
+        y: -2,
+        width: limits.width + 4,
+        height: limits.height + 4,
       },
     }),
   });
+
+  if (!eventsDefined) {
+    /* copy / paste events mount once */
+    window.addEventListener("keydown", async (e) => {
+      const isCopy = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c";
+      const isPaste = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v";
+
+      if (isCopy) {
+        const editingMode = stage.getAttr("editingMode");
+        if (editingMode === "text") {
+          const selectedText = getSelectedText(richText);
+          await navigator.clipboard.writeText(selectedText);
+        }
+      }
+
+      if (isPaste) {
+        const editingMode = stage.getAttr("editingMode");
+        if (editingMode === "text") {
+          const text = await navigator.clipboard.readText();
+
+          const selectionStart = richText.getAttr("selectionStart");
+          const selectionEnd = richText.getAttr("selectionEnd");
+
+          const { from: realFrom, to: realTo } = normalizeLineColumn(
+            selectionStart,
+            selectionEnd,
+          );
+          handleAddText(richText, realFrom, realTo, text);
+        }
+      }
+    });
+    eventsDefined = true;
+  }
 
   const oldGetClientRect = richText.getClientRect.bind(richText);
   richText.getClientRect = function (params) {
@@ -177,10 +217,10 @@ export const modelToKonvaNodes = (
 
     if (layout === "fixed") {
       return {
-        x: params?.skipTransform ? 0 : this.x(),
-        y: params?.skipTransform ? 0 : this.y(),
-        width: limits.width,
-        height: limits.height,
+        x: -2,
+        y: -2,
+        width: limits.width + 4,
+        height: limits.height + 4,
       };
     }
 
@@ -193,14 +233,13 @@ export const modelToKonvaNodes = (
 
   const bg = new Konva.Rect({
     name: "background",
-    x: 0 - 1,
-    y: 0 - 1,
-    width: layout === "auto" ? rect.width + 2 : limits.width + 2,
-    height: layout === "fixed" ? limits.height + 2 : rect.height + 2,
-    fill: "transparent",
+    x: -1,
+    y: -1,
+    width: layout === "auto" ? rect.width + 2 : limits.width,
+    height: layout === "fixed" ? limits.height : rect.height + 2,
     stroke: "#0D99FF",
     strokeWidth: 0,
-    strokeScaleEnabled: true,
+    strokeScaleEnabled: false,
     opacity: 1,
     listening: true,
   });

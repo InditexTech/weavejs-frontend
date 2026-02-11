@@ -78,7 +78,7 @@ export const keyboardHandler =
     }
   };
 
-const handleAddText = (
+export const handleAddText = (
   instance: Konva.Group,
   from: LineColumn,
   to: LineColumn | undefined,
@@ -91,6 +91,8 @@ const handleAddText = (
   if (to === undefined) {
     const modifiedRenderModel: RichTextRenderLine[] = [...renderModel];
     const actualLine = modifiedRenderModel[from.line];
+
+    const prevLines = modifiedRenderModel.length;
 
     let prevChar = "";
     if (from.line > 0 && from.column === 0) {
@@ -291,7 +293,13 @@ const handleAddText = (
 
     renderModifiedTextModel(instance, [...modifiedRenderModel]);
 
-    let moveAmount = amountOfCharsFromFirstLine + 1;
+    const newModel = instance.getAttr("renderModel") ?? [];
+    const newLines = newModel.length;
+
+    let moveAmount =
+      amountOfCharsFromFirstLine +
+      text.length +
+      (newLines > prevLines ? newLines - prevLines - 1 : 0);
     let action: MoveCursorAction = "none";
     if (text === "\n" && from.line === 0 && from.column === 0) {
       action = "add-line";
@@ -339,6 +347,9 @@ const handleAddText = (
       endSegmentOffset,
     } = foundStartEndSegments(renderModel, from, to);
 
+    const selectionLines = to.line - from.line;
+    const prevLines = renderModel.length;
+
     const modifiedRenderModel = updateRenderModel(renderModel, from, to, text, {
       startSegmentIndex,
       startSegmentOffset,
@@ -348,11 +359,16 @@ const handleAddText = (
 
     renderModifiedTextModel(instance, modifiedRenderModel);
 
+    const newModel = instance.getAttr("renderModel") ?? [];
+    const newLines = newModel.length;
+
     setCursorAt(instance, from, false);
     setSelectionStartChange(instance, undefined);
     setSelectionEndChange(instance, undefined);
 
-    const moveAmount = text.length;
+    const moveAmount =
+      text.length +
+      (newLines > prevLines ? newLines - prevLines + selectionLines : 0);
     moveCursor(instance, moveAmount, "none");
   }
 
@@ -825,13 +841,13 @@ export const renderModifiedTextModel = (
   const limits: TextLimits = instance.getAttr("limits");
 
   if (layout === "fixed") {
-    instance.setAttr("width", limits.width + 2);
-    instance.setAttr("height", limits.height + 2);
+    instance.setAttr("width", limits.width + 4);
+    instance.setAttr("height", limits.height + 4);
     instance.setAttr("clip", {
-      x: -1,
-      y: -1,
-      width: limits.width + 2,
-      height: limits.height + 2,
+      x: -2,
+      y: -2,
+      width: limits.width + 4,
+      height: limits.height + 4,
     });
   } else {
     instance.setAttr("width", undefined);
