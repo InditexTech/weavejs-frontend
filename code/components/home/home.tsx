@@ -62,7 +62,7 @@ export const Home = () => {
                     window.open(
                       DOCUMENTATION_URL,
                       "_blank",
-                      "noopener,noreferrer"
+                      "noopener,noreferrer",
                     );
                   }}
                   className="cursor-pointer font-inter font-light"
@@ -134,8 +134,10 @@ export const Home = () => {
         </motion.section>
       </main>
       <Toaster
-        offset={16}
+        // offset={16}
         mobileOffset={16}
+        position="bottom-center"
+        offset={{ right: "300px" }}
         toastOptions={{
           classNames: {
             toast: "w-full font-inter font-light text-xs",

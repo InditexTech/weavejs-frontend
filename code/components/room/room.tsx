@@ -45,23 +45,23 @@ export const Room = () => {
   const roomLoaded = useWeave((state) => state.room.loaded);
 
   const comBusConnected = useCollaborationRoom(
-    (state) => state.commBus.connected
+    (state) => state.commBus.connected,
   );
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const loadingFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.loading
+    (state) => state.fetchConnectionUrl.loading,
   );
   const errorFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.error
+    (state) => state.fetchConnectionUrl.error,
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
+    (state) => state.setFetchConnectionUrlError,
   );
   const setUser = useCollaborationRoom((state) => state.setUser);
   const setMeasurement = useCollaborationRoom((state) => state.setMeasurement);
   const setReferenceMeasurePixels = useCollaborationRoom(
-    (state) => state.setReferenceMeasurePixels
+    (state) => state.setReferenceMeasurePixels,
   );
 
   const { loadedParams } = useHandleRouteParams();
@@ -71,7 +71,7 @@ export const Room = () => {
   }, [user]);
 
   const upscaleConfiguration = useCollaborationRoom(
-    (state) => state.configuration.upscale
+    (state) => state.configuration.upscale,
   );
 
   const performanceConfiguration = React.useMemo(() => {
@@ -88,16 +88,16 @@ export const Room = () => {
   React.useEffect(() => {
     if (room) {
       const actualSavedConfig = JSON.parse(
-        sessionStorage.getItem(`weave_measurement_config_${room}`) || "{}"
+        sessionStorage.getItem(`weave_measurement_config_${room}`) || "{}",
       );
 
       setMeasurement(
         actualSavedConfig?.units ?? "cms",
-        Number.parseFloat(actualSavedConfig?.referenceMeasureUnits ?? "10")
+        Number.parseFloat(actualSavedConfig?.referenceMeasureUnits ?? "10"),
       );
 
       setReferenceMeasurePixels(
-        actualSavedConfig?.referenceMeasurePixels ?? null
+        actualSavedConfig?.referenceMeasurePixels ?? null,
       );
     }
   }, [room, setMeasurement, setReferenceMeasurePixels]);
