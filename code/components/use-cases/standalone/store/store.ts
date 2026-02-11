@@ -21,9 +21,9 @@ interface StandaloneUseCaseState {
     open: boolean;
   };
   measurement: {
-    units: string;
-    referenceMeasureUnits: number;
-    referenceMeasurePixels: number | null;
+    open: boolean;
+    unit: string | null;
+    measureId: string | null;
   };
   managing: {
     imageId: string | null;
@@ -38,6 +38,9 @@ interface StandaloneUseCaseState {
     showSelectFile: boolean;
     uploading: boolean;
     loading: boolean;
+  };
+  sidebar: {
+    active: "comments" | "measures" | null;
   };
   comments: {
     show: boolean;
@@ -56,17 +59,19 @@ interface StandaloneUseCaseState {
   setUploadingImage: (newUploadingImage: boolean) => void;
   setExporting: (newSaving: boolean) => void;
   setSaving: (newSaving: boolean) => void;
+  setSidebarActive: (newActive: "comments" | "measures" | null) => void;
   setCommentsShow: (newShow: boolean) => void;
   setCommentsStatus: (newStatus: ThreadStatus | "all") => void;
   setConfigurationOpen: (newOpen: boolean) => void;
-  setMeasurement: (units: string, referenceMeasureUnits: number) => void;
-  setReferenceMeasurePixels: (referenceMeasurePixels: number | null) => void;
   setNodePropertiesAction: (
     newNodePropertiesAction: NodePropertiesAction
   ) => void;
   setNodePropertiesCreateProps: (
     newNodePropertiesCreateProps: WeaveElementAttributes | undefined
   ) => void;
+  setMeasureUnit: (newUnit: string) => void;
+  setMeasureId: (newMeasureId: string | null) => void;
+  setMeasurementDefinitionOpen: (newOpen: boolean) => void;
 }
 
 export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
@@ -76,9 +81,10 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
     open: false,
   },
   measurement: {
-    units: "cms",
-    referenceMeasureUnits: 10,
-    referenceMeasurePixels: null,
+    open: false,
+    unit: null,
+    measureId: null,
+    forceDefine: false,
   },
   managing: {
     imageId: null,
@@ -93,6 +99,9 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
     showSelectFile: false,
     uploading: false,
     loading: false,
+  },
+  sidebar: {
+    active: "measures",
   },
   comments: {
     show: false,
@@ -140,6 +149,11 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
       ...state,
       actions: { ...state.actions, saving: newSaving },
     })),
+  setSidebarActive: (newActive) =>
+    set((state) => ({
+      ...state,
+      sidebar: { active: newActive },
+    })),
   setCommentsShow: (newShow) =>
     set((state) => ({
       ...state,
@@ -158,23 +172,6 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
         open: newOpen,
       },
     })),
-  setMeasurement: (units: string, referenceMeasureUnits: number) =>
-    set((state) => ({
-      ...state,
-      measurement: {
-        ...state.measurement,
-        units,
-        referenceMeasureUnits,
-      },
-    })),
-  setReferenceMeasurePixels: (referenceMeasurePixels: number | null) =>
-    set((state) => ({
-      ...state,
-      measurement: {
-        ...state.measurement,
-        referenceMeasurePixels,
-      },
-    })),
   setNodePropertiesAction: (newNodePropertiesAction) =>
     set((state) => ({
       ...state,
@@ -189,6 +186,30 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
       nodeProperties: {
         ...state.nodeProperties,
         createProps: newNodePropertiesCreateProps,
+      },
+    })),
+  setMeasureUnit: (newUnit) =>
+    set((state) => ({
+      ...state,
+      measurement: {
+        ...state.measurement,
+        unit: newUnit,
+      },
+    })),
+  setMeasureId: (newMeasureId) =>
+    set((state) => ({
+      ...state,
+      measurement: {
+        ...state.measurement,
+        measureId: newMeasureId,
+      },
+    })),
+  setMeasurementDefinitionOpen: (newOpen) =>
+    set((state) => ({
+      ...state,
+      measurement: {
+        ...state.measurement,
+        open: newOpen,
       },
     })),
 }));

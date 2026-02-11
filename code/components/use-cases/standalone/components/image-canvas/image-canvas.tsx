@@ -20,30 +20,6 @@ export const ImageCanvas = () => {
     (state) => state.managing.imageId
   );
 
-  const setMeasurement = useStandaloneUseCase((state) => state.setMeasurement);
-  const setReferenceMeasurePixels = useStandaloneUseCase(
-    (state) => state.setReferenceMeasurePixels
-  );
-
-  React.useEffect(() => {
-    if (instanceId) {
-      const actualSavedConfig = JSON.parse(
-        sessionStorage.getItem(
-          `weave.js_standalone_${instanceId}_${managingImageId}_config`
-        ) || "{}"
-      );
-
-      setMeasurement(
-        actualSavedConfig?.units ?? "cms",
-        Number.parseFloat(actualSavedConfig?.referenceMeasureUnits ?? "10")
-      );
-
-      setReferenceMeasurePixels(
-        actualSavedConfig?.referenceMeasurePixels ?? null
-      );
-    }
-  }, [instanceId, managingImageId, setMeasurement, setReferenceMeasurePixels]);
-
   const { data: roomData, isFetching } = useQuery({
     queryKey: ["standaloneInstanceData", instanceId, managingImageId],
     queryFn: () => {

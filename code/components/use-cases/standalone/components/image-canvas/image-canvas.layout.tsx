@@ -24,6 +24,11 @@ import { ConfigurationDialog } from "../overlays/configuration";
 import { NodeToolbar } from "../overlays/node-toolbar";
 import { useCollaborationRoom } from "@/store/store";
 import { ExportConfigDialog } from "@/components/room-components/overlay/export-config";
+import { MeasureDefinitionDialog } from "../overlays/measure-definition";
+import { MeasureNode } from "../../nodes/measure/measure";
+import { useMeasuresInfo } from "../../hooks/use-measures-info";
+import { MEASURE_NODE_TYPE } from "../../nodes/measure/constants";
+import { ExportPDFConfigDialog } from "@/components/room-components/overlay/export-pdf-config";
 
 export const ImageCanvasLayout = () => {
   const instance = useWeave((state) => state.instance);
@@ -33,28 +38,37 @@ export const ImageCanvasLayout = () => {
 
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible
+    (state) => state.setExportConfigVisible,
   );
 
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const exporting = useStandaloneUseCase((state) => state.actions.exporting);
   const saving = useStandaloneUseCase((state) => state.actions.saving);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const setManagingImageId = useStandaloneUseCase(
-    (state) => state.setManagingImageId
+    (state) => state.setManagingImageId,
   );
   const setSaving = useStandaloneUseCase((state) => state.setSaving);
   const setCommentsShow = useStandaloneUseCase(
-    (state) => state.setCommentsShow
+    (state) => state.setCommentsShow,
   );
   const setConfigurationOpen = useStandaloneUseCase(
-    (state) => state.setConfigurationOpen
+    (state) => state.setConfigurationOpen,
   );
   const setExporting = useStandaloneUseCase((state) => state.setExporting);
+  const setMeasureUnit = useStandaloneUseCase((state) => state.setMeasureUnit);
+  const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
+  const setMeasurementDefinitionOpen = useStandaloneUseCase(
+    (state) => state.setMeasurementDefinitionOpen,
+  );
 
   useWeaveEvents();
+
+  const [loaded, setLoaded] = React.useState(false);
+
+  const { scale } = useMeasuresInfo();
 
   React.useEffect(() => {
     if (!instance) return;
@@ -77,6 +91,86 @@ export const ImageCanvasLayout = () => {
     }
   }, [instance, status, roomLoaded]);
 
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const actualSavedConfig = JSON.parse(
+      sessionStorage.getItem(
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+      ) || "{}",
+    );
+
+    if (!loaded && !actualSavedConfig.measurement) {
+      sessionStorage.setItem(
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+        JSON.stringify({
+          ...actualSavedConfig,
+          measurement: {
+            unit: "cms",
+          },
+        }),
+      );
+
+      setLoaded(true);
+      return;
+    }
+
+    if (!loaded && actualSavedConfig.measurement) {
+      setLoaded(true);
+    }
+  }, [instance, instanceId, managingImageId, loaded]);
+
+  React.useEffect(() => {
+    if (!loaded) return;
+
+    if (!instance) return;
+
+    const actualSavedConfig = JSON.parse(
+      sessionStorage.getItem(
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+      ) || "{}",
+    );
+
+    setMeasureUnit(actualSavedConfig.measurement.unit || "cms");
+
+    instance.emitEvent("onMeasureReferenceChange", {
+      unit: actualSavedConfig.measurement.unit,
+      unitPerPixel: scale,
+    });
+  }, [instance, instanceId, managingImageId, loaded, scale, setMeasureUnit]);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    const defineMeasureHandler = (data: { nodeId: string }) => {
+      const measureHandler =
+        instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
+
+      if (!measureHandler) {
+        return;
+      }
+
+      const hasUnitPerPixelDefined = measureHandler.hasUnitPerPixelDefined();
+
+      if (!hasUnitPerPixelDefined) {
+        setMeasureId(data.nodeId);
+        setMeasurementDefinitionOpen(true);
+      }
+    };
+
+    instance.addEventListener("onCreateMeasure", defineMeasureHandler);
+
+    return () => {
+      instance.removeEventListener("onCreateMeasure", defineMeasureHandler);
+    };
+  }, [
+    instance,
+    instanceId,
+    managingImageId,
+    setMeasureId,
+    setMeasurementDefinitionOpen,
+  ]);
+
   const mutationSave = useMutation({
     mutationFn: async (data: string) => {
       if (!managingImageId) {
@@ -86,7 +180,7 @@ export const ImageCanvasLayout = () => {
       return await putStandaloneInstanceImageData(
         instanceId,
         managingImageId,
-        data
+        data,
       );
     },
     onMutate: () => {
@@ -187,7 +281,9 @@ export const ImageCanvasLayout = () => {
             </div>
           )}
           <ExportConfigDialog onIsExportingChange={setExporting} />
+          <ExportPDFConfigDialog onIsExportingChange={setExporting} />
           <ConfigurationDialog />
+          <MeasureDefinitionDialog />
         </>
       )}
     </>

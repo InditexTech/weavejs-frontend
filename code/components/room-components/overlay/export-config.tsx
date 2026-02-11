@@ -57,10 +57,11 @@ export function ExportConfigDialog({
 
   const nodesToExport = useCollaborationRoom((state) => state.export.nodes);
   const exportConfigVisible = useCollaborationRoom(
-    (state) => state.export.config.visible
+    (state) => state.export.config.visible,
   );
+  const exporting = useCollaborationRoom((state) => state.images.exporting);
   const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible
+    (state) => state.setExportConfigVisible,
   );
 
   React.useEffect(() => {
@@ -106,7 +107,7 @@ export function ExportConfigDialog({
         handleExport();
       }
     },
-    [exportConfigVisible, handleExport]
+    [exportConfigVisible, handleExport],
   );
 
   React.useEffect(() => {
@@ -273,7 +274,7 @@ export function ExportConfigDialog({
                           >
                             {`${ratio}`}
                           </SelectItem>
-                        )
+                        ),
                       )}
                     </SelectGroup>
                   </SelectContent>
@@ -285,6 +286,7 @@ export function ExportConfigDialog({
             <Button
               ref={buttonRef}
               type="button"
+              disabled={exporting}
               className="cursor-pointer font-inter rounded-none"
               onClick={handleExport}
             >

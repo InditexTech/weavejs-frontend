@@ -18,6 +18,8 @@ declare module "konva/lib/Node" {
     dblClick(): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
     canMoveToContainer(node: Konva.Node): boolean;
+    getNodeAnchors(): WeaveConnectorAnchor[];
+    canDrag(): boolean;
   }
   interface Layer {
     canMoveToContainer(node: Konva.Node): boolean;

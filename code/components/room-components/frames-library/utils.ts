@@ -20,7 +20,7 @@ export const toImageAsync = (
     y: number;
     width: number;
     height: number;
-  }
+  },
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
     node.toImage({
@@ -41,21 +41,18 @@ export const toImageAsync = (
 
 export async function generatePresentation(
   instance: Weave,
-  framesAvailable: Konva.Node[]
+  framesAvailable: Konva.Node[],
 ) {
-  const stage = instance.getStage();
-
   const images: PresentationImage[] = [];
   for (const frame of framesAvailable) {
     const attrs = frame.getAttrs();
-    const frameBg = stage.findOne(`#${attrs.id}-bg`) as Konva.Group;
-    const boxBg = frameBg.getClientRect();
+    const bounds = instance.getExportBoundingBox([attrs.containerId]);
     const img = await toImageAsync(frame, {
       pixelRatio: 4,
-      x: boxBg.x + 4,
-      y: boxBg.y + 4,
-      width: boxBg.width - 8,
-      height: boxBg.height - 8,
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.width,
+      height: bounds.height,
     });
     images.push({
       img,

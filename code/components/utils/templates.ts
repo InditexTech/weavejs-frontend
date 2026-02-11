@@ -16,19 +16,19 @@ import { WeaveStateElement } from "@inditextech/weave-types";
 import Konva from "konva";
 
 const getNodesSelectionPlugin = (
-  instance: Weave
+  instance: Weave,
 ): WeaveNodesSelectionPlugin | undefined => {
   return instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 };
 
 const getStageGridPlugin = (
-  instance: Weave
+  instance: Weave,
 ): WeaveStageGridPlugin | undefined => {
   return instance.getPlugin<WeaveStageGridPlugin>("stageGrid");
 };
 
 export const getSelectionAsTemplate = (
-  instance: Weave
+  instance: Weave,
 ): WeavePasteModel | undefined => {
   const stage = instance.getStage();
 
@@ -53,7 +53,7 @@ export const getSelectionAsTemplate = (
 
   for (const node of selectedNodes) {
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
-      node.getAttrs().nodeType
+      node.getAttrs().nodeType,
     );
 
     if (!nodeHandler) {
@@ -106,7 +106,7 @@ export const setTemplateOnPosition = (
   instance: Weave,
   template: WeavePasteModel,
   position: Konva.Vector2d,
-  relativePosition?: Konva.Vector2d
+  relativePosition?: Konva.Vector2d,
 ) => {
   const stage = instance.getStage();
   const nodesToSelect = [];
@@ -152,7 +152,7 @@ export const setTemplateOnPosition = (
     }
 
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
-      node.props.nodeType ?? ""
+      node.props.nodeType ?? "",
     );
 
     if (nodeHandler) {

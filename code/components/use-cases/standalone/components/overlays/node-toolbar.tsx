@@ -31,20 +31,20 @@ import {
   Paintbrush,
   FlipVertical2,
   Ruler,
+  CircleX,
+  PencilRuler,
 } from "lucide-react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
-import {
-  WeaveCopyPasteNodesPlugin,
-  WeaveMeasureNode,
-} from "@inditextech/weave-sdk";
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
 import { Button } from "@/components/ui/button";
-import { merge } from "lodash";
 import { ShortcutElement } from "@/components/room-components/help/shortcut-element";
 import { ToolbarButton } from "@/components/room-components/toolbar/toolbar-button";
 import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-divider";
 import { useNodeActionName } from "@/components/room-components/overlay/hooks/use-node-action-name";
 import { ColorPickerInput } from "@/components/room-components/inputs/color-picker";
 import { useStandaloneUseCase } from "../../store/store";
+import { MeasureNode } from "../../nodes/measure/measure";
+import { MEASURE_NODE_TYPE } from "../../nodes/measure/constants";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -73,11 +73,12 @@ export const NodeToolbar = () => {
   const setNodePropertiesAction = useStandaloneUseCase(
     (state) => state.setNodePropertiesAction
   );
+  const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
+  const setMeasurementDefinitionOpen = useStandaloneUseCase(
+    (state) => state.setMeasurementDefinitionOpen
+  );
   const nodeCreateProps = useStandaloneUseCase(
     (state) => state.nodeProperties.createProps
-  );
-  const setReferenceMeasurePixels = useStandaloneUseCase(
-    (state) => state.setReferenceMeasurePixels
   );
 
   const updateElement = React.useCallback(
@@ -281,8 +282,14 @@ export const NodeToolbar = () => {
   );
 
   const isMeasureNode = React.useMemo(
-    () => actualNode && (actualNode.type ?? "") === "measure",
+    () => actualNode && (actualNode.type ?? "") === MEASURE_NODE_TYPE,
     [actualNode]
+  );
+
+  const isMeasureRealValueDefined = React.useMemo(
+    () =>
+      actualNode && isMeasureNode && actualNode.props.realMeasure !== undefined,
+    [actualNode, isMeasureNode]
   );
 
   const canSetNodeStyling = React.useMemo(() => {
@@ -291,12 +298,12 @@ export const NodeToolbar = () => {
       actualNode &&
       ![
         "mask",
-        "measure",
         "fuzzy-mask",
         "image",
         "video",
         "color-token",
         "image-template",
+        MEASURE_NODE_TYPE,
       ].includes(actualNode.type as string)
     );
   }, [isSingleNodeSelected, actualNode]);
@@ -346,7 +353,7 @@ export const NodeToolbar = () => {
                       .findOne(`#${node?.key}`);
 
                     const measureHandler =
-                      instance.getNodeHandler<WeaveMeasureNode>("measure");
+                      instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
                     if (nodeInstance && measureHandler) {
                       measureHandler.flipOrientation(
                         nodeInstance as Konva.Group
@@ -363,7 +370,13 @@ export const NodeToolbar = () => {
                 />
                 <ToolbarButton
                   className="rounded-full !w-[40px] !h-[40px]"
-                  icon={<Ruler className="px-0" size={20} strokeWidth={1} />}
+                  icon={
+                    !isMeasureRealValueDefined ? (
+                      <Ruler className="px-0" size={20} strokeWidth={1} />
+                    ) : (
+                      <PencilRuler className="px-0" size={20} strokeWidth={1} />
+                    )
+                  }
                   disabled={
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -378,53 +391,69 @@ export const NodeToolbar = () => {
                       .findOne(`#${node?.key}`);
 
                     const measureHandler =
-                      instance.getNodeHandler<WeaveMeasureNode>("measure");
+                      instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
+
                     if (nodeInstance && measureHandler) {
-                      const distanceInPixels =
-                        measureHandler.getNormalizedDistance(
-                          nodeInstance as Konva.Group
-                        );
-
-                      const actualSavedConfig = JSON.parse(
-                        sessionStorage.getItem(
-                          `weave.js_standalone_${instanceId}_${managingImageId}_config`
-                        ) || "{}"
-                      );
-
-                      const updatedConfig = {
-                        referenceMeasurePixels: distanceInPixels,
-                      };
-
-                      const finalConfiguration = merge(
-                        actualSavedConfig,
-                        updatedConfig
-                      );
-
-                      sessionStorage.setItem(
-                        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
-                        JSON.stringify(finalConfiguration)
-                      );
-
-                      setReferenceMeasurePixels(distanceInPixels);
-
-                      const scale =
-                        distanceInPixels /
-                        (actualSavedConfig?.referenceMeasureUnits ?? "10");
-
-                      instance.emitEvent("onMeasureReferenceChange", {
-                        unit: finalConfiguration.units ?? "cms",
-                        unitPerPixel: scale,
-                      });
+                      setMeasureId(nodeInstance.getAttrs().id as string);
+                      setMeasurementDefinitionOpen(true);
                     }
                   }}
                   label={
                     <div className="flex gap-3 justify-start items-center">
-                      <p>Set as reference measure</p>
+                      <p>
+                        {isMeasureRealValueDefined
+                          ? "Edit explicit measure"
+                          : "Set explicit measure"}
+                      </p>
                     </div>
                   }
                   tooltipSide="left"
                   tooltipAlign="center"
                 />
+                {isMeasureRealValueDefined && (
+                  <ToolbarButton
+                    className="rounded-full !w-[40px] !h-[40px]"
+                    icon={
+                      <CircleX className="px-0" size={20} strokeWidth={1} />
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={() => {
+                      if (!instance) {
+                        return;
+                      }
+
+                      const nodeInstance = instance
+                        .getStage()
+                        .findOne(`#${node?.key}`);
+
+                      const measureHandler =
+                        instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
+
+                      if (nodeInstance && measureHandler) {
+                        const actualSavedConfig = JSON.parse(
+                          sessionStorage.getItem(
+                            `weave.js_standalone_${instanceId}_${managingImageId}_config`
+                          ) || "{}"
+                        );
+
+                        instance.emitEvent("onMeasureChange", {
+                          nodeId: nodeInstance.getAttrs().id,
+                          unit: actualSavedConfig.measurement.unit,
+                        });
+                      }
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Clear explicit measure</p>
+                      </div>
+                    }
+                    tooltipSide="left"
+                    tooltipAlign="center"
+                  />
+                )}
               </>
             )}
             {canSetNodeStyling && (
@@ -1283,7 +1312,7 @@ export const NodeToolbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            {!["measure"].includes(actualNode?.type as string) && (
+            {![MEASURE_NODE_TYPE].includes(actualNode?.type as string) && (
               <DropdownMenu
                 modal={false}
                 open={actualMenusOpen.includes("layering")}

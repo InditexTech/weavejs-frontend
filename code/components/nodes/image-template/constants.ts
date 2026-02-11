@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export const IMAGE_TEMPLATE_NODE_TYPE = "image-template";
+
 export const IMAGE_TEMPLATE_FIT = {
   ["COVER"]: "cover",
   ["FILL"]: "fill",

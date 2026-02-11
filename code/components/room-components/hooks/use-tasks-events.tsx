@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import React from "react";
 import ReconnectingWebsocket from "reconnecting-websocket";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,6 +13,8 @@ import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
 import { postCommBusJoin } from "@/api/post-comm-bus-join";
 
 export const useTasksEvents = () => {
+  const toastRef = React.useRef<string | number | null>(null);
+
   const [initializedCommBus, setInitializedCommBus] =
     React.useState<boolean>(false);
   const room = useCollaborationRoom((state) => state.room);
@@ -19,9 +22,14 @@ export const useTasksEvents = () => {
   const clientId = useCollaborationRoom((state) => state.clientId);
   const setClientId = useCollaborationRoom((state) => state.setClientId);
   const setCommBusConnected = useCollaborationRoom(
-    (state) => state.setCommBusConnected
+    (state) => state.setCommBusConnected,
   );
-
+  const setImageExporting = useCollaborationRoom(
+    (state) => state.setImageExporting,
+  );
+  const setFramesExporting = useCollaborationRoom(
+    (state) => state.setFramesExporting,
+  );
   const queryClient = useQueryClient();
 
   const getCommBusUrl = useMutation({
@@ -58,9 +66,11 @@ export const useTasksEvents = () => {
 
       ws.onclose = () => console.log("🔌 closed");
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         const message = JSON.parse(event.data);
         const type = message.type;
+        const messageClientId = message.clientId;
+        const messageUserId = message.userId;
 
         if (type.startsWith("comment")) {
           eventBus.emit("onCommentsChanged");
@@ -93,6 +103,161 @@ export const useTasksEvents = () => {
           const queryKey = ["getVideos", room];
           queryClient.invalidateQueries({ queryKey });
         }
+
+        if (
+          ["exportImage"].includes(type) &&
+          messageClientId === clientId &&
+          messageUserId === user.id
+        ) {
+          const status = message.status;
+
+          switch (status) {
+            case "created": {
+              if (toastRef.current) {
+                toast.dismiss(toastRef.current);
+              }
+              toastRef.current = toast.loading("Export to image requested.", {
+                duration: Infinity,
+              });
+              break;
+            }
+            case "active": {
+              if (toastRef.current) {
+                toastRef.current = toast.loading(
+                  "Exporting to image processing.",
+                  {
+                    id: toastRef.current,
+                    duration: Infinity,
+                  },
+                );
+              }
+              break;
+            }
+            case "completed": {
+              if (toastRef.current) {
+                toast.success("Export to image completed.", {
+                  id: toastRef.current,
+                  duration: 4000,
+                });
+
+                const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
+
+                const res = await fetch(url);
+                const blob = await res.blob();
+
+                const objectUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = objectUrl;
+                if (message.data.responseType === "zip") {
+                  a.download = "export.zip";
+                } else if (message.data.responseType === "blob") {
+                  a.download = "export.png";
+                }
+                a.click();
+
+                URL.revokeObjectURL(objectUrl);
+
+                setImageExporting(false);
+              }
+              toastRef.current = null;
+              break;
+            }
+            case "failed": {
+              if (toastRef.current) {
+                toast.error("Export to image failed.", {
+                  id: toastRef.current,
+                  duration: 4000,
+                });
+
+                setImageExporting(false);
+              }
+              toastRef.current = null;
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        if (
+          ["exportPdf"].includes(type) &&
+          messageClientId === clientId &&
+          messageUserId === user.id
+        ) {
+          const status = message.status;
+
+          switch (status) {
+            case "created": {
+              if (toastRef.current) {
+                toast.dismiss(toastRef.current);
+              }
+              toastRef.current = toast.loading(
+                "Export frames to PDF requested.",
+                {
+                  duration: Infinity,
+                },
+              );
+              break;
+            }
+            case "active": {
+              if (toastRef.current) {
+                toastRef.current = toast.loading(
+                  "Exporting frames to PDF processing.",
+                  {
+                    id: toastRef.current,
+                    duration: Infinity,
+                  },
+                );
+              }
+              break;
+            }
+            case "completed": {
+              if (toastRef.current) {
+                toast.success("Export frames to PDF completed.", {
+                  id: toastRef.current,
+                  duration: 4000,
+                });
+
+                const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
+
+                const res = await fetch(url);
+                const blob = await res.blob();
+
+                const objectUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = objectUrl;
+                if (message.data.responseType === "zip") {
+                  a.download = "export.zip";
+                } else if (message.data.responseType === "blob") {
+                  a.download = "export.pdf";
+                }
+                a.click();
+
+                URL.revokeObjectURL(objectUrl);
+
+                setFramesExporting(false);
+              }
+              toastRef.current = null;
+              break;
+            }
+            case "failed": {
+              if (toastRef.current) {
+                toast.error("Export frames to PDF failed.", {
+                  id: toastRef.current,
+                  duration: 4000,
+                });
+
+                setFramesExporting(false);
+              }
+              toastRef.current = null;
+              break;
+            }
+            default:
+              break;
+          }
+        }
       };
 
       ws.onerror = (err) => console.error("❌ error", err);
@@ -120,5 +285,9 @@ export const useTasksEvents = () => {
     user?.name,
     setCommBusConnected,
     queryClient,
+    clientId,
+    user?.id,
+    setFramesExporting,
+    setImageExporting,
   ]);
 };

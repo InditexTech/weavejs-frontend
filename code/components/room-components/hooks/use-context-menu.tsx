@@ -47,20 +47,20 @@ function useContextMenu() {
 
   const room = useCollaborationRoom((state) => state.room);
   const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show
+    (state) => state.contextMenu.show,
   );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
+    (state) => state.setContextMenuShow,
   );
   const setContextMenuPosition = useCollaborationRoom(
-    (state) => state.setContextMenuPosition
+    (state) => state.setContextMenuPosition,
   );
   const setContextMenuOptions = useCollaborationRoom(
-    (state) => state.setContextMenuOptions
+    (state) => state.setContextMenuOptions,
   );
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible
+    (state) => state.setExportConfigVisible,
   );
 
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
@@ -69,7 +69,7 @@ function useContextMenu() {
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const setSaveDialogVisible = useTemplates(
-    (state) => state.setSaveDialogVisible
+    (state) => state.setSaveDialogVisible,
   );
 
   const { isExporting } = useExportToImageServerSide();
@@ -250,7 +250,7 @@ function useContextMenu() {
               if (handler) {
                 handler.setImage(
                   nodes[0].instance,
-                  linkedNode as WeaveElementInstance
+                  linkedNode as WeaveElementInstance,
                 );
               }
 
@@ -296,24 +296,6 @@ function useContextMenu() {
           });
         }
 
-        if (!singleLocked) {
-          // SAVE AS TEMPLATE
-          options.push({
-            id: "save-as-template",
-            type: "button",
-            label: (
-              <div className="w-full flex justify-between items-center">
-                <div>Save as template</div>
-              </div>
-            ),
-            icon: <PackagePlus size={16} />,
-            disabled: !["selectionTool"].includes(actActionActive ?? ""),
-            onClick: () => {
-              setSaveDialogVisible(true);
-              setContextMenuShow(false);
-            },
-          });
-        }
         options.push({
           id: "create-template-instance",
           type: "button",
@@ -327,13 +309,13 @@ function useContextMenu() {
           onClick: () => {
             if (!instance) return;
             const templateString = sessionStorage.getItem(
-              `weave.js_${room}_template`
+              `weave.js_${room}_template`,
             );
             setTemplateOnPosition(
               instance,
               templateString ? JSON.parse(templateString) : {},
               clickPoint,
-              stageClickPoint
+              stageClickPoint,
             );
           },
         });
@@ -390,6 +372,7 @@ function useContextMenu() {
           });
         }
       }
+
       options.push({
         id: "paste",
         type: "button",
@@ -415,6 +398,30 @@ function useContextMenu() {
           }
         },
       });
+
+      if (!singleLocked && nodes.length > 0) {
+        options.push({
+          id: "div-templates",
+          type: "divider",
+        });
+        // SAVE AS TEMPLATE
+        options.push({
+          id: "save-as-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Save as template</div>
+            </div>
+          ),
+          icon: <PackagePlus size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: () => {
+            setSaveDialogVisible(true);
+            setContextMenuShow(false);
+          },
+        });
+      }
+
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
         options.push({
@@ -538,7 +545,7 @@ function useContextMenu() {
             instance.group(
               nodes
                 .map((n) => n?.node)
-                .filter((node) => typeof node !== "undefined")
+                .filter((node) => typeof node !== "undefined"),
             );
             setContextMenuShow(false);
           },
@@ -679,7 +686,7 @@ function useContextMenu() {
       setContextMenuShow,
       room,
       linkedNode,
-    ]
+    ],
   );
 
   const onNodeContextMenuHandler = React.useCallback(
@@ -725,7 +732,7 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
-    ]
+    ],
   );
 
   React.useEffect(() => {
@@ -736,7 +743,7 @@ function useContextMenu() {
     return () => {
       instance.removeEventListener(
         "onNodeContextMenu",
-        onNodeContextMenuHandler
+        onNodeContextMenuHandler,
       );
     };
   }, [instance, onNodeContextMenuHandler]);
