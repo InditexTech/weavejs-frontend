@@ -203,12 +203,6 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     }
   }, [instance, roomFullyLoaded, asyncElementsAllLoaded, controls]);
 
-  console.log({
-    asyncElementsLoaded,
-    asyncElementsTotal,
-    asyncElementsAllLoaded,
-  });
-
   return (
     <AnimatePresence>
       <motion.div

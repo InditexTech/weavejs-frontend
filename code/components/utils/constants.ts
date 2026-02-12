@@ -261,7 +261,10 @@ const NODES = () => [
   new WeaveImageNode({
     config: {
       performance: {
-        caching: true,
+        cache: {
+          enabled: true,
+          pixelRatio: 4,
+        },
       },
       transform: {
         enabledAnchors: [

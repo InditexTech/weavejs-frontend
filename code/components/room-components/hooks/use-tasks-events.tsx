@@ -13,7 +13,8 @@ import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
 import { postCommBusJoin } from "@/api/post-comm-bus-join";
 
 export const useTasksEvents = () => {
-  const toastRef = React.useRef<string | number | null>(null);
+  const toastExportImageRef = React.useRef<string | number | null>(null);
+  const toastExportPdfRef = React.useRef<string | number | null>(null);
 
   const [initializedCommBus, setInitializedCommBus] =
     React.useState<boolean>(false);
@@ -113,20 +114,20 @@ export const useTasksEvents = () => {
 
           switch (status) {
             case "created": {
-              if (toastRef.current) {
-                toast.dismiss(toastRef.current);
-              }
-              toastRef.current = toast.loading("Export to image requested.", {
-                duration: Infinity,
-              });
+              toastExportImageRef.current = toast.loading(
+                "Export to image requested",
+                {
+                  duration: Infinity,
+                },
+              );
               break;
             }
             case "active": {
-              if (toastRef.current) {
-                toastRef.current = toast.loading(
-                  "Exporting to image processing.",
+              if (toastExportImageRef.current) {
+                toastExportImageRef.current = toast.loading(
+                  "Exporting to image processing",
                   {
-                    id: toastRef.current,
+                    id: toastExportImageRef.current,
                     duration: Infinity,
                   },
                 );
@@ -134,12 +135,7 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastRef.current) {
-                toast.success("Export to image completed.", {
-                  id: toastRef.current,
-                  duration: 4000,
-                });
-
+              if (toastExportImageRef.current) {
                 const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
 
                 const res = await fetch(url);
@@ -156,23 +152,31 @@ export const useTasksEvents = () => {
                 }
                 a.click();
 
+                toast.success(
+                  "Export to image completed, triggering download, please wait",
+                  {
+                    id: toastExportImageRef.current,
+                    duration: 4000,
+                  },
+                );
+
                 URL.revokeObjectURL(objectUrl);
 
                 setImageExporting(false);
               }
-              toastRef.current = null;
+              toastExportImageRef.current = null;
               break;
             }
             case "failed": {
-              if (toastRef.current) {
-                toast.error("Export to image failed.", {
-                  id: toastRef.current,
+              if (toastExportImageRef.current) {
+                toast.error("Export to image failed, try again", {
+                  id: toastExportImageRef.current,
                   duration: 4000,
                 });
 
                 setImageExporting(false);
               }
-              toastRef.current = null;
+              toastExportImageRef.current = null;
               break;
             }
             default:
@@ -189,11 +193,8 @@ export const useTasksEvents = () => {
 
           switch (status) {
             case "created": {
-              if (toastRef.current) {
-                toast.dismiss(toastRef.current);
-              }
-              toastRef.current = toast.loading(
-                "Export frames to PDF requested.",
+              toastExportPdfRef.current = toast.loading(
+                "Export frames to PDF requested",
                 {
                   duration: Infinity,
                 },
@@ -201,11 +202,11 @@ export const useTasksEvents = () => {
               break;
             }
             case "active": {
-              if (toastRef.current) {
-                toastRef.current = toast.loading(
-                  "Exporting frames to PDF processing.",
+              if (toastExportPdfRef.current) {
+                toastExportPdfRef.current = toast.loading(
+                  "Exporting frames to PDF processing",
                   {
-                    id: toastRef.current,
+                    id: toastExportPdfRef.current,
                     duration: Infinity,
                   },
                 );
@@ -213,12 +214,7 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastRef.current) {
-                toast.success("Export frames to PDF completed.", {
-                  id: toastRef.current,
-                  duration: 4000,
-                });
-
+              if (toastExportPdfRef.current) {
                 const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
 
                 const res = await fetch(url);
@@ -235,23 +231,31 @@ export const useTasksEvents = () => {
                 }
                 a.click();
 
+                toast.success(
+                  "Export frames to PDF completed, triggering download, please wait",
+                  {
+                    id: toastExportPdfRef.current,
+                    duration: 4000,
+                  },
+                );
+
                 URL.revokeObjectURL(objectUrl);
 
                 setFramesExporting(false);
               }
-              toastRef.current = null;
+              toastExportPdfRef.current = null;
               break;
             }
             case "failed": {
-              if (toastRef.current) {
-                toast.error("Export frames to PDF failed.", {
-                  id: toastRef.current,
+              if (toastExportPdfRef.current) {
+                toast.error("Export frames to PDF failed, try again", {
+                  id: toastExportPdfRef.current,
                   duration: 4000,
                 });
 
                 setFramesExporting(false);
               }
-              toastRef.current = null;
+              toastExportPdfRef.current = null;
               break;
             }
             default:

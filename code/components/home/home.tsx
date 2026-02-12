@@ -15,8 +15,18 @@ import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import weavePackage from "../../node_modules/@inditextech/weave-sdk/package.json";
 import weaveReactHelperPackage from "../../node_modules/@inditextech/weave-react/package.json";
 import weaveStorePackage from "../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
+import { createPortal } from "react-dom";
 
 export const Home = () => {
+  return (
+    <>
+      <HomeInternal />
+      <Toasts />
+    </>
+  );
+};
+
+const HomeInternal = () => {
   const [showDetails, setShowDetails] = React.useState(false);
 
   return (
@@ -133,24 +143,34 @@ export const Home = () => {
           </div>
         </motion.section>
       </main>
-      <Toaster
-        // offset={16}
-        mobileOffset={16}
-        position="bottom-center"
-        offset={{ right: "300px" }}
-        toastOptions={{
-          classNames: {
-            toast: "w-full font-inter font-light text-xs",
-            content: "w-full",
-            title: "w-full font-inter font-semibold text-sm",
-            description: "w-full font-inter font-light text-xs !text-black",
-          },
-          style: {
-            borderRadius: "0px",
-            boxShadow: "none",
-          },
-        }}
-      />
     </>
   );
+};
+
+const Toasts = () => {
+  const toasterContent = (
+    <Toaster
+      offset={16}
+      mobileOffset={16}
+      position="bottom-center"
+      toastOptions={{
+        classNames: {
+          toast: "w-full font-inter font-light text-xs",
+          content: "w-full",
+          title: "w-full font-inter font-semibold text-sm",
+          description: "w-full font-inter font-light text-xs !text-black",
+        },
+        style: {
+          transform: "translateX(calc(-496px + 50%))",
+          borderRadius: "0px",
+          boxShadow: "none",
+        },
+      }}
+    />
+  );
+
+  // Only render in the browser
+  if (typeof window === "undefined") return null;
+
+  return createPortal(toasterContent, document.body);
 };
