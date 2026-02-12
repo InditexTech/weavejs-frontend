@@ -65,35 +65,39 @@ export const FramesLibrary = () => {
   const [selectedFrames, setSelectedFrames] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    if (!instance) {
-      return;
-    }
-
-    const stage = instance.getStage();
-
-    if (!stage) {
-      return [];
-    }
-
-    if (sidebarActive === SIDEBAR_ELEMENTS.frames) {
-      const nodes = instance.findNodesByType(
-        appState.weave as WeaveStateElement,
-        "frame",
-      );
-
-      const frames: Konva.Node[] = [];
-      for (const node of nodes) {
-        const ele = stage.findOne(`#${node.key}`);
-        if (ele) {
-          frames.push(ele);
-        }
+    const handleFrames = () => {
+      if (!instance) {
+        return;
       }
 
-      setLoadingFrames(true);
-      setFramesAvailable(frames);
-    } else {
-      setFramesAvailable([]);
-    }
+      const stage = instance.getStage();
+
+      if (!stage) {
+        return [];
+      }
+
+      if (sidebarActive === SIDEBAR_ELEMENTS.frames) {
+        const nodes = instance.findNodesByType(
+          appState.weave as WeaveStateElement,
+          "frame",
+        );
+
+        const frames: Konva.Node[] = [];
+        for (const node of nodes) {
+          const ele = stage.findOne(`#${node.key}`);
+          if (ele) {
+            frames.push(ele);
+          }
+        }
+
+        setLoadingFrames(true);
+        setFramesAvailable(frames);
+      } else {
+        setFramesAvailable([]);
+      }
+    };
+
+    handleFrames();
   }, [instance, appState, sidebarActive]);
 
   React.useEffect(() => {
