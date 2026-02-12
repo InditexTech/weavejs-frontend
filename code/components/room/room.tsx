@@ -38,6 +38,15 @@ const statusMap: any = {
 };
 
 export const Room = () => {
+  return (
+    <>
+      <RoomInternal />
+      <Toasts />
+    </>
+  );
+};
+
+const RoomInternal = () => {
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
@@ -253,7 +262,6 @@ export const Room = () => {
           </WeaveProvider>
         </ChatBotPromptProvider>
       )}
-      <Toasts />
     </>
   );
 };
@@ -263,6 +271,7 @@ const Toasts = () => {
     <Toaster
       offset={16}
       mobileOffset={16}
+      position="bottom-center"
       toastOptions={{
         classNames: {
           toast: "w-full font-inter font-light text-xs",
@@ -271,6 +280,7 @@ const Toasts = () => {
           description: "w-full font-inter font-light text-xs !text-black",
         },
         style: {
+          transform: "translateX(calc(-496px + 50%))",
           borderRadius: "0px",
           boxShadow: "none",
         },

@@ -19,7 +19,7 @@ import {
   StepForward,
   XIcon,
 } from "lucide-react";
-import { generatePresentation, PresentationImage } from "./utils";
+import { generatePresentation, PresentationImage, toImageAsync } from "./utils";
 import { FrameImage } from "./frames-library.image";
 import { FramePresentationImage } from "./frames-library.presentation-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -32,6 +32,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
+import { cn } from "@/lib/utils";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -46,6 +47,13 @@ export const FramesLibrary = () => {
     (state) => state.frames.export.exporting,
   );
 
+  const [framesAvailable, setFramesAvailable] = React.useState<Konva.Node[]>(
+    [],
+  );
+  const [framesImages, setFramesImages] = React.useState<
+    Record<string, HTMLImageElement>
+  >({});
+  const [loadingFrames, setLoadingFrames] = React.useState<boolean>(false);
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
   const [presentationImagesLoaded, setPresentationImagesLoaded] =
@@ -56,9 +64,9 @@ export const FramesLibrary = () => {
   const [actualFrame, setActualFrame] = React.useState<number>(0);
   const [selectedFrames, setSelectedFrames] = React.useState<string[]>([]);
 
-  const framesAvailable = React.useMemo(() => {
+  React.useEffect(() => {
     if (!instance) {
-      return [];
+      return;
     }
 
     const stage = instance.getStage();
@@ -67,20 +75,59 @@ export const FramesLibrary = () => {
       return [];
     }
 
-    const nodes = instance.findNodesByType(
-      appState.weave as WeaveStateElement,
-      "frame",
-    );
+    if (sidebarActive === SIDEBAR_ELEMENTS.frames) {
+      const nodes = instance.findNodesByType(
+        appState.weave as WeaveStateElement,
+        "frame",
+      );
 
-    const frames: Konva.Node[] = [];
-    for (const node of nodes) {
-      const ele = stage.findOne(`#${node.key}`);
-      if (ele) {
-        frames.push(ele);
+      const frames: Konva.Node[] = [];
+      for (const node of nodes) {
+        const ele = stage.findOne(`#${node.key}`);
+        if (ele) {
+          frames.push(ele);
+        }
       }
+
+      setLoadingFrames(true);
+      setFramesAvailable(frames);
+    } else {
+      setFramesAvailable([]);
     }
-    return frames;
-  }, [instance, appState]);
+  }, [instance, appState, sidebarActive]);
+
+  React.useEffect(() => {
+    const loadImage = async (node: Konva.Node) => {
+      if (!instance) return;
+
+      const nodeAttrs = node.getAttrs();
+      try {
+        const bounds = instance.getExportBoundingBox([nodeAttrs.containerId]);
+        const img = await toImageAsync(node, {
+          x: bounds.x,
+          y: bounds.y,
+          pixelRatio: 3,
+          width: bounds.width,
+          height: bounds.height,
+        });
+        setFramesImages((prev) => ({ ...prev, [nodeAttrs.id ?? ""]: img }));
+      } catch (ex) {
+        console.error(ex);
+      }
+    };
+
+    const loadImages = async () => {
+      const images = framesAvailable.map((frame) => loadImage(frame));
+      await Promise.allSettled(images);
+      setLoadingFrames(false);
+    };
+
+    if (loadingFrames) {
+      setTimeout(() => {
+        loadImages();
+      }, 50);
+    }
+  }, [framesAvailable, loadingFrames]);
 
   const exportFramesHandler = React.useCallback(async () => {
     if (!instance) {
@@ -241,51 +288,68 @@ export const FramesLibrary = () => {
           <SidebarSelector title="Frames" />
         </SidebarHeader>
         <ScrollArea className="w-full h-[calc(100%-65px-73px)]">
-          <div className="flex flex-col gap-[24px] w-full h-full p-[24px]">
-            {framesAvailable.length === 0 && (
-              <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+          <div
+            className={cn("flex flex-col gap-[24px] w-full h-full", {
+              ["p-0"]:
+                loadingFrames ||
+                (!loadingFrames && framesAvailable.length === 0),
+              ["p-[24px]"]: !loadingFrames && framesAvailable.length > 0,
+            })}
+          >
+            {loadingFrames && (
+              <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+                <b className="font-normal text-[18px]">Loading frames</b>
+                <span className="text-[14px]">Please wait...</span>
+              </div>
+            )}
+            {!loadingFrames && framesAvailable.length === 0 && (
+              <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                 <b className="font-normal text-[18px]">No frames created</b>
                 <span className="text-[14px]">
                   Add a frame to the whiteboard
                 </span>
               </div>
             )}
-            {framesAvailable.map((node) => {
-              const attrs = node.getAttrs();
+            {!loadingFrames &&
+              framesAvailable.map((node) => {
+                const attrs = node.getAttrs();
 
-              return (
-                <div
-                  key={attrs.id}
-                  className="w-full bg-light-background-1 flex flex-col gap-3"
-                >
-                  <div className="w-full flex justify-between items-center">
-                    <div className="w-full text-[14px] font-inter font-light">
-                      {attrs.title}
+                return (
+                  <div
+                    key={attrs.id}
+                    className="w-full bg-light-background-1 flex flex-col gap-3"
+                  >
+                    <div className="w-full flex justify-between items-center">
+                      <div className="w-full text-[14px] font-inter font-light">
+                        {attrs.title}
+                      </div>
+                      <div className="font-label-l-regular">
+                        <Checkbox
+                          className="cursor-pointer rounded-none"
+                          checked={
+                            selectedFrames.findIndex((e) => e === attrs.id) !==
+                            -1
+                          }
+                          onCheckedChange={() => {
+                            setSelectedFrames((prev) => {
+                              const newElements = new Set(prev);
+                              if (newElements.has(attrs.id ?? "")) {
+                                newElements.delete(attrs.id ?? "");
+                              } else {
+                                newElements.add(attrs.id ?? "");
+                              }
+                              return Array.from(newElements);
+                            });
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="font-label-l-regular">
-                      <Checkbox
-                        className="cursor-pointer rounded-none"
-                        checked={
-                          selectedFrames.findIndex((e) => e === attrs.id) !== -1
-                        }
-                        onCheckedChange={() => {
-                          setSelectedFrames((prev) => {
-                            const newElements = new Set(prev);
-                            if (newElements.has(attrs.id ?? "")) {
-                              newElements.delete(attrs.id ?? "");
-                            } else {
-                              newElements.add(attrs.id ?? "");
-                            }
-                            return Array.from(newElements);
-                          });
-                        }}
-                      />
-                    </div>
+                    <FrameImage
+                      image={framesImages[node.getAttrs().id ?? ""]}
+                    />
                   </div>
-                  <FrameImage node={node as Konva.Group} />
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </ScrollArea>
       </div>

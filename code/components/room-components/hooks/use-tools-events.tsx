@@ -44,11 +44,11 @@ const AddFrameToast = () => {
   const room = useCollaborationRoom((state) => state.room);
 
   const [frameTemplate, setFrameTemplate] = React.useState<"none" | string>(
-    "none"
+    "none",
   );
   const [templates, setTemplates] = React.useState<TemplateEntity[]>([]);
   const [frameKind, setFrameKind] = React.useState<"horizontal" | "vertical">(
-    "horizontal"
+    "horizontal",
   );
   const [selectBackgroundColor, setSelectBackgroundColor] =
     React.useState(false);
@@ -80,7 +80,7 @@ const AddFrameToast = () => {
       }
 
       const template = templates.find(
-        (t) => t.templateId === frameTemplate
+        (t) => t.templateId === frameTemplate,
       ) as TemplateEntity;
 
       if (!template) {
@@ -102,7 +102,7 @@ const AddFrameToast = () => {
       setTemplateOnPosition(
         instance,
         JSON.parse(template.templateData),
-        mousePoint
+        mousePoint,
       );
 
       const actionHandler: WeaveFrameToolAction | undefined =
@@ -188,7 +188,7 @@ const AddFrameToast = () => {
                 weaveConnectionStatus !==
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
                 frameTemplate !== "none",
-            }
+            },
           )}
         >
           <div className="text-[10px] font-inter uppercase px-0">
@@ -209,7 +209,7 @@ const AddFrameToast = () => {
                         weaveConnectionStatus !==
                           WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
                         frameTemplate !== "none",
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -342,20 +342,20 @@ export const useToolsEvents = () => {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const setLoadingImage = useCollaborationRoom(
-    (state) => state.setLoadingImage
+    (state) => state.setLoadingImage,
   );
   const setNodePropertiesCreateProps = useCollaborationRoom(
-    (state) => state.setNodePropertiesCreateProps
+    (state) => state.setNodePropertiesCreateProps,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const isTouchDevice = useIsTouchDevice();
@@ -372,7 +372,7 @@ export const useToolsEvents = () => {
       if (actualAction === "commentTool" && action !== "commentTool") {
         sidebarToggle(null);
       }
-      toast.dismiss();
+      // toast.dismiss();
     };
 
     instance.addEventListener("onPropsChange", handlePropsChange);
@@ -383,7 +383,7 @@ export const useToolsEvents = () => {
         instance.removeEventListener("onPropsChange", handlePropsChange);
         instance.removeEventListener(
           "onActiveActionChange",
-          handleActiveActionChange
+          handleActiveActionChange,
         );
         instance.removeEventListener("onImageLoadStart", handlePropsChange);
         instance.removeEventListener("onImageLoadEnd", handlePropsChange);
@@ -416,18 +416,18 @@ export const useToolsEvents = () => {
     instance.addEventListener("onStartAddingComment", handleStartCommentAdding);
     instance.addEventListener(
       "onFinishAddingComment",
-      handleFinishCommentAdding
+      handleFinishCommentAdding,
     );
 
     return () => {
       if (instance) {
         instance.removeEventListener(
           "onStartAddingComment",
-          handleStartCommentAdding
+          handleStartCommentAdding,
         );
         instance.removeEventListener(
           "onFinishAddingComment",
-          handleFinishCommentAdding
+          handleFinishCommentAdding,
         );
       }
     };
@@ -504,22 +504,22 @@ export const useToolsEvents = () => {
 
     instance.addEventListener(
       "onAddingRegularPolygon",
-      handleRegularPolygonAdding
+      handleRegularPolygonAdding,
     );
     instance.addEventListener(
       "onAddedRegularPolygon",
-      handleRegularPolygonAdded
+      handleRegularPolygonAdded,
     );
 
     return () => {
       if (instance) {
         instance.removeEventListener(
           "onAddingRegularPolygon",
-          handleRegularPolygonAdding
+          handleRegularPolygonAdding,
         );
         instance.removeEventListener(
           "onAddedRegularPolygon",
-          handleRegularPolygonAdded
+          handleRegularPolygonAdded,
         );
       }
     };
@@ -573,11 +573,11 @@ export const useToolsEvents = () => {
       if (instance) {
         instance.removeEventListener(
           "onAddingColorToken",
-          handleColorTokenAdding
+          handleColorTokenAdding,
         );
         instance.removeEventListener(
           "onAddedColorToken",
-          handleColorTokenAdded
+          handleColorTokenAdded,
         );
       }
     };
@@ -709,7 +709,7 @@ export const useToolsEvents = () => {
       if (instance) {
         instance.removeEventListener(
           "onAddingConnector",
-          handleConnectorAdding
+          handleConnectorAdding,
         );
         instance.removeEventListener("onAddedConnector", handleConnectorAdded);
       }

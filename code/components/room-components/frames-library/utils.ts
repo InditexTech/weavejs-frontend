@@ -48,7 +48,7 @@ export async function generatePresentation(
     const attrs = frame.getAttrs();
     const bounds = instance.getExportBoundingBox([attrs.containerId]);
     const img = await toImageAsync(frame, {
-      pixelRatio: 4,
+      pixelRatio: 8,
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
