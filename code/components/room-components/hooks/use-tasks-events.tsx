@@ -153,7 +153,7 @@ export const useTasksEvents = () => {
                 a.click();
 
                 toast.success(
-                  "Export frames to image completed, triggering download, please wait",
+                  "Export to image completed, triggering download, please wait",
                   {
                     id: toastExportImageRef.current,
                     duration: 4000,
