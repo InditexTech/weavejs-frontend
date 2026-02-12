@@ -127,7 +127,7 @@ export const FramesLibrary = () => {
         loadImages();
       }, 50);
     }
-  }, [framesAvailable, loadingFrames]);
+  }, [instance, framesAvailable, loadingFrames]);
 
   const exportFramesHandler = React.useCallback(async () => {
     if (!instance) {
