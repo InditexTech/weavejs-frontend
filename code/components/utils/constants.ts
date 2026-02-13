@@ -20,6 +20,7 @@ import {
   WeaveTextToolAction,
   WeaveStarToolAction,
   WeaveArrowToolAction,
+  // WeaveArrowV2ToolAction,
   WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
@@ -41,6 +42,7 @@ import {
   WeaveImageNode,
   WeaveStarNode,
   WeaveArrowNode,
+  // WeaveArrowV2Node,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
   WeaveStrokeNode,
@@ -282,6 +284,7 @@ const NODES = () => [
   }),
   new WeaveStarNode(),
   new WeaveArrowNode(),
+  // new WeaveArrowV2Node(),
   new WeaveRegularPolygonNode(),
   new WeaveFrameNode({
     config: {
@@ -616,6 +619,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveFrameToolAction(),
   new WeaveStarToolAction(),
   new WeaveArrowToolAction(),
+  // new WeaveArrowV2ToolAction(),
   new WeaveRegularPolygonToolAction(),
   new ColorTokenToolAction(),
   new ImageTemplateToolAction(),
