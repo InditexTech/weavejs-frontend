@@ -169,6 +169,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       instance.triggerAction("fitToScreenTool", {
         previousAction: "selectionTool",
+        overrideZoom: false,
       });
     }
   }, [instance, status, roomLoaded, asyncElementsAllLoaded]);
@@ -199,6 +200,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
 
       instance.triggerAction("fitToScreenTool", {
         previousAction: "selectionTool",
+        overrideZoom: false,
       });
     }
   }, [instance, roomFullyLoaded, asyncElementsAllLoaded, controls]);

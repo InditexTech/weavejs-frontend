@@ -28,7 +28,7 @@ export function Zoom() {
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const isZoomingAllowed = React.useMemo(() => {
@@ -89,6 +89,7 @@ export function Zoom() {
 
                 handleTriggerActionWithParams("fitToScreenTool", {
                   previousAction: actualAction,
+                  overrideZoom: false,
                 });
 
                 const weaveStageZoomPlugin =
@@ -113,6 +114,7 @@ export function Zoom() {
               onClick={() => {
                 handleTriggerActionWithParams("fitToSelectionTool", {
                   previousAction: actualAction,
+                  overrideZoom: false,
                 });
               }}
               label={

@@ -80,6 +80,7 @@ export const ImageCanvasLayout = () => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING) {
       instance.triggerAction("fitToScreenTool", {
         previousAction: "selectionTool",
+        overrideZoom: false,
       });
 
       const weaveStageZoomPlugin =

@@ -265,7 +265,7 @@ const NODES = () => [
       performance: {
         cache: {
           enabled: true,
-          pixelRatio: 4,
+          pixelRatio: 2,
         },
       },
       transform: {

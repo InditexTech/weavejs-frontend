@@ -52,12 +52,12 @@ export function useOnPasteExternalText() {
         node?.y(node.y() - node.height() / 2);
 
         const nodeHandle = instance?.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
+          node.getAttrs().nodeType,
         );
 
         if (nodeHandle) {
           instance?.updateNode(
-            nodeHandle.serialize(node as WeaveElementInstance)
+            nodeHandle.serialize(node as WeaveElementInstance),
           );
         }
 
@@ -70,19 +70,20 @@ export function useOnPasteExternalText() {
         instance?.triggerAction("fitToSelectionTool", {
           previousAction: "selectionTool",
           smartZoom: true,
+          overrideZoom: false,
         });
       }
     };
 
     instance?.addEventListener(
       "onNodeRenderedAdded",
-      onNodeRenderedAddedHandler
+      onNodeRenderedAddedHandler,
     );
 
     return () => {
       instance?.removeEventListener(
         "onNodeRenderedAdded",
-        onNodeRenderedAddedHandler
+        onNodeRenderedAddedHandler,
       );
     };
   }, [instance]);
