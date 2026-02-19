@@ -116,6 +116,7 @@ export function ZoomToolbar() {
               onClick={() => {
                 handleTriggerActionWithParams("fitToScreenTool", {
                   previousAction: actualAction,
+                  overrideZoom: false,
                 });
               }}
               label={
@@ -142,6 +143,7 @@ export function ZoomToolbar() {
               onClick={() => {
                 handleTriggerActionWithParams("fitToSelectionTool", {
                   previousAction: actualAction,
+                  overrideZoom: false,
                 });
               }}
               label={

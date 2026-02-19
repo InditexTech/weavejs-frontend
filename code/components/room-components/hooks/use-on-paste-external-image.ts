@@ -31,10 +31,10 @@ export function useOnPasteExternalImage() {
 
   const room = useCollaborationRoom((state) => state.room);
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const queryClient = useQueryClient();
@@ -49,7 +49,7 @@ export function useOnPasteExternalImage() {
   });
 
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   React.useEffect(() => {
@@ -78,12 +78,12 @@ export function useOnPasteExternalImage() {
         node?.y(node.y() - node.height() / 2);
 
         const nodeHandle = instance?.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
+          node.getAttrs().nodeType,
         );
 
         if (nodeHandle) {
           instance?.updateNode(
-            nodeHandle.serialize(node as WeaveElementInstance)
+            nodeHandle.serialize(node as WeaveElementInstance),
           );
         }
 
@@ -96,13 +96,14 @@ export function useOnPasteExternalImage() {
         instance?.triggerAction("fitToSelectionTool", {
           previousAction: "selectionTool",
           smartZoom: true,
+          overrideZoom: false,
         });
       }
     };
 
     instance?.addEventListener<WeaveImageToolActionOnAddedEvent>(
       "onAddedImage",
-      onAddedImageHandler
+      onAddedImageHandler,
     );
 
     return () => {
@@ -179,7 +180,7 @@ export function useOnPasteExternalImage() {
               position,
               forceMainContainer: true,
               imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-            }
+            },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
 

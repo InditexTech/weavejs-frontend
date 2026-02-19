@@ -29,13 +29,13 @@ export function useKeyboardHandler() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
   const threadsEnabled = useCollaborationRoom(
-    (state) => state.features.threads
+    (state) => state.features.threads,
   );
 
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
@@ -50,14 +50,14 @@ export function useKeyboardHandler() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const handleTriggerAction = React.useCallback(
@@ -70,7 +70,7 @@ export function useKeyboardHandler() {
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const handlePrintToConsoleState = React.useCallback(() => {
@@ -283,7 +283,7 @@ export function useKeyboardHandler() {
                 padding: 20,
                 pixelRatio: 2,
               },
-            }
+            },
           );
         }
       }
@@ -369,7 +369,7 @@ export function useKeyboardHandler() {
         instance.group(
           selectedNodes
             .map((n) => n?.node)
-            .filter((node) => typeof node !== "undefined")
+            .filter((node) => typeof node !== "undefined"),
         );
       }
 
@@ -468,12 +468,14 @@ export function useKeyboardHandler() {
       if (event.code === "Digit1" && isZoomingAllowed && event.shiftKey) {
         handleTriggerAction("fitToScreenTool", {
           previousAction: actualAction,
+          overrideZoom: false,
         });
       }
 
       if (event.code === "Digit2" && isZoomingAllowed && event.shiftKey) {
         handleTriggerAction("fitToSelectionTool", {
           previousAction: actualAction,
+          overrideZoom: false,
         });
       }
 
@@ -504,7 +506,7 @@ export function useKeyboardHandler() {
         instance
       ) {
         const { finishUploadCallback } = instance.triggerAction(
-          "videoTool"
+          "videoTool",
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ) as any;
 
@@ -531,7 +533,7 @@ export function useKeyboardHandler() {
       handlePrintToConsoleState,
       triggerTool,
       setShowSelectFileImage,
-    ]
+    ],
   );
 
   useKeyDown(keyDownHandler);

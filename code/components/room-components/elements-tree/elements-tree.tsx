@@ -77,7 +77,7 @@ function mapElementsToTree(
   instance: Weave,
   elements: WeaveStateElement[],
   lockedNodes: Record<string, { user: WeaveUser; operation: string }>,
-  selectedNodes: string[]
+  selectedNodes: string[],
 ) {
   const elementsMapped = elements.map((element) => {
     return {
@@ -118,7 +118,7 @@ function mapElementsToTree(
                 className="w-[16px] h-[16px] border border-[#c9c9c9]"
                 style={{
                   backgroundColor: stringToColor(
-                    lockedNodes[element.key]?.user.name ?? ""
+                    lockedNodes[element.key]?.user.name ?? "",
                   ),
                 }}
               ></div>
@@ -140,7 +140,7 @@ function mapElementsToTree(
                   className="w-[16px] h-[16px] border border-[#c9c9c9]"
                   style={{
                     backgroundColor: stringToColor(
-                      lockedNodes[element.key]?.user.name ?? ""
+                      lockedNodes[element.key]?.user.name ?? "",
                     ),
                   }}
                 ></div>
@@ -164,7 +164,10 @@ function mapElementsToTree(
             const stageZoomPlugin =
               instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
             if (stageZoomPlugin) {
-              stageZoomPlugin.fitToNodes([element.key], true);
+              stageZoomPlugin.fitToNodes([element.key], {
+                smartZoom: true,
+                overrideZoom: false,
+              });
             }
           }}
         >
@@ -256,7 +259,7 @@ function mapElementsToTree(
           instance,
           element.props.children ?? [],
           lockedNodes,
-          selectedNodes
+          selectedNodes,
         ),
       }),
     } as TreeDataItem;
@@ -275,12 +278,12 @@ export const ElementsTree = () => {
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
-    []
+    [],
   );
   const [selectedNodes, setSelectedNodes] = React.useState<string[]>(
     initialSelectedNodes
       .map((node) => node.node?.key)
-      .filter((key) => typeof key !== "undefined")
+      .filter((key) => typeof key !== "undefined"),
   );
 
   const amountOfNodes = React.useMemo(() => {
@@ -321,7 +324,7 @@ export const ElementsTree = () => {
       setSelectedNodes(
         nodes
           .map((node) => node.node?.key)
-          .filter((key) => typeof key !== "undefined")
+          .filter((key) => typeof key !== "undefined"),
       );
     }
 
@@ -333,7 +336,7 @@ export const ElementsTree = () => {
       if (instance) {
         instance.removeEventListener(
           "onNodesChange",
-          handleOnNodesSelectedChange
+          handleOnNodesSelectedChange,
         );
       }
     };
@@ -371,7 +374,7 @@ export const ElementsTree = () => {
       instance,
       elementsTree,
       lockedNodes,
-      selectedNodes
+      selectedNodes,
     );
   }, [instance, elementsTree, lockedNodes, selectedNodes]);
 
