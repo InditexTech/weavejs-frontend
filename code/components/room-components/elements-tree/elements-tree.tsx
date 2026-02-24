@@ -64,6 +64,7 @@ const iconsMap: Record<string, any> = {
   "color-token": Tag,
   connector: ChevronsLeftRightEllipsis,
   line: Spline,
+  "stroke-single": Spline,
   stroke: LineSquiggle,
   "regular-polygon": Hexagon,
   "image-template": LayoutPanelTop,

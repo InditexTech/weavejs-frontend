@@ -10,7 +10,6 @@ import {
   Brush,
   Image,
   Images,
-  PenTool,
   PenLine,
   Square,
   Frame,
@@ -22,7 +21,6 @@ import {
   Eraser,
   Circle,
   Star,
-  ArrowUpRight,
   Hexagon,
   ChevronDown,
   ChevronUp,
@@ -31,6 +29,7 @@ import {
   // MapPinned,
   Video,
   LayoutPanelTop,
+  MoveUpRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,7 +55,8 @@ import { useImagesTools } from "./hooks/use-images-tools";
 
 export function ToolsOverlayMouse() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
-  const [actualStrokesTool, setActualStrokesTool] = React.useState("lineTool");
+  const [actualStrokesTool, setActualStrokesTool] =
+    React.useState("strokeTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
@@ -69,20 +69,20 @@ export function ToolsOverlayMouse() {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
   const imageCroppingEnabled = useCollaborationRoom(
-    (state) => state.images.cropping.enabled
+    (state) => state.images.cropping.enabled,
   );
   const setShowSelectFileVideo = useCollaborationRoom(
-    (state) => state.setShowSelectFileVideo
+    (state) => state.setShowSelectFileVideo,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const threadsEnabled = useCollaborationRoom(
-    (state) => state.features.threads
+    (state) => state.features.threads,
   );
   // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
@@ -91,7 +91,7 @@ export function ToolsOverlayMouse() {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const triggerTool = React.useCallback(
@@ -104,7 +104,7 @@ export function ToolsOverlayMouse() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const SHAPES_TOOLS = useShapesTools();
@@ -198,7 +198,7 @@ export function ToolsOverlayMouse() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -352,7 +352,7 @@ export function ToolsOverlayMouse() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -406,8 +406,8 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualStrokesTool("lineTool");
-                  STROKES_TOOLS["lineTool"].onClick();
+                  setActualStrokesTool("strokeTool");
+                  STROKES_TOOLS["strokeTool"].onClick();
                 }}
               >
                 <PenLine size={20} strokeWidth={1} /> Line tool
@@ -422,12 +422,12 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualStrokesTool("penTool");
-                  STROKES_TOOLS["penTool"].onClick();
+                  setActualStrokesTool("arrowTool");
+                  STROKES_TOOLS["arrowTool"].onClick();
                 }}
               >
-                <PenTool size={20} strokeWidth={1} /> Pen tool
-                <DropdownMenuShortcut>Q</DropdownMenuShortcut>
+                <MoveUpRight size={20} strokeWidth={1} /> Arrow tool
+                <DropdownMenuShortcut>L</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -444,22 +444,6 @@ export function ToolsOverlayMouse() {
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
                 <DropdownMenuShortcut>B</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
-                  if (!instance) {
-                    return;
-                  }
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setActualStrokesTool("arrowTool");
-                  STROKES_TOOLS["arrowTool"].onClick();
-                }}
-              >
-                <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
-                <DropdownMenuShortcut>A</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -517,7 +501,7 @@ export function ToolsOverlayMouse() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >

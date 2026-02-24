@@ -16,7 +16,7 @@ export const useNodeActionName = () => {
   const setNode = useWeave((state) => state.setNode);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeType = React.useMemo(() => {
@@ -34,6 +34,8 @@ export const useNodeActionName = () => {
       case "regular-polygon":
         return "Regular Polygon";
       case "stroke":
+        return "Stroke";
+      case "stroke-single":
         return "Stroke";
       case "line":
         if (node.props.points?.length && node.props.points.length === 4) {
@@ -81,14 +83,14 @@ export const useNodeActionName = () => {
         return "Regular Polygon";
       case "brushTool":
         return "Stroke";
-      case "penTool":
-        return "Vector path";
       case "imageTool":
         return "Image";
       case "starTool":
         return "Star";
+      case "strokeTool":
+        return "Stroke";
       case "arrowTool":
-        return "Arrow";
+        return "Stroke";
       case "colorTokenTool":
         return "Color Token";
       case "frameTool":

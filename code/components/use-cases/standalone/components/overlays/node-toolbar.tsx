@@ -66,19 +66,19 @@ export const NodeToolbar = () => {
 
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const nodePropertiesAction: "create" | "update" | undefined =
     useStandaloneUseCase((state) => state.nodeProperties.action);
   const setNodePropertiesAction = useStandaloneUseCase(
-    (state) => state.setNodePropertiesAction
+    (state) => state.setNodePropertiesAction,
   );
   const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
   const setMeasurementDefinitionOpen = useStandaloneUseCase(
-    (state) => state.setMeasurementDefinitionOpen
+    (state) => state.setMeasurementDefinitionOpen,
   );
   const nodeCreateProps = useStandaloneUseCase(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const updateElement = React.useCallback(
@@ -91,7 +91,7 @@ export const NodeToolbar = () => {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   // Handle drag & transform
@@ -136,21 +136,21 @@ export const NodeToolbar = () => {
 
     instance.addEventListener(
       "onEnterTextNodeEditMode",
-      handleOnEnterTextEditMode
+      handleOnEnterTextEditMode,
     );
     instance.addEventListener(
       "onExitTextNodeEditMode",
-      handleOnExitTextEditMode
+      handleOnExitTextEditMode,
     );
 
     return () => {
       instance.removeEventListener(
         "onEnterTextNodeEditMode",
-        handleOnEnterTextEditMode
+        handleOnEnterTextEditMode,
       );
       instance.removeEventListener(
         "onExitTextNodeEditMode",
-        handleOnExitTextEditMode
+        handleOnExitTextEditMode,
       );
     };
   }, [instance]);
@@ -177,17 +177,17 @@ export const NodeToolbar = () => {
     instance.addEventListener("onImageTemplateFreed", handleImageTemplateFreed);
     instance.addEventListener(
       "onImageTemplateLocked",
-      handleImageTemplateLocked
+      handleImageTemplateLocked,
     );
 
     return () => {
       instance.removeEventListener(
         "onImageTemplateFreed",
-        handleImageTemplateFreed
+        handleImageTemplateFreed,
       );
       instance.removeEventListener(
         "onImageTemplateLocked",
-        handleImageTemplateLocked
+        handleImageTemplateLocked,
       );
     };
   }, [instance, movingImageTemplate]);
@@ -202,10 +202,10 @@ export const NodeToolbar = () => {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "penTool",
         "imageTool",
         "videoTool",
         "starTool",
+        "strokeTool",
         "arrowTool",
         "colorTokenTool",
         "frameTool",
@@ -278,18 +278,18 @@ export const NodeToolbar = () => {
 
   const isTextNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "text",
-    [actualNode]
+    [actualNode],
   );
 
   const isMeasureNode = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === MEASURE_NODE_TYPE,
-    [actualNode]
+    [actualNode],
   );
 
   const isMeasureRealValueDefined = React.useMemo(
     () =>
       actualNode && isMeasureNode && actualNode.props.realMeasure !== undefined,
-    [actualNode, isMeasureNode]
+    [actualNode, isMeasureNode],
   );
 
   const canSetNodeStyling = React.useMemo(() => {
@@ -356,7 +356,7 @@ export const NodeToolbar = () => {
                       instance.getNodeHandler<MeasureNode>(MEASURE_NODE_TYPE);
                     if (nodeInstance && measureHandler) {
                       measureHandler.flipOrientation(
-                        nodeInstance as Konva.Group
+                        nodeInstance as Konva.Group,
                       );
                     }
                   }}
@@ -435,8 +435,8 @@ export const NodeToolbar = () => {
                       if (nodeInstance && measureHandler) {
                         const actualSavedConfig = JSON.parse(
                           sessionStorage.getItem(
-                            `weave.js_standalone_${instanceId}_${managingImageId}_config`
-                          ) || "{}"
+                            `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+                          ) || "{}",
                         );
 
                         instance.emitEvent("onMeasureChange", {
@@ -472,7 +472,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -489,7 +489,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["nodeStyle"]
+                        prev.length > 0 ? [] : ["nodeStyle"],
                       );
                     }}
                     label={
@@ -530,7 +530,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -549,7 +549,7 @@ export const NodeToolbar = () => {
                                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                                 }
                                 active={actualMenusOpen.includes(
-                                  "nodeTextColor"
+                                  "nodeTextColor",
                                 )}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -616,7 +616,7 @@ export const NodeToolbar = () => {
                       </>
                     )}
                     {!["stroke", "line", "connector"].includes(
-                      actualNode?.type ?? ""
+                      actualNode?.type ?? "",
                     ) && (
                       <>
                         <div className="w-full flex justify-end items-center py-1">
@@ -635,7 +635,7 @@ export const NodeToolbar = () => {
                                   ["disabled:cursor-default disabled:opacity-50"]:
                                     weaveConnectionStatus !==
                                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                                }
+                                },
                               )}
                               asChild
                             >
@@ -733,7 +733,7 @@ export const NodeToolbar = () => {
                               ["disabled:cursor-default disabled:opacity-50"]:
                                 weaveConnectionStatus !==
                                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                            }
+                            },
                           )}
                           asChild
                         >
@@ -829,7 +829,7 @@ export const NodeToolbar = () => {
                               ["disabled:cursor-default disabled:opacity-50"]:
                                 weaveConnectionStatus !==
                                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                            }
+                            },
                           )}
                           asChild
                         >
@@ -1127,7 +1127,7 @@ export const NodeToolbar = () => {
                               ["disabled:cursor-default disabled:opacity-50"]:
                                 weaveConnectionStatus !==
                                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                            }
+                            },
                           )}
                           asChild
                         >
@@ -1328,7 +1328,7 @@ export const NodeToolbar = () => {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -1343,7 +1343,7 @@ export const NodeToolbar = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setActualMenusOpen((prev) =>
-                        prev.length > 0 ? [] : ["layering"]
+                        prev.length > 0 ? [] : ["layering"],
                       );
                     }}
                     label={
@@ -1395,7 +1395,7 @@ export const NodeToolbar = () => {
                         }
 
                         instance.bringToFront(
-                          nodeInstance as WeaveElementInstance
+                          nodeInstance as WeaveElementInstance,
                         );
                       }}
                       label={
@@ -1521,7 +1521,7 @@ export const NodeToolbar = () => {
                         }
 
                         instance.sendToBack(
-                          nodeInstance as WeaveElementInstance
+                          nodeInstance as WeaveElementInstance,
                         );
                       }}
                       label={
@@ -1627,7 +1627,7 @@ export const NodeToolbar = () => {
 
                 const weaveCopyPasteNodesPlugin =
                   instance.getPlugin<WeaveCopyPasteNodesPlugin>(
-                    "copyPasteNodes"
+                    "copyPasteNodes",
                   );
                 if (weaveCopyPasteNodesPlugin) {
                   await weaveCopyPasteNodesPlugin.copy();

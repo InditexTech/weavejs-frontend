@@ -19,11 +19,11 @@ export function FillProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const actualNode = React.useMemo(() => {
@@ -52,7 +52,7 @@ export function FillProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   if (nodes && nodes.length > 1) return null;
@@ -69,6 +69,8 @@ export function FillProperties() {
     [
       "image-template",
       "line",
+      "arrow",
+      "stroke-single",
       "connector",
       "group",
       "mask",
@@ -84,8 +86,8 @@ export function FillProperties() {
     actualAction &&
     ![
       "selectionTool",
-      "lineTool",
-      "penTool",
+      "strokeTool",
+      "arrowTool",
       "rectangleTool",
       "ellipseTool",
       "starTool",

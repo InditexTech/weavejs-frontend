@@ -448,8 +448,15 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleRectangleCancelled = (activeAction: string) => {
+      if (activeAction !== "rectangleTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingRectangle", handleRectangleAdding);
     instance.addEventListener("onAddedRectangle", handleRectangleAdded);
+    instance.addEventListener("onActiveActionChange", handleRectangleCancelled);
 
     return () => {
       if (!instance) {
@@ -458,6 +465,10 @@ export const useToolsEvents = () => {
 
       instance.removeEventListener("onAddingRectangle", handleRectangleAdding);
       instance.removeEventListener("onAddedRectangle", handleRectangleAdded);
+      instance.removeEventListener(
+        "onActiveActionChange",
+        handleRectangleCancelled,
+      );
     };
   }, [instance, isTouchDevice]);
 
@@ -476,13 +487,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleEllipseCancelled = (activeAction: string) => {
+      if (activeAction !== "ellipseTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingEllipse", handleEllipseAdding);
     instance.addEventListener("onAddedEllipse", handleEllipseAdded);
+    instance.addEventListener("onActiveActionChange", handleEllipseCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingEllipse", handleEllipseAdding);
         instance.removeEventListener("onAddedEllipse", handleEllipseAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleEllipseCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -502,6 +524,12 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleRegularPolygonCancelled = (activeAction: string) => {
+      if (activeAction !== "regularPolygonTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener(
       "onAddingRegularPolygon",
       handleRegularPolygonAdding,
@@ -509,6 +537,10 @@ export const useToolsEvents = () => {
     instance.addEventListener(
       "onAddedRegularPolygon",
       handleRegularPolygonAdded,
+    );
+    instance.addEventListener(
+      "onActiveActionChange",
+      handleRegularPolygonCancelled,
     );
 
     return () => {
@@ -520,6 +552,10 @@ export const useToolsEvents = () => {
         instance.removeEventListener(
           "onAddedRegularPolygon",
           handleRegularPolygonAdded,
+        );
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleRegularPolygonCancelled,
         );
       }
     };
@@ -540,13 +576,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleStarCancelled = (activeAction: string) => {
+      if (activeAction !== "starTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingStar", handleStarAdding);
     instance.addEventListener("onAddedStar", handleStarAdded);
+    instance.addEventListener("onActiveActionChange", handleStarCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingStar", handleStarAdding);
         instance.removeEventListener("onAddedStar", handleStarAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleStarCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -566,8 +613,18 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleColorTokenCancelled = (activeAction: string) => {
+      if (activeAction !== "colorTokenTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingColorToken", handleColorTokenAdding);
     instance.addEventListener("onAddedColorToken", handleColorTokenAdded);
+    instance.addEventListener(
+      "onActiveActionChange",
+      handleColorTokenCancelled,
+    );
 
     return () => {
       if (instance) {
@@ -579,6 +636,10 @@ export const useToolsEvents = () => {
           "onAddedColorToken",
           handleColorTokenAdded,
         );
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleColorTokenCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -587,50 +648,80 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
-    const handleLineAdding = () => {
-      toast("Add line", {
-        description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint a line.`,
-        duration: Infinity,
-      });
+    const handleStrokeAdding = ({ actionName }: { actionName: string }) => {
+      if (actionName === "strokeTool") {
+        toast("Add a stroke", {
+          description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint a stroke.`,
+          duration: Infinity,
+        });
+      }
     };
 
-    const handleLineAdded = () => {
-      toast.dismiss();
+    const handleStrokeAdded = ({ actionName }: { actionName: string }) => {
+      if (actionName === "strokeTool") {
+        toast.dismiss();
+      }
     };
 
-    instance.addEventListener("onAddingLine", handleLineAdding);
-    instance.addEventListener("onAddedLine", handleLineAdded);
+    const handleStrokeCancelled = (activeAction: string) => {
+      if (activeAction !== "strokeTool") {
+        toast.dismiss();
+      }
+    };
+
+    instance.addEventListener("onAddingStroke", handleStrokeAdding);
+    instance.addEventListener("onAddedStroke", handleStrokeAdded);
+    instance.addEventListener("onActiveActionChange", handleStrokeCancelled);
 
     return () => {
       if (instance) {
-        instance.removeEventListener("onAddingLine", handleLineAdding);
-        instance.removeEventListener("onAddedLine", handleLineAdded);
+        instance.removeEventListener("onAddingStroke", handleStrokeAdding);
+        instance.removeEventListener("onAddedStroke", handleStrokeAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleStrokeCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
 
-  // Pen tool events
+  // Arrow tool events
   React.useEffect(() => {
     if (!instance) return;
 
-    const handlePenAdding = () => {
-      toast("Add lines", {
-        description: `${isTouchDevice ? "Tap" : "Click"} to set the line start point. Then keep ${isTouchDevice ? "tapping" : "moving and clicking"} to add more line segments.`,
-        duration: Infinity,
-      });
+    const handleArrowAdding = ({ actionName }: { actionName: string }) => {
+      if (actionName === "arrowTool") {
+        toast("Add an arrow", {
+          description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint an arrow.`,
+          duration: Infinity,
+        });
+      }
     };
 
-    const handlePenAdded = () => {
-      toast.dismiss();
+    const handleArrowAdded = ({ actionName }: { actionName: string }) => {
+      if (actionName === "arrowTool") {
+        toast.dismiss();
+      }
     };
 
-    instance.addEventListener("onAddingPen", handlePenAdding);
-    instance.addEventListener("onAddedPen", handlePenAdded);
+    const handleArrowCancelled = (activeAction: string) => {
+      if (activeAction !== "arrowTool") {
+        toast.dismiss();
+      }
+    };
+
+    instance.addEventListener("onAddingStroke", handleArrowAdding);
+    instance.addEventListener("onAddedStroke", handleArrowAdded);
+    instance.addEventListener("onActiveActionChange", handleArrowCancelled);
 
     return () => {
       if (instance) {
-        instance.removeEventListener("onAddingPen", handlePenAdding);
-        instance.removeEventListener("onAddedPen", handlePenAdded);
+        instance.removeEventListener("onAddingStroke", handleArrowAdding);
+        instance.removeEventListener("onAddedStroke", handleArrowAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleArrowCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -650,39 +741,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleBrushCancelled = (activeAction: string) => {
+      if (activeAction !== "brushTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingBrush", handleBrushAdding);
     instance.addEventListener("onAddedBrush", handleBrushAdded);
+    instance.addEventListener("onActiveActionChange", handleBrushCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingBrush", handleBrushAdding);
         instance.removeEventListener("onAddedBrush", handleBrushAdded);
-      }
-    };
-  }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
-
-  // Arrow tool events
-  React.useEffect(() => {
-    if (!instance) return;
-
-    const handleArrowAdding = () => {
-      toast("Add an arrow segment", {
-        description: `${isTouchDevice ? "Tap" : "Click"} to set the arrow segment start point. Then keep ${isTouchDevice ? "tapping" : "moving and clicking"} to add more segments to the arrow.`,
-        duration: Infinity,
-      });
-    };
-
-    const handleArrowAdded = () => {
-      toast.dismiss();
-    };
-
-    instance.addEventListener("onAddingArrow", handleArrowAdding);
-    instance.addEventListener("onAddedArrow", handleArrowAdded);
-
-    return () => {
-      if (instance) {
-        instance.removeEventListener("onAddingArrow", handleArrowAdding);
-        instance.removeEventListener("onAddedArrow", handleArrowAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleBrushCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -702,8 +778,15 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleConnectorCancelled = (activeAction: string) => {
+      if (activeAction !== "connectorTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingConnector", handleConnectorAdding);
     instance.addEventListener("onAddedConnector", handleConnectorAdded);
+    instance.addEventListener("onActiveActionChange", handleConnectorCancelled);
 
     return () => {
       if (instance) {
@@ -712,6 +795,10 @@ export const useToolsEvents = () => {
           handleConnectorAdding,
         );
         instance.removeEventListener("onAddedConnector", handleConnectorAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleConnectorCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -731,13 +818,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleImageCancelled = (activeAction: string) => {
+      if (activeAction !== "imageTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingImage", handleImageAdding);
     instance.addEventListener("onAddedImage", handleImageAdded);
+    instance.addEventListener("onActiveActionChange", handleImageCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingImage", handleImageAdding);
         instance.removeEventListener("onAddedImage", handleImageAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleImageCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -757,13 +855,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleImagesCancelled = (activeAction: string) => {
+      if (activeAction !== "imagesTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingImages", handleImagesAdding);
     instance.addEventListener("onAddedImages", handleImagesAdded);
+    instance.addEventListener("onActiveActionChange", handleImagesCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingImages", handleImagesAdding);
         instance.removeEventListener("onAddedImages", handleImagesAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleImagesCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -783,13 +892,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleVideoCancelled = (activeAction: string) => {
+      if (activeAction !== "videoTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingVideo", handleVideoAdding);
     instance.addEventListener("onAddedVideo", handleVideoAdded);
+    instance.addEventListener("onActiveActionChange", handleVideoCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingVideo", handleVideoAdding);
         instance.removeEventListener("onAddedVideo", handleVideoAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleVideoCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -809,13 +929,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleTextCancelled = (activeAction: string) => {
+      if (activeAction !== "textTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingText", handleTextAdding);
     instance.addEventListener("onAddedText", handleTextAdded);
+    instance.addEventListener("onActiveActionChange", handleTextCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingText", handleTextAdding);
         instance.removeEventListener("onAddedText", handleTextAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleTextCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);
@@ -836,13 +967,24 @@ export const useToolsEvents = () => {
       toast.dismiss();
     };
 
+    const handleFrameCancelled = (activeAction: string) => {
+      if (activeAction !== "frameTool") {
+        toast.dismiss();
+      }
+    };
+
     instance.addEventListener("onAddingFrame", handleFrameAdding);
     instance.addEventListener("onAddedFrame", handleFrameAdded);
+    instance.addEventListener("onActiveActionChange", handleFrameCancelled);
 
     return () => {
       if (instance) {
         instance.removeEventListener("onAddingFrame", handleFrameAdding);
         instance.removeEventListener("onAddedFrame", handleFrameAdded);
+        instance.removeEventListener(
+          "onActiveActionChange",
+          handleFrameCancelled,
+        );
       }
     };
   }, [instance, isTouchDevice, setLoadingImage, setNodePropertiesCreateProps]);

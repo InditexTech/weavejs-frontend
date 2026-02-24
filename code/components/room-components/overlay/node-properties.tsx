@@ -41,14 +41,14 @@ export const NodeProperties = () => {
 
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setNodePropertiesAction = useCollaborationRoom(
-    (state) => state.setNodePropertiesAction
+    (state) => state.setNodePropertiesAction,
   );
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   // React.useEffect(() => {
@@ -65,10 +65,10 @@ export const NodeProperties = () => {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "penTool",
         "imageTool",
         "videoTool",
         "starTool",
+        "strokeTool",
         "arrowTool",
         "colorTokenTool",
         "frameTool",

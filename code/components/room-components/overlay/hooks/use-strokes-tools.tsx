@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { ArrowUpRight, Brush, PenLine, PenTool } from "lucide-react";
+import { Brush, MoveUpRight, PenLine } from "lucide-react";
 import React from "react";
 import { ShortcutElement } from "../../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
@@ -22,7 +22,7 @@ export const useStrokesTools = () => {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const STROKES_TOOLS: Record<
@@ -35,23 +35,7 @@ export const useStrokesTools = () => {
     }
   > = React.useMemo(
     () => ({
-      penTool: {
-        icon: <PenTool className="px-2" size={40} strokeWidth={1} />,
-        label: (
-          <div className="flex gap-3 justify-start items-center">
-            <p>Pen tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "Q",
-                [SYSTEM_OS.OTHER]: "Q",
-              }}
-            />
-          </div>
-        ),
-        onClick: () => triggerTool("penTool"),
-        active: () => actualAction === "penTool",
-      },
-      lineTool: {
+      strokeTool: {
         icon: <PenLine className="px-2" size={40} strokeWidth={1} />,
         label: (
           <div className="flex gap-3 justify-start items-center">
@@ -64,8 +48,40 @@ export const useStrokesTools = () => {
             />
           </div>
         ),
-        onClick: () => triggerTool("lineTool"),
-        active: () => actualAction === "lineTool",
+        onClick: () => {
+          triggerTool("strokeTool");
+        },
+        active: () => actualAction === "strokeTool",
+      },
+      arrowTool: {
+        icon: <MoveUpRight className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Arrow tool</p>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "L",
+                [SYSTEM_OS.OTHER]: "L",
+              }}
+            />
+          </div>
+        ),
+        onClick: () => {
+          if (!instance) return;
+
+          triggerTool("arrowTool");
+
+          instance.updatePropsAction("arrowTool", {
+            stroke: "#000000ff",
+            strokeWidth: 1,
+            opacity: 1,
+            tipStartStyle: "none",
+            tipEndStyle: "arrow",
+            tipEndBase: 5,
+            tipEndHeight: (Math.sqrt(3) / 2) * 5,
+          });
+        },
+        active: () => actualAction === "arrowTool",
       },
       brushTool: {
         icon: <Brush className="px-2" size={40} strokeWidth={1} />,
@@ -83,24 +99,8 @@ export const useStrokesTools = () => {
         onClick: () => triggerTool("brushTool"),
         active: () => actualAction === "brushTool",
       },
-      arrowTool: {
-        icon: <ArrowUpRight className="px-2" size={40} strokeWidth={1} />,
-        label: (
-          <div className="flex gap-3 justify-start items-center">
-            <p>Arrow tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "A",
-                [SYSTEM_OS.OTHER]: "A",
-              }}
-            />
-          </div>
-        ),
-        onClick: () => triggerTool("arrowTool"),
-        active: () => actualAction === "arrowTool",
-      },
     }),
-    [actualAction, triggerTool]
+    [actualAction, triggerTool],
   );
 
   return STROKES_TOOLS;

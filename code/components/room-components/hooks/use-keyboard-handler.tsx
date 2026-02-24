@@ -131,14 +131,14 @@ export function useKeyboardHandler() {
         triggerTool("regularPolygonTool");
       }
 
-      if (event.code === "KeyL") {
-        event.preventDefault();
-        triggerTool("lineTool");
-      }
-
       if (event.code === "KeyQ") {
         event.preventDefault();
-        triggerTool("penTool");
+        triggerTool("arrowTool");
+      }
+
+      if (event.code === "KeyL") {
+        event.preventDefault();
+        triggerTool("strokeTool");
       }
 
       if (event.code === "KeyB") {
@@ -178,11 +178,6 @@ export function useKeyboardHandler() {
       if (event.code === "KeyJ") {
         event.preventDefault();
         triggerTool("starTool");
-      }
-
-      if (event.code === "KeyA") {
-        event.preventDefault();
-        triggerTool("arrowTool");
       }
 
       if (event.code === "KeyK" && !(event.ctrlKey || event.metaKey)) {

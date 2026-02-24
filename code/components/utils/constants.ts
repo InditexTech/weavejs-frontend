@@ -14,13 +14,11 @@ import {
   WeaveFrameToolAction,
   WeaveImageToolAction,
   WeavePenToolAction,
-  WeaveLineToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
   WeaveTextToolAction,
   WeaveStarToolAction,
-  WeaveArrowToolAction,
-  // WeaveArrowV2ToolAction,
+  WeaveStrokeToolAction,
   WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
@@ -37,15 +35,14 @@ import {
   WeaveGroupNode,
   WeaveRectangleNode,
   WeaveEllipseNode,
-  WeaveLineNode,
   WeaveTextNode,
   WeaveImageNode,
   WeaveStarNode,
-  WeaveArrowNode,
-  // WeaveArrowV2Node,
+  WeaveLineNode,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
   WeaveStrokeNode,
+  WeaveStrokeSingleNode,
   WeaveCommentNode,
   WeaveVideoNode,
   WeaveMeasureNode,
@@ -71,6 +68,9 @@ import {
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
   WEAVE_COMMENT_STATUS,
+  WEAVE_FRAME_NODE_TYPE,
+  WEAVE_IMAGE_NODE_TYPE,
+  WEAVE_STROKE_SINGLE_NODE_TYPE,
 } from "@inditextech/weave-sdk";
 import {
   WeaveElementInstance,
@@ -95,6 +95,8 @@ import {
 import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 import { getImageBase64 } from "./images";
+import { COLOR_TOKEN_ACTION_NAME } from "../actions/color-token-tool/constants";
+import resources from "./resources.json";
 
 export const OPERATIONS_MAP: Record<string, string> = {
   ["node-transform"]: "transforming element",
@@ -259,6 +261,7 @@ const NODES = () => [
   new WeaveEllipseNode(),
   new WeaveLineNode(),
   new WeaveStrokeNode(),
+  new WeaveStrokeSingleNode(),
   new WeaveTextNode(),
   new WeaveImageNode({
     config: {
@@ -277,14 +280,35 @@ const NODES = () => [
         ],
         keepRatio: true,
       },
+      urlTransformer: (url: string, node?: Konva.Node) => {
+        let resourceId: string | null = null;
+        let resource = null;
+
+        if (node?.getAttrs().resourceId) {
+          resourceId = node.getAttrs().resourceId;
+          resource = resources.find((res) => res.resourceId === resourceId);
+        }
+
+        console.log("URL", {
+          id: node?.getAttrs().id,
+          url,
+          resourceId,
+          resource,
+          resources,
+        });
+
+        // if (resource) {
+        //   return resource.downloadUrl;
+        // }
+
+        return url;
+      },
       onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
-        instance.triggerCrop(node);
+        instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
       },
     },
   }),
   new WeaveStarNode(),
-  new WeaveArrowNode(),
-  // new WeaveArrowV2Node(),
   new WeaveRegularPolygonNode(),
   new WeaveFrameNode({
     config: {
@@ -449,11 +473,11 @@ const PLUGINS = (getUser: () => WeaveUser) => [
         },
         onMultipleSelection: (nodes: Konva.Node[]) => {
           const containsColorToken = nodes.some(
-            (node) => node.getAttrs().nodeType === "color-token",
+            (node) => node.getAttrs().nodeType === COLOR_TOKEN_ACTION_NAME,
           );
 
           const containsFrame = nodes.some(
-            (node) => node.getAttrs().nodeType === "frame",
+            (node) => node.getAttrs().nodeType === WEAVE_FRAME_NODE_TYPE,
           );
 
           if (containsColorToken || containsFrame) {
@@ -464,8 +488,26 @@ const PLUGINS = (getUser: () => WeaveUser) => [
             };
           }
 
+          const containsArrow = nodes.some(
+            (node) =>
+              node.getAttrs().nodeType === WEAVE_STROKE_SINGLE_NODE_TYPE,
+          );
+
+          if (containsArrow) {
+            return {
+              resizeEnabled: true,
+              rotateEnabled: true,
+              enabledAnchors: [
+                "top-left",
+                "top-right",
+                "bottom-left",
+                "bottom-right",
+              ],
+            };
+          }
+
           const containsImage = nodes.some(
-            (node) => node.getAttrs().nodeType === "image",
+            (node) => node.getAttrs().nodeType === WEAVE_IMAGE_NODE_TYPE,
           );
 
           if (containsImage) {
@@ -613,13 +655,11 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
   new WeavePenToolAction(),
-  new WeaveLineToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),
   new WeaveFrameToolAction(),
   new WeaveStarToolAction(),
-  new WeaveArrowToolAction(),
-  // new WeaveArrowV2ToolAction(),
+  new WeaveStrokeToolAction(),
   new WeaveRegularPolygonToolAction(),
   new ColorTokenToolAction(),
   new ImageTemplateToolAction(),

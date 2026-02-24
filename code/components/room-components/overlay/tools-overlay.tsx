@@ -20,18 +20,24 @@ export function ToolsOverlay() {
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setCroppingImage = useCollaborationRoom(
-    (state) => state.setCroppingImage
+    (state) => state.setCroppingImage,
   );
   const setCroppingNode = useCollaborationRoom(
-    (state) => state.setCroppingNode
+    (state) => state.setCroppingNode,
   );
 
   React.useEffect(() => {
     if (!instance) return;
 
-    const handlerImageCropStart = ({ instance }: { instance: Konva.Group }) => {
-      setCroppingImage(true);
-      setCroppingNode(instance);
+    const handlerImageCropStart = ({
+      instance,
+      cmdCtrlTriggered,
+    }: {
+      instance: Konva.Group;
+      cmdCtrlTriggered: boolean;
+    }) => {
+      setCroppingImage(!cmdCtrlTriggered);
+      setCroppingNode(cmdCtrlTriggered ? undefined : instance);
     };
 
     const handlerImageCropEnd = () => {
@@ -40,7 +46,6 @@ export function ToolsOverlay() {
     };
 
     instance.addEventListener("onImageCropStart", handlerImageCropStart);
-
     instance.addEventListener("onImageCropEnd", handlerImageCropEnd);
 
     return () => {

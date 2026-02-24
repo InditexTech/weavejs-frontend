@@ -9,7 +9,6 @@ import {
   MessageSquare,
   MousePointer,
   PenLine,
-  PenTool,
   Square,
   SwatchBook,
   Type,
@@ -21,7 +20,7 @@ import { useCollaborationRoom } from "@/store/store";
 
 export const HelpTools = () => {
   const threadsEnabled = useCollaborationRoom(
-    (state) => state.features.threads
+    (state) => state.features.threads,
   );
 
   return (
@@ -59,14 +58,6 @@ export const HelpTools = () => {
           shortcuts={{
             [SYSTEM_OS.MAC]: "L",
             [SYSTEM_OS.OTHER]: "L",
-          }}
-        />
-        <HelpShortcutElement
-          icon={<PenTool />}
-          label="Pen tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "Q",
-            [SYSTEM_OS.OTHER]: "Q",
           }}
         />
         <HelpShortcutElement

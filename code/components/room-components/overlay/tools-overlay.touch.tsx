@@ -10,7 +10,6 @@ import {
   Brush,
   Image,
   Images,
-  PenTool,
   Square,
   Type,
   MousePointer,
@@ -20,7 +19,6 @@ import {
   Eraser,
   Circle,
   Star,
-  ArrowUpRight,
   Hexagon,
   ChevronRight,
   ChevronLeft,
@@ -32,6 +30,7 @@ import {
   Video,
   PenLine,
   RulerDimensionLine,
+  MoveUpRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,7 +54,8 @@ import { useImagesTools } from "./hooks/use-images-tools";
 
 export function ToolsOverlayTouch() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
-  const [actualStrokesTool, setActualStrokesTool] = React.useState("lineTool");
+  const [actualStrokesTool, setActualStrokesTool] =
+    React.useState("strokeTool");
   const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
@@ -68,31 +68,31 @@ export function ToolsOverlayTouch() {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
   const imageCroppingEnabled = useCollaborationRoom(
-    (state) => state.images.cropping.enabled
+    (state) => state.images.cropping.enabled,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const showUI = useCollaborationRoom((state) => state.ui.show);
 
   const measurementUnits = useCollaborationRoom(
-    (state) => state.measurement.units
+    (state) => state.measurement.units,
   );
   const measurementReferenceMeasureUnits = useCollaborationRoom(
-    (state) => state.measurement.referenceMeasureUnits
+    (state) => state.measurement.referenceMeasureUnits,
   );
   const measurementReferenceMeasurePixels = useCollaborationRoom(
-    (state) => state.measurement.referenceMeasurePixels
+    (state) => state.measurement.referenceMeasurePixels,
   );
 
   const threadsEnabled = useCollaborationRoom(
-    (state) => state.features.threads
+    (state) => state.features.threads,
   );
   const setShowSelectFileVideo = useCollaborationRoom(
-    (state) => state.setShowSelectFileVideo
+    (state) => state.setShowSelectFileVideo,
   );
   // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
@@ -101,7 +101,7 @@ export function ToolsOverlayTouch() {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const triggerTool = React.useCallback(
@@ -114,7 +114,7 @@ export function ToolsOverlayTouch() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const SHAPES_TOOLS = useShapesTools();
@@ -193,7 +193,7 @@ export function ToolsOverlayTouch() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -326,7 +326,7 @@ export function ToolsOverlayTouch() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -379,23 +379,26 @@ export function ToolsOverlayTouch() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualStrokesTool("lineTool");
-                  STROKES_TOOLS["lineTool"].onClick();
+                  setActualStrokesTool("strokeTool");
+                  STROKES_TOOLS["strokeTool"].onClick();
                 }}
               >
                 <PenLine size={20} strokeWidth={1} /> Line tool
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
+                onClick={() => {
+                  if (!instance) {
+                    return;
+                  }
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualStrokesTool("penTool");
-                  STROKES_TOOLS["penTool"].onClick();
+                  setActualStrokesTool("arrowTool");
+                  STROKES_TOOLS["arrowTool"].onClick();
                 }}
               >
-                <PenTool size={20} strokeWidth={1} /> Pen tool
+                <MoveUpRight size={20} strokeWidth={1} /> Arrow tool
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
@@ -408,18 +411,6 @@ export function ToolsOverlayTouch() {
                 }}
               >
                 <Brush size={20} strokeWidth={1} /> Brush tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setStrokesMenuOpen(false);
-                  setImagesMenuOpen(false);
-                  setActualStrokesTool("arrowTool");
-                  STROKES_TOOLS["arrowTool"].onClick();
-                }}
-              >
-                <ArrowUpRight size={20} strokeWidth={1} /> Arrow tool
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -472,7 +463,7 @@ export function ToolsOverlayTouch() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >

@@ -21,7 +21,7 @@ export function RoomShadowDomHost() {
 
   React.useEffect(() => {
     const handleRoute = function () {
-      console.log("AQUI", { loadedParams });
+      console.log("handling route");
     };
 
     window.addEventListener("nextRouter", handleRoute);

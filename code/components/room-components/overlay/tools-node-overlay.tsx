@@ -57,6 +57,11 @@ import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-re
 import { ColorPickerInput } from "../inputs/color-picker";
 import { getImageBase64 } from "@/components/utils/images";
 import { useIAChat } from "@/store/ia-chat";
+import {
+  ARROW_DASH_OPTIONS,
+  ARROW_SIZE_OPTIONS,
+  ARROW_TIP_SIZE_OPTIONS,
+} from "../node-properties/arrow-properties";
 
 export function ToolsNodeOverlay() {
   const [onEraserMode, setOnEraserMode] = React.useState(false);
@@ -71,6 +76,10 @@ export function ToolsNodeOverlay() {
     React.useState(false);
   const [nodeStrokeStyleMenuOpen, setNodeStrokeStyleMenuOpen] =
     React.useState(false);
+  const [nodeArrowStartTipMenuOpen, setNodeArrowStartTipMenuOpen] =
+    React.useState(false);
+  const [nodeArrowEndTipMenuOpen, setNodeArrowEndTipMenuOpen] =
+    React.useState(false);
   const [nodeLayeringMenuOpen, setNodeLayeringMenuOpen] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
@@ -79,7 +88,7 @@ export function ToolsNodeOverlay() {
   const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const user = useCollaborationRoom((state) => state.user);
@@ -87,39 +96,39 @@ export function ToolsNodeOverlay() {
   const room = useCollaborationRoom((state) => state.room);
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const imageCroppingEnabled = useCollaborationRoom(
-    (state) => state.images.cropping.enabled
+    (state) => state.images.cropping.enabled,
   );
   const imageCroppingNode = useCollaborationRoom(
-    (state) => state.images.cropping.node
+    (state) => state.images.cropping.node,
   );
   const nodePropertiesAction: "create" | "update" | undefined =
     useCollaborationRoom((state) => state.nodeProperties.action);
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
   const setRemoveBackgroundPopupShow = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupShow
+    (state) => state.setRemoveBackgroundPopupShow,
   );
   const setRemoveBackgroundPopupOriginNodeId = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupOriginNodeId
+    (state) => state.setRemoveBackgroundPopupOriginNodeId,
   );
   const setRemoveBackgroundPopupOriginImage = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupOriginImage
+    (state) => state.setRemoveBackgroundPopupOriginImage,
   );
   const setRemoveBackgroundPopupImageId = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupImageId
+    (state) => state.setRemoveBackgroundPopupImageId,
   );
   const setRemoveBackgroundPopupImageURL = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupImageURL
+    (state) => state.setRemoveBackgroundPopupImageURL,
   );
   const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
+    (state) => state.setTransformingImage,
   );
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setNodePropertiesAction = useCollaborationRoom(
-    (state) => state.setNodePropertiesAction
+    (state) => state.setNodePropertiesAction,
   );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
@@ -128,7 +137,7 @@ export function ToolsNodeOverlay() {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const mutationUpload = useMutation({
@@ -160,7 +169,7 @@ export function ToolsNodeOverlay() {
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
   });
@@ -184,10 +193,10 @@ export function ToolsNodeOverlay() {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "penTool",
         "imageTool",
         "videoTool",
         "starTool",
+        "strokeTool",
         "arrowTool",
         "colorTokenTool",
         "frameTool",
@@ -202,7 +211,7 @@ export function ToolsNodeOverlay() {
     if (!actualAction || !node) {
       setNodePropertiesAction(undefined);
       setSidebarActive(
-        aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.nodesTree
+        aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.nodesTree,
       );
       return;
     }
@@ -249,6 +258,8 @@ export function ToolsNodeOverlay() {
       setNodeStrokeMenuOpen(false);
       setNodeStrokeWidthMenuOpen(false);
       setNodeStrokeStyleMenuOpen(false);
+      setNodeArrowStartTipMenuOpen(false);
+      setNodeArrowEndTipMenuOpen(false);
       setColorTokenColorMenuOpen(false);
       setNodeTextColorMenuOpen(false);
     }
@@ -264,7 +275,7 @@ export function ToolsNodeOverlay() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   const nodeDashBackground = React.useMemo(() => {
@@ -288,7 +299,7 @@ export function ToolsNodeOverlay() {
   const isGroup = React.useMemo(
     () =>
       nodes.length === 1 && actualNode && (actualNode.type ?? "") === "group",
-    [actualNode, nodes]
+    [actualNode, nodes],
   );
 
   const singleLocked = React.useMemo(() => {
@@ -362,7 +373,7 @@ export function ToolsNodeOverlay() {
                           const imageURL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
 
                           setRemoveBackgroundPopupOriginNodeId(
-                            nodeImage.getAttrs().id
+                            nodeImage.getAttrs().id,
                           );
                           setRemoveBackgroundPopupImageId(imageId);
                           setRemoveBackgroundPopupImageURL(imageURL);
@@ -374,7 +385,7 @@ export function ToolsNodeOverlay() {
                         onSettled: () => {
                           setTransformingImage(false);
                         },
-                      }
+                      },
                     );
                   } catch (error) {
                     console.error(error);
@@ -443,13 +454,13 @@ export function ToolsNodeOverlay() {
                         },
                         onError: () => {
                           toast.error(
-                            "Error requesting image background removal."
+                            "Error requesting image background removal.",
                           );
                         },
                         onSettled: () => {
                           setTransformingImage(false);
                         },
-                      }
+                      },
                     );
                   } catch (error) {
                     console.error(error);
@@ -468,7 +479,7 @@ export function ToolsNodeOverlay() {
               tooltipAlign="center"
             />
           )}
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -522,7 +533,7 @@ export function ToolsNodeOverlay() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -599,7 +610,7 @@ export function ToolsNodeOverlay() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -642,7 +653,7 @@ export function ToolsNodeOverlay() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -718,7 +729,7 @@ export function ToolsNodeOverlay() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -787,7 +798,7 @@ export function ToolsNodeOverlay() {
                   ["disabled:cursor-default disabled:opacity-50"]:
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
+                },
               )}
               asChild
             >
@@ -1111,7 +1122,7 @@ export function ToolsNodeOverlay() {
             tooltipSide="left"
             tooltipAlign="center"
           />
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -1147,114 +1158,124 @@ export function ToolsNodeOverlay() {
         "color-token",
       ].includes(actualNode.type as string) &&
       !["colorTokenTool", "imageTool", "imagesTool", "videoTool"].includes(
-        actualAction as string
+        actualAction as string,
       )
     ) {
       actualNodeTools.push(
         <React.Fragment key="common-shape-tools">
-          {!["image"].includes(actualNode.type) && !onEraserMode && (
-            <>
-              <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-3">
-                Fill
-              </div>
-              <DropdownMenu modal={false} open={nodeFillMenuOpen}>
-                <DropdownMenuTrigger
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  className={cn(
-                    "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                    {
-                      ["disabled:cursor-default disabled:opacity-50"]:
-                        weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
-                  )}
-                  asChild
-                >
-                  <ToolbarButton
-                    className="rounded-full min-w-[40px] !w-[40px]"
-                    icon={
-                      <div
-                        className="border border-[#c9c9c9c] w-[20px] h-[20px]"
-                        style={{ background: actualNode.props.fill }}
-                      />
-                    }
+          {!["image"].includes(actualNode.type) &&
+            !["strokeTool", "arrowTool"].includes(actualAction as string) &&
+            !onEraserMode && (
+              <>
+                <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-3">
+                  Fill
+                </div>
+                <DropdownMenu modal={false} open={nodeFillMenuOpen}>
+                  <DropdownMenuTrigger
                     disabled={
                       weaveConnectionStatus !==
                       WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
-                    active={nodeFillMenuOpen}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setNodeLayeringMenuOpen(false);
-                      setNodeFillMenuOpen((prev) => !prev);
-                      setNodeStrokeMenuOpen(false);
-                      setNodeStrokeWidthMenuOpen(false);
-                      setNodeStrokeStyleMenuOpen(false);
-                    }}
-                    label={
-                      <div className="flex gap-3 justify-start items-center">
-                        <p>Fill</p>
-                      </div>
-                    }
-                    tooltipSide="left"
-                    tooltipAlign="center"
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  side="left"
-                  alignOffset={0}
-                  sideOffset={8}
-                  className="min-w-auto font-inter rounded-none shadow-none flex flex-row"
-                >
-                  <div
-                    className="flex !flex-col gap-0 w-[300px] p-4"
-                    onClick={(e) => e.preventDefault()}
+                    className={cn(
+                      "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      },
+                    )}
+                    asChild
                   >
-                    <ColorPickerInput
-                      value={actualNode.props.fill ?? "#ffffff"}
-                      onChange={(color: string) => {
-                        if (!actualNode) {
-                          return;
-                        }
-
-                        const updatedNode: WeaveStateElement = {
-                          ...actualNode,
-                          props: {
-                            ...actualNode.props,
-                            fill: color,
-                          },
-                        };
-
-                        updateElement(updatedNode);
+                    <ToolbarButton
+                      className="rounded-full min-w-[40px] !w-[40px]"
+                      icon={
+                        <div
+                          className="border border-[#c9c9c9c] w-[20px] h-[20px]"
+                          style={{ background: actualNode.props.fill }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      active={nodeFillMenuOpen}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNodeLayeringMenuOpen(false);
+                        setNodeFillMenuOpen((prev) => !prev);
+                        setNodeStrokeMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
+                        setNodeStrokeStyleMenuOpen(false);
+                        setNodeArrowStartTipMenuOpen(false);
+                        setNodeArrowEndTipMenuOpen(false);
                       }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>Fill</p>
+                        </div>
+                      }
+                      tooltipSide="left"
+                      tooltipAlign="center"
                     />
-                    <Button
-                      onClick={() => {
-                        setNodeFillMenuOpen(false);
-                      }}
-                      className="cursor-pointer font-inter font-light rounded-none w-full"
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    side="left"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="min-w-auto font-inter rounded-none shadow-none flex flex-row"
+                  >
+                    <div
+                      className="flex !flex-col gap-0 w-[300px] p-4"
+                      onClick={(e) => e.preventDefault()}
                     >
-                      CLOSE
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <ColorPickerInput
+                        value={actualNode.props.fill ?? "#ffffff"}
+                        onChange={(color: string) => {
+                          if (!actualNode) {
+                            return;
+                          }
 
-              <ToolbarDivider orientation="horizontal" className="col-span-1" />
-            </>
-          )}
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              fill: color,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                      />
+                      <Button
+                        onClick={() => {
+                          setNodeFillMenuOpen(false);
+                        }}
+                        className="cursor-pointer font-inter font-light rounded-none w-full"
+                      >
+                        CLOSE
+                      </Button>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ToolbarDivider
+                  orientation="horizontal"
+                  className="col-span-1"
+                />
+              </>
+            )}
           {!onEraserMode && (
             <>
               <div
                 className={cn(
                   "w-[40px] text-[9px] text-center font-inter uppercase pt-3",
                   {
-                    ["pt-0"]: !["image"].includes(actualNode.type),
-                  }
+                    ["pt-0"]:
+                      !["image"].includes(actualNode.type) &&
+                      !["strokeTool", "arrowTool"].includes(
+                        actualAction as string,
+                      ),
+                  },
                 )}
               >
                 Stroke
@@ -1271,7 +1292,7 @@ export function ToolsNodeOverlay() {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
@@ -1295,6 +1316,8 @@ export function ToolsNodeOverlay() {
                       setNodeStrokeMenuOpen((prev) => !prev);
                       setNodeStrokeWidthMenuOpen(false);
                       setNodeStrokeStyleMenuOpen(false);
+                      setNodeArrowStartTipMenuOpen(false);
+                      setNodeArrowEndTipMenuOpen(false);
                     }}
                     label={
                       <div className="flex gap-3 justify-start items-center">
@@ -1352,317 +1375,14 @@ export function ToolsNodeOverlay() {
               "w-[40px] text-[9px] text-center font-inter uppercase pt-0",
               {
                 ["pt-3"]: onEraserMode,
-              }
+              },
             )}
           >
             Width
           </div>
-          <DropdownMenu modal={false} open={nodeStrokeWidthMenuOpen}>
-            <DropdownMenuTrigger
-              disabled={
-                weaveConnectionStatus !==
-                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-              }
-              className={cn(
-                "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                {
-                  ["disabled:cursor-default disabled:opacity-50"]:
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                }
-              )}
-              asChild
-            >
-              <ToolbarButton
-                className="rounded-full !w-[40px]"
-                icon={
-                  actualNode.props.strokeWidth === 0 ? (
-                    <X className="px-2" size={40} strokeWidth={1} />
-                  ) : (
-                    <div
-                      className="w-[20px] rounded-full"
-                      style={{
-                        height: actualNode.props.strokeWidth,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  )
-                }
-                disabled={
-                  weaveConnectionStatus !==
-                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-                  setNodeLayeringMenuOpen(false);
-                  setNodeFillMenuOpen(false);
-                  setNodeStrokeMenuOpen(false);
-                  setNodeStrokeWidthMenuOpen((prev) => !prev);
-                  setNodeStrokeStyleMenuOpen(false);
-                }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>Stroke width</p>
-                  </div>
-                }
-                tooltipSide="left"
-                tooltipAlign="center"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              onCloseAutoFocus={(e) => {
-                e.preventDefault();
-              }}
-              align="center"
-              side="right"
-              alignOffset={0}
-              sideOffset={8}
-              className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
-            >
-              <div className="flex gap-1">
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={
-                    <div
-                      className="w-[30px] rounded-full"
-                      style={{
-                        height: 20,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 20,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>20px</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={
-                    <div
-                      className="w-[20px] rounded-full"
-                      style={{
-                        height: 10,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 10,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>10px</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={
-                    <div
-                      className="w-[20px] rounded-full"
-                      style={{
-                        height: 5,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 5,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>5px</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={
-                    <div
-                      className="w-[20px] rounded-full"
-                      style={{
-                        height: 2,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 2,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>2px</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={
-                    <div
-                      className="w-[20px] rounded-full"
-                      style={{
-                        height: 1,
-                        background: actualNode.props.stroke,
-                      }}
-                    />
-                  }
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 1,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>1px</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-
-                <ToolbarButton
-                  className="rounded-full !w-[40px]"
-                  icon={<X className="px-2" size={40} strokeWidth={1} />}
-                  disabled={
-                    weaveConnectionStatus !==
-                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                  }
-                  onClick={() => {
-                    setNodeStrokeWidthMenuOpen(false);
-
-                    if (!actualNode) {
-                      return;
-                    }
-
-                    const updatedNode: WeaveStateElement = {
-                      ...actualNode,
-                      props: {
-                        ...actualNode.props,
-                        strokeWidth: 0,
-                      },
-                    };
-
-                    updateElement(updatedNode);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>None</p>
-                    </div>
-                  }
-                  tooltipSide="top"
-                  tooltipAlign="center"
-                />
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {!onEraserMode && (
-            <>
-              <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-0">
-                Style
-              </div>
-              <DropdownMenu modal={false} open={nodeStrokeStyleMenuOpen}>
+          {!["strokeTool", "arrowTool"].includes(actualAction as string) &&
+            !onEraserMode && (
+              <DropdownMenu modal={false} open={nodeStrokeWidthMenuOpen}>
                 <DropdownMenuTrigger
                   disabled={
                     weaveConnectionStatus !==
@@ -1674,40 +1394,42 @@ export function ToolsNodeOverlay() {
                       ["disabled:cursor-default disabled:opacity-50"]:
                         weaveConnectionStatus !==
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-                    }
+                    },
                   )}
                   asChild
                 >
                   <ToolbarButton
                     className="rounded-full !w-[40px]"
                     icon={
-                      <div
-                        className="w-[20px] rounded-full"
-                        style={{
-                          height:
-                            (actualNode.props.strokeWidth ?? 0) === 0
-                              ? 1
-                              : (actualNode.props.strokeWidth ?? 0),
-                          background: nodeDashBackground,
-                        }}
-                      />
+                      actualNode.props.strokeWidth === 0 ? (
+                        <X className="px-2" size={40} strokeWidth={1} />
+                      ) : (
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: actualNode.props.strokeWidth,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      )
                     }
                     disabled={
                       weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-                      (actualNode.props.strokeWidth ?? 0) === 0
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     onClick={(e) => {
                       e.preventDefault();
                       setNodeLayeringMenuOpen(false);
                       setNodeFillMenuOpen(false);
                       setNodeStrokeMenuOpen(false);
-                      setNodeStrokeWidthMenuOpen(false);
-                      setNodeStrokeStyleMenuOpen((prev) => !prev);
+                      setNodeStrokeWidthMenuOpen((prev) => !prev);
+                      setNodeStrokeStyleMenuOpen(false);
+                      setNodeArrowStartTipMenuOpen(false);
+                      setNodeArrowEndTipMenuOpen(false);
                     }}
                     label={
                       <div className="flex gap-3 justify-start items-center">
-                        <p>Stroke style</p>
+                        <p>Stroke width</p>
                       </div>
                     }
                     tooltipSide="left"
@@ -1729,99 +1451,9 @@ export function ToolsNodeOverlay() {
                       className="rounded-full !w-[40px]"
                       icon={
                         <div
-                          className="w-[20px] rounded-full"
+                          className="w-[30px] rounded-full"
                           style={{
-                            height:
-                              (actualNode.props.strokeWidth ?? 0) === 0
-                                ? 1
-                                : (actualNode.props.strokeWidth ?? 0),
-                            background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 4px, transparent 4px, transparent 8px)`,
-                          }}
-                        />
-                      }
-                      disabled={
-                        weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                      }
-                      onClick={() => {
-                        setNodeStrokeStyleMenuOpen(false);
-
-                        if (!actualNode) {
-                          return;
-                        }
-
-                        const updatedNode: WeaveStateElement = {
-                          ...actualNode,
-                          props: {
-                            ...actualNode.props,
-                            dash: [8, 4],
-                          },
-                        };
-
-                        updateElement(updatedNode);
-                      }}
-                      label={
-                        <div className="flex gap-3 justify-start items-center">
-                          <p>Dashed (long)</p>
-                        </div>
-                      }
-                      tooltipSide="top"
-                      tooltipAlign="center"
-                    />
-                    <ToolbarButton
-                      className="rounded-full !w-[40px]"
-                      icon={
-                        <div
-                          className="w-[20px] rounded-full"
-                          style={{
-                            height:
-                              (actualNode.props.strokeWidth ?? 0) === 0
-                                ? 1
-                                : (actualNode.props.strokeWidth ?? 0),
-                            background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 2px, transparent 2px, transparent 4px)`,
-                          }}
-                        />
-                      }
-                      disabled={
-                        weaveConnectionStatus !==
-                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-                      }
-                      onClick={() => {
-                        setNodeStrokeStyleMenuOpen(false);
-
-                        if (!actualNode) {
-                          return;
-                        }
-
-                        const updatedNode: WeaveStateElement = {
-                          ...actualNode,
-                          props: {
-                            ...actualNode.props,
-                            dash: [4, 2],
-                          },
-                        };
-
-                        updateElement(updatedNode);
-                      }}
-                      label={
-                        <div className="flex gap-3 justify-start items-center">
-                          <p>Dashed (short)</p>
-                        </div>
-                      }
-                      tooltipSide="top"
-                      tooltipAlign="center"
-                    />
-
-                    <ToolbarButton
-                      className="rounded-full !w-[40px]"
-                      icon={
-                        <div
-                          className="w-[20px] rounded-full"
-                          style={{
-                            height:
-                              (actualNode.props.strokeWidth ?? 0) === 0
-                                ? 1
-                                : (actualNode.props.strokeWidth ?? 0),
+                            height: 20,
                             background: actualNode.props.stroke,
                           }}
                         />
@@ -1831,7 +1463,7 @@ export function ToolsNodeOverlay() {
                         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                       }
                       onClick={() => {
-                        setNodeStrokeStyleMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
 
                         if (!actualNode) {
                           return;
@@ -1841,7 +1473,7 @@ export function ToolsNodeOverlay() {
                           ...actualNode,
                           props: {
                             ...actualNode.props,
-                            dash: [],
+                            strokeWidth: 20,
                           },
                         };
 
@@ -1849,7 +1481,201 @@ export function ToolsNodeOverlay() {
                       }}
                       label={
                         <div className="flex gap-3 justify-start items-center">
-                          <p>Normal</p>
+                          <p>20px</p>
+                        </div>
+                      }
+                      tooltipSide="top"
+                      tooltipAlign="center"
+                    />
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: 10,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={() => {
+                        setNodeStrokeWidthMenuOpen(false);
+
+                        if (!actualNode) {
+                          return;
+                        }
+
+                        const updatedNode: WeaveStateElement = {
+                          ...actualNode,
+                          props: {
+                            ...actualNode.props,
+                            strokeWidth: 10,
+                          },
+                        };
+
+                        updateElement(updatedNode);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>10px</p>
+                        </div>
+                      }
+                      tooltipSide="top"
+                      tooltipAlign="center"
+                    />
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: 5,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={() => {
+                        setNodeStrokeWidthMenuOpen(false);
+
+                        if (!actualNode) {
+                          return;
+                        }
+
+                        const updatedNode: WeaveStateElement = {
+                          ...actualNode,
+                          props: {
+                            ...actualNode.props,
+                            strokeWidth: 5,
+                          },
+                        };
+
+                        updateElement(updatedNode);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>5px</p>
+                        </div>
+                      }
+                      tooltipSide="top"
+                      tooltipAlign="center"
+                    />
+
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: 2,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={() => {
+                        setNodeStrokeWidthMenuOpen(false);
+
+                        if (!actualNode) {
+                          return;
+                        }
+
+                        const updatedNode: WeaveStateElement = {
+                          ...actualNode,
+                          props: {
+                            ...actualNode.props,
+                            strokeWidth: 2,
+                          },
+                        };
+
+                        updateElement(updatedNode);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>2px</p>
+                        </div>
+                      }
+                      tooltipSide="top"
+                      tooltipAlign="center"
+                    />
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: 1,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={() => {
+                        setNodeStrokeWidthMenuOpen(false);
+
+                        if (!actualNode) {
+                          return;
+                        }
+
+                        const updatedNode: WeaveStateElement = {
+                          ...actualNode,
+                          props: {
+                            ...actualNode.props,
+                            strokeWidth: 1,
+                          },
+                        };
+
+                        updateElement(updatedNode);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>1px</p>
+                        </div>
+                      }
+                      tooltipSide="top"
+                      tooltipAlign="center"
+                    />
+
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={<X className="px-2" size={40} strokeWidth={1} />}
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={() => {
+                        setNodeStrokeWidthMenuOpen(false);
+
+                        if (!actualNode) {
+                          return;
+                        }
+
+                        const updatedNode: WeaveStateElement = {
+                          ...actualNode,
+                          props: {
+                            ...actualNode.props,
+                            strokeWidth: 0,
+                          },
+                        };
+
+                        updateElement(updatedNode);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>None</p>
                         </div>
                       }
                       tooltipSide="top"
@@ -1858,9 +1684,1382 @@ export function ToolsNodeOverlay() {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
-          )}
-        </React.Fragment>
+            )}
+          {["strokeTool", "arrowTool"].includes(actualAction as string) &&
+            !onEraserMode && (
+              <DropdownMenu modal={false} open={nodeStrokeWidthMenuOpen}>
+                <DropdownMenuTrigger
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  className={cn(
+                    "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                    {
+                      ["disabled:cursor-default disabled:opacity-50"]:
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                    },
+                  )}
+                  asChild
+                >
+                  <ToolbarButton
+                    className="rounded-full !w-[40px]"
+                    icon={
+                      actualNode.props.strokeWidth === 0 ? (
+                        <X className="px-2" size={40} strokeWidth={1} />
+                      ) : (
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height: actualNode.props.strokeWidth,
+                            background: actualNode.props.stroke,
+                          }}
+                        />
+                      )
+                    }
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setNodeLayeringMenuOpen(false);
+                      setNodeFillMenuOpen(false);
+                      setNodeStrokeMenuOpen(false);
+                      setNodeStrokeWidthMenuOpen((prev) => !prev);
+                      setNodeStrokeStyleMenuOpen(false);
+                      setNodeArrowStartTipMenuOpen(false);
+                      setNodeArrowEndTipMenuOpen(false);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Stroke width</p>
+                      </div>
+                    }
+                    tooltipSide="left"
+                    tooltipAlign="center"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  onCloseAutoFocus={(e) => {
+                    e.preventDefault();
+                  }}
+                  align="center"
+                  side="right"
+                  alignOffset={0}
+                  sideOffset={8}
+                  className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
+                >
+                  <div className="flex gap-1">
+                    {ARROW_SIZE_OPTIONS.map((option) => (
+                      <ToolbarButton
+                        key={option.value}
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[30px] rounded-full"
+                            style={{
+                              height: parseInt(option.value, 10),
+                              background: actualNode.props.stroke,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeWidthMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (act) => act.value === option.value,
+                          );
+
+                          const tipStartSize =
+                            ARROW_TIP_SIZE_OPTIONS[
+                              actualNode.props.tipStartStyle
+                            ][index];
+                          const tipEndSize =
+                            ARROW_TIP_SIZE_OPTIONS[
+                              actualNode.props.tipEndStyle
+                            ][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              strokeWidth: parseInt(option.value, 10),
+                              tipStartBase: undefined,
+                              tipStartHeight: undefined,
+                              tipStartRadius: undefined,
+                              tipStartWidth: undefined,
+                              tipEndBase: undefined,
+                              tipEndHeight: undefined,
+                              tipEndRadius: undefined,
+                              tipEndWidth: undefined,
+                              ...(actualNode.props.tipStartStyle ===
+                                "arrow" && {
+                                tipStartBase: parseInt(tipStartSize.value),
+                                tipStartHeight:
+                                  (Math.sqrt(3) / 2) *
+                                  parseInt(tipStartSize.value),
+                              }),
+                              ...(actualNode.props.tipStartStyle ===
+                                "circle" && {
+                                tipStartRadius: parseInt(tipStartSize.value),
+                              }),
+                              ...(actualNode.props.tipStartStyle ===
+                                "square" && {
+                                tipStartWidth: parseInt(tipStartSize.value),
+                              }),
+                              ...(actualNode.props.tipEndStyle === "arrow" && {
+                                tipEndBase: parseInt(tipEndSize.value),
+                                tipEndHeight:
+                                  (Math.sqrt(3) / 2) *
+                                  parseInt(tipEndSize.value),
+                              }),
+                              ...(actualNode.props.tipEndStyle === "circle" && {
+                                tipEndRadius: parseInt(tipEndSize.value),
+                              }),
+                              ...(actualNode.props.tipEndStyle === "square" && {
+                                tipEndWidth: parseInt(tipEndSize.value),
+                              }),
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>{option.label}</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          {!["strokeTool", "arrowTool"].includes(actualAction as string) &&
+            !onEraserMode && (
+              <>
+                <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-0">
+                  Style
+                </div>
+                <DropdownMenu modal={false} open={nodeStrokeStyleMenuOpen}>
+                  <DropdownMenuTrigger
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    className={cn(
+                      "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      },
+                    )}
+                    asChild
+                  >
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height:
+                              (actualNode.props.strokeWidth ?? 0) === 0
+                                ? 1
+                                : (actualNode.props.strokeWidth ?? 0),
+                            background: nodeDashBackground,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                        (actualNode.props.strokeWidth ?? 0) === 0
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNodeLayeringMenuOpen(false);
+                        setNodeFillMenuOpen(false);
+                        setNodeStrokeMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
+                        setNodeStrokeStyleMenuOpen((prev) => !prev);
+                        setNodeArrowStartTipMenuOpen(false);
+                        setNodeArrowEndTipMenuOpen(false);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>Stroke style</p>
+                        </div>
+                      }
+                      tooltipSide="left"
+                      tooltipAlign="center"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                    align="center"
+                    side="right"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
+                  >
+                    <div className="flex gap-1">
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 4px, transparent 4px, transparent 8px)`,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: [8, 4],
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Dashed (long)</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 2px, transparent 2px, transparent 4px)`,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: [4, 2],
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Dashed (short)</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: actualNode.props.stroke,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: [],
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Normal</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          {["strokeTool", "arrowTool"].includes(actualAction as string) &&
+            !onEraserMode && (
+              <>
+                <div className="w-[40px] text-[9px] text-center font-inter uppercase pt-0">
+                  Style
+                </div>
+                <DropdownMenu modal={false} open={nodeStrokeStyleMenuOpen}>
+                  <DropdownMenuTrigger
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    className={cn(
+                      "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      },
+                    )}
+                    asChild
+                  >
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <div
+                          className="w-[20px] rounded-full"
+                          style={{
+                            height:
+                              (actualNode.props.strokeWidth ?? 0) === 0
+                                ? 1
+                                : (actualNode.props.strokeWidth ?? 0),
+                            background: nodeDashBackground,
+                          }}
+                        />
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+                        (actualNode.props.strokeWidth ?? 0) === 0
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNodeLayeringMenuOpen(false);
+                        setNodeFillMenuOpen(false);
+                        setNodeStrokeMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
+                        setNodeStrokeStyleMenuOpen((prev) => !prev);
+                        setNodeArrowStartTipMenuOpen(false);
+                        setNodeArrowEndTipMenuOpen(false);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>Stroke style</p>
+                        </div>
+                      }
+                      tooltipSide="left"
+                      tooltipAlign="center"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                    align="center"
+                    side="right"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
+                  >
+                    <div className="flex gap-1">
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 4px, transparent 4px, transparent 8px)`,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (act) =>
+                              act.value === `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: ARROW_DASH_OPTIONS[index][0].value,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Dashed (long)</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: `repeating-linear-gradient(90deg, ${actualNode.props.stroke} 0px, ${actualNode.props.stroke} 2px, transparent 2px, transparent 4px)`,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (act) =>
+                              act.value === `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: ARROW_DASH_OPTIONS[index][1].value,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Dashed (short)</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height:
+                                (actualNode.props.strokeWidth ?? 0) === 0
+                                  ? 1
+                                  : (actualNode.props.strokeWidth ?? 0),
+                              background: actualNode.props.stroke,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeStrokeStyleMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (act) =>
+                              act.value === `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              dash: ARROW_DASH_OPTIONS[index][2].value,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Normal</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu modal={false} open={nodeArrowStartTipMenuOpen}>
+                  <DropdownMenuTrigger
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    className={cn(
+                      "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      },
+                    )}
+                    asChild
+                  >
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <>
+                          {actualNode.props.tipStartStyle === "arrow" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g transform="rotate(180 16 16)">
+                                <rect
+                                  x="4"
+                                  y="15"
+                                  width="16"
+                                  height="2"
+                                  fill="black"
+                                />
+
+                                <polygon
+                                  points="20,12 20,20 27,16"
+                                  fill="black"
+                                />
+                              </g>
+                            </svg>
+                          )}
+                          {actualNode.props.tipStartStyle === "circle" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g transform="rotate(180 16 16)">
+                                <rect
+                                  x="4"
+                                  y="15"
+                                  width="18"
+                                  height="2"
+                                  fill="black"
+                                />
+
+                                <circle cx="26" cy="16" r="4" fill="black" />
+                              </g>
+                            </svg>
+                          )}
+                          {actualNode.props.tipStartStyle === "square" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g transform="rotate(180 16 16)">
+                                <rect
+                                  x="4"
+                                  y="15"
+                                  width="18"
+                                  height="2"
+                                  fill="black"
+                                />
+
+                                <rect
+                                  x="22"
+                                  y="12"
+                                  width="8"
+                                  height="8"
+                                  fill="black"
+                                />
+                              </g>
+                            </svg>
+                          )}
+                          {actualNode.props.tipStartStyle === "none" && (
+                            <div
+                              className="w-[30px] rounded-full"
+                              style={{
+                                width: 20,
+                                height: 2,
+                                background: actualNode.props.stroke,
+                              }}
+                            />
+                          )}
+                        </>
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNodeLayeringMenuOpen(false);
+                        setNodeFillMenuOpen(false);
+                        setNodeStrokeMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
+                        setNodeStrokeStyleMenuOpen(false);
+                        setNodeArrowStartTipMenuOpen((prev) => !prev);
+                        setNodeArrowEndTipMenuOpen(false);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>Start tip</p>
+                        </div>
+                      }
+                      tooltipSide="left"
+                      tooltipAlign="center"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                    align="center"
+                    side="right"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
+                  >
+                    <div className="flex gap-1">
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g transform="rotate(180 16 16)">
+                              <rect
+                                x="4"
+                                y="15"
+                                width="16"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <polygon
+                                points="20,12 20,20 27,16"
+                                fill="black"
+                              />
+                            </g>
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowStartTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipStartStyle = "arrow";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipStartSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipStartStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipStartRadius: undefined,
+                              tipStartHeight: undefined,
+                              tipStartBase: undefined,
+                              tipStartWidth: undefined,
+                              ...(newTipStartStyle === "arrow" && {
+                                tipStartBase: parseInt(tipStartSize.value),
+                                tipStartHeight:
+                                  (Math.sqrt(3) / 2) *
+                                  parseInt(tipStartSize.value),
+                              }),
+                              tipStartStyle: newTipStartStyle,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Arrow</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g transform="rotate(180 16 16)">
+                              <rect
+                                x="4"
+                                y="15"
+                                width="18"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <circle cx="26" cy="16" r="4" fill="black" />
+                            </g>
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowStartTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipStartStyle = "circle";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipStartSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipStartStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipStartRadius: undefined,
+                              tipStartHeight: undefined,
+                              tipStartBase: undefined,
+                              tipStartWidth: undefined,
+                              ...(newTipStartStyle === "circle" && {
+                                tipStartRadius: parseInt(tipStartSize.value),
+                              }),
+                              tipStartStyle: newTipStartStyle,
+                            },
+                          };
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Circle</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g transform="rotate(180 16 16)">
+                              <rect
+                                x="4"
+                                y="15"
+                                width="18"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <rect
+                                x="22"
+                                y="12"
+                                width="8"
+                                height="8"
+                                fill="black"
+                              />
+                            </g>
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowStartTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipStartStyle = "square";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipStartSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipStartStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipStartRadius: undefined,
+                              tipStartHeight: undefined,
+                              tipStartBase: undefined,
+                              tipStartWidth: undefined,
+                              ...(newTipStartStyle === "square" && {
+                                tipStartWidth: parseInt(tipStartSize.value),
+                              }),
+                              tipStartStyle: newTipStartStyle,
+                            },
+                          };
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Square</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[30px] rounded-full"
+                            style={{
+                              height: 2,
+                              background: actualNode.props.stroke,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowStartTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipStartRadius: undefined,
+                              tipStartHeight: undefined,
+                              tipStartBase: undefined,
+                              tipStartWidth: undefined,
+                              tipStartStyle: "none",
+                            },
+                          };
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>None</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu modal={false} open={nodeArrowEndTipMenuOpen}>
+                  <DropdownMenuTrigger
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
+                    className={cn(
+                      "relative rounded-full cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
+                      {
+                        ["disabled:cursor-default disabled:opacity-50"]:
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+                      },
+                    )}
+                    asChild
+                  >
+                    <ToolbarButton
+                      className="rounded-full !w-[40px]"
+                      icon={
+                        <>
+                          {actualNode.props.tipEndStyle === "arrow" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <rect
+                                x="4"
+                                y="15"
+                                width="16"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <polygon
+                                points="20,12 20,20 27,16"
+                                fill="black"
+                              />
+                            </svg>
+                          )}
+                          {actualNode.props.tipEndStyle === "circle" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <rect
+                                x="4"
+                                y="15"
+                                width="18"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <circle cx="26" cy="16" r="4" fill="black" />
+                            </svg>
+                          )}
+                          {actualNode.props.tipEndStyle === "square" && (
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <rect
+                                x="4"
+                                y="15"
+                                width="18"
+                                height="2"
+                                fill="black"
+                              />
+
+                              <rect
+                                x="22"
+                                y="12"
+                                width="8"
+                                height="8"
+                                fill="black"
+                              />
+                            </svg>
+                          )}
+                          {actualNode.props.tipEndStyle === "none" && (
+                            <div
+                              className="w-[30px] rounded-full"
+                              style={{
+                                width: 20,
+                                height: 2,
+                                background: actualNode.props.stroke,
+                              }}
+                            />
+                          )}
+                        </>
+                      }
+                      disabled={
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setNodeLayeringMenuOpen(false);
+                        setNodeFillMenuOpen(false);
+                        setNodeStrokeMenuOpen(false);
+                        setNodeStrokeWidthMenuOpen(false);
+                        setNodeStrokeStyleMenuOpen(false);
+                        setNodeArrowStartTipMenuOpen(false);
+                        setNodeArrowEndTipMenuOpen((prev) => !prev);
+                      }}
+                      label={
+                        <div className="flex gap-3 justify-start items-center">
+                          <p>End tip</p>
+                        </div>
+                      }
+                      tooltipSide="left"
+                      tooltipAlign="center"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                    align="center"
+                    side="right"
+                    alignOffset={0}
+                    sideOffset={8}
+                    className="min-w-auto font-inter rounded-none shadow-none flex flex-row rounded-full"
+                  >
+                    <div className="flex gap-1">
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <rect
+                              x="4"
+                              y="15"
+                              width="16"
+                              height="2"
+                              fill="black"
+                            />
+
+                            <polygon points="20,12 20,20 27,16" fill="black" />
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowEndTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipEndStyle = "arrow";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipEndSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipEndStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipEndRadius: undefined,
+                              tipEndHeight: undefined,
+                              tipEndBase: undefined,
+                              tipEndWidth: undefined,
+                              ...(newTipEndStyle === "arrow" && {
+                                tipEndBase: parseInt(tipEndSize.value),
+                                tipEndHeight:
+                                  (Math.sqrt(3) / 2) *
+                                  parseInt(tipEndSize.value),
+                              }),
+                              tipEndStyle: newTipEndStyle,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Arrow</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <rect
+                              x="4"
+                              y="15"
+                              width="18"
+                              height="2"
+                              fill="black"
+                            />
+
+                            <circle cx="26" cy="16" r="4" fill="black" />
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowEndTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipEndStyle = "circle";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipEndSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipEndStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipEndRadius: undefined,
+                              tipEndHeight: undefined,
+                              tipEndBase: undefined,
+                              tipEndWidth: undefined,
+                              ...(newTipEndStyle === "circle" && {
+                                tipEndRadius: parseInt(tipEndSize.value),
+                              }),
+                              tipEndStyle: newTipEndStyle,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Circle</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <rect
+                              x="4"
+                              y="15"
+                              width="18"
+                              height="2"
+                              fill="black"
+                            />
+
+                            <rect
+                              x="22"
+                              y="12"
+                              width="8"
+                              height="8"
+                              fill="black"
+                            />
+                          </svg>
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowEndTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const newTipEndStyle = "square";
+
+                          const index = ARROW_SIZE_OPTIONS.findIndex(
+                            (option) =>
+                              option.value ===
+                              `${actualNode.props.strokeWidth}`,
+                          );
+
+                          const tipEndSize =
+                            ARROW_TIP_SIZE_OPTIONS[newTipEndStyle][index];
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipEndRadius: undefined,
+                              tipEndHeight: undefined,
+                              tipEndBase: undefined,
+                              tipEndWidth: undefined,
+                              ...(newTipEndStyle === "square" && {
+                                tipEndWidth: parseInt(tipEndSize.value),
+                              }),
+                              tipEndStyle: newTipEndStyle,
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Square</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                      <ToolbarButton
+                        className="rounded-full !w-[40px]"
+                        icon={
+                          <div
+                            className="w-[20px] rounded-full"
+                            style={{
+                              height: 1,
+                              background: actualNode.props.stroke,
+                            }}
+                          />
+                        }
+                        disabled={
+                          weaveConnectionStatus !==
+                          WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                        }
+                        onClick={() => {
+                          setNodeArrowEndTipMenuOpen(false);
+
+                          if (!actualNode) {
+                            return;
+                          }
+
+                          const updatedNode: WeaveStateElement = {
+                            ...actualNode,
+                            props: {
+                              ...actualNode.props,
+                              tipEndRadius: undefined,
+                              tipEndHeight: undefined,
+                              tipEndBase: undefined,
+                              tipEndWidth: undefined,
+                              tipEndStyle: "none",
+                            },
+                          };
+
+                          updateElement(updatedNode);
+                        }}
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>None</p>
+                          </div>
+                        }
+                        tooltipSide="top"
+                        tooltipAlign="center"
+                      />
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+        </React.Fragment>,
       );
     }
 
@@ -1875,6 +3074,8 @@ export function ToolsNodeOverlay() {
     nodeStrokeMenuOpen,
     nodeStrokeWidthMenuOpen,
     nodeStrokeStyleMenuOpen,
+    nodeArrowStartTipMenuOpen,
+    nodeArrowEndTipMenuOpen,
     nodeDashBackground,
     updateElement,
   ]);
@@ -1897,7 +3098,7 @@ export function ToolsNodeOverlay() {
             orientation="horizontal"
             key="divider-1"
             className="!w-full col-span-1"
-          />
+          />,
         );
       }
 
@@ -1936,7 +3137,7 @@ export function ToolsNodeOverlay() {
               orientation="horizontal"
               className="!w-full col-span-1"
             />
-          </React.Fragment>
+          </React.Fragment>,
         );
       }
 
@@ -1972,7 +3173,7 @@ export function ToolsNodeOverlay() {
           }
           tooltipSide="left"
           tooltipAlign="center"
-        />
+        />,
       );
     }
 
@@ -1999,7 +3200,7 @@ export function ToolsNodeOverlay() {
       (nodePropertiesAction === undefined && actualAction === "commentTool") ||
       (nodePropertiesAction === "create" &&
         !["selectionTool", "moveTool", "eraseTool"].includes(
-          actualAction as string
+          actualAction as string,
         ) &&
         !imageCroppingNode)
     ) {
@@ -2026,7 +3227,7 @@ export function ToolsNodeOverlay() {
             tooltipSide="left"
             tooltipAlign="center"
           />
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -2041,6 +3242,7 @@ export function ToolsNodeOverlay() {
 
   const croppingTools = React.useMemo(() => {
     const actualNodeTools = [];
+
     if (imageCroppingEnabled && imageCroppingNode) {
       actualNodeTools.push(
         <React.Fragment key="image-cropping-tools">
@@ -2086,7 +3288,7 @@ export function ToolsNodeOverlay() {
             tooltipSide="left"
             tooltipAlign="center"
           />
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
     return actualNodeTools;
@@ -2118,7 +3320,7 @@ export function ToolsNodeOverlay() {
     return null;
   }
 
-  if (nodePropertiesAction === "update") {
+  if (nodePropertiesAction === "update" && croppingTools.length === 0) {
     return null;
   }
 

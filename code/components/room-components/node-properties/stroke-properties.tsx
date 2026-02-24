@@ -30,11 +30,11 @@ export function StrokeProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const actualNode = React.useMemo(() => {
@@ -63,7 +63,7 @@ export function StrokeProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   if (nodes && nodes.length > 1) return null;
@@ -79,9 +79,11 @@ export function StrokeProperties() {
 
   if (
     [
+      "arrow",
       "image-template",
       "group",
       "mask",
+      "stroke-single",
       "fuzzy-mask",
       "text",
       "color-token",
@@ -132,10 +134,8 @@ export function StrokeProperties() {
             updateElement(updatedNode);
           }}
         />
-        {(["line"].includes(actualNode.type) ||
-          ["connector"].includes(actualNode.type) ||
-          ["lineTool"].includes(actualAction) ||
-          ["penTool"].includes(actualAction)) && (
+        {(["stroke-single", "connector"].includes(actualNode.type) ||
+          ["strokeTool", "arrowTool"].includes(actualAction)) && (
           <>
             <InputNumber
               label="Width (px)"
@@ -185,8 +185,8 @@ export function StrokeProperties() {
             </div>
           </>
         )}
-        {(["line"].includes(actualNode.type) ||
-          ["penTool"].includes(actualAction)) && (
+        {(["stroke-single"].includes(actualNode.type) ||
+          ["strokeTool", "arrowTool"].includes(actualAction)) && (
           <>
             <div className="col-span-2">
               <InputNumber
