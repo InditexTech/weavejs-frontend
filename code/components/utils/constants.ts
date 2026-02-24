@@ -267,8 +267,8 @@ const NODES = () => [
     config: {
       outline: {
         enabled: false,
-        color: "#ffffff",
-        width: 2,
+        // color: "#ffffff",
+        // width: 2,
       },
     },
   }),
