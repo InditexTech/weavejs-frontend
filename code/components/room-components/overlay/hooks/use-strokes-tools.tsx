@@ -100,7 +100,7 @@ export const useStrokesTools = () => {
         active: () => actualAction === "brushTool",
       },
     }),
-    [actualAction, triggerTool],
+    [instance, actualAction, triggerTool],
   );
 
   return STROKES_TOOLS;
