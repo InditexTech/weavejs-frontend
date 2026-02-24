@@ -564,6 +564,7 @@ export class ImageTemplateNode extends WeaveNode {
     const cleanedAttrs = { ...realAttrs };
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.onTargetEnter;
+    delete cleanedAttrs.dragBoundFunc;
 
     return {
       key: realAttrs?.id ?? "",
