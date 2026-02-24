@@ -96,7 +96,7 @@ import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 import { getImageBase64 } from "./images";
 import { COLOR_TOKEN_ACTION_NAME } from "../actions/color-token-tool/constants";
-import resources from "./resources.json";
+// import resources from "./resources.json";
 
 export const OPERATIONS_MAP: Record<string, string> = {
   ["node-transform"]: "transforming element",
@@ -280,22 +280,25 @@ const NODES = () => [
         ],
         keepRatio: true,
       },
-      urlTransformer: (url: string, node?: Konva.Node) => {
-        let resourceId: string | null = null;
-        let resource = null;
+      urlTransformer: (
+        url: string,
+        //, node?: Konva.Node
+      ) => {
+        // let resourceId: string | null = null;
+        // let resource = null;
 
-        if (node?.getAttrs().resourceId) {
-          resourceId = node.getAttrs().resourceId;
-          resource = resources.find((res) => res.resourceId === resourceId);
-        }
+        // if (node?.getAttrs().resourceId) {
+        //   resourceId = node.getAttrs().resourceId;
+        //   resource = resources.find((res) => res.resourceId === resourceId);
+        // }
 
-        console.log("URL", {
-          id: node?.getAttrs().id,
-          url,
-          resourceId,
-          resource,
-          resources,
-        });
+        // console.log("URL", {
+        //   id: node?.getAttrs().id,
+        //   url,
+        //   resourceId,
+        //   resource,
+        //   resources,
+        // });
 
         // if (resource) {
         //   return resource.downloadUrl;
