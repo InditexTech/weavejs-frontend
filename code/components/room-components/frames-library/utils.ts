@@ -45,10 +45,11 @@ export async function generatePresentation(
 ) {
   const images: PresentationImage[] = [];
   for (const frame of framesAvailable) {
+    const stage = instance.getStage();
     const attrs = frame.getAttrs();
     const bounds = instance.getExportBoundingBox([attrs.containerId]);
     const img = await toImageAsync(frame, {
-      pixelRatio: 8,
+      pixelRatio: 2 * (1 / (stage.getAttrs().scaleX ?? 1)),
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,

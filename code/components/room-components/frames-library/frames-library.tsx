@@ -106,11 +106,12 @@ export const FramesLibrary = () => {
 
       const nodeAttrs = node.getAttrs();
       try {
+        const stage = instance.getStage();
         const bounds = instance.getExportBoundingBox([nodeAttrs.containerId]);
         const img = await toImageAsync(node, {
           x: bounds.x,
           y: bounds.y,
-          pixelRatio: 3,
+          pixelRatio: 0.5 * (1 / (stage.getAttrs().scaleX ?? 1)),
           width: bounds.width,
           height: bounds.height,
         });
