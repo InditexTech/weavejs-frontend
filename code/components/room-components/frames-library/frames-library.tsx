@@ -111,7 +111,7 @@ export const FramesLibrary = () => {
         const img = await toImageAsync(node, {
           x: bounds.x,
           y: bounds.y,
-          pixelRatio: 0.5 * (1 / stage.getAttrs().scaleX),
+          pixelRatio: 0.5 * (1 / (stage.getAttrs().scaleX ?? 1)),
           width: bounds.width,
           height: bounds.height,
         });
