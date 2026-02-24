@@ -5,6 +5,7 @@
 "use client";
 
 import Konva from "konva";
+// import { BACKGROUND_COLOR } from "@/store/store";
 import { formatDistanceToNow } from "date-fns";
 import {
   WeaveMoveToolAction,
@@ -96,7 +97,7 @@ import { getUserShort } from "./users";
 import { ThreadEntity } from "../room-components/hooks/types";
 import { getImageBase64 } from "./images";
 import { COLOR_TOKEN_ACTION_NAME } from "../actions/color-token-tool/constants";
-// import resources from "./resources.json";
+// import resources from "./resources1.json";
 
 export const OPERATIONS_MAP: Record<string, string> = {
   ["node-transform"]: "transforming element",
@@ -262,7 +263,15 @@ const NODES = () => [
   new WeaveLineNode(),
   new WeaveStrokeNode(),
   new WeaveStrokeSingleNode(),
-  new WeaveTextNode(),
+  new WeaveTextNode({
+    config: {
+      outline: {
+        enabled: false,
+        color: "#ffffff",
+        width: 2,
+      },
+    },
+  }),
   new WeaveImageNode({
     config: {
       performance: {
@@ -282,7 +291,7 @@ const NODES = () => [
       },
       urlTransformer: (
         url: string,
-        //, node?: Konva.Node
+        //  , node?: Konva.Node
       ) => {
         // let resourceId: string | null = null;
         // let resource = null;
@@ -292,23 +301,16 @@ const NODES = () => [
         //   resource = resources.find((res) => res.resourceId === resourceId);
         // }
 
-        // console.log("URL", {
-        //   id: node?.getAttrs().id,
-        //   url,
-        //   resourceId,
-        //   resource,
-        //   resources,
-        // });
-
         // if (resource) {
         //   return resource.downloadUrl;
         // }
 
         return url;
       },
-      onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
-        instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
-      },
+      // onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
+      //   console.log("double click on image, triggering crop action");
+      //   instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
+      // },
     },
   }),
   new WeaveStarNode(),
