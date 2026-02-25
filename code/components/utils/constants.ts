@@ -307,10 +307,9 @@ const NODES = () => [
 
         return url;
       },
-      // onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
-      //   console.log("double click on image, triggering crop action");
-      //   instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
-      // },
+      onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
+        instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
+      },
     },
   }),
   new WeaveStarNode(),
