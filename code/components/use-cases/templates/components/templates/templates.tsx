@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TemplateEntity } from "./types";
 import { Template } from "./template";
 import { CogIcon, LayoutTemplateIcon } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
 
 const TEMPLATES_LIMIT = 20;
 
