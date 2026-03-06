@@ -101,7 +101,7 @@ const ChatBotPrompt = () => {
   const chefs = Array.from(new Set(MODELS.map((model) => model.chef)));
 
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const handleSubmit = React.useCallback(
@@ -146,7 +146,7 @@ const ChatBotPrompt = () => {
       setAiView,
       setSidebarActive,
       scrollToBottom,
-    ]
+    ],
   );
 
   const attachments = usePromptInputAttachments();
@@ -154,21 +154,29 @@ const ChatBotPrompt = () => {
   return (
     <div
       className={cn(
-        "pointer-events-none fixed bottom-[10px] left-[20px] right-[500px] flex justify-center items-center",
+        "pointer-events-none fixed left-[16px] right-[16px] flex justify-center items-center",
         {
-          ["bottom-[-124px]"]: hidden,
-          ["bottom-[10px]"]: !hidden,
-        }
+          ["bottom-[-134px]"]: hidden,
+          ["bottom-[16px]"]: !hidden,
+        },
       )}
     >
       <div className="relative w-[900px] pointer-events-auto border border-[#c9c9c9]">
         {hidden && (
-          <button
-            className="absolute top-[-40px] right-0 px-5 py-3 bg-white rounded-none border border-[#c9c9c9] cursor-pointer"
-            onClick={() => setHidden(false)}
-          >
-            <PanelBottomOpen strokeWidth={1} size={16} />
-          </button>
+          <div className="absolute top-[-40px] left-0 right-0 flex justify-center items-center">
+            <button
+              className={cn(
+                "bg-white rounded-none border border-[#c9c9c9] cursor-pointer",
+                {
+                  ["px-3 py-2"]: hidden,
+                  ["px-5 py-3"]: !hidden,
+                },
+              )}
+              onClick={() => setHidden(false)}
+            >
+              <PanelBottomOpen strokeWidth={1} size={16} />
+            </button>
+          </div>
         )}
         {attachments.files.length > 0 && (
           <div className="w-full bg-white border-b border-[#c9c9c9] p-3">
@@ -240,7 +248,7 @@ const ChatBotPrompt = () => {
                                 <div className="ml-auto size-4" />
                               )}
                             </ModelSelectorItem>
-                          )
+                          ),
                         )}
                       </ModelSelectorGroup>
                     ))}

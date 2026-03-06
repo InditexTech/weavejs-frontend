@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { OrbitProgress } from "react-loading-indicators";
 import { postChat } from "@/api/post-chat";
 import { ChatBotChatInfo } from "./chatbot.chat-info";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const ChatBot = () => {
   const threadId = useIAChat((state) => state.threadId);
@@ -36,6 +37,7 @@ export const ChatBot = () => {
 
   const user = useCollaborationRoom((state) => state.user);
   const room = useCollaborationRoom((state) => state.room);
+  const activeSidebar = useCollaborationRoom((state) => state.sidebar.active);
 
   const queryClient = useQueryClient();
 
@@ -109,7 +111,7 @@ export const ChatBot = () => {
 
     if (threadId === "undefined") {
       const storedThreadId = sessionStorage.getItem(
-        `weave.js_${room}_${user.name}_ai_thread_id`
+        `weave.js_${room}_${user.name}_ai_thread_id`,
       );
 
       if (storedThreadId) {
@@ -118,7 +120,7 @@ export const ChatBot = () => {
         actualThreadId = uuidv4();
         sessionStorage.setItem(
           `weave.js_${room}_${user.name}_ai_thread_id`,
-          actualThreadId
+          actualThreadId,
         );
       }
 
@@ -130,6 +132,10 @@ export const ChatBot = () => {
       setResourceId(actualResourceId);
     }
   }, [user, room, threadId, resourceId, setThreadId, setResourceId]);
+
+  if (activeSidebar !== SIDEBAR_ELEMENTS.aiChat) {
+    return null;
+  }
 
   return (
     <>
@@ -152,7 +158,7 @@ export const ChatBot = () => {
 
                         sessionStorage.setItem(
                           `weave.js_${room}_${user.name}_ai_thread_id`,
-                          newTreadId
+                          newTreadId,
                         );
 
                         await postChat(room, newTreadId, resourceId, {

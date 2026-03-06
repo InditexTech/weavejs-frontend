@@ -10,7 +10,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
-import { ACTIONS, FONTS, NODES, PLUGINS } from "@/components/utils/constants";
 import { useWeave, WeaveProvider } from "@inditextech/weave-react";
 import { RoomLayout } from "./room.layout";
 import { RoomLoader } from "../room-components/room-loader/room-loader";
@@ -26,6 +25,12 @@ import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
 import { useCommentsHandler } from "../room-components/hooks/use-comments-handler";
 import { UploadVideo } from "../room-components/upload-video";
 import ChatBotPromptProvider from "../room-components/ai-components/chatbot.prompt.provider";
+import useGetRendererKonvaBase from "../room-components/hooks/use-get-renderer-konva-base";
+import { NODES } from "../utils/weave/nodes";
+import { PLUGINS } from "../utils/weave/plugins";
+import { ACTIONS } from "../utils/weave/actions";
+import { FONTS } from "../utils/weave/fonts";
+// import useGetRendererKonvaReactReconciler from "../room-components/hooks/use-get-renderer-konva-react-reconciler";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -142,6 +147,9 @@ const RoomInternal = () => {
     return "";
   }, [loadedParams, loadingFetchConnectionUrl, status, comBusConnected]);
 
+  const rendererProvider = useGetRendererKonvaBase();
+  // const rendererProvider = useGetRendererKonvaReactReconciler();
+
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
     getUser,
@@ -236,56 +244,77 @@ const RoomInternal = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && storeProvider && comBusConnected && (
-        <ChatBotPromptProvider>
-          <WeaveProvider
-            getContainer={() => {
-              return document?.getElementById("weave") as HTMLDivElement;
-            }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            store={storeProvider as any}
-            fonts={FONTS}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            nodes={NODES() as any[]}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            plugins={PLUGINS(getUser) as any[]}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            actions={ACTIONS(getUser) as any[]}
-            performance={performanceConfiguration}
-            logModules={[]}
-          >
-            <UploadImage />
-            <UploadImages />
-            <UploadVideo />
-            <RoomLayout inShadowDom={false} />
-            <HelpDrawer />
-          </WeaveProvider>
-        </ChatBotPromptProvider>
-      )}
+      {loadedParams &&
+        room &&
+        user &&
+        storeProvider &&
+        rendererProvider &&
+        comBusConnected && (
+          <ChatBotPromptProvider>
+            <WeaveProvider
+              getContainer={() => {
+                return document?.getElementById("weave") as HTMLDivElement;
+              }}
+              renderer={rendererProvider}
+              store={storeProvider}
+              fonts={FONTS}
+              nodes={NODES()}
+              plugins={PLUGINS(getUser)}
+              actions={ACTIONS(getUser)}
+              performance={performanceConfiguration}
+              logModules={[]}
+            >
+              <UploadImage />
+              <UploadImages />
+              <UploadVideo />
+              <RoomLayout inShadowDom={false} />
+              <HelpDrawer />
+            </WeaveProvider>
+          </ChatBotPromptProvider>
+        )}
     </>
   );
 };
 
 const Toasts = () => {
   const toasterContent = (
-    <Toaster
-      offset={16}
-      mobileOffset={16}
-      position="bottom-center"
-      toastOptions={{
-        classNames: {
-          toast: "w-full font-inter font-light text-xs",
-          content: "w-full",
-          title: "w-full font-inter font-semibold text-sm",
-          description: "w-full font-inter font-light text-xs !text-black",
-        },
-        style: {
-          transform: "translateX(calc(-496px + 50%))",
-          borderRadius: "0px",
-          boxShadow: "none",
-        },
-      }}
-    />
+    <>
+      <Toaster
+        offset={16}
+        mobileOffset={16}
+        position="bottom-right"
+        toastOptions={{
+          classNames: {
+            toast: "w-full font-inter font-light text-xs drop-shadow-md",
+            content: "w-full",
+            title: "w-full font-inter font-semibold text-sm",
+            description: "w-full font-inter font-light text-xs !text-black",
+          },
+          style: {
+            borderRadius: "0px",
+            boxShadow: "none",
+          },
+        }}
+      />
+      <Toaster
+        id="info"
+        offset={16}
+        mobileOffset={16}
+        position="top-center"
+        toastOptions={{
+          classNames: {
+            toast: "w-full font-inter font-light text-xs drop-shadow-md",
+            content: "w-full",
+            title: "w-full font-inter font-semibold text-sm",
+            description: "w-full font-inter font-light text-xs !text-black",
+          },
+          style: {
+            borderRadius: "0px",
+            boxShadow: "none",
+          },
+        }}
+      />
+    </>
   );
 
   // Only render in the browser

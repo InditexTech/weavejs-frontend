@@ -11,10 +11,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TemplateEntity } from "./types";
 import { Template } from "./template";
 import { CogIcon, LayoutTemplateIcon } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
 
 const TEMPLATES_LIMIT = 20;
 
 export const Templates = () => {
+  const instance = useWeave((state) => state.instance);
+
   const instanceId = useTemplatesUseCase((state) => state.instanceId);
   const templatesManage = useTemplatesUseCase(
     (state) => state.templates.manage,
@@ -127,10 +130,15 @@ export const Templates = () => {
           <div
             className="w-full p-5 grid grid-cols-4 gap-5"
             onDragStart={(e) => {
+              if (!instance) {
+                return;
+              }
+
               if (e.target instanceof HTMLImageElement) {
-                window.weaveDragTemplateData = {
-                  templateData: e.target.dataset.templateData,
-                };
+                instance.startDrag("add-template-to-room");
+                instance.setDragProperties<{ templateData: string }>({
+                  templateData: e.target.dataset.templateData ?? "",
+                });
               }
             }}
           >

@@ -51,13 +51,13 @@ export class MaskEraserToolAction extends WeaveAction {
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Backspace" || e.key === "Delete") {
         const maskTransformer: Konva.Transformer | undefined = stage.findOne(
-          "#maskSelectionTransformer"
+          "#maskSelectionTransformer",
         );
 
         if (maskTransformer) {
           const selectedNodes: Konva.Node[] = maskTransformer.getNodes();
           const selectedNodesIds: string[] = selectedNodes.map(
-            (node) => node.getAttrs().id ?? ""
+            (node) => node.getAttrs().id ?? "",
           );
 
           maskTransformer.nodes([
@@ -65,7 +65,7 @@ export class MaskEraserToolAction extends WeaveAction {
               .nodes()
               .filter(
                 (node: Konva.Node) =>
-                  !selectedNodesIds.includes(node.getAttrs().id ?? "")
+                  !selectedNodesIds.includes(node.getAttrs().id ?? ""),
               ),
           ]);
           for (const node of selectedNodes) {
@@ -87,11 +87,11 @@ export class MaskEraserToolAction extends WeaveAction {
       (node: Konva.Node) =>
         (node.getType() === "Line" && node.getAttrs().nodeType === "mask") ||
         (node.getType() === "Group" &&
-          node.getAttrs().nodeType === "fuzzy-mask")
+          node.getAttrs().nodeType === "fuzzy-mask"),
     );
 
     const maskTransformer: Konva.Transformer | undefined = stage.findOne(
-      "#maskSelectionTransformer"
+      "#maskSelectionTransformer",
     );
 
     for (const node of nodes) {

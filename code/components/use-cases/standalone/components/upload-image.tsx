@@ -16,13 +16,13 @@ export function UploadImage() {
 
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const showSelectFile = useStandaloneUseCase(
-    (state) => state.images.showSelectFile
+    (state) => state.images.showSelectFile,
   );
   const setUploadingImage = useStandaloneUseCase(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const setShowSelectFileImage = useStandaloneUseCase(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   const queryClient = useQueryClient();
@@ -50,7 +50,7 @@ export function UploadImage() {
         },
       });
     },
-    [instanceId, mutationUpload, queryClient, setUploadingImage]
+    [instanceId, mutationUpload, queryClient, setUploadingImage],
   );
 
   React.useEffect(() => {
@@ -73,7 +73,7 @@ export function UploadImage() {
   return (
     <input
       type="file"
-      accept="image/png,image/jpeg"
+      accept="image/png,image/jpeg,image/webp"
       name="image"
       ref={inputFileRef}
       className="hidden"

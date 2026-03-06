@@ -21,6 +21,12 @@ export type ImageInfo = {
 
 export type ImagesToolActionTriggerParams = {
   images: ImageInfo[];
+  imagesIds?: string[];
   padding?: number;
   position?: Vector2d;
+};
+
+export type ImagesToolDragAndDropProperties = {
+  imageURL: string;
+  imageId?: string;
 };

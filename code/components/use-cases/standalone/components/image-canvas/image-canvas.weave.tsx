@@ -10,6 +10,7 @@ import { ACTIONS, FONTS, NODES, PLUGINS } from "../../weave";
 import { useGetStandaloneStore } from "../../hooks/use-get-standalone-store";
 import { ImageCanvasLayout } from "./image-canvas.layout";
 import { useStandaloneUseCase } from "../../store/store";
+import useGetRendererKonvaBase from "@/components/room-components/hooks/use-get-renderer-konva-base";
 
 type ImageCanvasWeaveProps = {
   data: string | undefined;
@@ -19,13 +20,13 @@ export const ImageCanvasWeave = ({ data }: ImageCanvasWeaveProps) => {
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const user = useStandaloneUseCase((state) => state.user);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const managingImageWidth = useStandaloneUseCase(
-    (state) => state.managing.width
+    (state) => state.managing.width,
   );
   const managingImageHeight = useStandaloneUseCase(
-    (state) => state.managing.height
+    (state) => state.managing.height,
   );
 
   const getUser = React.useCallback(() => {
@@ -39,6 +40,9 @@ export const ImageCanvasWeave = ({ data }: ImageCanvasWeaveProps) => {
     return user;
   }, [user]);
 
+  const renderer = useGetRendererKonvaBase();
+  // const rendererProvider = useGetRendererKonvaReactReconciler();
+
   const store = useGetStandaloneStore({
     instanceId,
     imageId: managingImageId!,
@@ -47,7 +51,7 @@ export const ImageCanvasWeave = ({ data }: ImageCanvasWeaveProps) => {
     getUser,
   });
 
-  if (!store) {
+  if (!store || !renderer) {
     return null;
   }
 
@@ -57,6 +61,7 @@ export const ImageCanvasWeave = ({ data }: ImageCanvasWeaveProps) => {
         return document?.getElementById("weave") as HTMLDivElement;
       }}
       store={store}
+      renderer={renderer}
       fonts={FONTS}
       nodes={NODES()}
       plugins={PLUGINS(getUser)}

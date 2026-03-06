@@ -37,7 +37,7 @@ import {
   ArrowDown,
   SendToBack,
   Trash,
-  Settings,
+  // Settings,
   Paintbrush,
   Crop,
   BrushCleaning,
@@ -79,6 +79,8 @@ import {
   WeaveConnectorNode,
   WEAVE_CONNECTOR_NODE_LINE_ORIGIN,
   WEAVE_CONNECTOR_NODE_DECORATOR_TYPE,
+  WeaveTextNode,
+  TEXT_LAYOUT,
 } from "@inditextech/weave-sdk";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -93,7 +95,7 @@ import { ImageTemplateNode } from "@/components/nodes/image-template/image-templ
 import { IMAGE_TEMPLATE_FIT } from "@/components/nodes/image-template/constants";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { useIAChat } from "@/store/ia-chat";
-import { useNodeActionName } from "./hooks/use-node-action-name";
+// import { useNodeActionName } from "./hooks/use-node-action-name";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -115,6 +117,7 @@ export const NodeToolbar = () => {
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
 
+  // const viewType = useCollaborationRoom((state) => state.viewType);
   const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
@@ -262,7 +265,7 @@ export const NodeToolbar = () => {
     };
   }, [instance, movingImageTemplate]);
 
-  const title = useNodeActionName();
+  // const title = useNodeActionName();
 
   const mutationRemoveBackground = useMutation({
     mutationFn: async ({
@@ -567,12 +570,12 @@ export const NodeToolbar = () => {
 
   return (
     <>
-      <div className="pointer-events-none absolute px-0 py-0 top-[16px] right-[82px] flex flex-col gap-0 justify-center items-center bg-white px-3 py-2 text-lg font-inter font-light border border-r-0 border-[#c9c9c9]">
+      {/* <div className="pointer-events-none absolute px-0 py-0 top-[16px] right-[440px] flex flex-col gap-0 justify-center items-center bg-white px-3 py-2 text-lg font-inter font-light border border-r-0 border-[#c9c9c9]">
         {title.toUpperCase()}
-      </div>
-      <div className="pointer-events-none absolute px-0 py-0 top-[16px] bottom-[16px] right-[16px] flex flex-col gap-0 justify-start items-center">
-        <div className="flex flex-col gap-0 justify-start items-center bg-white border rounded-none border-zinc-200">
-          <div className="flex flex-col gap-[2px] justify-end items-center px-1 my-1">
+      </div> */}
+      <div className="pointer-events-none absolute px-0 py-0 left-[16px] top-[16px] right-[16px] flex gap-0 justify-center items-center">
+        <div className="flex gap-0 justify-center items-center bg-white border rounded-full border-zinc-200">
+          <div className="flex gap-[2px] h-[40px] justify-end items-center px-1 my-1">
             {!isGroup && isColorTokenNode && (
               <DropdownMenu
                 modal={false}
@@ -594,7 +597,7 @@ export const NodeToolbar = () => {
                   asChild
                 >
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={
                       <div
                         className="border border-[#c9c9c9c] w-[20px] h-[20px]"
@@ -669,7 +672,7 @@ export const NodeToolbar = () => {
               <>
                 {!isVideoPlaying && (
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={<Play className="px-0" size={20} strokeWidth={1} />}
                     disabled={
                       weaveConnectionStatus !==
@@ -702,7 +705,7 @@ export const NodeToolbar = () => {
                 )}
                 {isVideoPlaying && (
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={<Pause className="px-0" size={20} strokeWidth={1} />}
                     disabled={
                       weaveConnectionStatus !==
@@ -734,7 +737,7 @@ export const NodeToolbar = () => {
                   />
                 )}
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={
                     <RotateCcw className="px-0" size={20} strokeWidth={1} />
                   }
@@ -765,10 +768,7 @@ export const NodeToolbar = () => {
                   tooltipSide="left"
                   tooltipAlign="center"
                 />
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
+                <ToolbarDivider orientation="vertical" />
               </>
             )}
             {isConnectorNode && (
@@ -793,7 +793,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <ArrowLeftFromLine
                           className="px-0"
@@ -983,7 +983,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                           {(actualNode?.props?.["startNodeDecoratorType"] ===
@@ -1051,7 +1051,7 @@ export const NodeToolbar = () => {
                   >
                     <div className="flex flex-row-reverse gap-1">
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["startNodeDecoratorType"] ===
@@ -1101,7 +1101,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["startNodeDecoratorType"] ===
@@ -1151,7 +1151,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["startNodeDecoratorType"] ===
@@ -1223,7 +1223,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <ArrowRightFromLine
                           className="px-0"
@@ -1411,7 +1411,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                           {(actualNode?.props?.["endNodeDecoratorType"] ===
@@ -1475,7 +1475,7 @@ export const NodeToolbar = () => {
                   >
                     <div className="flex flex-row-reverse gap-1">
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["endNodeDecoratorType"] ===
@@ -1523,7 +1523,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["endNodeDecoratorType"] ===
@@ -1571,7 +1571,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <div className="w-[20px] h-[20px] rounded-full text-[9px] flex justify-center items-center">
                             {actualNode?.props?.["endNodeDecoratorType"] ===
@@ -1641,7 +1641,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <Spline className="px-0" size={20} strokeWidth={1} />
                       }
@@ -1807,7 +1807,7 @@ export const NodeToolbar = () => {
             {isMeasureNode && (
               <>
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={
                     <FlipVertical2 className="px-0" size={20} strokeWidth={1} />
                   }
@@ -1841,7 +1841,7 @@ export const NodeToolbar = () => {
                   tooltipAlign="center"
                 />
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={<Ruler className="px-0" size={20} strokeWidth={1} />}
                   disabled={
                     weaveConnectionStatus !==
@@ -1910,7 +1910,7 @@ export const NodeToolbar = () => {
               <>
                 {!actualNode?.props.isUsed && (
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={<Link className="px-0" size={20} strokeWidth={1} />}
                     disabled={
                       !linkedNode ||
@@ -1975,7 +1975,7 @@ export const NodeToolbar = () => {
                         asChild
                       >
                         <ToolbarButton
-                          className="rounded-full !w-[40px] !h-[40px]"
+                          className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                           icon={
                             <ImageUpscale
                               className="px-0"
@@ -2179,7 +2179,7 @@ export const NodeToolbar = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <Unlink className="px-0" size={20} strokeWidth={1} />
                       }
@@ -2218,10 +2218,7 @@ export const NodeToolbar = () => {
                     />
                   </>
                 )}
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
+                <ToolbarDivider orientation="vertical" />
               </>
             )}
             {!isGroup && canSetNodeStyling && (
@@ -2245,7 +2242,7 @@ export const NodeToolbar = () => {
                   asChild
                 >
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={
                       <Paintbrush className="px-0" size={20} strokeWidth={1} />
                     }
@@ -2303,7 +2300,7 @@ export const NodeToolbar = () => {
                               asChild
                             >
                               <ToolbarButton
-                                className="rounded-full min-w-[32px] !w-[40px] !h-[40px]"
+                                className="rounded-full min-w-[32px] !min-w-[40px] !w-[40px] !h-[40px]"
                                 icon={
                                   <div
                                     className="border border-[#c9c9c9c] w-[20px] h-[20px]"
@@ -2406,7 +2403,7 @@ export const NodeToolbar = () => {
                               asChild
                             >
                               <ToolbarButton
-                                className="rounded-full min-w-[32px] !w-[40px] !h-[40px]"
+                                className="rounded-full min-w-[32px] !min-w-[40px] !w-[40px] !h-[40px]"
                                 icon={
                                   <div
                                     className="border border-[#c9c9c9c] w-[20px] h-[20px]"
@@ -2519,7 +2516,7 @@ export const NodeToolbar = () => {
                                   asChild
                                 >
                                   <ToolbarButton
-                                    className="rounded-full min-w-[32px] !w-[40px] !h-[40px]"
+                                    className="rounded-full min-w-[32px] !min-w-[40px] !w-[40px] !h-[40px]"
                                     icon={
                                       <div
                                         className="border border-[#c9c9c9c] w-[20px] h-[20px]"
@@ -2623,7 +2620,7 @@ export const NodeToolbar = () => {
                               asChild
                             >
                               <ToolbarButton
-                                className="rounded-full min-w-[32px] !w-[40px] !h-[40px]"
+                                className="rounded-full min-w-[32px] !min-w-[40px] !w-[40px] !h-[40px]"
                                 icon={
                                   <div
                                     className="border border-[#c9c9c9c] w-[20px] h-[20px]"
@@ -2719,7 +2716,7 @@ export const NodeToolbar = () => {
                               asChild
                             >
                               <ToolbarButton
-                                className="rounded-full !w-[40px] !h-[40px]"
+                                className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                 icon={
                                   actualNode?.props.strokeWidth === 0 ? (
                                     <X
@@ -2769,7 +2766,7 @@ export const NodeToolbar = () => {
                             >
                               <div className="flex flex-row-reverse gap-1">
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -2807,7 +2804,7 @@ export const NodeToolbar = () => {
                                   tooltipAlign="end"
                                 />
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -2845,7 +2842,7 @@ export const NodeToolbar = () => {
                                   tooltipAlign="end"
                                 />
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -2884,7 +2881,7 @@ export const NodeToolbar = () => {
                                 />
 
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -2922,7 +2919,7 @@ export const NodeToolbar = () => {
                                   tooltipAlign="end"
                                 />
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -2961,7 +2958,7 @@ export const NodeToolbar = () => {
                                 />
 
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <X
                                       className="px-0"
@@ -3025,7 +3022,7 @@ export const NodeToolbar = () => {
                               asChild
                             >
                               <ToolbarButton
-                                className="rounded-full !w-[40px] !h-[40px]"
+                                className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                 icon={
                                   <div
                                     className="w-[20px] rounded-full"
@@ -3073,7 +3070,7 @@ export const NodeToolbar = () => {
                             >
                               <div className="flex flex-row-reverse gap-1">
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -3116,7 +3113,7 @@ export const NodeToolbar = () => {
                                   tooltipAlign="end"
                                 />
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -3160,7 +3157,7 @@ export const NodeToolbar = () => {
                                 />
 
                                 <ToolbarButton
-                                  className="rounded-full !w-[40px] !h-[40px]"
+                                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                                   icon={
                                     <div
                                       className="w-[24px] rounded-full"
@@ -3218,7 +3215,7 @@ export const NodeToolbar = () => {
             {isImage && (
               <>
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={
                     <Paperclip className="px-0" size={20} strokeWidth={1} />
                   }
@@ -3274,7 +3271,7 @@ export const NodeToolbar = () => {
                   tooltipAlign="center"
                 />
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={<Link className="px-0" size={20} strokeWidth={1} />}
                   disabled={
                     weaveConnectionStatus !==
@@ -3301,14 +3298,11 @@ export const NodeToolbar = () => {
                   tooltipSide="left"
                   tooltipAlign="end"
                 />
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
+                <ToolbarDivider orientation="vertical" />
                 {workloadsEnabled && (
                   <>
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <BrushCleaning
                           className="px-0"
@@ -3387,7 +3381,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="center"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <Minus className="px-0" size={20} strokeWidth={1} />
                       }
@@ -3462,7 +3456,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="center"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <FlipHorizontal
                           className="px-0"
@@ -3542,7 +3536,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="center"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <FlipVertical
                           className="px-0"
@@ -3622,7 +3616,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="center"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <PaintRoller
                           className="px-0"
@@ -3703,7 +3697,7 @@ export const NodeToolbar = () => {
                   </>
                 )}
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={<Crop className="px-0" size={20} strokeWidth={1} />}
                   disabled={
                     weaveConnectionStatus !==
@@ -3731,7 +3725,7 @@ export const NodeToolbar = () => {
                   tooltipAlign="center"
                 />
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={
                     <RotateCcw className="px-0" size={20} strokeWidth={1} />
                   }
@@ -3760,16 +3754,13 @@ export const NodeToolbar = () => {
                   tooltipSide="left"
                   tooltipAlign="center"
                 />
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
+                <ToolbarDivider orientation="vertical" />
               </>
             )}
             {isMultiNodesSelected && (
               <>
                 <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                   icon={
                     <WandSparkles className="px-0" size={20} strokeWidth={1} />
                   }
@@ -3852,10 +3843,7 @@ export const NodeToolbar = () => {
                   tooltipSide="left"
                   tooltipAlign="center"
                 />
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
+                <ToolbarDivider orientation="vertical" />
                 <DropdownMenu
                   modal={false}
                   open={actualMenusOpen.includes("nodesAlignmentHorizontal")}
@@ -3876,7 +3864,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <UnfoldHorizontal
                           className="px-0"
@@ -3916,7 +3904,7 @@ export const NodeToolbar = () => {
                   >
                     <div className="flex gap-1">
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignHorizontalJustifyStart
                             className="px-0"
@@ -3951,7 +3939,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignHorizontalJustifyCenter
                             className="px-0"
@@ -3986,7 +3974,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignHorizontalJustifyEnd
                             className="px-0"
@@ -4043,7 +4031,7 @@ export const NodeToolbar = () => {
                     asChild
                   >
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <UnfoldVertical
                           className="px-0"
@@ -4083,7 +4071,7 @@ export const NodeToolbar = () => {
                   >
                     <div className="flex gap-1">
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignVerticalJustifyStart
                             className="px-0"
@@ -4118,7 +4106,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignVerticalJustifyCenter
                             className="px-0"
@@ -4153,7 +4141,7 @@ export const NodeToolbar = () => {
                         tooltipAlign="end"
                       />
                       <ToolbarButton
-                        className="rounded-full !w-[40px] !h-[40px]"
+                        className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                         icon={
                           <AlignVerticalJustifyEnd
                             className="px-0"
@@ -4213,7 +4201,7 @@ export const NodeToolbar = () => {
                   asChild
                 >
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={
                       <RectangleCircle
                         className="px-0"
@@ -4789,7 +4777,7 @@ export const NodeToolbar = () => {
                   asChild
                 >
                   <ToolbarButton
-                    className="rounded-full !w-[40px] !h-[40px]"
+                    className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                     icon={<Layers className="px-0" size={20} strokeWidth={1} />}
                     disabled={
                       weaveConnectionStatus !==
@@ -4823,7 +4811,7 @@ export const NodeToolbar = () => {
                 >
                   <div className="flex gap-0 justify-center items-center py-1 px-1">
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <BringToFront
                           className="px-0"
@@ -4869,7 +4857,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="end"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <ArrowUp className="px-0" size={20} strokeWidth={1} />
                       }
@@ -4909,7 +4897,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="end"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <ArrowDown className="px-0" size={20} strokeWidth={1} />
                       }
@@ -4949,7 +4937,7 @@ export const NodeToolbar = () => {
                       tooltipAlign="end"
                     />
                     <ToolbarButton
-                      className="rounded-full !w-[40px] !h-[40px]"
+                      className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                       icon={
                         <SendToBack
                           className="px-0"
@@ -4998,10 +4986,57 @@ export const NodeToolbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <ToolbarDivider orientation="horizontal" className="!h-[28px]" />
+            {isTextNode &&
+              actualNode?.props.layout === TEXT_LAYOUT.SMART &&
+              ((actualNode?.props.smartFixedWidth ?? false) ||
+                (actualNode?.props.smartFixedHeight ?? false)) && (
+                <ToolbarButton
+                  className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
+                  icon={
+                    <RotateCcw className="px-0" size={20} strokeWidth={1} />
+                  }
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
+                  onClick={() => {
+                    setActualMenusOpen([]);
+
+                    if (!instance) {
+                      return;
+                    }
+
+                    const nodeHandler =
+                      instance.getNodeHandler<WeaveTextNode>("text");
+
+                    if (!nodeHandler) {
+                      return;
+                    }
+
+                    const stage = instance.getStage();
+                    const nodeInstance = stage.findOne(
+                      `#${actualNode?.key ?? ""}`,
+                    );
+
+                    if (!nodeInstance) {
+                      return;
+                    }
+
+                    nodeHandler.resetSmartLayout(nodeInstance as Konva.Text);
+                  }}
+                  label={
+                    <div className="flex gap-3 justify-start items-center">
+                      <p>Reset</p>
+                    </div>
+                  }
+                  tooltipSide="left"
+                  tooltipAlign="center"
+                />
+              )}
+            <ToolbarDivider orientation="vertical" />
             {isMultiNodesSelected && (
               <ToolbarButton
-                className="rounded-full !w-[40px] !h-[40px]"
+                className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                 icon={<Group className="px-0" size={20} strokeWidth={1} />}
                 disabled={
                   weaveConnectionStatus !==
@@ -5035,7 +5070,7 @@ export const NodeToolbar = () => {
             )}
             {isGroup && (
               <ToolbarButton
-                className="rounded-full !w-[40px] !h-[40px]"
+                className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
                 icon={<Ungroup className="px-0" size={20} strokeWidth={1} />}
                 disabled={
                   weaveConnectionStatus !==
@@ -5066,7 +5101,7 @@ export const NodeToolbar = () => {
               />
             )}
             <ToolbarButton
-              className="rounded-full !w-[40px] !h-[40px]"
+              className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
               icon={<Lock className="px-0" size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
@@ -5113,7 +5148,7 @@ export const NodeToolbar = () => {
               tooltipAlign="center"
             />
             <ToolbarButton
-              className="rounded-full !w-[40px] !h-[40px]"
+              className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
               icon={<EyeOff className="px-0" size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
@@ -5160,7 +5195,7 @@ export const NodeToolbar = () => {
               tooltipAlign="center"
             />
             <ToolbarButton
-              className="rounded-full !w-[40px] !h-[40px]"
+              className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
               icon={<Copy className="px-0" size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
@@ -5196,7 +5231,7 @@ export const NodeToolbar = () => {
               tooltipAlign="center"
             />
             <ToolbarButton
-              className="rounded-full !w-[40px] !h-[40px]"
+              className="rounded-full !min-w-[40px] !w-[40px] !h-[40px]"
               icon={<Trash className="px-0" size={20} strokeWidth={1} />}
               disabled={
                 weaveConnectionStatus !==
@@ -5236,42 +5271,6 @@ export const NodeToolbar = () => {
               tooltipSide="left"
               tooltipAlign="center"
             />
-            {isSingleNodeSelected && (
-              <>
-                <ToolbarDivider
-                  orientation="horizontal"
-                  className="!h-[28px]"
-                />
-                <ToolbarButton
-                  className="rounded-full !w-[40px] !h-[40px]"
-                  icon={<Settings className="px-0" size={20} strokeWidth={1} />}
-                  disabled={
-                    weaveConnectionStatus !==
-                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-                    typeof nodePropertiesAction === "undefined" ||
-                    typeof actualNode === "undefined" ||
-                    (typeof actualNode === "undefined" && nodes.length < 2)
-                  }
-                  onClick={() => {
-                    setActualMenusOpen([]);
-                    setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
-                  }}
-                  label={
-                    <div className="flex gap-3 justify-start items-center">
-                      <p>Node Properties</p>
-                      <ShortcutElement
-                        shortcuts={{
-                          [SYSTEM_OS.MAC]: "⌘ Z",
-                          [SYSTEM_OS.OTHER]: "Ctrl Z",
-                        }}
-                      />
-                    </div>
-                  }
-                  tooltipSide="left"
-                  tooltipAlign="center"
-                />
-              </>
-            )}
           </div>
         </div>
       </div>

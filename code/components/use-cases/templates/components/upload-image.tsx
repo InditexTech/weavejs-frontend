@@ -3,10 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useWeave } from "@inditextech/weave-react";
 import { useTemplatesUseCase } from "../store/store";
 import { postTemplatesImage } from "@/api/templates/post-templates-image";
+import Konva from "konva";
 
 export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,23 +37,65 @@ export function UploadImage() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File) => {
-      setUploadingImage(true);
-      mutationUpload.mutate(file, {
-        onSuccess: () => {
-          const queryKey = ["getTemplatesImages", instanceId];
-          queryClient.invalidateQueries({ queryKey });
-        },
-        onError: (ex) => {
-          console.error(ex);
-          console.error("Error uploading image");
-        },
-        onSettled: () => {
-          setUploadingImage(false);
-        },
-      });
+    (file: File, position?: Konva.Vector2d) => {
+      const resourceId = uuidv4();
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (!instance) {
+          return;
+        }
+
+        const { nodeId, finishUploadCallback } = instance.triggerAction(
+          "imageTool",
+          {
+            imageId: resourceId,
+            imageData: reader.result as string,
+            ...(position && { position, forceMainContainer: true }),
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any;
+
+        const toastId = toast.loading("Uploading image...", {
+          duration: Infinity,
+        });
+
+        mutationUpload.mutate(file, {
+          onSuccess: (data) => {
+            toast.dismiss(toastId);
+            toast.success("Image uploaded successfully");
+
+            const queryKey = ["getTemplatesImages", instanceId];
+            queryClient.invalidateQueries({ queryKey });
+
+            if (!instance) {
+              return;
+            }
+
+            inputFileRef.current.value = null;
+            const room = data.image.roomId;
+            const imageId = data.image.imageId;
+
+            finishUploadCallback?.(
+              nodeId,
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+            );
+          },
+          onError: (ex) => {
+            toast.dismiss(toastId);
+            toast.error("Error uploading image");
+
+            console.error(ex);
+            console.error("Error uploading image");
+          },
+        });
+      };
+      reader.onerror = () => {
+        toast.error("Error reading image file");
+      };
+      reader.readAsDataURL(file);
     },
-    [instanceId, mutationUpload, queryClient, setUploadingImage],
+    [instance, instanceId, mutationUpload, queryClient, setUploadingImage],
   );
 
   React.useEffect(() => {
@@ -70,7 +115,7 @@ export function UploadImage() {
   return (
     <input
       type="file"
-      accept="image/png,image/jpeg"
+      accept="image/png,image/jpeg,image/webp"
       name="image"
       ref={inputFileRef}
       className="hidden"

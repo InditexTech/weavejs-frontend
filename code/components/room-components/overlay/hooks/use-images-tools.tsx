@@ -10,28 +10,28 @@ import { Image, Images } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
 
 export const useImagesTools = () => {
-  const instance = useWeave((state) => state.instance);
+  // const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
   const setShowSelectFilesImages = useCollaborationRoom(
-    (state) => state.setShowSelectFilesImages
+    (state) => state.setShowSelectFilesImages,
   );
 
-  const triggerTool = React.useCallback(
-    (toolName: string, params?: unknown) => {
-      if (instance && actualAction !== toolName) {
-        instance.triggerAction(toolName, params);
-        return;
-      }
-      if (instance && actualAction === toolName) {
-        instance.cancelAction(toolName);
-      }
-    },
-    [instance, actualAction]
-  );
+  // const triggerTool = React.useCallback(
+  //   (toolName: string, params?: unknown) => {
+  //     if (instance && actualAction !== toolName) {
+  //       instance.triggerAction(toolName, params);
+  //       return;
+  //     }
+  //     if (instance && actualAction === toolName) {
+  //       instance.cancelAction(toolName);
+  //     }
+  //   },
+  //   [instance, actualAction],
+  // );
 
   const IMAGES_TOOLS: Record<
     string,
@@ -58,7 +58,7 @@ export const useImagesTools = () => {
           </div>
         ),
         onClick: () => {
-          triggerTool("imageTool");
+          // triggerTool("imageTool");
           setShowSelectFileImage(true);
         },
         active: () => actualAction === "imageTool",
@@ -82,12 +82,7 @@ export const useImagesTools = () => {
         active: () => actualAction === "imagesTool",
       },
     }),
-    [
-      actualAction,
-      setShowSelectFileImage,
-      setShowSelectFilesImages,
-      triggerTool,
-    ]
+    [actualAction, setShowSelectFileImage, setShowSelectFilesImages],
   );
 
   return IMAGES_TOOLS;

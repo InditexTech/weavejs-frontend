@@ -4,6 +4,7 @@
 
 import { TreeView, TreeDataItem } from "@/components/ui/tree-view";
 import {
+  WEAVE_INSTANCE_STATUS,
   WeaveSelection,
   WeaveStateElement,
   WeaveUser,
@@ -48,10 +49,10 @@ import {
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SidebarSelector } from "../sidebar-selector";
-import { SidebarHeader } from "../sidebar-header";
-import { OPERATIONS_MAP } from "@/components/utils/constants";
+// import { SidebarSelector } from "../sidebar-selector";
+// import { SidebarHeader } from "../sidebar-header";
 import { stringToColor } from "@/lib/utils";
+import { OPERATIONS_MAP } from "@/components/utils/weave/constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -271,12 +272,16 @@ function mapElementsToTree(
 
 export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
+  const status = useWeave((state) => state.status);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
   const usersLocks = useWeave((state) => state.usersLocks);
 
   const user = useCollaborationRoom((state) => state.user);
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive,
+  );
 
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+  // const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
     [],
@@ -307,7 +312,7 @@ export const ElementsTree = () => {
       setElementsTree(nodesTree);
     }
 
-    if (instance) {
+    if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING) {
       instance.addEventListener("onStateChange", handleOnStateChange);
       setElementsTree(instance.getElementsTree());
     }
@@ -318,10 +323,17 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sidebarActive]);
+  }, [status]);
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
+      if (nodes.length > 1) {
+        setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
+      }
+      if (nodes.length === 0) {
+        setSidebarActive(SIDEBAR_ELEMENTS.images);
+      }
+
       setSelectedNodes(
         nodes
           .map((node) => node.node?.key)
@@ -329,7 +341,7 @@ export const ElementsTree = () => {
       );
     }
 
-    if (instance) {
+    if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING) {
       instance.addEventListener("onNodesChange", handleOnNodesSelectedChange);
     }
 
@@ -342,7 +354,7 @@ export const ElementsTree = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sidebarActive]);
+  }, [status]);
 
   const lockedNodes: Record<string, { user: WeaveUser; operation: string }> =
     React.useMemo(() => {
@@ -383,16 +395,19 @@ export const ElementsTree = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.nodesTree) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.nodesTree) {
+  //   return null;
+  // }
 
   return (
     <div className="w-full h-full">
-      <SidebarHeader>
+      <div className="flex px-[28px] py-[16px] gap-2 rounded-none font-inter font-light text-base justify-start items-center uppercase border-b-[0.5px] border-[#c9c9c9]">
+        <div>Elements</div>
+      </div>
+      {/* <SidebarHeader>
         <SidebarSelector title="Elements Tree" />
-      </SidebarHeader>
-      <ScrollArea className="w-full h-[calc(100%-95px-33px)]">
+      </SidebarHeader> */}
+      <ScrollArea className="w-full h-[calc(100%-65px-57px-33px)]">
         <div className="flex flex-col gap-2 w-full h-full">
           {elementsTree.length === 0 && (
             <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">

@@ -8,7 +8,7 @@ import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ConnectionStatus } from "../connection-status";
+// import { ConnectionStatus } from "../connection-status";
 import { useWeave } from "@inditextech/weave-react";
 import {
   BACKGROUND_COLOR,
@@ -37,6 +37,7 @@ import {
   IdCard,
   Bookmark,
   Contact,
+  PanelRight,
 } from "lucide-react";
 import {
   WEAVE_GRID_TYPES,
@@ -73,24 +74,27 @@ export function RoomHeader() {
   const room = useCollaborationRoom((state) => state.room);
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible
+    (state) => state.setExportConfigVisible,
   );
   const backgroundColor = useCollaborationRoom(
-    (state) => state.backgroundColor
+    (state) => state.backgroundColor,
   );
   const setBackgroundColor = useCollaborationRoom(
-    (state) => state.setBackgroundColor
+    (state) => state.setBackgroundColor,
   );
 
   const connectionTestsShow = useCollaborationRoom(
-    (state) => state.connection.tests.show
+    (state) => state.connection.tests.show,
   );
   const setConnectionTestsShow = useCollaborationRoom(
-    (state) => state.setConnectionTestsShow
+    (state) => state.setConnectionTestsShow,
   );
   const setConfigurationOpen = useCollaborationRoom(
-    (state) => state.setConfigurationOpen
+    (state) => state.setConfigurationOpen,
   );
+
+  const viewType = useCollaborationRoom((state) => state.viewType);
+  const setViewType = useCollaborationRoom((state) => state.setViewType);
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
   const setAiChatSetupVisible = useIAChat((state) => state.setSetupVisible);
@@ -100,7 +104,7 @@ export function RoomHeader() {
   const [commentsEnabled, setCommentsEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
-    WEAVE_GRID_TYPES.LINES
+    WEAVE_GRID_TYPES.LINES,
   );
 
   const {
@@ -194,14 +198,14 @@ export function RoomHeader() {
       sessionConfig.backgroundColor = color;
       setSessionConfig(room, sessionConfig);
     },
-    [instance, room, setBackgroundColor]
+    [instance, room, setBackgroundColor],
   );
 
   const handleSetGridType = React.useCallback(
     (type: WeaveStageGridType) => {
       if (instance) {
         (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
-          type
+          type,
         );
         setGridType(type);
 
@@ -215,7 +219,7 @@ export function RoomHeader() {
       }
       setMenuOpen(false);
     },
-    [instance, room]
+    [instance, room],
   );
 
   React.useEffect(() => {
@@ -234,7 +238,7 @@ export function RoomHeader() {
     const sessionConfig = getSessionConfig(room);
 
     const stageGridPlugin = instance.getPlugin(
-      "stageGrid"
+      "stageGrid",
     ) as WeaveStageGridPlugin;
 
     stageGridPlugin?.setType(sessionConfig.grid.type);
@@ -259,7 +263,7 @@ export function RoomHeader() {
   React.useEffect(() => {
     if (instance) {
       const stageGridPlugin = instance.getPlugin(
-        "stageGrid"
+        "stageGrid",
       ) as WeaveStageGridPlugin;
       setGridType(stageGridPlugin?.getType());
     }
@@ -305,7 +309,7 @@ export function RoomHeader() {
               {
                 ["pointer-events-none"]: selectionActive,
                 ["pointer-events-auto"]: !selectionActive,
-              }
+              },
             )}
           >
             <ZoomToolbar />
@@ -318,15 +322,17 @@ export function RoomHeader() {
         exit="hidden"
         variants={topElementVariants}
         className={cn(
-          "w-auto z-1 flex gap-1 justify-center items-center absolute top-[16px] left-[16px]",
+          "w-auto z-1 flex gap-1 justify-center items-center top-[16px] left-[16px] min-w-[400px] max-w-[400px]",
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          }
+            ["block"]: viewType === "fixed",
+            ["absolute"]: viewType === "floating",
+          },
         )}
       >
-        <div className="bg-white min-w-[370px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]">
-          <div className="flex justify-start items-center gap-3">
+        <div className="bg-white min-w-[400px] flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[24px] border-[0.5px] border-[#c9c9c9]">
+          <div className="w-full flex justify-start items-center gap-3">
             <DropdownMenu
               open={menuOpen}
               onOpenChange={(open: boolean) => {
@@ -339,11 +345,11 @@ export function RoomHeader() {
                   {
                     ["font-normal"]: menuOpen,
                     ["font-extralight"]: !menuOpen,
-                  }
+                  },
                 )}
               >
-                <div className="flex gap-1 justify-start items-center">
-                  <div className="h-[40px] 2xl:h-[60px] flex justify-start items-center">
+                <div className="flex gap-1 justify-start items-center min-w-[50px]">
+                  <div className="h-[40px] 2xl:h-[54px] flex justify-start items-center">
                     <Logo kind="only-logo" variant="no-text" />
                   </div>
                   {menuOpen ? (
@@ -629,7 +635,7 @@ export function RoomHeader() {
                           window.open(
                             GITHUB_URL,
                             "_blank",
-                            "noopener,noreferrer"
+                            "noopener,noreferrer",
                           );
                         }}
                       >
@@ -641,7 +647,7 @@ export function RoomHeader() {
                           window.open(
                             DOCUMENTATION_URL,
                             "_blank",
-                            "noopener,noreferrer"
+                            "noopener,noreferrer",
                           );
                         }}
                       >
@@ -752,13 +758,23 @@ export function RoomHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Divider className="hidden lg:block" />
-            <div className="hidden lg:block flex justify-start items-center gap-1">
+            <div className="hidden lg:block flex justify-start items-center gap-1 w-full">
               <div className="flex justify-start items-center gap-2 font-inter text-foreground !normal-case min-h-[32px]">
-                <div className="font-inter text-[24px] font-light">{room}</div>
+                <div className="font-inter text-[24px] font-light whitespace-nowrap text-ellipsis max-w-[230px] overflow-hidden">
+                  {room}
+                </div>
               </div>
             </div>
-            <Divider className="hidden lg:block" />
-            <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
+            <button
+              className="cursor-pointer"
+              onClick={() => {
+                setViewType(viewType === "fixed" ? "floating" : "fixed");
+              }}
+            >
+              <PanelRight size={20} strokeWidth={1} />
+            </button>
+            {/* <Divider className="hidden lg:block" /> */}
+            {/* <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} /> */}
           </div>
         </div>
       </motion.div>

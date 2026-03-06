@@ -16,6 +16,9 @@ import {
   Eraser,
   MessageSquare,
   RulerDimensionLine,
+  PenLine,
+  MoveUpRight,
+  Image,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "@/components/room-components/toolbar/toolbar";
@@ -40,7 +43,7 @@ export function Tools() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   return (
@@ -91,6 +94,54 @@ export function Tools() {
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Rectangle tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<PenLine className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "strokeTool"}
+          onClick={() => triggerTool("strokeTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Line tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<MoveUpRight className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "arrowTool"}
+          onClick={() => triggerTool("arrowTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Arrow tool</p>
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Image className="px-2" size={40} strokeWidth={1} />}
+          disabled={
+            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+          }
+          active={actualAction === "imageTool"}
+          onClick={() => triggerTool("imageTool")}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Image tool</p>
             </div>
           }
           tooltipSide="top"

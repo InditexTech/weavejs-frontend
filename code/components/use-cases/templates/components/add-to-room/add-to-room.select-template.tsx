@@ -18,10 +18,13 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LayoutTemplateIcon } from "lucide-react";
 import { AddToRoomTemplate } from "./add-to-room.template";
+import { useWeave } from "@inditextech/weave-react";
 
 const TEMPLATES_LIMIT = 20;
 
 export function AddToRoomSelectTemplate() {
+  const instance = useWeave((state) => state.instance);
+
   const instanceId = useTemplatesUseCase((state) => state.instanceId);
   const addToRoomOpen = useTemplatesUseCase((state) => state.addToRoom.open);
 
@@ -105,10 +108,15 @@ export function AddToRoomSelectTemplate() {
               <div
                 className="w-full grid grid-cols-3 gap-5 p-5"
                 onDragStart={(e) => {
+                  if (!instance) {
+                    return;
+                  }
+
                   if (e.target instanceof HTMLImageElement) {
-                    window.weaveDragTemplateData = {
-                      templateData: e.target.dataset.templateData,
-                    };
+                    instance.startDrag("add-template-to-room");
+                    instance.setDragProperties<{ templateData: string }>({
+                      templateData: e.target.dataset.templateData ?? "",
+                    });
                   }
                 }}
               >

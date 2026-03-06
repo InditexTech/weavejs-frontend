@@ -56,7 +56,7 @@ export const TemplatesLibrary = () => {
         user?.name ?? "",
         clientId ?? "",
         room ?? "",
-        templateId
+        templateId,
       );
     },
     onMutate: () => {
@@ -83,7 +83,7 @@ export const TemplatesLibrary = () => {
 
       mutationDelete.mutate(template.templateId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   React.useEffect(() => {
@@ -97,7 +97,12 @@ export const TemplatesLibrary = () => {
         return;
       }
 
-      if (window.weaveDragTemplateData) {
+      const dragId = instance.getDragStartedId();
+      const dragProperties = instance.getDragProperties<{
+        templateData: string;
+      }>();
+
+      if (dragProperties && dragId === "add-template-to-room") {
         instance.getStage().setPointersPositions(e);
         const position: Konva.Vector2d | null | undefined = instance
           .getStage()
@@ -112,13 +117,13 @@ export const TemplatesLibrary = () => {
 
         setTemplateOnPosition(
           instance,
-          window.weaveDragTemplateData
-            ? JSON.parse(window.weaveDragTemplateData.templateData)
+          dragProperties.templateData
+            ? JSON.parse(dragProperties.templateData)
             : {},
-          mousePoint
+          mousePoint,
         );
 
-        window.weaveDragTemplateData = undefined;
+        instance.endDrag("add-template-to-room");
       }
     }
 
@@ -139,7 +144,7 @@ export const TemplatesLibrary = () => {
       return await getTemplates(
         room ?? "",
         pageParam as number,
-        TEMPLATES_LIMIT
+        TEMPLATES_LIMIT,
       );
     },
     select: (newData) => newData, // keep shape stable
@@ -148,7 +153,7 @@ export const TemplatesLibrary = () => {
     getNextPageParam: (lastPage, allPages) => {
       const loadedSoFar = allPages.reduce(
         (sum, page) => sum + page.items.length,
-        0
+        0,
       );
       if (loadedSoFar < lastPage.total) {
         return loadedSoFar; // next offset
@@ -166,9 +171,9 @@ export const TemplatesLibrary = () => {
           prev.find(
             (oldItem) =>
               oldItem.templateId === newItem.templateId &&
-              oldItem.updatedAt === newItem.updatedAt
-          ) || newItem
-      )
+              oldItem.updatedAt === newItem.updatedAt,
+          ) || newItem,
+      ),
     );
   }, [query.data]);
 
@@ -205,13 +210,13 @@ export const TemplatesLibrary = () => {
         newSelectedTemplates.push(template);
       } else {
         newSelectedTemplates = newSelectedTemplates.filter(
-          (actTemplate) => actTemplate !== template
+          (actTemplate) => actTemplate !== template,
         );
       }
       const unique = [...new Set(newSelectedTemplates)];
       setSelectedTemplates(unique);
     },
-    [selectedTemplates]
+    [selectedTemplates],
   );
 
   if (!instance) {
@@ -286,10 +291,15 @@ export const TemplatesLibrary = () => {
         <div
           className="w-full weaveDraggable p-0 py-[24px] pb-0 flex flex-col gap-[24px]"
           onDragStart={(e) => {
+            if (!instance) {
+              return;
+            }
+
             if (e.target instanceof HTMLImageElement) {
-              window.weaveDragTemplateData = {
-                templateData: e.target.dataset.templateData,
-              };
+              instance.startDrag("add-template-to-room");
+              instance.setDragProperties<{ templateData: string }>({
+                templateData: e.target.dataset.templateData ?? "",
+              });
             }
           }}
         >

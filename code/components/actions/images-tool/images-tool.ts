@@ -17,6 +17,7 @@ import {
   ImageInfo,
   ImagesToolActionOnAddedImageEvent,
   ImagesToolActionOnAddingImageEvent,
+  // ImagesToolDragAndDropProperties,
 } from "./types";
 import { IMAGES_TOOL_ACTION_NAME, IMAGES_TOOL_STATE } from "./constants";
 
@@ -29,6 +30,7 @@ export class ImagesToolAction extends WeaveAction {
   protected tempImageNode: Konva.Group | null;
   protected pointers: Map<number, Vector2d>;
   protected container: Konva.Layer | Konva.Group | undefined;
+  protected imagesIds: string[] = [];
   protected images: Record<
     string,
     {
@@ -42,6 +44,7 @@ export class ImagesToolAction extends WeaveAction {
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
+  onInit = undefined;
   onPropsChange = undefined;
   update = undefined;
 
@@ -75,26 +78,6 @@ export class ImagesToolAction extends WeaveAction {
       scaleX: 1,
       scaleY: 1,
     };
-  }
-
-  onInit(): void {
-    this.instance.addEventListener("onStageDrop", (e) => {
-      if (window.weaveDragImageURL) {
-        this.instance.getStage().setPointersPositions(e);
-        const position = this.instance.getStage().getRelativePointerPosition();
-        this.instance.triggerAction("imageTool", {
-          imageURL: window.weaveDragImageURL,
-          position,
-        });
-        if (window.weaveDragImageId) {
-          this.instance.updatePropsAction("imageTool", {
-            imageId: window.weaveDragImageId,
-          });
-          window.weaveDragImageId = undefined;
-        }
-        window.weaveDragImageURL = undefined;
-      }
-    });
   }
 
   private setupEvents() {
@@ -190,14 +173,14 @@ export class ImagesToolAction extends WeaveAction {
     this.preloadImgs[imageId].onerror = () => {
       this.instance.emitEvent<ImagesToolActionOnEndLoadImageEvent>(
         "onImageLoadEnd",
-        new Error("Error loading image")
+        new Error("Error loading image"),
       );
       this.cancelAction();
     };
     this.preloadImgs[imageId].onload = () => {
       this.instance.emitEvent<ImagesToolActionOnEndLoadImageEvent>(
         "onImageLoadEnd",
-        undefined
+        undefined,
       );
 
       this.images[imageId].loaded = true;
@@ -277,7 +260,7 @@ export class ImagesToolAction extends WeaveAction {
 
     this.instance.emitEvent<ImagesToolActionOnAddingImageEvent>(
       "onAddingImages",
-      { imagesURL: images }
+      { imagesURL: images },
     );
 
     this.clickPoint = null;
@@ -335,7 +318,7 @@ export class ImagesToolAction extends WeaveAction {
 
     this.instance.emitEvent<ImagesToolActionOnAddedImageEvent>(
       "onAddedImages",
-      { imagesURL: images }
+      { imagesURL: images },
     );
 
     this.setState(IMAGES_TOOL_STATE.FINISHED);
@@ -345,7 +328,7 @@ export class ImagesToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    params: ImagesToolActionTriggerParams
+    params: ImagesToolActionTriggerParams,
   ): void {
     if (!this.instance) {
       throw new Error("Instance not defined");
@@ -361,6 +344,10 @@ export class ImagesToolAction extends WeaveAction {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       selectionPlugin.setSelectedNodes([]);
+    }
+
+    if (params.imagesIds) {
+      this.imagesIds = params.imagesIds;
     }
 
     this.instance.addEventListener("imageLoaded", () => {

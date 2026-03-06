@@ -21,16 +21,16 @@ export function UploadImages() {
 
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFiles = useCollaborationRoom(
-    (state) => state.images.showSelectFiles
+    (state) => state.images.showSelectFiles,
   );
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const setShowSelectFilesImages = useCollaborationRoom(
-    (state) => state.setShowSelectFilesImages
+    (state) => state.setShowSelectFilesImages,
   );
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const queryClient = useQueryClient();
@@ -40,7 +40,7 @@ export function UploadImages() {
       let promises = [];
       if (workloadsEnabled) {
         promises = Array.from(files).map((file) =>
-          postImageV2(room ?? "", file)
+          postImageV2(room ?? "", file),
         );
       } else {
         promises = Array.from(files).map((file) => postImage(room ?? "", file));
@@ -75,7 +75,7 @@ export function UploadImages() {
               {
                 images,
                 padding: 20,
-              }
+              },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ) as any;
           }
@@ -88,7 +88,7 @@ export function UploadImages() {
         },
       });
     },
-    [instance, queryClient, room, mutationUploadMulti, setUploadingImage]
+    [instance, queryClient, room, mutationUploadMulti, setUploadingImage],
   );
 
   React.useEffect(() => {
@@ -104,7 +104,7 @@ export function UploadImages() {
   return (
     <input
       type="file"
-      accept="image/png,image/jpeg"
+      accept="image/png,image/jpeg,image/webp"
       name="image"
       multiple
       ref={inputFileRef}

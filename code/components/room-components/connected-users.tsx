@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
-import { OPERATIONS_MAP } from "../utils/constants";
 import { WeaveUserMutexLock } from "@inditextech/weave-types";
+import { OPERATIONS_MAP } from "../utils/weave/constants";
 
 const SHOW_USERS_LIMIT = 4;
 
@@ -34,14 +34,14 @@ export const ConnectedUsers = () => {
 
   const connectedUserKey = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser === user?.name
+      (actUser) => actUser === user?.name,
     );
     return filterOwnUser?.[0];
   }, [user, connectedUsers]);
 
   const { showUsers, restUsers } = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser !== user?.name
+      (actUser) => actUser !== user?.name,
     );
     return {
       showUsers: filterOwnUser.slice(0, SHOW_USERS_LIMIT - 1),
