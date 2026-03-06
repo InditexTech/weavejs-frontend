@@ -24,6 +24,8 @@ import { FONTS } from "../utils/weave/fonts";
 import { NODES } from "../utils/weave/nodes";
 import { PLUGINS } from "../utils/weave/plugins";
 import { ACTIONS } from "../utils/weave/actions";
+import useGetRendererKonvaBase from "../room-components/hooks/use-get-renderer-konva-base";
+// import useGetRendererKonvaReactReconciler from "../room-components/hooks/use-get-renderer-konva-react-reconciler";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -99,6 +101,9 @@ export const Room = () => {
 
     return "";
   }, [loadingFetchConnectionUrl, status]);
+
+  const rendererProvider = useGetRendererKonvaBase();
+  // const rendererProvider = useGetRendererKonvaReactReconciler();
 
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams: true,
@@ -193,7 +198,7 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {room && user && storeProvider && (
+      {room && user && storeProvider && rendererProvider && (
         <WeaveProvider
           getContainer={() => {
             const shadowHost = document.getElementById("shadow-host");
@@ -201,15 +206,12 @@ export const Room = () => {
               "#weave",
             ) as HTMLDivElement;
           }}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          store={storeProvider as any}
+          store={storeProvider}
+          renderer={rendererProvider}
           fonts={FONTS}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          nodes={NODES() as any[]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          plugins={PLUGINS(getUser) as any[]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          actions={ACTIONS(getUser) as any[]}
+          nodes={NODES()}
+          plugins={PLUGINS(getUser)}
+          actions={ACTIONS(getUser)}
         >
           <UploadImage />
           <UploadImages />
