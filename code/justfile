@@ -4,7 +4,7 @@ alias ld := link-deps
 alias uld := unlink-deps
 
 link-deps:
-  npm link @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone
+  npm link @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone @inditextech/weave-renderer-konva-react-reconciler @inditextech/weave-renderer-konva-base
 
 unlink-deps:
-  npm unlink @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone
+  npm unlink @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react @inditextech/weave-store-websockets @inditextech/weave-store-azure-web-pubsub @inditextech/weave-store-standalone @inditextech/weave-renderer-konva-react-reconciler @inditextech/weave-renderer-konva-base

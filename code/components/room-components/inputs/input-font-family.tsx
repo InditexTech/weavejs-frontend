@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
@@ -33,6 +32,10 @@ function InputFontFamily({
   const lastSelectedFontFamily = React.useRef<string>(value);
 
   const fontsValues = useCollaborationRoom((state) => state.fonts.values);
+
+  React.useEffect(() => {
+    setSelectedFont(value);
+  }, [value]);
 
   React.useEffect(() => {
     if (onChange && selectedFont !== lastSelectedFontFamily.current) {

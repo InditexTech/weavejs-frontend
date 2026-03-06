@@ -5,6 +5,7 @@
 "use client";
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import {
   WeaveImageToolActionOnAddedEvent,
@@ -162,38 +163,64 @@ export function useOnPasteExternalImage() {
         return;
       }
 
-      pastingToastIdRef.current = toast.loading("Pasting...");
+      const resourceId = uuidv4();
 
-      setUploadingImage(true);
-      const file = new File([blob], "external.image");
-      mutationUpload.mutate(file, {
-        onSuccess: (data) => {
-          const room: string = data.image.fileName.split("/")[0];
-          const imageId = data.image.fileName.split("/")[1];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        pastingToastIdRef.current = toast.loading("Pasting...");
 
-          const queryKey = ["getImages", room];
-          queryClient.invalidateQueries({ queryKey });
+        if (!instance) {
+          return;
+        }
 
-          instance?.triggerAction(
-            "imageTool",
-            {
-              position,
-              forceMainContainer: true,
-              imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any;
+        const { nodeId, finishUploadCallback } = instance.triggerAction(
+          "imageTool",
+          {
+            imageId: resourceId,
+            imageData: reader.result as string,
+            ...(position && { position, forceMainContainer: true }),
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any;
 
-          addImageRef.current = imageId;
+        const toastId = toast.loading("Uploading image...", {
+          duration: Infinity,
+        });
 
-          setPositionCalculated(positionCalculated);
-        },
-        onError: (ex) => {
-          console.error(ex);
-          setUploadingImage(false);
-          console.error("Error uploading image");
-        },
-      });
+        const file = new File([blob], "external.image");
+        mutationUpload.mutate(file, {
+          onSuccess: (data) => {
+            toast.dismiss(toastId);
+            toast.success("Image uploaded successfully");
+
+            const room: string = data.image.fileName.split("/")[0];
+            const imageId = data.image.fileName.split("/")[1];
+
+            const queryKey = ["getImages", room];
+            queryClient.invalidateQueries({ queryKey });
+
+            finishUploadCallback?.(
+              nodeId,
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+            );
+
+            addImageRef.current = imageId;
+
+            setPositionCalculated(positionCalculated);
+          },
+          onError: (ex) => {
+            toast.dismiss(toastId);
+            toast.error("Error uploading image");
+
+            console.error(ex);
+            console.error("Error uploading image");
+          },
+        });
+      };
+      reader.onerror = () => {
+        toast.error("Error reading pasted image");
+      };
+      reader.readAsDataURL(blob);
     };
 
     if (instance) {

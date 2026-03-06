@@ -79,6 +79,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
   const room = useCollaborationRoom((state) => state.room);
+  const nodes = useWeave((state) => state.selection.nodes);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const asyncElementsLoaded = useWeave((state) => state.asyncElements.loaded);
   const asyncElementsTotal = useWeave((state) => state.asyncElements.total);
@@ -86,6 +87,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
     (state) => state.asyncElements.allLoaded,
   );
 
+  const viewType = useCollaborationRoom((state) => state.viewType);
   const contextMenuShow = useCollaborationRoom(
     (state) => state.contextMenu.show,
   );
@@ -211,7 +213,31 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
         animate={controls}
         className="w-full h-full flex flex-col relative overflow-hidden"
       >
-        <section className="w-[calc(100%-480px)] h-full flex z-0 overflow-hidden relative">
+        {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
+          <section
+            className={cn(
+              "fixed bg-white top-0 left-0 bottom-0 w-[400px] h-full border-r border-r-[#c9c9c9]",
+              {
+                ["visible"]: viewType === "fixed",
+                ["invisible"]: viewType === "floating",
+              },
+            )}
+          >
+            {viewType === "fixed" && inShadowDom && <RoomHeaderShadowDom />}
+            {viewType === "fixed" && !inShadowDom && <RoomHeader />}
+            <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
+          </section>
+        )}
+        <section
+          className={cn(
+            "fixed top-0 bottom-0 h-full flex z-0 overflow-hidden relative",
+            {
+              ["left-[400px] right-[400px] w-[calc(100%-400px-400px)]"]:
+                viewType === "fixed",
+              ["left-0 right-0 w-[calc(100%)]"]: viewType === "floating",
+            },
+          )}
+        >
           <div
             id="weave"
             tabIndex={0}
@@ -318,26 +344,49 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             </>
           )}
         </section>
-        {inShadowDom ? <RoomHeaderShadowDom /> : <RoomHeader />}
+        {viewType === "floating" && inShadowDom && <RoomHeaderShadowDom />}
+        {viewType === "floating" && !inShadowDom && <RoomHeader />}
         {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus && (
-          <section className="fixed bg-white top-0 right-0 bottom-0 w-[480px] h-full border-l border-l-[#c9c9c9]">
+          <section
+            className={cn(
+              "bg-white top-0 right-0 w-[400px] border-l border-l-[#c9c9c9]",
+              {
+                ["fixed top-0 right-0 bottom-0 h-full w-[400px]"]:
+                  viewType === "fixed",
+                ["absolute top-[16px] right-[16px] w-[400px] h-[calc(100%-32px)]"]:
+                  viewType === "floating",
+                ["h-[65px]"]: viewType === "floating" && nodes.length === 0,
+                ["bottom-[16px] h-[calc(100%-32px)]"]:
+                  viewType === "floating" && nodes.length > 0,
+              },
+            )}
+          >
             <RoomHeaderRight />
-            <AnimatePresence>
-              {WEAVE_STORE_CONNECTION_STATUS.CONNECTED ===
-                weaveConnectionStatus && (
-                <>
-                  <NodeProperties />
-                  <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
-                  <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
-                  <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
-                  <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
-                  <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
-                  <Comments key={SIDEBAR_ELEMENTS.comments} />
-                  <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-                  {aiChatEnabled && <ChatBot key={SIDEBAR_ELEMENTS.aiChat} />}
-                </>
-              )}
-            </AnimatePresence>
+            <div
+              className={cn("", {
+                ["visible"]:
+                  (viewType === "floating" && nodes.length > 0) ||
+                  viewType === "fixed",
+                ["invisible"]: viewType === "floating" && nodes.length === 0,
+              })}
+            >
+              <AnimatePresence>
+                {WEAVE_STORE_CONNECTION_STATUS.CONNECTED ===
+                  weaveConnectionStatus && (
+                  <>
+                    <NodeProperties />
+                    <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+                    <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
+                    <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
+                    <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
+                    <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
+                    <Comments key={SIDEBAR_ELEMENTS.comments} />
+                    {/* <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} /> */}
+                    {aiChatEnabled && <ChatBot key={SIDEBAR_ELEMENTS.aiChat} />}
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </section>
         )}
         {uploadingImage && (

@@ -6,7 +6,7 @@ import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
-import { WeaveElementAttributes } from "@inditextech/weave-types";
+import { WeaveElementAttributes, WeaveFont } from "@inditextech/weave-types";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { merge } from "lodash";
 
@@ -40,6 +40,8 @@ export type TransformingOperation =
 
 type FinishUploadCallback = (imageURL: string) => void;
 
+type ViewType = "fixed" | "floating";
+
 type DrawerKeyKeys = keyof typeof DRAWER_ELEMENTS;
 export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
 
@@ -47,6 +49,7 @@ type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
 interface CollaborationRoomState {
+  viewType: ViewType;
   backgroundColor: BackgroundColor;
   configuration: {
     open: boolean;
@@ -74,7 +77,7 @@ interface CollaborationRoomState {
   fonts: {
     loaded: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    values: { id: string; name: string }[];
+    values: WeaveFont[];
   };
   ui: {
     show: boolean;
@@ -221,6 +224,7 @@ interface CollaborationRoomState {
   setFramesExportVisible: (newVisible: boolean) => void;
   setFramesExporting: (newExporting: boolean) => void;
   setFramesPages: (newPages: { title: string; nodes: string[] }[]) => void;
+  setViewType: (newView: ViewType) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -247,6 +251,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
   );
 
   return {
+    viewType: "floating",
     backgroundColor: BACKGROUND_COLOR.GRAY,
     measurement: {
       units: "cms",
@@ -277,7 +282,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     room: undefined,
     sidebar: {
       previouslyActive: null,
-      active: SIDEBAR_ELEMENTS.nodesTree,
+      active: SIDEBAR_ELEMENTS.nodeProperties,
     },
     fonts: {
       loaded: false,
@@ -702,6 +707,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           ...state.frames,
           pages: newPages,
         },
+      })),
+    setViewType: (newView) =>
+      set((state) => ({
+        ...state,
+        viewType: newView,
       })),
   };
 });

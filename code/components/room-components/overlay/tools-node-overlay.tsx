@@ -208,21 +208,23 @@ export function ToolsNodeOverlay() {
       return;
     }
 
-    if (!actualAction || !node) {
+    if ((!actualAction || !node) && nodes.length === 0) {
       setNodePropertiesAction(undefined);
       setSidebarActive(
-        aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.nodesTree,
+        aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.images,
       );
       return;
     }
 
     if (node) {
       setNodePropertiesAction("update");
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
     }
   }, [
     aiChatEnabled,
     actualAction,
     node,
+    nodes,
     setSidebarActive,
     setNodePropertiesAction,
   ]);
@@ -3352,7 +3354,7 @@ export function ToolsNodeOverlay() {
         nodePropertiesAction === "create" &&
         !["textTool", "frameTool"].includes(actualAction ?? "") && (
           <Toolbar
-            orientation="vertical"
+            orientation="horizontal"
             className="grid grid-cols-1 w-auto justify-start items-center rounded-3xl"
           >
             {imageEditionTools}
@@ -3364,7 +3366,7 @@ export function ToolsNodeOverlay() {
         )}
       {secondElements > 0 && (
         <Toolbar
-          orientation="vertical"
+          orientation="horizontal"
           className="grid grid-cols-1 w-auto justify-start items-center rounded-3xl"
         >
           {commonShapeManagementTools}

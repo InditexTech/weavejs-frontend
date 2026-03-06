@@ -17,11 +17,16 @@ export function ToolbarDivider({
   orientation = "vertical",
 }: Readonly<ToolbarDividerProps>) {
   return (
-    <div className={cn("w-full justify-center items-center flex", className)}>
+    <div
+      className={cn(
+        "w-full !h-full justify-center items-center flex",
+        className,
+      )}
+    >
       <div
         className={cn("bg-zinc-200", {
-          "w-[1px] h-[calc(100%-16px)] mx-2": orientation === "vertical",
-          "w-[calc(100%-16px)] h-[1px] my-2": orientation === "horizontal",
+          "!w-[1px] !h-[calc(100%-16px)] mx-2": orientation === "vertical",
+          "!w-[calc(100%-16px)] !h-[1px] my-2": orientation === "horizontal",
         })}
       ></div>
     </div>

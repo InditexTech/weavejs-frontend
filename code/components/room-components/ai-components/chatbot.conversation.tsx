@@ -39,6 +39,11 @@ import { GeneratedImage } from "@google/genai";
 import { useCollaborationRoom } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
+import {
+  IMAGE_TOOL_ACTION_NAME,
+  WeaveImageToolAction,
+} from "@inditextech/weave-sdk";
+import { useWeave } from "@inditextech/weave-react";
 
 type ChatBotConversationProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +53,8 @@ type ChatBotConversationProps = {
 export const ChatBotConversation = ({
   initialMessages,
 }: ChatBotConversationProps) => {
+  const instance = useWeave((state) => state.instance);
+
   const room = useCollaborationRoom((state) => state.room);
 
   const threadId = useIAChat((state) => state.threadId);
@@ -84,8 +91,25 @@ export const ChatBotConversation = ({
         className="gap-4"
         onDragStart={(e) => {
           if (e.target instanceof HTMLImageElement) {
-            window.weaveDragImageURL = e.target.src;
-            window.weaveDragImageId = e.target.dataset.imageId;
+            if (!instance) {
+              return;
+            }
+            if (e.target instanceof HTMLImageElement) {
+              const imageTool = instance.getActionHandler(
+                IMAGE_TOOL_ACTION_NAME,
+              ) as WeaveImageToolAction | undefined;
+
+              if (!imageTool) {
+                return;
+              }
+
+              imageTool.setDragAndDropProperties({
+                imageURL: e.target.src,
+                imageId: e.target.dataset.imageId,
+                imageWidth: e.target.naturalWidth,
+                imageHeight: e.target.naturalHeight,
+              });
+            }
           }
         }}
       >
@@ -98,7 +122,7 @@ export const ChatBotConversation = ({
         )}
         {messages?.map((message, messageIndex) => {
           const attachments = message.parts.filter(
-            (part) => part.type === "file"
+            (part) => part.type === "file",
           );
 
           return (
@@ -171,7 +195,7 @@ export const ChatBotConversation = ({
                                             className="rounded-none !cursor-pointer uppercase !text-xs w-[40px]"
                                             onClick={async () => {
                                               const blob = await fetch(
-                                                image.url
+                                                image.url,
                                               ).then((res) => res.blob());
 
                                               const file = new File(
@@ -179,11 +203,11 @@ export const ChatBotConversation = ({
                                                 "image.png",
                                                 {
                                                   type: "image/png",
-                                                }
+                                                },
                                               );
 
                                               promptInputAttachmentsController.add(
-                                                [file]
+                                                [file],
                                               );
                                             }}
                                           >

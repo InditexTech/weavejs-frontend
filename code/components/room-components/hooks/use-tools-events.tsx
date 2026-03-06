@@ -372,7 +372,6 @@ export const useToolsEvents = () => {
       if (actualAction === "commentTool" && action !== "commentTool") {
         sidebarToggle(null);
       }
-      // toast.dismiss();
     };
 
     instance.addEventListener("onPropsChange", handlePropsChange);
@@ -402,15 +401,18 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleStartCommentAdding = () => {
-      toast("Add comments", {
+      toastId = toast("Add comments", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add a comment.`,
         duration: Infinity,
       });
     };
 
     const handleFinishCommentAdding = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     instance.addEventListener("onStartAddingComment", handleStartCommentAdding);
@@ -437,20 +439,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleRectangleAdding = () => {
-      toast("Add a rectangle", {
+      toastId = toast("Add a rectangle", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add a fixed size rectangle or ${isTouchDevice ? "tap" : "click"} and drag to add a rectangle with a defined size.`,
         duration: Infinity,
       });
     };
 
     const handleRectangleAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleRectangleCancelled = (activeAction: string) => {
       if (activeAction !== "rectangleTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -476,20 +481,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleEllipseAdding = () => {
-      toast("Add an ellipse", {
+      toastId = toast("Add an ellipse", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add a fixed size ellipse or ${isTouchDevice ? "tap" : "click"} and drag to add a ellipse with a defined size.`,
         duration: Infinity,
       });
     };
 
     const handleEllipseAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleEllipseCancelled = (activeAction: string) => {
       if (activeAction !== "ellipseTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -513,20 +521,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleRegularPolygonAdding = () => {
-      toast("Add a regular polygon", {
+      toastId = toast("Add a regular polygon", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add a fixed size regular polygon or ${isTouchDevice ? "tap" : "click"} and drag to add a regular polygon with a defined size.`,
         duration: Infinity,
       });
     };
 
     const handleRegularPolygonAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleRegularPolygonCancelled = (activeAction: string) => {
       if (activeAction !== "regularPolygonTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -565,20 +576,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleStarAdding = () => {
-      toast("Add a star", {
+      toastId = toast("Add a star", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add a fixed size star or ${isTouchDevice ? "tap" : "click"} and drag to add a star with a defined size, movement on the x-axis defines the outer radius and movement on the y-axis defines the inner radius.`,
         duration: Infinity,
       });
     };
 
     const handleStarAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleStarCancelled = (activeAction: string) => {
       if (activeAction !== "starTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -602,20 +616,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleColorTokenAdding = () => {
-      toast("Add a color token", {
+      toastId = toast("Add a color token", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add the color token. You can select the color of the token on the right toolbar.`,
         duration: Infinity,
       });
     };
 
     const handleColorTokenAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleColorTokenCancelled = (activeAction: string) => {
       if (activeAction !== "colorTokenTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -648,9 +665,12 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleStrokeAdding = ({ actionName }: { actionName: string }) => {
       if (actionName === "strokeTool") {
-        toast("Add a stroke", {
+        toastId = toast("Add a stroke", {
+          toasterId: "info",
           description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint a stroke.`,
           duration: Infinity,
         });
@@ -659,13 +679,13 @@ export const useToolsEvents = () => {
 
     const handleStrokeAdded = ({ actionName }: { actionName: string }) => {
       if (actionName === "strokeTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
     const handleStrokeCancelled = (activeAction: string) => {
       if (activeAction !== "strokeTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -689,9 +709,12 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleArrowAdding = ({ actionName }: { actionName: string }) => {
       if (actionName === "arrowTool") {
-        toast("Add an arrow", {
+        toastId = toast("Add an arrow", {
+          toasterId: "info",
           description: `${isTouchDevice ? "Tap" : "Click"} and drag to paint an arrow.`,
           duration: Infinity,
         });
@@ -700,13 +723,13 @@ export const useToolsEvents = () => {
 
     const handleArrowAdded = ({ actionName }: { actionName: string }) => {
       if (actionName === "arrowTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
     const handleArrowCancelled = (activeAction: string) => {
       if (activeAction !== "arrowTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -730,20 +753,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleBrushAdding = () => {
-      toast("Free-hand drawing", {
+      toastId = toast("Free-hand drawing", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} and move to draw a stroke.`,
         duration: Infinity,
       });
     };
 
     const handleBrushAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleBrushCancelled = (activeAction: string) => {
       if (activeAction !== "brushTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -767,20 +793,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleConnectorAdding = () => {
-      toast("Add connector", {
+      toastId = toast("Add connector", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} on an element anchor to set the start point and then ${isTouchDevice ? "tap" : "click"} on another anchor to add the connector.`,
         duration: Infinity,
       });
     };
 
     const handleConnectorAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleConnectorCancelled = (activeAction: string) => {
       if (activeAction !== "connectorTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -807,20 +836,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleImageAdding = () => {
-      toast("Add an image", {
+      toastId = toast("Add an image", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add the image to the room.`,
         duration: Infinity,
       });
     };
 
     const handleImageAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleImageCancelled = (activeAction: string) => {
       if (activeAction !== "imageTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -844,20 +876,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleImagesAdding = () => {
-      toast("Add multiple images", {
+      toastId = toast("Add multiple images", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add the images to the room.`,
         duration: Infinity,
       });
     };
 
     const handleImagesAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleImagesCancelled = (activeAction: string) => {
       if (activeAction !== "imagesTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -881,20 +916,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleVideoAdding = () => {
-      toast("Add a video", {
+      toastId = toast("Add a video", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to add the video to the room.`,
         duration: Infinity,
       });
     };
 
     const handleVideoAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleVideoCancelled = (activeAction: string) => {
       if (activeAction !== "videoTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -918,20 +956,23 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleTextAdding = () => {
-      toast("Add text", {
+      toastId = toast("Add text", {
+        toasterId: "info",
         description: `${isTouchDevice ? "Tap" : "Click"} to set the text position. Then type and ${isTouchDevice ? "tap" : "click"} outside the text to confirm and add it.`,
         duration: Infinity,
       });
     };
 
     const handleTextAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleTextCancelled = (activeAction: string) => {
       if (activeAction !== "textTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 
@@ -955,8 +996,11 @@ export const useToolsEvents = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    let toastId: string | number = 0;
+
     const handleFrameAdding = () => {
-      toast("Add a frame", {
+      toastId = toast("Add a frame", {
+        toasterId: "info",
         description: AddFrameToast,
 
         duration: Infinity,
@@ -964,12 +1008,12 @@ export const useToolsEvents = () => {
     };
 
     const handleFrameAdded = () => {
-      toast.dismiss();
+      toast.dismiss(toastId);
     };
 
     const handleFrameCancelled = (activeAction: string) => {
       if (activeAction !== "frameTool") {
-        toast.dismiss();
+        toast.dismiss(toastId);
       }
     };
 

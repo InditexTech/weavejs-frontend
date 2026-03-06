@@ -137,7 +137,7 @@ export class ColorTokenToolAction extends WeaveAction {
     }
 
     this.instance.emitEvent<ColorTokenToolActionOnAddingEvent>(
-      "onAddingColorToken"
+      "onAddingColorToken",
     );
 
     this.colorTokenId = null;
@@ -166,7 +166,7 @@ export class ColorTokenToolAction extends WeaveAction {
       this.instance.addNode(node, this.container?.getAttrs().id);
 
       this.instance.emitEvent<ColorTokenToolActionOnAddedEvent>(
-        "onAddedColorToken"
+        "onAddedColorToken",
       );
     }
 
@@ -175,7 +175,7 @@ export class ColorTokenToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    params?: ColorTokenToolActionTriggerParams
+    params?: ColorTokenToolActionTriggerParams,
   ) {
     if (!this.instance) {
       throw new Error("Instance not defined");

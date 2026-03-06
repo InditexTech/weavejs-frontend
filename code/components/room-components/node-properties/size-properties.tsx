@@ -12,6 +12,7 @@ import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { Scaling } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TEXT_LAYOUT } from "@inditextech/weave-sdk";
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -20,11 +21,11 @@ export function SizeProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(true);
@@ -55,7 +56,7 @@ export function SizeProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   React.useEffect(() => {
@@ -79,7 +80,7 @@ export function SizeProperties() {
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
     ["mask", "fuzzy-mask", "ellipse", "regular-polygon", "star"].includes(
-      actualNode.type
+      actualNode.type,
     )
   ) {
     return null;
@@ -108,14 +109,52 @@ export function SizeProperties() {
               <ToggleIconButton
                 kind="switch"
                 className="w-full"
-                icon={<div className="text-[12px] uppercase">Auto width</div>}
-                pressed={(actualNode.props.layout ?? "auto-all") === "auto-all"}
+                icon={
+                  <div className="text-[12px] uppercase">
+                    Smart
+                    <br />
+                    size
+                  </div>
+                }
+                pressed={
+                  (actualNode.props.layout ?? TEXT_LAYOUT.SMART) ===
+                  TEXT_LAYOUT.SMART
+                }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: "auto-all",
+                      layout: TEXT_LAYOUT.SMART,
+                      smartFixedWidth: false,
+                      smartFixedHeight: false,
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+              <ToggleIconButton
+                kind="switch"
+                className="w-full"
+                icon={
+                  <div className="text-[12px] uppercase">
+                    Auto
+                    <br />
+                    size
+                  </div>
+                }
+                pressed={
+                  (actualNode.props.layout ?? TEXT_LAYOUT.AUTO_ALL) ===
+                  TEXT_LAYOUT.AUTO_ALL
+                }
+                onClick={() => {
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      layout: TEXT_LAYOUT.AUTO_ALL,
+                      smartFixedWidth: false,
+                      smartFixedHeight: false,
                     },
                   };
                   updateElement(updatedNode);
@@ -126,14 +165,17 @@ export function SizeProperties() {
                 className="w-full"
                 icon={<div className="text-[12px] uppercase">Auto height</div>}
                 pressed={
-                  (actualNode.props.layout ?? "auto-all") === "auto-height"
+                  (actualNode.props.layout ?? TEXT_LAYOUT.AUTO_ALL) ===
+                  TEXT_LAYOUT.AUTO_HEIGHT
                 }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: "auto-height",
+                      layout: TEXT_LAYOUT.AUTO_HEIGHT,
+                      smartFixedWidth: false,
+                      smartFixedHeight: false,
                     },
                   };
                   updateElement(updatedNode);
@@ -142,14 +184,25 @@ export function SizeProperties() {
               <ToggleIconButton
                 kind="switch"
                 className="w-full"
-                icon={<div className="text-[12px] uppercase">Fixed size</div>}
-                pressed={(actualNode.props.layout ?? "auto-all") === "fixed"}
+                icon={
+                  <div className="text-[12px] uppercase">
+                    Fixed
+                    <br />
+                    size
+                  </div>
+                }
+                pressed={
+                  (actualNode.props.layout ?? TEXT_LAYOUT.AUTO_ALL) ===
+                  TEXT_LAYOUT.FIXED
+                }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: "fixed",
+                      layout: TEXT_LAYOUT.FIXED,
+                      smartFixedWidth: false,
+                      smartFixedHeight: false,
                     },
                   };
                   updateElement(updatedNode);

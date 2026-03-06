@@ -19,13 +19,13 @@ export function UploadVideo() {
 
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFile = useCollaborationRoom(
-    (state) => state.videos.showSelectFile
+    (state) => state.videos.showSelectFile,
   );
   const setUploadingVideo = useCollaborationRoom(
-    (state) => state.setUploadingVideo
+    (state) => state.setUploadingVideo,
   );
   const setShowSelectFileVideo = useCollaborationRoom(
-    (state) => state.setShowSelectFileVideo
+    (state) => state.setShowSelectFileVideo,
   );
 
   const queryClient = useQueryClient();
@@ -65,12 +65,12 @@ export function UploadVideo() {
                 },
                 position,
                 forceMainContainer: true,
-              }
+              },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ) as any;
           } else {
             const { finishUploadCallback } = instance.triggerAction(
-              "videoTool"
+              "videoTool",
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ) as any;
 
@@ -99,7 +99,7 @@ export function UploadVideo() {
         },
       });
     },
-    [instance, room, mutationUpload, queryClient, setUploadingVideo]
+    [instance, room, mutationUpload, queryClient, setUploadingVideo],
   );
 
   React.useEffect(() => {
@@ -108,7 +108,7 @@ export function UploadVideo() {
         return;
       }
 
-      if (window.weaveDragVideoParams) {
+      if (instance.isDragStarted()) {
         return;
       }
 

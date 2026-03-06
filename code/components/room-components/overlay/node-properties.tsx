@@ -31,6 +31,7 @@ import { ImageTemplateProperties } from "../node-properties/image-template-prope
 // import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -80,16 +81,17 @@ export const NodeProperties = () => {
       return;
     }
 
-    // if (!actualAction || !node) {
-    //   setNodePropertiesAction(undefined);
-    //   setSidebarActive(SIDEBAR_ELEMENTS.nodesTree);
-    //   return;
-    // }
+    if ((!actualAction || !node) && nodes.length === 0) {
+      setNodePropertiesAction(undefined);
+      setSidebarActive(SIDEBAR_ELEMENTS.images);
+      return;
+    }
 
     if (node) {
       setNodePropertiesAction("update");
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
     }
-  }, [actualAction, node, setSidebarActive, setNodePropertiesAction]);
+  }, [actualAction, node, nodes, setSidebarActive, setNodePropertiesAction]);
 
   React.useEffect(() => {
     if (!instance) return;

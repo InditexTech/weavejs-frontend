@@ -292,7 +292,7 @@ export const FramesLibrary = () => {
         >
           <SidebarSelector title="Frames" />
         </SidebarHeader>
-        <ScrollArea className="w-full h-[calc(100%-65px-73px)]">
+        <ScrollArea className="w-full h-[calc(100vh-65px-73px)]">
           <div
             className={cn("flex flex-col gap-[24px] w-full h-full", {
               ["p-0"]:

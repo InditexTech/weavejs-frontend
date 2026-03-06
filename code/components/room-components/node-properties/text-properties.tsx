@@ -13,14 +13,12 @@ import {
   AlignRight,
   AlignStartHorizontal,
   Bold,
-  CaseSensitive,
-  CaseUpper,
   Italic,
   RemoveFormatting,
   Strikethrough,
   Underline,
 } from "lucide-react";
-import { WeaveStateElement } from "@inditextech/weave-types";
+import { WeaveFont, WeaveStateElement } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputColor } from "../inputs/input-color";
@@ -33,13 +31,18 @@ export function TextProperties() {
   const node = useWeave((state) => state.selection.node);
   const actualAction = useWeave((state) => state.actions.actual);
 
+  const fontsValues = useCollaborationRoom((state) => state.fonts.values);
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
+
+  const [selectedFontFamily, setSelectedFontFamily] = React.useState<
+    string | null
+  >(null);
 
   const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === "create") {
@@ -57,6 +60,16 @@ export function TextProperties() {
     return undefined;
   }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
+  React.useEffect(() => {
+    setSelectedFontFamily(actualNode?.props?.fontFamily ?? null);
+  }, [actualNode]);
+
+  const weaveFont = React.useMemo(() => {
+    return fontsValues.find(
+      (font: WeaveFont) => font.name === selectedFontFamily,
+    );
+  }, [fontsValues, selectedFontFamily]);
+
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
@@ -67,7 +80,7 @@ export function TextProperties() {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   if (!instance || !actualAction || !actualNode) {
@@ -162,6 +175,7 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<RemoveFormatting size={20} strokeWidth={1} />}
+              disabled={!weaveFont?.supportedStyles?.includes("normal")}
               pressed={
                 (actualNode.props.fontStyle ?? "normal").indexOf("normal") !==
                 -1
@@ -180,6 +194,7 @@ export function TextProperties() {
             />
             <ToggleIconButton
               kind="switch"
+              disabled={!weaveFont?.supportedStyles?.includes("italic")}
               icon={<Italic size={20} strokeWidth={1} />}
               pressed={
                 (actualNode.props.fontStyle ?? "normal").indexOf("italic") !==
@@ -223,6 +238,7 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<Bold size={20} strokeWidth={1} />}
+              disabled={!weaveFont?.supportedStyles?.includes("bold")}
               pressed={
                 (actualNode.props.fontStyle ?? "normal").indexOf("bold") !== -1
               }
@@ -256,46 +272,6 @@ export function TextProperties() {
                   props: {
                     ...actualNode.props,
                     fontStyle: items.join(" "),
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-          </div>
-        </div>
-        <div className="w-full flex justify-between items-center gap-4 col-span-2">
-          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
-            Variant
-          </div>
-          <div className="w-full flex justify-end items-center gap-1">
-            <ToggleIconButton
-              kind="switch"
-              icon={<CaseSensitive size={20} strokeWidth={1} />}
-              pressed={
-                !actualNode.props.fontVariant ||
-                actualNode.props.fontVariant === "normal"
-              }
-              onClick={() => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    fontVariant: "normal",
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-            <ToggleIconButton
-              kind="switch"
-              icon={<CaseUpper size={20} strokeWidth={1} />}
-              pressed={actualNode.props.fontVariant === "small-caps"}
-              onClick={() => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    fontVariant: "small-caps",
                   },
                 };
                 updateElement(updatedNode);

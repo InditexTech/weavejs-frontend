@@ -20,8 +20,8 @@ import {
   Circle,
   Star,
   Hexagon,
-  ChevronRight,
-  ChevronLeft,
+  // ChevronRight,
+  // ChevronLeft,
   MessageSquare,
   ChevronsLeftRightEllipsis,
   // MapPinned,
@@ -31,6 +31,8 @@ import {
   PenLine,
   RulerDimensionLine,
   MoveUpRight,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -41,7 +43,7 @@ import {
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { motion } from "framer-motion";
-import { leftElementVariants } from "./variants";
+import { bottomElementVariants } from "./variants";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { cn } from "@/lib/utils";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
@@ -51,6 +53,7 @@ import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { useShapesTools } from "./hooks/use-shapes-tools";
 import { useStrokesTools } from "./hooks/use-strokes-tools";
 import { useImagesTools } from "./hooks/use-images-tools";
+import { useIAChat } from "@/store/ia-chat";
 
 export function ToolsOverlayTouch() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
@@ -66,6 +69,8 @@ export function ToolsOverlayTouch() {
   const canUndo = useWeave((state) => state.undoRedo.canUndo);
   const canRedo = useWeave((state) => state.undoRedo.canRedo);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
+
+  const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps,
@@ -125,16 +130,24 @@ export function ToolsOverlayTouch() {
     return null;
   }
 
+  const barOrientation = "horizontal";
+
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       exit="hidden"
-      variants={leftElementVariants}
-      className="pointer-events-none absolute left-[16px] top-[16px] bottom-[16px] flex flex-col gap-2 justify-center items-center"
+      variants={bottomElementVariants}
+      className={cn(
+        "pointer-events-none absolute left-[16px] right-[16px] flex flex-col gap-2 justify-center items-center",
+        {
+          ["bottom-[148px]"]: aiChatEnabled,
+          ["bottom-[16px]"]: !aiChatEnabled,
+        },
+      )}
     >
-      <Toolbar orientation="vertical" className="flex">
-        <MoveToolTrigger tooltipSide="right" />
+      <Toolbar orientation={barOrientation} className="flex !h-[50px]">
+        <MoveToolTrigger tooltipSide="top" />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
@@ -148,7 +161,7 @@ export function ToolsOverlayTouch() {
               <p>Selection</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <ToolbarButton
@@ -164,10 +177,10 @@ export function ToolsOverlayTouch() {
               <p>Erase</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider orientation="horizontal" />
+        <ToolbarDivider orientation="vertical" />
         <div className="relative flex gap-0 justify-start items-center">
           <ToolbarButton
             className="rounded-full !w-[40px]"
@@ -178,7 +191,7 @@ export function ToolsOverlayTouch() {
             active={SHAPES_TOOLS[actualShapeTool].active()}
             onClick={SHAPES_TOOLS[actualShapeTool].onClick}
             label={SHAPES_TOOLS[actualShapeTool].label}
-            tooltipSide="right"
+            tooltipSide="top"
             tooltipAlign="center"
           />
           <DropdownMenu modal={false} open={shapesMenuOpen}>
@@ -198,12 +211,12 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
+                className="rounded-full absolute bg-white !w-full !h-[22px] border border-[#c9c9c9] rounded-none rounded-t-lg left-0 top-[-26px]"
                 icon={
                   shapesMenuOpen ? (
-                    <ChevronLeft className="px-0" size={20} strokeWidth={1} />
+                    <ChevronDown className="px-0" size={20} strokeWidth={1} />
                   ) : (
-                    <ChevronRight className="px-0" size={20} strokeWidth={1} />
+                    <ChevronUp className="px-0" size={20} strokeWidth={1} />
                   )
                 }
                 disabled={
@@ -221,8 +234,9 @@ export function ToolsOverlayTouch() {
                     <p>More shapes tools</p>
                   </div>
                 }
-                tooltipSide="right"
-                tooltipAlign="start"
+                tooltipSideOffset={4}
+                tooltipSide="top"
+                tooltipAlign="center"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -233,7 +247,7 @@ export function ToolsOverlayTouch() {
                 setShapesMenuOpen(false);
               }}
               align="start"
-              side="right"
+              side="top"
               alignOffset={0}
               sideOffset={3}
               className="font-inter rounded-none shadow-none"
@@ -311,7 +325,7 @@ export function ToolsOverlayTouch() {
             active={STROKES_TOOLS[actualStrokesTool].active()}
             onClick={STROKES_TOOLS[actualStrokesTool].onClick}
             label={STROKES_TOOLS[actualStrokesTool].label}
-            tooltipSide="right"
+            tooltipSide="top"
             tooltipAlign="center"
           />
           <DropdownMenu modal={false} open={strokesMenuOpen}>
@@ -331,12 +345,12 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
+                className="rounded-full absolute bg-white !w-full !h-[22px] border border-[#c9c9c9] rounded-none rounded-t-lg top-[-26px] left-[0px]"
                 icon={
                   strokesMenuOpen ? (
-                    <ChevronLeft className="px-0" size={20} strokeWidth={1} />
+                    <ChevronDown className="px-0" size={20} strokeWidth={1} />
                   ) : (
-                    <ChevronRight className="px-0" size={20} strokeWidth={1} />
+                    <ChevronUp className="px-0" size={20} strokeWidth={1} />
                   )
                 }
                 disabled={
@@ -353,8 +367,9 @@ export function ToolsOverlayTouch() {
                     <p>More strokes tools</p>
                   </div>
                 }
-                tooltipSide="right"
-                tooltipAlign="start"
+                tooltipSideOffset={4}
+                tooltipSide="top"
+                tooltipAlign="center"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -365,7 +380,7 @@ export function ToolsOverlayTouch() {
                 setStrokesMenuOpen(false);
               }}
               align="start"
-              side="right"
+              side="top"
               alignOffset={0}
               sideOffset={3}
               className="font-inter rounded-none shadow-none"
@@ -435,7 +450,7 @@ export function ToolsOverlayTouch() {
               <p>Connector Tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <div className="relative flex gap-0 justify-start items-center">
@@ -448,7 +463,7 @@ export function ToolsOverlayTouch() {
             active={IMAGES_TOOLS[actualImagesTool].active()}
             onClick={IMAGES_TOOLS[actualImagesTool].onClick}
             label={IMAGES_TOOLS[actualImagesTool].label}
-            tooltipSide="right"
+            tooltipSide="top"
             tooltipAlign="center"
           />
           <DropdownMenu modal={false} open={imagesMenuOpen}>
@@ -468,12 +483,12 @@ export function ToolsOverlayTouch() {
               asChild
             >
               <ToolbarButton
-                className="rounded-full !w-[20px] absolute bg-white !w-[20px] border border-[#c9c9c9] rounded-none rounded-r-lg left-[44px] top-0"
+                className="rounded-full absolute bg-white !w-full !h-[22px] border border-[#c9c9c9] rounded-none rounded-t-lg left-0 top-[-26px]"
                 icon={
                   imagesMenuOpen ? (
-                    <ChevronLeft className="px-0" size={20} strokeWidth={1} />
+                    <ChevronDown className="px-0" size={20} strokeWidth={1} />
                   ) : (
-                    <ChevronRight className="px-0" size={20} strokeWidth={1} />
+                    <ChevronUp className="px-0" size={20} strokeWidth={1} />
                   )
                 }
                 disabled={
@@ -490,8 +505,9 @@ export function ToolsOverlayTouch() {
                     <p>More images tools</p>
                   </div>
                 }
-                tooltipSide="right"
-                tooltipAlign="start"
+                tooltipSideOffset={4}
+                tooltipSide="top"
+                tooltipAlign="center"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -502,7 +518,7 @@ export function ToolsOverlayTouch() {
                 setImagesMenuOpen(false);
               }}
               align="start"
-              side="right"
+              side="top"
               alignOffset={0}
               sideOffset={3}
               className="font-inter rounded-none shadow-none"
@@ -551,7 +567,7 @@ export function ToolsOverlayTouch() {
               <p>Video tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <ToolbarButton
@@ -567,7 +583,7 @@ export function ToolsOverlayTouch() {
               <p>Text tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <ToolbarButton
@@ -583,7 +599,7 @@ export function ToolsOverlayTouch() {
               <p>Frame tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <ToolbarButton
@@ -599,7 +615,7 @@ export function ToolsOverlayTouch() {
               <p>Image Template Tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         {threadsEnabled && (
@@ -619,7 +635,7 @@ export function ToolsOverlayTouch() {
                 <p>Comment tool</p>
               </div>
             }
-            tooltipSide="right"
+            tooltipSide="top"
             tooltipAlign="center"
           />
         )}
@@ -652,7 +668,7 @@ export function ToolsOverlayTouch() {
               <p>Measure tool</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         {/* <ToolbarButton
@@ -673,8 +689,8 @@ export function ToolsOverlayTouch() {
           tooltipSide="top"
           tooltipAlign="center"
         />
-        <ToolbarDivider orientation="horizontal" /> */}
-        <ToolbarDivider orientation="horizontal" />
+        <ToolbarDivider orientation="vertical" /> */}
+        <ToolbarDivider orientation="vertical" />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Undo className="px-2" size={40} strokeWidth={1} />}
@@ -693,7 +709,7 @@ export function ToolsOverlayTouch() {
               <p>Undo latest changes</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
         <ToolbarButton
@@ -714,7 +730,7 @@ export function ToolsOverlayTouch() {
               <p>Redo latest changes</p>
             </div>
           }
-          tooltipSide="right"
+          tooltipSide="top"
           tooltipAlign="center"
         />
       </Toolbar>

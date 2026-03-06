@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import { useCollaborationRoom } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
@@ -19,16 +21,16 @@ export function UploadImage() {
 
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFile = useCollaborationRoom(
-    (state) => state.images.showSelectFile
+    (state) => state.images.showSelectFile,
   );
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const queryClient = useQueryClient();
@@ -44,97 +46,66 @@ export function UploadImage() {
 
   const handleUploadFile = React.useCallback(
     (file: File, position?: Konva.Vector2d) => {
-      setUploadingImage(true);
-      mutationUpload.mutate(file, {
-        onSuccess: (data) => {
-          const queryKey = ["getImages", room];
-          queryClient.invalidateQueries({ queryKey });
+      const resourceId = uuidv4();
 
-          if (!instance) {
-            return;
-          }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (!instance) {
+          return;
+        }
 
-          if (!workloadsEnabled) {
-            inputFileRef.current.value = null;
-            const room = data.fileName.split("/")[0];
-            const imageId = data.fileName.split("/")[1];
+        const { nodeId, finishUploadCallback } = instance.triggerAction(
+          "imageTool",
+          {
+            imageId: resourceId,
+            imageData: reader.result as string,
+            ...(position && { position, forceMainContainer: true }),
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any;
 
-            if (position) {
-              instance.triggerAction(
-                "imageTool",
-                {
-                  imageId,
-                  imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-                  position,
-                  forceMainContainer: true,
-                }
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ) as any;
-            } else {
-              const { finishUploadCallback } = instance.triggerAction(
-                "imageTool"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ) as any;
+        const toastId = toast.loading("Uploading image...", {
+          duration: Infinity,
+        });
 
-              instance.updatePropsAction("imageTool", {
-                imageId,
-              });
+        mutationUpload.mutate(file, {
+          onSuccess: (data) => {
+            toast.dismiss(toastId);
+            toast.success("Image uploaded successfully");
 
-              finishUploadCallback?.({
-                imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-              });
+            const queryKey = ["getImages", room];
+            queryClient.invalidateQueries({ queryKey });
+
+            if (!instance) {
+              return;
             }
-          }
 
-          if (workloadsEnabled) {
-            inputFileRef.current.value = null;
-            const room = data.image.roomId;
-            const imageId = data.image.imageId;
-
-            if (position) {
-              instance.triggerAction(
-                "imageTool",
-                {
-                  imageId,
-                  imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-                  position,
-                  forceMainContainer: true,
-                }
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ) as any;
-            } else {
-              const { finishUploadCallback } = instance.triggerAction(
-                "imageTool"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ) as any;
-
-              instance.updatePropsAction("imageTool", {
-                imageId,
-              });
+            if (workloadsEnabled) {
+              inputFileRef.current.value = null;
+              const room = data.image.roomId;
+              const imageId = data.image.imageId;
 
               finishUploadCallback?.(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                nodeId,
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
               );
             }
-          }
-        },
-        onError: (ex) => {
-          console.error(ex);
-          console.error("Error uploading image");
-        },
-        onSettled: () => {
-          setUploadingImage(false);
-        },
-      });
+          },
+          onError: (ex) => {
+            toast.dismiss(toastId);
+            toast.error("Error uploading image");
+
+            console.error(ex);
+            console.error("Error uploading image");
+          },
+        });
+      };
+      reader.onerror = () => {
+        toast.error("Error reading image file");
+      };
+      reader.readAsDataURL(file);
     },
-    [
-      instance,
-      room,
-      workloadsEnabled,
-      mutationUpload,
-      queryClient,
-      setUploadingImage,
-    ]
+    [instance, room, workloadsEnabled, mutationUpload, queryClient],
   );
 
   React.useEffect(() => {
@@ -143,7 +114,7 @@ export function UploadImage() {
         return;
       }
 
-      if (window.weaveDragImageURL) {
+      if (instance.isDragStarted()) {
         return;
       }
 
@@ -207,7 +178,7 @@ export function UploadImage() {
   return (
     <input
       type="file"
-      accept="image/png,image/jpeg"
+      accept="image/png,image/jpeg,image/webp"
       name="image"
       ref={inputFileRef}
       className="hidden"

@@ -8,7 +8,6 @@ import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
-import { ACTIONS, FONTS, NODES, PLUGINS } from "@/components/utils/constants";
 import { useWeave, WeaveProvider } from "@inditextech/weave-react";
 import { RoomLayout } from "./room.layout";
 import { RoomLoader } from "../room-components/room-loader/room-loader";
@@ -21,6 +20,10 @@ import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
 import { AppProviders } from "@/app/providers";
 import { UploadVideo } from "../room-components/upload-video";
+import { FONTS } from "../utils/weave/fonts";
+import { NODES } from "../utils/weave/nodes";
+import { PLUGINS } from "../utils/weave/plugins";
+import { ACTIONS } from "../utils/weave/actions";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const statusMap: any = {
@@ -56,13 +59,13 @@ export const Room = () => {
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
   const loadingFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.loading
+    (state) => state.fetchConnectionUrl.loading,
   );
   const errorFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.error
+    (state) => state.fetchConnectionUrl.error,
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
+    (state) => state.setFetchConnectionUrlError,
   );
   const setUser = useCollaborationRoom((state) => state.setUser);
 
@@ -195,7 +198,7 @@ export const Room = () => {
           getContainer={() => {
             const shadowHost = document.getElementById("shadow-host");
             return shadowHost?.shadowRoot?.querySelector(
-              "#weave"
+              "#weave",
             ) as HTMLDivElement;
           }}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

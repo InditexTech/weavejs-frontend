@@ -33,7 +33,12 @@ import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
-import { WeaveImageNode } from "@inditextech/weave-sdk";
+import {
+  IMAGE_TOOL_ACTION_NAME,
+  // Weave,
+  WeaveImageNode,
+  WeaveImageToolAction,
+} from "@inditextech/weave-sdk";
 import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
@@ -76,7 +81,7 @@ export const ImagesLibrary = () => {
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
@@ -103,7 +108,7 @@ export const ImagesLibrary = () => {
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
     onMutate: () => {
@@ -127,7 +132,7 @@ export const ImagesLibrary = () => {
         user?.name ?? "",
         clientId ?? "",
         room ?? "",
-        imageId
+        imageId,
       );
     },
     onMutate: () => {
@@ -154,7 +159,7 @@ export const ImagesLibrary = () => {
 
       mutationDelete.mutate(image.imageId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   const handleRemoveBackground = React.useCallback(
@@ -164,7 +169,7 @@ export const ImagesLibrary = () => {
       }
 
       const element = document.querySelector(
-        `img[id="${image.imageId}"]`
+        `img[id="${image.imageId}"]`,
       ) as HTMLImageElement | null;
 
       if (!element) {
@@ -193,7 +198,7 @@ export const ImagesLibrary = () => {
         });
       }
     },
-    [instance, clientId, user, mutationUploadV2]
+    [instance, clientId, user, mutationUploadV2],
   );
 
   const query = useInfiniteQuery({
@@ -219,7 +224,7 @@ export const ImagesLibrary = () => {
       }
       const loadedSoFar = allPages.reduce(
         (sum, page) => sum + page.items.length,
-        0
+        0,
       );
       if (loadedSoFar < lastPage.total) {
         return loadedSoFar; // next offset
@@ -232,7 +237,7 @@ export const ImagesLibrary = () => {
   const appImages = React.useMemo(() => {
     function extractImages(
       images: WeaveStateElement[],
-      node: WeaveStateElement
+      node: WeaveStateElement,
     ) {
       if (node.props && node.props.nodeType === "image" && node.props.imageId) {
         images.push(node);
@@ -273,9 +278,9 @@ export const ImagesLibrary = () => {
           prev.find(
             (oldItem) =>
               oldItem.imageId === newItem.imageId &&
-              oldItem.updatedAt === newItem.updatedAt
-          ) || newItem
-      )
+              oldItem.updatedAt === newItem.updatedAt,
+          ) || newItem,
+      ),
     );
   }, [query.data]);
 
@@ -300,7 +305,7 @@ export const ImagesLibrary = () => {
 
     for (const image of images) {
       const appImage = appImages.find(
-        (appImage) => appImage.props.imageId === image.imageId
+        (appImage) => appImage.props.imageId === image.imageId,
       );
 
       if (
@@ -322,13 +327,13 @@ export const ImagesLibrary = () => {
         newSelectedImages.push(image);
       } else {
         newSelectedImages = newSelectedImages.filter(
-          (actImage) => actImage !== image
+          (actImage) => actImage !== image,
         );
       }
       const unique = [...new Set(newSelectedImages)];
       setSelectedImages(unique);
     },
-    [selectedImages]
+    [selectedImages],
   );
 
   if (!instance) {
@@ -371,9 +376,24 @@ export const ImagesLibrary = () => {
             <div
               className="grid grid-cols-2 gap-2 w-full weaveDraggable p-[24px]"
               onDragStart={(e) => {
+                if (!instance) {
+                  return;
+                }
                 if (e.target instanceof HTMLImageElement) {
-                  window.weaveDragImageURL = e.target.src;
-                  window.weaveDragImageId = e.target.dataset.imageId;
+                  const imageTool = instance.getActionHandler(
+                    IMAGE_TOOL_ACTION_NAME,
+                  ) as WeaveImageToolAction | undefined;
+
+                  if (!imageTool) {
+                    return;
+                  }
+
+                  imageTool.setDragAndDropProperties({
+                    imageURL: e.target.src,
+                    imageId: e.target.dataset.imageId,
+                    imageWidth: e.target.naturalWidth,
+                    imageHeight: e.target.naturalHeight,
+                  });
                 }
               }}
             >
@@ -435,7 +455,7 @@ export const ImagesLibrary = () => {
                             if (node) {
                               const nodeHandler =
                                 instance.getNodeHandler<WeaveImageNode>(
-                                  node.getAttrs().nodeType
+                                  node.getAttrs().nodeType,
                                 );
                               if (!nodeHandler) {
                                 return;
@@ -443,8 +463,8 @@ export const ImagesLibrary = () => {
 
                               instance.removeNode(
                                 nodeHandler.serialize(
-                                  node as WeaveElementInstance
-                                )
+                                  node as WeaveElementInstance,
+                                ),
                               );
                             }
                           }}
@@ -498,9 +518,24 @@ export const ImagesLibrary = () => {
           <div
             className="w-full weaveDraggable p-0"
             onDragStart={(e) => {
+              if (!instance) {
+                return;
+              }
               if (e.target instanceof HTMLImageElement) {
-                window.weaveDragImageURL = e.target.src;
-                window.weaveDragImageId = e.target.dataset.imageId;
+                const imageTool = instance.getActionHandler(
+                  IMAGE_TOOL_ACTION_NAME,
+                ) as WeaveImageToolAction | undefined;
+
+                if (!imageTool) {
+                  return;
+                }
+
+                imageTool.setDragAndDropProperties({
+                  imageURL: e.target.src,
+                  imageId: e.target.dataset.imageId,
+                  imageWidth: e.target.naturalWidth,
+                  imageHeight: e.target.naturalHeight,
+                });
               }
             }}
           >
@@ -524,7 +559,7 @@ export const ImagesLibrary = () => {
               {images.length > 0 &&
                 images.map((image) => {
                   const appImage = appImages.find(
-                    (appImage) => appImage.props.imageId === image.imageId
+                    (appImage) => appImage.props.imageId === image.imageId,
                   );
 
                   const isChecked = realSelectedImages.includes(image);
@@ -568,7 +603,7 @@ export const ImagesLibrary = () => {
                             (image.removalJobId !== null &&
                               image.removalStatus !== null &&
                               ["pending", "working"].includes(
-                                image.removalStatus
+                                image.removalStatus,
                               ))
                           )
                         ) {
@@ -587,7 +622,7 @@ export const ImagesLibrary = () => {
                                 (image.removalJobId !== null &&
                                   image.removalStatus !== null &&
                                   ["pending", "working"].includes(
-                                    image.removalStatus
+                                    image.removalStatus,
                                   ))
                               ) && (
                                 <div className="absolute top-[8px] right-[8px] z-10">

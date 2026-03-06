@@ -157,7 +157,7 @@ export class ImageTemplateToolAction extends WeaveAction {
     this.setCursor();
 
     this.instance.emitEvent<ImageTemplateToolActionOnAddingEvent>(
-      "onAddingImageTemplate"
+      "onAddingImageTemplate",
     );
 
     this.imageTemplateId = null;
@@ -203,7 +203,7 @@ export class ImageTemplateToolAction extends WeaveAction {
       this.container
     ) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-        this.container
+        this.container,
       );
 
       const rectPos: Konva.Vector2d = {
@@ -243,7 +243,7 @@ export class ImageTemplateToolAction extends WeaveAction {
       }
 
       this.instance.emitEvent<ImageTemplateToolActionOnAddedEvent>(
-        "onAddedImageTemplate"
+        "onAddedImageTemplate",
       );
     }
 
@@ -264,7 +264,7 @@ export class ImageTemplateToolAction extends WeaveAction {
       this.moved = true;
 
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-        this.measureContainer
+        this.measureContainer,
       );
 
       const deltaX = mousePoint.x - this.clickPoint?.x;

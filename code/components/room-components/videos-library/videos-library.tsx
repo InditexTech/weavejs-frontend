@@ -36,6 +36,10 @@ import { VideoEntity } from "./types";
 import { VideosLibraryActions } from "./videos-ibrary.actions";
 import { getVideos } from "@/api/get-videos";
 import { SidebarHeader } from "../sidebar-header";
+import {
+  VIDEO_TOOL_ACTION_NAME,
+  WeaveVideoToolAction,
+} from "@inditextech/weave-sdk";
 
 const VIDEOS_LIMIT = 20;
 
@@ -52,7 +56,7 @@ export const VideosLibrary = () => {
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const workloadsEnabled = useCollaborationRoom(
-    (state) => state.features.workloads
+    (state) => state.features.workloads,
   );
 
   const mutationDelete = useMutation({
@@ -61,7 +65,7 @@ export const VideosLibrary = () => {
         user?.name ?? "",
         clientId ?? "",
         room ?? "",
-        videoId
+        videoId,
       );
     },
     onMutate: () => {
@@ -88,7 +92,7 @@ export const VideosLibrary = () => {
 
       mutationDelete.mutate(video.videoId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   const query = useInfiniteQuery({
@@ -108,7 +112,7 @@ export const VideosLibrary = () => {
       }
       const loadedSoFar = allPages.reduce(
         (sum, page) => sum + page.items.length,
-        0
+        0,
       );
       if (loadedSoFar < lastPage.total) {
         return loadedSoFar; // next offset
@@ -121,7 +125,7 @@ export const VideosLibrary = () => {
   const appVideos = React.useMemo(() => {
     function extractVideos(
       videos: WeaveStateElement[],
-      node: WeaveStateElement
+      node: WeaveStateElement,
     ) {
       if (node.props && node.props.nodeType === "video" && node.props.videoId) {
         videos.push(node);
@@ -162,9 +166,9 @@ export const VideosLibrary = () => {
           prev.find(
             (oldItem) =>
               oldItem.videoId === newItem.videoId &&
-              oldItem.updatedAt === newItem.updatedAt
-          ) || newItem
-      )
+              oldItem.updatedAt === newItem.updatedAt,
+          ) || newItem,
+      ),
     );
   }, [query.data]);
 
@@ -189,7 +193,7 @@ export const VideosLibrary = () => {
 
     for (const video of videos) {
       const appVideo = appVideos.find(
-        (appVideo) => appVideo.props.videoId === video.videoId
+        (appVideo) => appVideo.props.videoId === video.videoId,
       );
 
       if (
@@ -211,13 +215,13 @@ export const VideosLibrary = () => {
         newSelectedVideos.push(video);
       } else {
         newSelectedVideos = newSelectedVideos.filter(
-          (actVideo) => actVideo !== video
+          (actVideo) => actVideo !== video,
         );
       }
       const unique = [...new Set(newSelectedVideos)];
       setSelectedVideos(unique);
     },
-    [selectedVideos]
+    [selectedVideos],
   );
 
   if (!instance) {
@@ -292,14 +296,28 @@ export const VideosLibrary = () => {
         <div
           className="w-full weaveDraggable p-0"
           onDragStart={(e) => {
+            if (!instance) {
+              return;
+            }
+
             if (e.target instanceof HTMLVideoElement) {
-              window.weaveDragVideoParams = {
-                placeholderUrl: e.target.dataset.videoPlaceholderUrl,
-                url: e.target.dataset.videoUrl,
-                width: parseInt(e.target.dataset.videoWidth ?? "0"),
-                height: parseInt(e.target.dataset.videoHeight ?? "0"),
-              };
-              window.weaveDragVideoId = e.target.dataset.videoId;
+              const videoTool = instance.getActionHandler(
+                VIDEO_TOOL_ACTION_NAME,
+              ) as WeaveVideoToolAction | undefined;
+
+              if (!videoTool) {
+                return;
+              }
+
+              videoTool.setDragAndDropProperties({
+                videoId: e.target.dataset.videoId ?? "",
+                videoParams: {
+                  placeholderUrl: e.target.dataset.videoPlaceholderUrl ?? "",
+                  url: e.target.dataset.videoUrl ?? "",
+                  width: parseInt(e.target.dataset.videoWidth ?? "0"),
+                  height: parseInt(e.target.dataset.videoHeight ?? "0"),
+                },
+              });
             }
           }}
         >
@@ -313,7 +331,7 @@ export const VideosLibrary = () => {
             {videos.length > 0 &&
               videos.map((video) => {
                 const appVideo = appVideos.find(
-                  (appVideo) => appVideo.props.videoId === video.videoId
+                  (appVideo) => appVideo.props.videoId === video.videoId,
                 );
 
                 const isChecked = realSelectedVideos.includes(video);
@@ -338,7 +356,7 @@ export const VideosLibrary = () => {
                           (video.removalJobId !== null &&
                             video.removalStatus !== null &&
                             ["pending", "working"].includes(
-                              video.removalStatus
+                              video.removalStatus,
                             ))
                         )
                       ) {
@@ -357,7 +375,7 @@ export const VideosLibrary = () => {
                               (video.removalJobId !== null &&
                                 video.removalStatus !== null &&
                                 ["pending", "working"].includes(
-                                  video.removalStatus
+                                  video.removalStatus,
                                 ))
                             ) && (
                               <div className="absolute top-[8px] right-[8px] z-10">

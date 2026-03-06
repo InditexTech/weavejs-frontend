@@ -17,7 +17,7 @@ import {
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import {
   SwatchBook,
-  ListTree,
+  // ListTree,
   Projector,
   Images,
   ChevronDown,
@@ -43,10 +43,10 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const threadsEnabled = useCollaborationRoom(
-    (state) => state.features.threads
+    (state) => state.features.threads,
   );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
@@ -55,18 +55,22 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   return (
-    <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
+    <DropdownMenu
+      onOpenChange={(open: boolean) => setMenuOpen(open)}
+      // open={menuOpen}
+      modal={false}
+    >
       <DropdownMenuTrigger
         className={cn(
           "flex gap-2 rounded-none h-[32px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
-          }
+          },
         )}
       >
         <span>{title}</span>
@@ -85,18 +89,24 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
       >
         <DropdownMenuGroup>
           {selectedNodes.length > 0 && (
-            <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
-                sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
-              }}
-            >
-              <SquareMousePointer strokeWidth={1} /> Selection
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
+                }}
+              >
+                <SquareMousePointer strokeWidth={1} /> Selection
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+            </>
           )}
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
             }}
           >
@@ -104,11 +114,11 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             <DropdownMenuShortcut>
               {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
@@ -119,7 +129,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.videos);
             }}
           >
@@ -130,7 +141,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
@@ -141,7 +153,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.templates);
             }}
           >
@@ -152,7 +165,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
@@ -164,7 +178,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           {threadsEnabled && (
             <DropdownMenuItem
               className="text-foreground cursor-pointer hover:rounded-none w-full"
-              onPointerDown={() => {
+              onPointerDown={(e) => {
+                e.stopPropagation();
                 sidebarToggle(SIDEBAR_ELEMENTS.comments);
               }}
             >
@@ -179,7 +194,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
+                onPointerDown={(e) => {
+                  e.stopPropagation();
                   sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
                 }}
               >
