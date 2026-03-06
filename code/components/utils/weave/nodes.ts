@@ -39,10 +39,10 @@ import {
 } from "../../room-components/comment/comment-dom";
 import { getUserShort } from "./../users";
 import { ThreadEntity } from "../../room-components/hooks/types";
-import resources from "./resources/resources2.json";
+// import resources from "./resources/resources2.json";
 import { BACKGROUND_COLOR } from "@/store/store";
 
-const ENABLED_RESOURCES = true;
+const ENABLED_RESOURCES = false;
 
 export const NODES = () => [
   new WeaveStageNode(),
@@ -79,22 +79,25 @@ export const NODES = () => [
         ],
         keepRatio: true,
       },
-      urlTransformer: (url: string, node?: Konva.Node) => {
+      urlTransformer: (
+        url: string,
+        //node?: Konva.Node
+      ) => {
         if (!ENABLED_RESOURCES) {
           return url;
         }
 
-        let resourceId: string | null = null;
-        let resource = null;
+        // let resourceId: string | null = null;
+        // let resource = null;
 
-        if (node?.getAttrs().resourceId) {
-          resourceId = node.getAttrs().resourceId;
-          resource = resources.find((res) => res.resourceId === resourceId);
-        }
+        // if (node?.getAttrs().resourceId) {
+        //   resourceId = node.getAttrs().resourceId;
+        //   resource = resources.find((res) => res.resourceId === resourceId);
+        // }
 
-        if (resource) {
-          return resource.downloadUrl;
-        }
+        // if (resource) {
+        //   return resource.downloadUrl;
+        // }
 
         return url;
       },
