@@ -66,6 +66,7 @@ export class MaskToolAction extends WeaveAction {
         e.key === "Enter" &&
         this.instance.getActiveAction() === MASK_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -73,6 +74,7 @@ export class MaskToolAction extends WeaveAction {
         e.key === "Escape" &&
         this.instance.getActiveAction() === MASK_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -156,7 +158,7 @@ export class MaskToolAction extends WeaveAction {
             stage.container().style.cursor = "pointer";
             e.cancelBubble = true;
           }
-        }
+        },
       );
 
       this.tempPoint = new Konva.Circle({

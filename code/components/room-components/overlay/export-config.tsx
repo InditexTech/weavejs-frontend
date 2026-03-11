@@ -104,6 +104,7 @@ export function ExportConfigDialog({
       if (!exportConfigVisible) return;
 
       if (event.key === "Enter") {
+        event.stopPropagation();
         handleExport();
       }
     },

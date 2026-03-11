@@ -12,7 +12,10 @@ import { InputNumber } from "../inputs/input-number";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { Scaling } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TEXT_LAYOUT } from "@inditextech/weave-sdk";
+import {
+  TEXT_LAYOUT,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+} from "@inditextech/weave-sdk";
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -88,7 +91,9 @@ export function SizeProperties() {
 
   if (
     actualAction &&
-    !["selectionTool", "rectangleTool", "imageTool"].includes(actualAction)
+    !["selectionTool", "rectangleTool", WEAVE_IMAGE_TOOL_ACTION_NAME].includes(
+      actualAction,
+    )
   ) {
     return null;
   }

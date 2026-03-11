@@ -10,6 +10,12 @@ import { useWeave } from "@inditextech/weave-react";
 import { useTemplatesUseCase } from "../store/store";
 import { postTemplatesImage } from "@/api/templates/post-templates-image";
 import Konva from "konva";
+import {
+  getDownscaleRatio,
+  getImageSizeFromFile,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+} from "@inditextech/weave-sdk";
 
 export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,65 +43,66 @@ export function UploadImage() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File, position?: Konva.Vector2d) => {
+    async (file: File, position?: Konva.Vector2d) => {
       const resourceId = uuidv4();
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (!instance) {
-          return;
-        }
+      if (!instance) {
+        return;
+      }
 
-        const { nodeId, finishUploadCallback } = instance.triggerAction(
-          "imageTool",
-          {
-            imageId: resourceId,
-            imageData: reader.result as string,
-            ...(position && { position, forceMainContainer: true }),
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ) as any;
+      const imageSize = await getImageSizeFromFile(file);
+      const downscaleRatio = getDownscaleRatio(
+        imageSize.width,
+        imageSize.height,
+      );
 
-        const toastId = toast.loading("Uploading image...", {
-          duration: Infinity,
-        });
+      const { nodeId, finishUploadCallback } = instance.triggerAction(
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
+        {
+          type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+          imageFile: file,
+          imageDownscaleRatio: downscaleRatio,
+          imageId: resourceId,
+          ...(position && { position, forceMainContainer: true }),
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any;
 
-        mutationUpload.mutate(file, {
-          onSuccess: (data) => {
-            toast.dismiss(toastId);
-            toast.success("Image uploaded successfully");
+      const toastId = toast.loading("Uploading image...", {
+        duration: Infinity,
+      });
 
-            const queryKey = ["getTemplatesImages", instanceId];
-            queryClient.invalidateQueries({ queryKey });
+      mutationUpload.mutate(file, {
+        onSuccess: (data) => {
+          toast.dismiss(toastId);
+          toast.success("Image uploaded successfully");
 
-            if (!instance) {
-              return;
-            }
+          const queryKey = ["getTemplatesImages", instanceId];
+          queryClient.invalidateQueries({ queryKey });
 
-            inputFileRef.current.value = null;
-            const room = data.image.roomId;
-            const imageId = data.image.imageId;
+          if (!instance) {
+            return;
+          }
 
-            finishUploadCallback?.(
-              nodeId,
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-            );
-          },
-          onError: (ex) => {
-            toast.dismiss(toastId);
-            toast.error("Error uploading image");
+          inputFileRef.current.value = null;
+          const room = data.image.roomId;
+          const imageId = data.image.imageId;
 
-            console.error(ex);
-            console.error("Error uploading image");
-          },
-        });
-      };
-      reader.onerror = () => {
-        toast.error("Error reading image file");
-      };
-      reader.readAsDataURL(file);
+          finishUploadCallback?.(
+            nodeId,
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+          );
+        },
+        onError: (ex) => {
+          toast.dismiss(toastId);
+          toast.error("Error uploading image");
+
+          console.error(ex);
+          console.error("Error uploading image");
+        },
+      });
     },
-    [instance, instanceId, mutationUpload, queryClient, setUploadingImage],
+    [instance, instanceId, mutationUpload, queryClient],
   );
 
   React.useEffect(() => {

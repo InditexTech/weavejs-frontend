@@ -35,7 +35,10 @@ import {
   PencilRuler,
 } from "lucide-react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
-import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
+import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WeaveCopyPasteNodesPlugin,
+} from "@inditextech/weave-sdk";
 import { Button } from "@/components/ui/button";
 import { ShortcutElement } from "@/components/room-components/help/shortcut-element";
 import { ToolbarButton } from "@/components/room-components/toolbar/toolbar-button";
@@ -202,7 +205,7 @@ export const NodeToolbar = () => {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "imageTool",
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
         "videoTool",
         "starTool",
         "strokeTool",

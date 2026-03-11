@@ -244,6 +244,7 @@
 }
 
 .pulseOverlay {
+  pointer-events: none;
   position: absolute;
   inset: 0;
   background: #000000;

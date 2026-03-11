@@ -52,12 +52,18 @@ import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { useShapesTools } from "./hooks/use-shapes-tools";
 import { useStrokesTools } from "./hooks/use-strokes-tools";
 import { useImagesTools } from "./hooks/use-images-tools";
+import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
+} from "@inditextech/weave-sdk";
 
 export function ToolsOverlayMouse() {
   const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
   const [actualStrokesTool, setActualStrokesTool] =
     React.useState("strokeTool");
-  const [actualImagesTool, setActualImagesTool] = React.useState("imageTool");
+  const [actualImagesTool, setActualImagesTool] = React.useState(
+    WEAVE_IMAGE_TOOL_ACTION_NAME,
+  );
   const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
   const [strokesMenuOpen, setStrokesMenuOpen] = React.useState(false);
   const [imagesMenuOpen, setImagesMenuOpen] = React.useState(false);
@@ -555,8 +561,8 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualImagesTool("imageTool");
-                  IMAGES_TOOLS["imageTool"].onClick();
+                  setActualImagesTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
+                  IMAGES_TOOLS[WEAVE_IMAGE_TOOL_ACTION_NAME].onClick();
                 }}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -572,8 +578,8 @@ export function ToolsOverlayMouse() {
                   setShapesMenuOpen(false);
                   setStrokesMenuOpen(false);
                   setImagesMenuOpen(false);
-                  setActualImagesTool("imagesTool");
-                  IMAGES_TOOLS["imagesTool"].onClick();
+                  setActualImagesTool(WEAVE_IMAGES_TOOL_ACTION_NAME);
+                  IMAGES_TOOLS[WEAVE_IMAGES_TOOL_ACTION_NAME].onClick();
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool

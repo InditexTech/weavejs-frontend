@@ -78,6 +78,7 @@ export class ImageTemplateToolAction extends WeaveAction {
 
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        e.stopPropagation();
         this.cancelAction();
         return;
       }

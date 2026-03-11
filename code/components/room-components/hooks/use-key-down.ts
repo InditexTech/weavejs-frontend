@@ -31,9 +31,10 @@ export const useKeyDown = (callback: useKeyDownCallback) => {
         return;
       }
 
+      event.stopPropagation();
       callback(event);
     },
-    [callback, weaveConnectionStatus]
+    [callback, weaveConnectionStatus],
   );
 
   React.useEffect(() => {

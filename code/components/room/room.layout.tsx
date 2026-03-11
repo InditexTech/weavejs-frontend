@@ -363,7 +363,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
           >
             <RoomHeaderRight />
             <div
-              className={cn("", {
+              className={cn("w-full h-[calc(100%-65px)]", {
                 ["visible"]:
                   (viewType === "floating" && nodes.length > 0) ||
                   viewType === "fixed",

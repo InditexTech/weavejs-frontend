@@ -40,10 +40,11 @@ import { useCollaborationRoom } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import {
-  IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
   WeaveImageToolAction,
 } from "@inditextech/weave-sdk";
 import { useWeave } from "@inditextech/weave-react";
+import { ChatBotImage } from "./chatbot.image";
 
 type ChatBotConversationProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,20 +95,31 @@ export const ChatBotConversation = ({
             if (!instance) {
               return;
             }
+
             if (e.target instanceof HTMLImageElement) {
               const imageTool = instance.getActionHandler(
-                IMAGE_TOOL_ACTION_NAME,
+                WEAVE_IMAGE_TOOL_ACTION_NAME,
               ) as WeaveImageToolAction | undefined;
 
               if (!imageTool) {
                 return;
               }
 
+              if (
+                !e.target.dataset.imageFallback ||
+                !e.target.dataset.imageUrl
+              ) {
+                return;
+              }
+
               imageTool.setDragAndDropProperties({
-                imageURL: e.target.src,
+                imageURL: {
+                  url: e.target.dataset.imageUrl,
+                  fallback: e.target.dataset.imageFallback,
+                  width: e.target.naturalWidth,
+                  height: e.target.naturalHeight,
+                },
                 imageId: e.target.dataset.imageId,
-                imageWidth: e.target.naturalWidth,
-                imageHeight: e.target.naturalHeight,
               });
             }
           }
@@ -182,12 +194,7 @@ export const ChatBotConversation = ({
                                         key={image.imageId}
                                         className="relative"
                                       >
-                                        <img
-                                          src={image.url}
-                                          alt="Generated Image"
-                                          className="max-h-64 object-contain cursor-pointer border border-[#c9c9c9]"
-                                          data-image-id={image.imageId}
-                                        />
+                                        <ChatBotImage image={image} />
                                         <div className="absolute bottom-[12px] right-[12px]">
                                           <Button
                                             variant="secondary"

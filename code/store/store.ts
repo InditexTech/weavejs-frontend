@@ -251,7 +251,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
   );
 
   return {
-    viewType: "floating",
+    viewType: "fixed",
     backgroundColor: BACKGROUND_COLOR.GRAY,
     measurement: {
       units: "cms",

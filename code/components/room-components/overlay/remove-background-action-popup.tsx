@@ -22,31 +22,34 @@ import {
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { WeaveElementInstance } from "@inditextech/weave-types";
-import { WeaveNode } from "@inditextech/weave-sdk";
+import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WeaveNode,
+} from "@inditextech/weave-sdk";
 
 export function RemoveBackgroundActionPopup() {
   const instance = useWeave((state) => state.instance);
 
   const originNodeId = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.originNodeId
+    (state) => state.images.removeBackgroundPopup.originNodeId,
   );
   const imageId = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.imageId
+    (state) => state.images.removeBackgroundPopup.imageId,
   );
   const originalImage = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.originImage
+    (state) => state.images.removeBackgroundPopup.originImage,
   );
   const imageURL = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.imageURL
+    (state) => state.images.removeBackgroundPopup.imageURL,
   );
   const showPopup = useCollaborationRoom(
-    (state) => state.images.removeBackgroundPopup.show
+    (state) => state.images.removeBackgroundPopup.show,
   );
   const setRemoveBackgroundPopupAction = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupAction
+    (state) => state.setRemoveBackgroundPopupAction,
   );
   const setRemoveBackgroundPopupShow = useCollaborationRoom(
-    (state) => state.setRemoveBackgroundPopupShow
+    (state) => state.setRemoveBackgroundPopupShow,
   );
 
   return (
@@ -117,7 +120,7 @@ export function RemoveBackgroundActionPopup() {
                   if (!originNode) return;
 
                   const nodeHandler = instance.getNodeHandler<WeaveNode>(
-                    originNode.getAttrs().nodeType
+                    originNode.getAttrs().nodeType,
                   );
 
                   if (!nodeHandler) return;
@@ -134,7 +137,7 @@ export function RemoveBackgroundActionPopup() {
                   const imageInfo = originNode.getAttrs().imageInfo;
 
                   instance.removeNode(
-                    nodeHandler.serialize(originNode as WeaveElementInstance)
+                    nodeHandler.serialize(originNode as WeaveElementInstance),
                   );
 
                   const imageNode = nodeHandler.create(uuidv4(), {
@@ -166,11 +169,13 @@ export function RemoveBackgroundActionPopup() {
                   if (!instance) return;
 
                   const { finishUploadCallback } = instance.triggerAction(
-                    "imageTool"
+                    WEAVE_IMAGE_TOOL_ACTION_NAME,
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   ) as any;
 
-                  instance.updatePropsAction("imageTool", { imageId });
+                  instance.updatePropsAction(WEAVE_IMAGE_TOOL_ACTION_NAME, {
+                    imageId,
+                  });
 
                   finishUploadCallback(imageURL);
                 }}

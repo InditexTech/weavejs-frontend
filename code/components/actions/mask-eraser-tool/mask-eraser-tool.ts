@@ -50,6 +50,7 @@ export class MaskEraserToolAction extends WeaveAction {
 
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Backspace" || e.key === "Delete") {
+        e.stopPropagation();
         const maskTransformer: Konva.Transformer | undefined = stage.findOne(
           "#maskSelectionTransformer",
         );

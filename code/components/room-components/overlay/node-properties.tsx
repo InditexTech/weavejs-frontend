@@ -32,6 +32,7 @@ import { ImageTemplateProperties } from "../node-properties/image-template-prope
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -66,7 +67,7 @@ export const NodeProperties = () => {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "imageTool",
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
         "videoTool",
         "starTool",
         "strokeTool",

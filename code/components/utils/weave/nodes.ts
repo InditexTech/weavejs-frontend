@@ -67,7 +67,7 @@ export const NODES = () => [
       performance: {
         cache: {
           enabled: true,
-          pixelRatio: 2,
+          pixelRatio: 1,
         },
       },
       transform: {
@@ -79,6 +79,7 @@ export const NODES = () => [
         ],
         keepRatio: true,
       },
+      useFallbackImage: true,
       urlTransformer: (
         url: string,
         //node?: Konva.Node

@@ -62,6 +62,7 @@ export class FuzzyMaskToolAction extends WeaveAction {
       e.key === "Escape" &&
       this.instance.getActiveAction() === FUZZY_MASK_TOOL_ACTION_NAME
     ) {
+      e.stopPropagation();
       this.allowAdding = false;
       this.cancelAction();
       return;

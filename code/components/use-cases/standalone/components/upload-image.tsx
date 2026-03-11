@@ -3,10 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useWeave } from "@inditextech/weave-react";
 import { useStandaloneUseCase } from "../store/store";
 import { postStandaloneImage } from "@/api/standalone/post-standalone-image";
+import {
+  getDownscaleRatio,
+  getImageSizeFromFile,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+} from "@inditextech/weave-sdk";
 
 export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,29 +42,65 @@ export function UploadImage() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File) => {
+    async (file: File) => {
+      const resourceId = uuidv4();
+
+      if (!instance) {
+        return;
+      }
+
+      const imageSize = await getImageSizeFromFile(file);
+      const downscaleRatio = getDownscaleRatio(
+        imageSize.width,
+        imageSize.height,
+      );
+
+      const { nodeId, finishUploadCallback } = instance.triggerAction(
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
+        {
+          type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+          imageFile: file,
+          imageDownscaleRatio: downscaleRatio,
+          imageId: resourceId,
+          forceMainContainer: false,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any;
+
+      const toastId = toast.loading("Uploading image...", {
+        duration: Infinity,
+      });
+
       setUploadingImage(true);
       mutationUpload.mutate(file, {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          const room = data.image.roomId;
+          const imageId = data.image.imageId;
+
           const queryKey = ["getStandaloneImages", instanceId];
           queryClient.invalidateQueries({ queryKey });
+
+          finishUploadCallback?.(
+            nodeId,
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+          );
         },
         onError: (ex) => {
+          toast.dismiss(toastId);
+          toast.error("Error uploading image");
+
           console.error(ex);
           console.error("Error uploading image");
         },
-        onSettled: () => {
-          setUploadingImage(false);
-        },
       });
     },
-    [instanceId, mutationUpload, queryClient, setUploadingImage],
+    [instance, instanceId, mutationUpload, queryClient, setUploadingImage],
   );
 
   React.useEffect(() => {
     if (showSelectFile && inputFileRef.current) {
       inputFileRef.current.addEventListener("cancel", () => {
-        instance?.cancelAction("imageTool");
+        instance?.cancelAction(WEAVE_IMAGE_TOOL_ACTION_NAME);
       });
       inputFileRef.current.click();
       setShowSelectFileImage(false);

@@ -34,10 +34,14 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import {
-  IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
   // Weave,
   WeaveImageNode,
+  WeaveImagesToolAction,
   WeaveImageToolAction,
+  downscaleImageFromURL,
+  WeaveImagesURL,
 } from "@inditextech/weave-sdk";
 import { getImages } from "@/api/get-images";
 import { getImages as getImagesV2 } from "@/api/v2/get-images";
@@ -355,6 +359,9 @@ export const ImagesLibrary = () => {
                 checked={showSelection}
                 onCheckedChange={(checked) => {
                   setShowSelection(checked);
+                  if (!checked) {
+                    setSelectedImages([]);
+                  }
                 }}
                 className="w-[32px] cursor-pointer"
               />
@@ -379,20 +386,31 @@ export const ImagesLibrary = () => {
                 if (!instance) {
                   return;
                 }
+
                 if (e.target instanceof HTMLImageElement) {
                   const imageTool = instance.getActionHandler(
-                    IMAGE_TOOL_ACTION_NAME,
+                    WEAVE_IMAGE_TOOL_ACTION_NAME,
                   ) as WeaveImageToolAction | undefined;
 
                   if (!imageTool) {
                     return;
                   }
 
+                  if (
+                    !e.target.dataset.imageUrl ||
+                    !e.target.dataset.imageFallback
+                  ) {
+                    return;
+                  }
+
                   imageTool.setDragAndDropProperties({
-                    imageURL: e.target.src,
+                    imageURL: {
+                      url: e.target.dataset.imageUrl,
+                      fallback: e.target.dataset.imageFallback,
+                      width: e.target.naturalWidth,
+                      height: e.target.naturalHeight,
+                    },
                     imageId: e.target.dataset.imageId,
-                    imageWidth: e.target.naturalWidth,
-                    imageHeight: e.target.naturalHeight,
                   });
                 }
               }}
@@ -439,6 +457,10 @@ export const ImagesLibrary = () => {
                           draggable="true"
                           src={imageUrl}
                           data-image-id={imageId}
+                          data-image-fallback={downscaleImageFromURL(imageUrl, {
+                            maxWidth: 200,
+                            maxHeight: 200,
+                          })}
                           alt="An image"
                         />
                         <button
@@ -511,30 +533,81 @@ export const ImagesLibrary = () => {
       {workloadsEnabled && (
         <ScrollArea
           className={cn("w-full overflow-auto", {
-            ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
-            ["h-[calc(100%-65px-73px)]"]: !showSelection,
+            ["h-[calc(100%-73px-40px-40px)]"]: showSelection,
+            ["h-[calc(100%-73px)]"]: !showSelection,
           })}
         >
           <div
             className="w-full weaveDraggable p-0"
-            onDragStart={(e) => {
+            onDragStart={async (e) => {
               if (!instance) {
                 return;
               }
+
+              if (selectedImages.length > 1) {
+                const imagesTool = instance.getActionHandler(
+                  WEAVE_IMAGES_TOOL_ACTION_NAME,
+                ) as WeaveImagesToolAction | undefined;
+
+                if (!imagesTool) {
+                  return;
+                }
+
+                const images: WeaveImagesURL[] = [];
+
+                for (const image of selectedImages) {
+                  const imageId = uuidv4();
+                  const imageSize = {
+                    width: image.width ?? 0,
+                    height: image.height ?? 0,
+                  };
+                  const imageDom = document.getElementById(image.imageId);
+
+                  if (!imageDom) {
+                    continue;
+                  }
+
+                  const imageURL = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/weavejs/rooms/${image.roomId}/images/${image.imageId}`;
+
+                  images.push({
+                    url: imageURL,
+                    fallback: imageDom.dataset.imageFallback ?? "",
+                    width: imageSize.width,
+                    height: imageSize.height,
+                    imageId,
+                  });
+                }
+
+                imagesTool.setDragAndDropProperties({
+                  imagesURL: images,
+                });
+                return;
+              }
+
               if (e.target instanceof HTMLImageElement) {
                 const imageTool = instance.getActionHandler(
-                  IMAGE_TOOL_ACTION_NAME,
+                  WEAVE_IMAGE_TOOL_ACTION_NAME,
                 ) as WeaveImageToolAction | undefined;
 
                 if (!imageTool) {
                   return;
                 }
 
+                if (
+                  !e.target.dataset.imageUrl ||
+                  !e.target.dataset.imageFallback
+                ) {
+                  return;
+                }
+
                 imageTool.setDragAndDropProperties({
-                  imageURL: e.target.src,
+                  imageURL: {
+                    url: e.target.dataset.imageUrl,
+                    fallback: e.target.dataset.imageFallback,
+                    width: e.target.naturalWidth,
+                    height: e.target.naturalHeight,
+                  },
                   imageId: e.target.dataset.imageId,
-                  imageWidth: e.target.naturalWidth,
-                  imageHeight: e.target.naturalHeight,
                 });
               }
             }}

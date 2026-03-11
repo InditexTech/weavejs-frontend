@@ -73,10 +73,11 @@ export function LlmSetupDialog() {
       if (!setupVisible) return;
 
       if (event.key === "Enter") {
+        event.stopPropagation();
         mutationGenerate.mutate(password);
       }
     },
-    [password, setupVisible, mutationGenerate]
+    [password, setupVisible, mutationGenerate],
   );
 
   React.useEffect(() => {

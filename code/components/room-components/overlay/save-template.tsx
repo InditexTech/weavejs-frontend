@@ -44,12 +44,12 @@ export function SaveTemplateDialog() {
 
   const room = useCollaborationRoom((state) => state.room);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const [templateData, setTemplateData] = React.useState<string>("");
   const [templateImage, setTemplateImage] = React.useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [generatingImagePreview, setGeneratingImagePreview] =
     React.useState<boolean>(false);
@@ -59,7 +59,7 @@ export function SaveTemplateDialog() {
 
   const saveDialogVisible = useTemplates((state) => state.saveDialog.visible);
   const setSaveDialogVisible = useTemplates(
-    (state) => state.setSaveDialogVisible
+    (state) => state.setSaveDialogVisible,
   );
 
   const instance = useWeave((state) => state.instance);
@@ -68,7 +68,7 @@ export function SaveTemplateDialog() {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   React.useEffect(() => {
@@ -182,6 +182,7 @@ export function SaveTemplateDialog() {
       if (!templateImage) return;
 
       if (event.key === "Enter") {
+        event.stopPropagation();
         mutationGenerate.mutate({
           name,
           templateImage,
@@ -189,7 +190,7 @@ export function SaveTemplateDialog() {
         });
       }
     },
-    [name, templateImage, templateData, saveDialogVisible, mutationGenerate]
+    [name, templateImage, templateData, saveDialogVisible, mutationGenerate],
   );
 
   React.useEffect(() => {

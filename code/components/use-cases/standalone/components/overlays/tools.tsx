@@ -25,6 +25,7 @@ import { Toolbar } from "@/components/room-components/toolbar/toolbar";
 import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-divider";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { MoveToolTrigger } from "@/components/room-components/overlay/tools-triggers/move-tool";
+import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 
 export function Tools() {
   const instance = useWeave((state) => state.instance);
@@ -137,8 +138,8 @@ export function Tools() {
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
           }
-          active={actualAction === "imageTool"}
-          onClick={() => triggerTool("imageTool")}
+          active={actualAction === WEAVE_IMAGE_TOOL_ACTION_NAME}
+          onClick={() => triggerTool(WEAVE_IMAGE_TOOL_ACTION_NAME)}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Image tool</p>

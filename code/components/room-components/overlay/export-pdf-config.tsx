@@ -99,6 +99,7 @@ export function ExportPDFConfigDialog({
       if (!exportFrameConfigVisible) return;
 
       if (event.key === "Enter") {
+        event.stopPropagation();
         handleExport();
       }
     },

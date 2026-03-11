@@ -44,6 +44,7 @@ declare module "konva/lib/Stage" {
 declare global {
   interface Window {
     weave: Weave;
+    dropFormat?: string;
     weaveOnFieldFocus?: boolean;
     weaveTextEditing?: Record<string, string>;
     colorTokenDragColor?: string;

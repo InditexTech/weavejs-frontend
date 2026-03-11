@@ -8,6 +8,10 @@ import { SYSTEM_OS } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
 import { Image, Images } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
+import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
+} from "@inditextech/weave-sdk";
 
 export const useImagesTools = () => {
   // const instance = useWeave((state) => state.instance);
@@ -19,19 +23,6 @@ export const useImagesTools = () => {
   const setShowSelectFilesImages = useCollaborationRoom(
     (state) => state.setShowSelectFilesImages,
   );
-
-  // const triggerTool = React.useCallback(
-  //   (toolName: string, params?: unknown) => {
-  //     if (instance && actualAction !== toolName) {
-  //       instance.triggerAction(toolName, params);
-  //       return;
-  //     }
-  //     if (instance && actualAction === toolName) {
-  //       instance.cancelAction(toolName);
-  //     }
-  //   },
-  //   [instance, actualAction],
-  // );
 
   const IMAGES_TOOLS: Record<
     string,
@@ -58,10 +49,10 @@ export const useImagesTools = () => {
           </div>
         ),
         onClick: () => {
-          // triggerTool("imageTool");
+          // triggerTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
           setShowSelectFileImage(true);
         },
-        active: () => actualAction === "imageTool",
+        active: () => actualAction === WEAVE_IMAGE_TOOL_ACTION_NAME,
       },
       imagesTool: {
         icon: <Images className="px-2" size={40} strokeWidth={1} />,
@@ -79,7 +70,7 @@ export const useImagesTools = () => {
         onClick: () => {
           setShowSelectFilesImages(true);
         },
-        active: () => actualAction === "imagesTool",
+        active: () => actualAction === WEAVE_IMAGES_TOOL_ACTION_NAME,
       },
     }),
     [actualAction, setShowSelectFileImage, setShowSelectFilesImages],

@@ -255,7 +255,7 @@ export function ArrowProperties() {
                 hideSearch
                 label="Style"
                 options={
-                  ARROW_DASH_OPTIONS[arrowSizeIndex].map((opt) => ({
+                  ARROW_DASH_OPTIONS[arrowSizeIndex]?.map((opt) => ({
                     label: opt.label,
                     value: opt.value.map((v) => `${v}`).join(","),
                   })) || []

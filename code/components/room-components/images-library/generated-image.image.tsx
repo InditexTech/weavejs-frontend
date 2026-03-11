@@ -6,6 +6,7 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
+import { downscaleImageFromURL } from "@inditextech/weave-sdk";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
@@ -21,6 +22,10 @@ export const GeneratedImage = ({
   image,
   selected,
 }: Readonly<GeneratedImageProps>) => {
+  const [downscaledImageDataUrl, setDownscaledImageDataUrl] = React.useState<
+    string | null
+  >(null);
+
   const instance = useWeave((state) => state.instance);
 
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
@@ -28,6 +33,20 @@ export const GeneratedImage = ({
   const imageUrl = React.useMemo(() => {
     return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${image.roomId}/images/${image.imageId}`;
   }, [image]);
+
+  React.useEffect(() => {
+    const getDownscaledImage = async () => {
+      const dataURL = await downscaleImageFromURL(imageUrl, {
+        maxWidth: 200,
+        maxHeight: 200,
+      });
+      setDownscaledImageDataUrl(dataURL);
+    };
+
+    if (imageUrl) {
+      getDownscaledImage();
+    }
+  }, [imageUrl]);
 
   if (!image) {
     return null;
@@ -41,6 +60,10 @@ export const GeneratedImage = ({
     return null;
   }
 
+  if (!downscaledImageDataUrl) {
+    return null;
+  }
+
   return (
     <div
       key={image.imageId}
@@ -50,9 +73,9 @@ export const GeneratedImage = ({
           ["cursor-pointer hover:bg-black"]:
             ["completed", "failed"].includes(image.status) &&
             image.removalJobId === null,
-          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
+          ["after:content-[''] after:pointer-events-none after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
-        }
+        },
       )}
     >
       {image.removalJobId === null &&
@@ -91,8 +114,10 @@ export const GeneratedImage = ({
               aspectRatio: `${image.aspectRatio}`,
             }}
             id={image.imageId}
+            data-image-url={imageUrl}
             data-image-id={image.imageId}
-            draggable={selected ? undefined : "true"}
+            data-image-fallback={downscaledImageDataUrl}
+            draggable="true"
             src={imageUrl}
             alt="A generated image"
           />

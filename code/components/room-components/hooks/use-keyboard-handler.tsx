@@ -12,6 +12,8 @@ import { useKeyDown } from "../hooks/use-key-down";
 import { SYSTEM_OS } from "@/lib/utils";
 import { useGetOs } from "../hooks/use-get-os";
 import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
   WeaveExportNodesActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
@@ -97,56 +99,67 @@ export function useKeyboardHandler() {
   const keyDownHandler = React.useCallback(
     async (event: KeyboardEvent) => {
       if (event.code === "KeyM") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("moveTool");
       }
 
       if (event.code === "KeyS") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("selectionTool");
       }
 
       if (event.code === "KeyD") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("eraserTool");
       }
 
       if (event.code === "KeyF" && !(event.ctrlKey || event.metaKey)) {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("frameTool");
       }
 
       if (event.code === "KeyR") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("rectangleTool");
       }
 
       if (event.code === "KeyE") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("ellipseTool");
       }
 
       if (event.code === "KeyP") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("regularPolygonTool");
       }
 
       if (event.code === "KeyQ") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("arrowTool");
       }
 
       if (event.code === "KeyL") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("strokeTool");
       }
 
       if (event.code === "KeyB") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("brushTool");
       }
 
       if (event.code === "KeyX") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("connectorTool");
       }
@@ -159,28 +172,33 @@ export function useKeyboardHandler() {
           ? event.metaKey
           : event.ctrlKey)
       ) {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("textTool");
       }
 
       if (event.code === "KeyI" && !(event.ctrlKey || event.metaKey)) {
+        event.stopPropagation();
         event.preventDefault();
-        triggerTool("imageTool");
+        triggerTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
         setShowSelectFileImage(true);
       }
 
       if (event.code === "KeyO" && !(event.ctrlKey || event.metaKey)) {
+        event.stopPropagation();
         event.preventDefault();
-        triggerTool("imagesTool");
+        triggerTool(WEAVE_IMAGES_TOOL_ACTION_NAME);
         setShowSelectFileImage(true);
       }
 
       if (event.code === "KeyJ") {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("starTool");
       }
 
       if (event.code === "KeyK" && !(event.ctrlKey || event.metaKey)) {
+        event.stopPropagation();
         event.preventDefault();
         triggerTool("colorTokenTool");
       }
@@ -192,6 +210,8 @@ export function useKeyboardHandler() {
           : event.ctrlKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const actualStore = instance.getStore();
         actualStore.undoStateStep();
       }
@@ -203,6 +223,8 @@ export function useKeyboardHandler() {
           : event.ctrlKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const actualStore = instance.getStore();
         actualStore.redoStateStep();
       }
@@ -223,6 +245,8 @@ export function useKeyboardHandler() {
           : event.ctrlKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const usersPointersPlugin =
           instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
         if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
@@ -243,6 +267,8 @@ export function useKeyboardHandler() {
           : event.ctrlKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const selectionPlugin =
           instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
@@ -251,6 +277,8 @@ export function useKeyboardHandler() {
       }
 
       if (event.code === "Escape" && event.shiftKey && instance) {
+        event.stopPropagation();
+        event.preventDefault();
         const selectionPlugin =
           instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
@@ -269,6 +297,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length === 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         if (instance && selectedNodes.length === 1) {
           instance.triggerAction<WeaveExportNodesActionParams, void>(
             "exportNodeTool",
@@ -291,6 +321,8 @@ export function useKeyboardHandler() {
           : event.ctrlKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const image = await instance.triggerAction<
           WeaveExportStageActionParams,
           Promise<HTMLImageElement>
@@ -317,6 +349,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length === 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.bringToFront(selectedNodes[0].instance);
       }
 
@@ -328,6 +362,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length === 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.moveUp(selectedNodes[0].instance);
       }
 
@@ -339,6 +375,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length === 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.moveDown(selectedNodes[0].instance);
       }
 
@@ -350,6 +388,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length === 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.sendToBack(selectedNodes[0].instance);
       }
 
@@ -361,6 +401,8 @@ export function useKeyboardHandler() {
         instance &&
         selectedNodes.length > 1
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.group(
           selectedNodes
             .map((n) => n?.node)
@@ -377,6 +419,8 @@ export function useKeyboardHandler() {
         selectedNodes.length === 1 &&
         selectedNodes[0].node?.type === "group"
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         instance.unGroup(selectedNodes[0].node);
       }
 
@@ -449,6 +493,8 @@ export function useKeyboardHandler() {
         isZoomingAllowed &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         handleTriggerAction("zoomInTool", { previousAction: actualAction });
       }
 
@@ -457,10 +503,14 @@ export function useKeyboardHandler() {
         isZoomingAllowed &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         handleTriggerAction("zoomOutTool", { previousAction: actualAction });
       }
 
       if (event.code === "Digit1" && isZoomingAllowed && event.shiftKey) {
+        event.stopPropagation();
+        event.preventDefault();
         handleTriggerAction("fitToScreenTool", {
           previousAction: actualAction,
           overrideZoom: false,
@@ -468,6 +518,8 @@ export function useKeyboardHandler() {
       }
 
       if (event.code === "Digit2" && isZoomingAllowed && event.shiftKey) {
+        event.stopPropagation();
+        event.preventDefault();
         handleTriggerAction("fitToSelectionTool", {
           previousAction: actualAction,
           overrideZoom: false,
@@ -481,17 +533,23 @@ export function useKeyboardHandler() {
         event.altKey &&
         ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         handlePrintToConsoleState();
       }
 
       /* Other tools */
 
       if (event.code === "KeyH" && threadsEnabled) {
+        event.stopPropagation();
+        event.preventDefault();
         triggerTool("commentTool");
         sidebarToggle(SIDEBAR_ELEMENTS.comments);
       }
 
       if (event.code === "KeyN") {
+        event.stopPropagation();
+        event.preventDefault();
         setShowMinimap(!showMinimap);
       }
 
@@ -500,6 +558,8 @@ export function useKeyboardHandler() {
         !(event.ctrlKey || event.metaKey) &&
         instance
       ) {
+        event.stopPropagation();
+        event.preventDefault();
         const { finishUploadCallback } = instance.triggerAction(
           "videoTool",
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

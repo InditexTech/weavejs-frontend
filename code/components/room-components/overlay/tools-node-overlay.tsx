@@ -46,6 +46,8 @@ import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { ShortcutElement } from "../help/shortcut-element";
 import {
   WEAVE_IMAGE_CROP_END_TYPE,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
   WeaveBrushToolAction,
   WeaveCopyPasteNodesPlugin,
 } from "@inditextech/weave-sdk";
@@ -193,7 +195,7 @@ export function ToolsNodeOverlay() {
         "ellipseTool",
         "regularPolygonTool",
         "brushTool",
-        "imageTool",
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
         "videoTool",
         "starTool",
         "strokeTool",
@@ -1159,9 +1161,12 @@ export function ToolsNodeOverlay() {
         "frame",
         "color-token",
       ].includes(actualNode.type as string) &&
-      !["colorTokenTool", "imageTool", "imagesTool", "videoTool"].includes(
-        actualAction as string,
-      )
+      ![
+        "colorTokenTool",
+        WEAVE_IMAGE_TOOL_ACTION_NAME,
+        WEAVE_IMAGES_TOOL_ACTION_NAME,
+        "videoTool",
+      ].includes(actualAction as string)
     ) {
       actualNodeTools.push(
         <React.Fragment key="common-shape-tools">
