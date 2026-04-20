@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React, { FormEventHandler } from "react";
 import {
   ColorPicker,
@@ -40,7 +38,7 @@ export const ColorPickerInput = ({
     (newValue: string) => {
       onChange(newValue);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

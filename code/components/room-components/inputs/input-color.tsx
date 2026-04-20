@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,14 +37,14 @@ export const InputColor = ({
         setEnterPressed(true);
       }
     },
-    []
+    [],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEditedValue(e.target.value === "" ? "#ffffff" : e.target.value);
     },
-    []
+    [],
   );
 
   React.useEffect(() => {

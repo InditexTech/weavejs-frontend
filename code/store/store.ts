@@ -7,18 +7,22 @@ import { Vector2d } from "konva/lib/types";
 import { create } from "zustand";
 import { ContextMenuOption } from "@/components/room-components/context-menu";
 import { WeaveElementAttributes, WeaveFont } from "@inditextech/weave-types";
+import {
+  WEAVE_GRID_TYPES,
+  WeaveStageGridType,
+  WEAVE_GRID_DOT_TYPES,
+  WeaveStageGridDotType,
+} from "@inditextech/weave-sdk";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { merge } from "lodash";
+import merge from "lodash/merge";
 
-type ShowcaseUser = {
-  id: string;
-  name: string;
-  email: string;
-};
+type PresentationModeState = "idle" | "loading" | "loaded" | "error";
 
 type NodePropertiesAction = "create" | "update" | undefined;
 
 type CommentsStatus = "pending" | "resolved" | "all";
+
+type RoomDataStatus = "idle" | "loading" | "loaded" | "error";
 
 export const BACKGROUND_COLOR = {
   ["WHITE"]: "#FFFFFF",
@@ -40,7 +44,7 @@ export type TransformingOperation =
 
 type FinishUploadCallback = (imageURL: string) => void;
 
-type ViewType = "fixed" | "floating";
+export type ViewType = "fixed" | "floating";
 
 type DrawerKeyKeys = keyof typeof DRAWER_ELEMENTS;
 export type DrawerKey = (typeof DRAWER_ELEMENTS)[DrawerKeyKeys];
@@ -49,8 +53,21 @@ type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
 interface CollaborationRoomState {
+  signingIn: boolean;
   viewType: ViewType;
+  showLeftSidebarFloating: boolean;
+  showRightSidebarFloating: boolean;
+  grid: {
+    enabled: boolean;
+    type: WeaveStageGridType;
+    dots: {
+      kind: WeaveStageGridDotType;
+    };
+  };
   backgroundColor: BackgroundColor;
+  dependencies: {
+    visible: boolean;
+  };
   configuration: {
     open: boolean;
     upscale: {
@@ -59,6 +76,9 @@ interface CollaborationRoomState {
       baseHeight: number;
       multiplier: number;
     };
+  };
+  referenceArea: {
+    size: string;
   };
   measurement: {
     units: string;
@@ -73,6 +93,17 @@ interface CollaborationRoomState {
     loading: boolean;
     error: Error | null;
   };
+  pages: {
+    listVisible: boolean;
+    gridVisible: boolean;
+    amount: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    actualPages: any[];
+    actualPage: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    actualPageElement: any;
+    actualPageId: string | null;
+  };
   linkedNode: Konva.Node | null;
   fonts: {
     loaded: boolean;
@@ -80,8 +111,22 @@ interface CollaborationRoomState {
     values: WeaveFont[];
   };
   ui: {
-    show: boolean;
+    usersPointers: {
+      visible: boolean;
+    };
+    comments: {
+      visible: boolean;
+    };
+    referenceArea: {
+      visible: boolean;
+    };
     minimap: boolean;
+  };
+  presentation: {
+    instanceId: string | null;
+    visible: boolean;
+    loadedPages: number;
+    status: PresentationModeState;
   };
   connection: {
     tests: {
@@ -98,8 +143,16 @@ interface CollaborationRoomState {
     active: SidebarActive;
   };
   clientId: string | undefined;
-  user: ShowcaseUser | undefined;
+  leaderId: string | null;
   room: string | undefined;
+  roomInfo: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any | undefined;
+    error: Error | undefined;
+    loading: boolean;
+    loaded: boolean;
+  };
+  status: RoomDataStatus;
   contextMenu: {
     show: boolean;
     position: Vector2d;
@@ -112,10 +165,46 @@ interface CollaborationRoomState {
   commBus: {
     connected: boolean;
   };
+  rooms: {
+    filters: {
+      searchText: string;
+      status: "all" | "active" | "archived";
+    };
+    roomId: string | undefined;
+    pageId: string | undefined;
+    access: {
+      visible: boolean;
+    };
+    join: {
+      visible: boolean;
+    };
+    create: {
+      visible: boolean;
+    };
+    edit: {
+      visible: boolean;
+    };
+    delete: {
+      visible: boolean;
+    };
+    editPage: {
+      visible: boolean;
+    };
+    deletePage: {
+      visible: boolean;
+    };
+  };
   export: {
     nodes: string[]; // node ids
-    config: {
-      visible: boolean;
+    page: {
+      image: {
+        visible: boolean;
+      };
+    };
+    room: {
+      pdf: {
+        visible: boolean;
+      };
     };
   };
   comments: {
@@ -126,6 +215,7 @@ interface CollaborationRoomState {
     uploading: boolean;
   };
   images: {
+    adding: boolean;
     showSelectFiles: boolean;
     showSelectFile: boolean;
     transforming: boolean;
@@ -152,17 +242,18 @@ interface CollaborationRoomState {
       exporting: boolean;
       visible: boolean;
     };
+    images: Record<string, HTMLImageElement>;
     pages: { title: string; nodes: string[] }[];
   };
-  setShowUi: (newShowUI: boolean) => void;
+  setSigningIn: (newSigningIn: boolean) => void;
   setShowMinimap: (newShowMinimap: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
     newFetchConnectionUrlError: Error | null,
   ) => void;
   setClientId: (newClientId: string | undefined) => void;
-  setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
+  setRoomStatus: (newStatus: RoomDataStatus) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
@@ -174,6 +265,7 @@ interface CollaborationRoomState {
   setCroppingNode: (newCroppingNode: Konva.Node | undefined) => void;
   setUploadingVideo: (newUploadingVideo: boolean) => void;
   setShowSelectFileVideo: (newShowSelectFileVideo: boolean) => void;
+  setAddingImages: (newAddingImages: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFilesImages: (newShowSelectFilesImages: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
@@ -205,9 +297,9 @@ interface CollaborationRoomState {
   setImageExporting: (newExportingImage: boolean) => void;
   setCommentsStatus: (newStatus: CommentsStatus) => void;
   setExportNodes: (newNodes: string[]) => void;
-  setExportConfigVisible: (newVisible: boolean) => void;
+  setExportPageToImageConfigVisible: (newVisible: boolean) => void;
+  setExportRoomToPdfConfigVisible: (newVisible: boolean) => void;
   setFontsLoaded: (newLoaded: boolean) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFontsValues: (newValues: { id: string; name: string }[]) => void;
   setConnectionTestsShow: (newShow: boolean) => void;
   setBackgroundColor: (newBackgroundColor: BackgroundColor) => void;
@@ -225,6 +317,49 @@ interface CollaborationRoomState {
   setFramesExporting: (newExporting: boolean) => void;
   setFramesPages: (newPages: { title: string; nodes: string[] }[]) => void;
   setViewType: (newView: ViewType) => void;
+  setShowLeftSidebarFloating: (newShowLeftSidebarFloating: boolean) => void;
+  setShowRightSidebarFloating: (newShowRightSidebarFloating: boolean) => void;
+  setReferenceAreaSize: (newSize: string) => void;
+  setPagesListVisible: (newVisible: boolean) => void;
+  setPagesGridVisible: (newVisible: boolean) => void;
+  setPagesAmount: (newAmount: number) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setPagesActualPages: (newActualPages: any[]) => void;
+  setPagesActualPage: (newActualPage: number) => void;
+  setPagesActualPageId: (newActualPageId: string | null) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setPagesActualPageElement: (newActualPageElement: any) => void;
+  setRoomsCreateVisible: (newRoom: boolean) => void;
+  setRoomsJoinVisible: (newRoom: boolean) => void;
+  setRoomsRoomId: (newRoomId: string | undefined) => void;
+  setRoomsPageId: (newPageId: string | undefined) => void;
+  setRoomsEditVisible: (newRoom: boolean) => void;
+  setRoomsDeleteVisible: (newRoom: boolean) => void;
+  setRoomsAccessVisible: (newRoom: boolean) => void;
+  setDependenciesVisible: (newVisible: boolean) => void;
+  setRoomsPageEditVisible: (newPageEdit: boolean) => void;
+  setRoomsPageDeleteVisible: (newPageDelete: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setRoomInfoData: (newRoomInfo: any | undefined) => void;
+  setRoomInfoLoading: (newLoading: boolean) => void;
+  setRoomInfoLoaded: (newLoaded: boolean) => void;
+  setRoomInfoError: (newError: Error | undefined) => void;
+  setRoomsSearchTextFilter: (newSearchText: string) => void;
+  setRoomsStatusFilter: (
+    newStatusFilter: "all" | "active" | "archived",
+  ) => void;
+  setLeaderId: (newLeaderId: string | null) => void;
+  setFramesImages: (newImages: Record<string, HTMLImageElement>) => void;
+  setPresentationVisible: (newVisible: boolean) => void;
+  setPresentationStatus: (newStatus: PresentationModeState) => void;
+  setPresentationInstanceId: (newInstanceId: string | null) => void;
+  setPresentationPagesStatus: (loadedPages: number) => void;
+  setGridEnabled: (newEnabled: boolean) => void;
+  setGridType: (newType: WeaveStageGridType) => void;
+  setGridDotsKind: (newDotsKind: WeaveStageGridDotType) => void;
+  setUIUsersPointersVisible: (newVisible: boolean) => void;
+  setUICommentsVisible: (newVisible: boolean) => void;
+  setUIReferenceAreaVisible: (newVisible: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -251,12 +386,28 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
   );
 
   return {
+    signingIn: false,
     viewType: "floating",
+    showLeftSidebarFloating: false,
+    showRightSidebarFloating: false,
+    grid: {
+      enabled: false,
+      type: WEAVE_GRID_TYPES.DOTS,
+      dots: {
+        kind: WEAVE_GRID_DOT_TYPES.CIRCLE,
+      },
+    },
     backgroundColor: BACKGROUND_COLOR.GRAY,
+    dependencies: {
+      visible: false,
+    },
     measurement: {
       units: "cms",
       referenceMeasureUnits: 10,
       referenceMeasurePixels: null,
+    },
+    referenceArea: {
+      size: "4K",
     },
     configuration: finalConfiguration,
     linkedNode: null,
@@ -270,7 +421,15 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       },
     },
     ui: {
-      show: true,
+      usersPointers: {
+        visible: true,
+      },
+      comments: {
+        visible: true,
+      },
+      referenceArea: {
+        visible: true,
+      },
       minimap: false,
     },
     fetchConnectionUrl: {
@@ -278,8 +437,15 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       error: null,
     },
     clientId: undefined,
-    user: undefined,
+    leaderId: null,
     room: undefined,
+    roomInfo: {
+      data: undefined,
+      loading: false,
+      loaded: false,
+      error: undefined,
+    },
+    status: "idle",
     sidebar: {
       previouslyActive: null,
       active: SIDEBAR_ELEMENTS.nodeProperties,
@@ -292,6 +458,15 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       keyboardShortcuts: {
         visible: false,
       },
+    },
+    pages: {
+      listVisible: false,
+      gridVisible: false,
+      amount: 0,
+      actualPages: [],
+      actualPage: 1,
+      actualPageElement: null,
+      actualPageId: null,
     },
     contextMenu: {
       show: false,
@@ -306,10 +481,46 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     commBus: {
       connected: false,
     },
+    rooms: {
+      filters: {
+        searchText: "",
+        status: "active",
+      },
+      roomId: undefined,
+      pageId: undefined,
+      access: {
+        visible: false,
+      },
+      create: {
+        visible: false,
+      },
+      join: {
+        visible: false,
+      },
+      edit: {
+        visible: false,
+      },
+      delete: {
+        visible: false,
+      },
+      editPage: {
+        visible: false,
+      },
+      deletePage: {
+        visible: false,
+      },
+    },
     export: {
       nodes: [],
-      config: {
-        visible: false,
+      page: {
+        image: {
+          visible: false,
+        },
+      },
+      room: {
+        pdf: {
+          visible: false,
+        },
       },
     },
     videos: {
@@ -317,6 +528,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       uploading: false,
     },
     images: {
+      adding: false,
       showSelectFiles: false,
       showSelectFile: false,
       transforming: false,
@@ -342,7 +554,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         exporting: false,
         visible: false,
       },
+      images: {},
       pages: [],
+    },
+    presentation: {
+      visible: false,
+      instanceId: null,
+      loadedPages: 0,
+      status: "idle",
     },
     colorToken: {
       library: {
@@ -355,10 +574,10 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     nodesTree: {
       visible: false,
     },
-    setShowUi: (newShowUI) =>
+    setSigningIn: (newSigningIn) =>
       set((state) => ({
         ...state,
-        ui: { ...state.ui, show: newShowUI },
+        signingIn: newSigningIn,
       })),
     setShowMinimap: (newShowMinimap) =>
       set((state) => ({
@@ -386,8 +605,12 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         ...state,
         clientId: newClientId,
       })),
-    setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
     setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
+    setRoomStatus: (newStatus) =>
+      set((state) => ({
+        ...state,
+        status: newStatus,
+      })),
     setContextMenuShow: (newContextMenuShow) =>
       set((state) => ({
         ...state,
@@ -433,6 +656,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       set((state) => ({
         ...state,
         images: { ...state.images, uploading: newUploadingImage },
+      })),
+    setAddingImages: (newAddingImages) =>
+      set((state) => ({
+        ...state,
+        images: { ...state.images, adding: newAddingImages },
       })),
     setShowSelectFileImage: (newShowSelectFileImage) =>
       set((state) => ({
@@ -595,14 +823,31 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           nodes: newNodes,
         },
       })),
-    setExportConfigVisible: (newVisible: boolean) =>
+    setExportPageToImageConfigVisible: (newVisible: boolean) =>
       set((state) => ({
         ...state,
         export: {
           ...state.export,
-          config: {
-            ...state.export.config,
-            visible: newVisible,
+          page: {
+            ...state.export.page,
+            image: {
+              ...state.export.page.image,
+              visible: newVisible,
+            },
+          },
+        },
+      })),
+    setExportRoomToPdfConfigVisible: (newVisible: boolean) =>
+      set((state) => ({
+        ...state,
+        export: {
+          ...state.export,
+          room: {
+            ...state.export.room,
+            pdf: {
+              ...state.export.room.pdf,
+              visible: newVisible,
+            },
           },
         },
       })),
@@ -611,7 +856,6 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         ...state,
         fonts: { ...state.fonts, loaded: newLoaded },
       })),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFontsValues: (newValues: { id: string; name: string }[]) =>
       set((state) => ({
         ...state,
@@ -712,6 +956,334 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       set((state) => ({
         ...state,
         viewType: newView,
+      })),
+    setShowLeftSidebarFloating: (newShowSidebarFloating) =>
+      set((state) => ({
+        ...state,
+        showLeftSidebarFloating: newShowSidebarFloating,
+      })),
+    setShowRightSidebarFloating: (newShowSidebarFloating) =>
+      set((state) => ({
+        ...state,
+        showRightSidebarFloating: newShowSidebarFloating,
+      })),
+    setReferenceAreaSize: (newSize) =>
+      set((state) => ({
+        ...state,
+        referenceArea: {
+          ...state.referenceArea,
+          size: newSize,
+        },
+      })),
+    setPagesListVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          listVisible: newVisible,
+        },
+      })),
+    setPagesGridVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          gridVisible: newVisible,
+        },
+      })),
+    setPagesAmount: (newAmount) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          amount: newAmount,
+        },
+      })),
+    setPagesActualPages: (newActualPages) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          actualPages: newActualPages,
+        },
+      })),
+    setPagesActualPage: (newActualPage) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          actualPage: newActualPage,
+        },
+      })),
+    setPagesActualPageId: (newActualPageId) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          actualPageId: newActualPageId,
+        },
+      })),
+    setPagesActualPageElement: (newActualPageElement) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          actualPageElement: newActualPageElement,
+        },
+      })),
+    setRoomsCreateVisible: (newRoom) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          create: {
+            visible: newRoom,
+          },
+        },
+      })),
+    setRoomsJoinVisible: (newRoom) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          join: {
+            visible: newRoom,
+          },
+        },
+      })),
+    setRoomsAccessVisible: (newRoom) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          access: {
+            visible: newRoom,
+          },
+        },
+      })),
+    setRoomsEditVisible: (newRoom) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          edit: {
+            ...state.rooms.edit,
+            visible: newRoom,
+          },
+        },
+      })),
+    setRoomsDeleteVisible: (newRoom) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          delete: {
+            ...state.rooms.delete,
+            visible: newRoom,
+          },
+        },
+      })),
+    setRoomsPageEditVisible: (newPageEdit) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          editPage: {
+            ...state.rooms.editPage,
+            visible: newPageEdit,
+          },
+        },
+      })),
+    setRoomsPageDeleteVisible: (newPageDelete) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          deletePage: {
+            ...state.rooms.deletePage,
+            visible: newPageDelete,
+          },
+        },
+      })),
+    setRoomsRoomId: (newRoomId) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          roomId: newRoomId,
+        },
+      })),
+    setRoomsPageId: (newPageId) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          pageId: newPageId,
+        },
+      })),
+    setDependenciesVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        dependencies: {
+          visible: newVisible,
+        },
+      })),
+    setRoomInfoData: (newRoomInfo) =>
+      set((state) => ({
+        ...state,
+        roomInfo: {
+          ...state.roomInfo,
+          data: newRoomInfo,
+        },
+      })),
+    setRoomInfoLoading: (newLoading) =>
+      set((state) => ({
+        ...state,
+        roomInfo: {
+          ...state.roomInfo,
+          loading: newLoading,
+        },
+      })),
+    setRoomInfoLoaded: (newLoaded) =>
+      set((state) => ({
+        ...state,
+        roomInfo: {
+          ...state.roomInfo,
+          loaded: newLoaded,
+        },
+      })),
+    setRoomInfoError: (newError) =>
+      set((state) => ({
+        ...state,
+        roomInfo: {
+          ...state.roomInfo,
+          error: newError,
+        },
+      })),
+    setRoomsSearchTextFilter: (newSearchText) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          filters: {
+            ...state.rooms.filters,
+            searchText: newSearchText,
+          },
+        },
+      })),
+    setRoomsStatusFilter: (newStatusFilter) =>
+      set((state) => ({
+        ...state,
+        rooms: {
+          ...state.rooms,
+          filters: {
+            ...state.rooms.filters,
+            status: newStatusFilter,
+          },
+        },
+      })),
+    setLeaderId: (newLeaderId) =>
+      set((state) => ({
+        ...state,
+        leaderId: newLeaderId,
+      })),
+    setFramesImages: (newImages) =>
+      set((state) => ({
+        ...state,
+        frames: {
+          ...state.frames,
+          images: newImages,
+        },
+      })),
+    setPresentationVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        presentation: {
+          ...state.presentation,
+          visible: newVisible,
+        },
+      })),
+    setPresentationStatus: (newStatus) =>
+      set((state) => ({
+        ...state,
+        presentation: {
+          ...state.presentation,
+          status: newStatus,
+        },
+      })),
+    setPresentationInstanceId: (newInstanceId) =>
+      set((state) => ({
+        ...state,
+        presentation: {
+          ...state.presentation,
+          instanceId: newInstanceId,
+        },
+      })),
+    setPresentationPagesStatus: (loadedPages) =>
+      set((state) => ({
+        ...state,
+        presentation: {
+          ...state.presentation,
+          loadedPages,
+        },
+      })),
+    setGridEnabled: (newEnabled) =>
+      set((state) => ({
+        ...state,
+        grid: {
+          ...state.grid,
+          enabled: newEnabled,
+        },
+      })),
+    setGridType: (newType) =>
+      set((state) => ({
+        ...state,
+        grid: {
+          ...state.grid,
+          type: newType,
+        },
+      })),
+    setGridDotsKind(newDotsKind) {
+      set((state) => ({
+        ...state,
+        grid: {
+          ...state.grid,
+          dots: {
+            ...state.grid.dots,
+            kind: newDotsKind,
+          },
+        },
+      }));
+    },
+    setUIUsersPointersVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        ui: {
+          ...state.ui,
+          usersPointers: {
+            visible: newVisible,
+          },
+        },
+      })),
+    setUICommentsVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        ui: {
+          ...state.ui,
+          comments: {
+            visible: newVisible,
+          },
+        },
+      })),
+    setUIReferenceAreaVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        ui: {
+          ...state.ui,
+          referenceArea: {
+            visible: newVisible,
+          },
+        },
       })),
   };
 });

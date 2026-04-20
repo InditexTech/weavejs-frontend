@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { Slider } from "@/components/ui/slider";

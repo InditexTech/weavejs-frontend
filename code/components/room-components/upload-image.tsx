@@ -11,7 +11,15 @@ import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import Konva from "konva";
-import { getPositionRelativeToContainerOnPosition } from "@inditextech/weave-sdk";
+import {
+  getDownscaleRatio,
+  getImageSizeFromFile,
+  getPositionRelativeToContainerOnPosition,
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+  WeaveImageToolActionTriggerParams,
+  WeaveImageToolActionTriggerReturn,
+} from "@inditextech/weave-sdk";
 
 export function UploadImage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,9 +30,6 @@ export function UploadImage() {
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFile = useCollaborationRoom(
     (state) => state.images.showSelectFile,
-  );
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage,
   );
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage,
@@ -45,51 +50,29 @@ export function UploadImage() {
   });
 
   const handleUploadFile = React.useCallback(
-    (file: File, position?: Konva.Vector2d) => {
+    async (file: File, position?: Konva.Vector2d) => {
       const resourceId = uuidv4();
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (!instance) {
-          return;
-        }
+      if (!instance) {
+        return;
+      }
 
-        const { nodeId, finishUploadCallback } = instance.triggerAction(
-          "imageTool",
-          {
-            imageId: resourceId,
-            imageData: reader.result as string,
-            ...(position && { position, forceMainContainer: true }),
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ) as any;
+      const imageSize = await getImageSizeFromFile(file);
+      const downscaleRatio = getDownscaleRatio(
+        imageSize.width,
+        imageSize.height,
+      );
 
+      const uploadImageFunction = async (file: File) => {
         const toastId = toast.loading("Uploading image...", {
           duration: Infinity,
+          dismissible: false,
         });
 
-        mutationUpload.mutate(file, {
-          onSuccess: (data) => {
+        const data = await mutationUpload.mutateAsync(file, {
+          onSuccess: async () => {
             toast.dismiss(toastId);
             toast.success("Image uploaded successfully");
-
-            const queryKey = ["getImages", room];
-            queryClient.invalidateQueries({ queryKey });
-
-            if (!instance) {
-              return;
-            }
-
-            if (workloadsEnabled) {
-              inputFileRef.current.value = null;
-              const room = data.image.roomId;
-              const imageId = data.image.imageId;
-
-              finishUploadCallback?.(
-                nodeId,
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-              );
-            }
           },
           onError: (ex) => {
             toast.dismiss(toastId);
@@ -99,13 +82,34 @@ export function UploadImage() {
             console.error("Error uploading image");
           },
         });
+
+        const room = data.image.roomId;
+        const imageId = data.image.imageId;
+
+        const queryKey = ["getImages", room];
+        queryClient.invalidateQueries({ queryKey });
+
+        const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+
+        return `${apiEndpoint}/weavejs/rooms/${room}/images/${imageId}`;
       };
-      reader.onerror = () => {
-        toast.error("Error reading image file");
-      };
-      reader.readAsDataURL(file);
+
+      instance.triggerAction<
+        WeaveImageToolActionTriggerParams,
+        WeaveImageToolActionTriggerReturn
+      >(WEAVE_IMAGE_TOOL_ACTION_NAME, {
+        type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+        image: {
+          file,
+          downscaleRatio,
+        },
+        uploadImageFunction,
+        imageId: resourceId,
+        forceMainContainer: false,
+        ...(position && { position }),
+      });
     },
-    [instance, room, workloadsEnabled, mutationUpload, queryClient],
+    [instance, mutationUpload, queryClient],
   );
 
   React.useEffect(() => {
@@ -129,22 +133,24 @@ export function UploadImage() {
       const { mousePoint } = instance.getMousePointer(position);
 
       if (e.dataTransfer?.items) {
-        [...e.dataTransfer?.items].forEach((item) => {
+        if (e.dataTransfer?.items.length === 1) {
+          const item = e.dataTransfer.items[0];
           if (item.kind === "file" && item.type.startsWith("image/")) {
             const file = item.getAsFile();
             if (file) {
               handleUploadFile(file, mousePoint);
             }
           }
-        });
+        }
         return;
       }
       if (e.dataTransfer?.files) {
-        [...e.dataTransfer.files].forEach((file) => {
+        if (e.dataTransfer?.items.length === 1) {
+          const file = e.dataTransfer.files[0];
           if (file.type.startsWith("image/")) {
             handleUploadFile(file, mousePoint);
           }
-        });
+        }
         return;
       }
     };
@@ -153,27 +159,19 @@ export function UploadImage() {
       instance.addEventListener("onStageDrop", onStageDrop);
     }
 
-    if (showSelectFile && inputFileRef.current) {
-      inputFileRef.current.addEventListener("cancel", () => {
-        instance?.cancelAction("imageTool");
-      });
-      inputFileRef.current.click();
-      setShowSelectFileImage(false);
-    }
-
     return () => {
       if (instance) {
         instance.removeEventListener("onStageDrop", onStageDrop);
       }
     };
-  }, [
-    instance,
-    showSelectFile,
-    mutationUpload,
-    handleUploadFile,
-    setUploadingImage,
-    setShowSelectFileImage,
-  ]);
+  }, [instance, mutationUpload, handleUploadFile]);
+
+  React.useEffect(() => {
+    if (showSelectFile) {
+      inputFileRef.current.click();
+      setShowSelectFileImage(false);
+    }
+  }, [showSelectFile, setShowSelectFileImage]);
 
   return (
     <input

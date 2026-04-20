@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
 import { useIAChat } from "@/store/ia-chat";
@@ -12,6 +10,7 @@ import { OrbitProgress } from "react-loading-indicators";
 import { ArrowRight, MessagesSquare } from "lucide-react";
 import { ConversationEmptyState } from "@/components/ai-elements/conversation";
 import { useCollaborationRoom } from "@/store/store";
+import { useGetSession } from "../hooks/use-get-session";
 
 type ChatMessagesPage = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +24,8 @@ const CHATS_LIMIT = 50;
 
 export const ChatBotChats = () => {
   const room = useCollaborationRoom((state) => state.room);
-  const user = useCollaborationRoom((state) => state.user);
+
+  const { session } = useGetSession();
 
   const resourceId = useIAChat((state) => state.resourceId);
   const setThreadId = useIAChat((state) => state.setThreadId);
@@ -43,7 +43,7 @@ export const ChatBotChats = () => {
         room,
         resourceId,
         CHATS_LIMIT,
-        (pageParam as number) * CHATS_LIMIT
+        (pageParam as number) * CHATS_LIMIT,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
@@ -78,13 +78,13 @@ export const ChatBotChats = () => {
             key={chat.chatId}
             className="w-full flex justify-between min-h-[67px] items-center px-[24px] py-[12px] border-b-[0.5px] border-[#c9c9c9] text-left cursor-pointer hover:bg-[#f6f6f6]"
             onClick={() => {
-              if (!user) return;
+              if (!session) return;
               if (!room) return;
 
               setThreadId(chat.chatId);
               sessionStorage.setItem(
-                `weave.js_${room}_${user.name}_ai_thread_id`,
-                chat.chatId
+                `weave.js_${room}_${session?.user.id ?? ""}_ai_thread_id`,
+                chat.chatId,
               );
               setAiView("chat");
             }}

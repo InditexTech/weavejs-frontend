@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { motion } from "motion/react";
@@ -59,7 +57,7 @@ function UserForm() {
     setUser(userMapped);
     sessionStorage.setItem(
       `weave.js_standalone_${instanceId}`,
-      JSON.stringify(userMapped)
+      JSON.stringify(userMapped),
     );
   }
 

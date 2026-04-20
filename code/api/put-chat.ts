@@ -17,10 +17,14 @@ export const putChat = async (
     status?: ThreadStatus;
     updatedAt?: string;
   },
-  relative = true
+  relative = true,
 ) => {
-  const server = `${process.env.BACKEND_ENDPOINT}/api/v1`;
-  const endpoint = `${relative ? process.env.NEXT_PUBLIC_API_ENDPOINT : server}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats/${chatId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+  const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
+
+  const server = `${backendEndpoint}/api/v1`;
+  const endpoint = `${relative ? apiEndpoint : server}/${hubName}/rooms/${roomId}/chats/${chatId}`;
 
   const response = await fetch(endpoint, {
     method: "PUT",

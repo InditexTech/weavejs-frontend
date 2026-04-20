@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { Buffer } from "buffer";
 import { postExportToImage } from "@/api/post-export-to-image";
 import type { Weave } from "@inditextech/weave-sdk";
 import { WeaveExportNodesOptions } from "@inditextech/weave-types";
@@ -23,7 +24,7 @@ export const getImageBase64 = async ({
     Buffer.from(snapshot).toString("base64"),
     nodes,
     options,
-    "base64"
+    "base64",
   );
 
   return data;

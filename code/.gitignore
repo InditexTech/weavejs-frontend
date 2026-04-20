@@ -58,3 +58,5 @@ env.sh
 .mastra
 _chats
 mastra.db*
+
+.output

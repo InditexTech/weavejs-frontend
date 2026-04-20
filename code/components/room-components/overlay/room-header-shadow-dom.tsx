@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
@@ -49,7 +47,6 @@ import { ConnectionStatus } from "../connection-status";
 import { bottomElementVariants, topElementVariants } from "./variants";
 import { ConnectedUsers } from "../connected-users";
 import { Divider } from "./divider";
-import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
@@ -58,6 +55,7 @@ import { LlmSetupDialog } from "./llm-setup";
 import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useIAChat } from "@/store/ia-chat";
+import { ZoomToolbar } from "../toolbars/zoom.toolbar";
 
 export function RoomHeaderShadowDom() {
   const os = useGetOs();
@@ -66,7 +64,6 @@ export function RoomHeaderShadowDom() {
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
@@ -76,7 +73,7 @@ export function RoomHeaderShadowDom() {
   const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
-    WEAVE_GRID_TYPES.LINES
+    WEAVE_GRID_TYPES.LINES,
   );
 
   const handleToggleUsersPointers = React.useCallback(() => {
@@ -116,13 +113,13 @@ export function RoomHeaderShadowDom() {
     (type: WeaveStageGridType) => {
       if (instance) {
         (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
-          type
+          type,
         );
         setGridType(type);
       }
       setMenuOpen(false);
     },
-    [instance]
+    [instance],
   );
 
   const handleExportToImage = React.useCallback(async () => {
@@ -156,7 +153,7 @@ export function RoomHeaderShadowDom() {
   React.useEffect(() => {
     if (instance) {
       const stageGridPlugin = instance.getPlugin(
-        "stageGrid"
+        "stageGrid",
       ) as WeaveStageGridPlugin;
       setGridType(stageGridPlugin?.getType());
     }
@@ -178,10 +175,6 @@ export function RoomHeaderShadowDom() {
     setMenuOpen(false);
   }, [instance]);
 
-  if (!showUI) {
-    return null;
-  }
-
   return (
     <>
       <motion.div
@@ -197,7 +190,7 @@ export function RoomHeaderShadowDom() {
             {
               ["pointer-events-none"]: selectionActive,
               ["pointer-events-auto"]: !selectionActive,
-            }
+            },
           )}
         >
           <ZoomToolbar />
@@ -213,7 +206,7 @@ export function RoomHeaderShadowDom() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          }
+          },
         )}
       >
         <div className="bg-white flex justify-between items-center gap-0 p-[3px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
@@ -230,7 +223,7 @@ export function RoomHeaderShadowDom() {
                   {
                     ["font-normal"]: menuOpen,
                     ["font-extralight"]: !menuOpen,
-                  }
+                  },
                 )}
               >
                 <div className="flex gap-1 justify-start items-center">
@@ -450,14 +443,14 @@ export function RoomHeaderShadowDom() {
                       window.open(
                         DOCUMENTATION_URL,
                         "_blank",
-                        "noopener,noreferrer"
+                        "noopener,noreferrer",
                       );
                     }}
                     onClick={() => {
                       window.open(
                         DOCUMENTATION_URL,
                         "_blank",
-                        "noopener,noreferrer"
+                        "noopener,noreferrer",
                       );
                     }}
                   >
@@ -512,13 +505,13 @@ export function RoomHeaderShadowDom() {
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
-          }
+          },
         )}
       >
         <div className="w-auto h-[48px] 2xl:h-[72px] bg-white flex justify-between items-center gap-0 p-[5px] px-[12px] 2xl:py-[5px] 2xl:px-[32px] border-[0.5px] border-[#c9c9c9]">
           <div className="flex justify-end items-center gap-[16px]">
             <div className="flex justify-end items-center gap-[16px]">
-              <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
+              <ConnectionStatus />
               <div className="max-w-[320px]">
                 <ConnectedUsers />
               </div>

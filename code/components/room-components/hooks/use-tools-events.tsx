@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
 import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
   WeaveActionPropsChangeEvent,
   WeaveFrameToolAction,
 } from "@inditextech/weave-sdk";
@@ -851,7 +853,7 @@ export const useToolsEvents = () => {
     };
 
     const handleImageCancelled = (activeAction: string) => {
-      if (activeAction !== "imageTool") {
+      if (activeAction !== WEAVE_IMAGE_TOOL_ACTION_NAME) {
         toast.dismiss(toastId);
       }
     };
@@ -891,7 +893,7 @@ export const useToolsEvents = () => {
     };
 
     const handleImagesCancelled = (activeAction: string) => {
-      if (activeAction !== "imagesTool") {
+      if (activeAction !== WEAVE_IMAGES_TOOL_ACTION_NAME) {
         toast.dismiss(toastId);
       }
     };

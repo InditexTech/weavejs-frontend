@@ -11,15 +11,19 @@ import {
 } from "./constants";
 
 export class MaskEraserToolAction extends WeaveAction {
-  protected initialized: boolean = false;
-  protected state: MaskEraserToolActionState;
-  protected erasing: boolean = false;
+  protected initialized!: boolean;
+  protected state!: MaskEraserToolActionState;
+  protected erasing!: boolean;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.erasing = false;
     this.state = MASK_ERASER_TOOL_STATE.IDLE;
@@ -50,6 +54,9 @@ export class MaskEraserToolAction extends WeaveAction {
 
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        e.stopPropagation();
+
         const maskTransformer: Konva.Transformer | undefined = stage.findOne(
           "#maskSelectionTransformer",
         );

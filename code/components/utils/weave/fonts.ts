@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { WeaveFont } from "@inditextech/weave-types";
 
 export const FONTS = async (): Promise<WeaveFont[]> => {

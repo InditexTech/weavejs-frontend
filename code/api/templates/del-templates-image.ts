@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const delTemplatesImage = async (roomId: string, imageId: string) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/templates/${roomId}/images/${imageId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/templates/${roomId}/images/${imageId}`;
   const response = await fetch(endpoint, {
     method: "DELETE",
   });

@@ -12,17 +12,17 @@ import { setupTransformer } from "../utils/utils";
 import { KonvaEventObject } from "konva/lib/Node";
 
 export class MaskToolAction extends WeaveAction {
-  protected initialized: boolean = false;
-  protected initialCursor: string | null = null;
-  protected state: MaskToolActionState;
-  protected maskId: string | null;
-  protected tempLineId: string | null;
+  protected initialized!: boolean;
+  protected initialCursor!: string | null;
+  protected state!: MaskToolActionState;
+  protected maskId!: string | null;
+  protected tempLineId!: string | null;
   protected tempLine!: Konva.Line | null;
   protected mask!: Konva.Line | undefined;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected maskTransformer!: Konva.Transformer | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint!: Vector2d | null;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -32,7 +32,12 @@ export class MaskToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
+    this.initialCursor = null;
     this.state = MASK_TOOL_STATE.IDLE;
     this.maskId = null;
     this.tempLineId = null;
@@ -60,12 +65,12 @@ export class MaskToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener("keydown", (e) => {
-      e.preventDefault();
-
       if (
         e.key === "Enter" &&
         this.instance.getActiveAction() === MASK_TOOL_ACTION_NAME
       ) {
+        e.preventDefault();
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -73,6 +78,8 @@ export class MaskToolAction extends WeaveAction {
         e.key === "Escape" &&
         this.instance.getActiveAction() === MASK_TOOL_ACTION_NAME
       ) {
+        e.preventDefault();
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -156,7 +163,7 @@ export class MaskToolAction extends WeaveAction {
             stage.container().style.cursor = "pointer";
             e.cancelBubble = true;
           }
-        }
+        },
       );
 
       this.tempPoint = new Konva.Circle({

@@ -2,18 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { TemplateEntity } from "./types";
 import { cn } from "@/lib/utils";
 import { delTemplate } from "@/api/del-template";
+import { useGetSession } from "../hooks/use-get-session";
 
 type TemplatesLibraryActions = {
   selectedTemplates: TemplateEntity[];
@@ -24,18 +22,18 @@ export const TemplatesLibraryActions = ({
 }: Readonly<TemplatesLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const mutationDelete = useMutation({
     mutationFn: async (templateId: string) => {
       return await delTemplate(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
-        templateId
+        templateId,
       );
     },
     onMutate: () => {
@@ -62,7 +60,7 @@ export const TemplatesLibraryActions = ({
 
       mutationDelete.mutate(template.templateId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   const actions = React.useMemo(() => {
@@ -80,7 +78,7 @@ export const TemplatesLibraryActions = ({
           }}
         >
           <Trash strokeWidth={1} size={16} stroke="red" />
-        </button>
+        </button>,
       );
     }
 
@@ -88,10 +86,6 @@ export const TemplatesLibraryActions = ({
   }, [handleDeleteTemplate, selectedTemplates]);
 
   if (!instance) {
-    return null;
-  }
-
-  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
     return null;
   }
 

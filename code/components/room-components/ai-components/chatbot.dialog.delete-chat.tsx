@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -19,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { delChat } from "@/api/del-chat";
 import { useIAChat } from "@/store/ia-chat";
 import { useCollaborationRoom } from "@/store/store";
+import { useGetSession } from "../hooks/use-get-session";
 
 type ChatBotDialogDeleteChatProps = {
   threadId: string;
@@ -33,7 +32,8 @@ export const ChatBotDialogDeleteChat = ({
 }: ChatBotDialogDeleteChatProps) => {
   const [deleting, setDeleting] = React.useState<boolean>(false);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const room = useCollaborationRoom((state) => state.room);
 
   const resourceId = useIAChat((state) => state.resourceId);
@@ -59,20 +59,24 @@ export const ChatBotDialogDeleteChat = ({
       setDeleting(false);
     },
     async onSuccess(_, { threadId }) {
-      if (!user || !room) return;
+      if (!session || !room) return;
 
       const actualChat = sessionStorage.getItem(
-        `weave.js_${room}_${user.name}_ai_thread_id`
+        `weave.js_${room}_${session?.user.id ?? ""}_ai_thread_id`,
       );
 
       if (threadId === actualChat) {
-        sessionStorage.removeItem(`weave.js_${room}_${user.name}_ai_thread_id`);
+        sessionStorage.removeItem(
+          `weave.js_${room}_${session?.user.id ?? ""}_ai_thread_id`,
+        );
       }
 
       const queryKey = ["getChats", resourceId];
       await queryClient.invalidateQueries({ queryKey });
 
-      sessionStorage.removeItem(`weave.js_${room}_${user.name}_ai_thread_id`);
+      sessionStorage.removeItem(
+        `weave.js_${room}_${session?.user.id ?? ""}_ai_thread_id`,
+      );
       setOpen(false);
       setAiView("chats");
 

@@ -2,13 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import React from "react";
 import { TemplateEntity } from "./types";
 import { useAmountSlotsTemplate } from "../../hooks/use-amount-slots-template";
+import { Badge } from "@/components/ui/badge";
 
 type TemplateProps = {
   template: TemplateEntity;
@@ -20,7 +17,7 @@ export const Template = ({ template }: Readonly<TemplateProps>) => {
   return (
     <div
       key={template.templateId}
-      className="block flex flex-col gap-0 w-full object-cover bg-white relative border border-[#c9c9c9] overflow-hidden"
+      className="block relative flex flex-col gap-0 w-full rounded-lg object-cover bg-white relative border-[0.5px] border-[#c9c9c9] overflow-hidden"
     >
       <img
         className="bg-[#d6d6d6] w-full aspect-video block object-contain relative"
@@ -28,11 +25,13 @@ export const Template = ({ template }: Readonly<TemplateProps>) => {
         alt="A template"
         data-template-data={template.templateData}
       />
-      <div className="w-full flex p-3 justify-between items-center gap-3 border-t border-[#c9c9c9]">
-        <div className="font-inter text-base truncate">{template.name}</div>
-        <div className="font-inter text-xs truncate text-muted-foreground uppercase">
-          {amountOfImageTemplates} slots available
-        </div>
+      <div className="absolute bottom-3 left-3 rounded-md bg-white w-auto max-w[calc(100%-24px)] flex px-3 py-2 justify-between items-center gap-3 border-t border-[#c9c9c9]">
+        <div className="font-light text-base truncate">{template.name}</div>
+      </div>
+      <div className="absolute top-3 left-3 flex justify-start items-center gap-3">
+        <Badge className="font-light">
+          {amountOfImageTemplates} slot(s) available
+        </Badge>
       </div>
       {template.removalJobId !== null &&
         template.removalStatus !== null &&

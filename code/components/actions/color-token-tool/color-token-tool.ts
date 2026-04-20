@@ -16,18 +16,22 @@ import Konva from "konva";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 
 export class ColorTokenToolAction extends WeaveAction {
-  protected initialized: boolean = false;
-  protected state: ColorTokenToolActionState;
-  protected pointers: Map<number, Vector2d>;
-  protected colorTokenId: string | null;
+  protected initialized!: boolean;
+  protected state!: ColorTokenToolActionState;
+  protected pointers!: Map<number, Vector2d>;
+  protected colorTokenId!: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint!: Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = COLOR_TOKEN_TOOL_STATE.IDLE;
@@ -68,6 +72,8 @@ export class ColorTokenToolAction extends WeaveAction {
 
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
         this.cancelAction();
         return;
       }

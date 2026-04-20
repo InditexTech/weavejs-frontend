@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ColorToken } from "./color-token";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
+import { cn } from "@/lib/utils";
 
 type ColorTokenElement = {
   id: string;
@@ -40,16 +39,23 @@ export const ColorTokensLibrary = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.colorTokens) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.colorTokens) {
+  //   return null;
+  // }
 
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.colorTokens,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.colorTokens,
+      })}
+    >
       <SidebarHeader>
         <SidebarSelector title="Color Tokens" />
       </SidebarHeader>
-      <ScrollArea className="w-full h-[calc(100%-95px)]">
+      <ScrollArea className="w-full h-[calc(100%-57px)]">
         <div className="flex flex-col gap-2 w-full h-full p-[24px]">
           <div
             className="grid grid-cols-2 gap-2 w-full weaveDraggable select-none"
@@ -69,6 +75,7 @@ export const ColorTokensLibrary = () => {
             })}
           </div>
         </div>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   );

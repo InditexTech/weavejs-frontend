@@ -13,6 +13,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { postThreadAnswer } from "@/api/post-thread-answer";
 import { eventBus } from "@/components/utils/events-bus";
 import { useComment } from "./use-comment";
+import { useGetSession } from "../hooks/use-get-session";
 
 type CommentReplyProps = {
   node: WeaveElementInstance;
@@ -21,9 +22,10 @@ type CommentReplyProps = {
 export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
 
   const [content, setContent] = React.useState<string>("");
   const [replyPersisting, setReplyPersisting] = React.useState<boolean>(false);
@@ -39,16 +41,16 @@ export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
       threadId: string;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await postThreadAnswer({
-        userId: user.name ?? "",
-        userMetadata: user,
+        userId: session?.user.id ?? "",
+        userMetadata: session?.user,
         clientId: clientId ?? "",
         threadId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         content,
       });
     },
@@ -82,14 +84,14 @@ export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
         setContent("");
       }
     },
-    [content, node, commentId, mutateCreateThreadAnswer]
+    [content, node, commentId, mutateCreateThreadAnswer],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setContent(e.target.value);
     },
-    []
+    [],
   );
 
   const handleAddCommentReply = React.useCallback(() => {

@@ -17,6 +17,7 @@ type StandaloneUser = {
 interface StandaloneUseCaseState {
   user: StandaloneUser | undefined;
   instanceId: string;
+  instanceLoading: boolean;
   configuration: {
     open: boolean;
   };
@@ -40,6 +41,7 @@ interface StandaloneUseCaseState {
     loading: boolean;
   };
   sidebar: {
+    visible: boolean;
     active: "comments" | "measures" | null;
   };
   comments: {
@@ -52,6 +54,7 @@ interface StandaloneUseCaseState {
   };
   setUser: (newUser: StandaloneUser | undefined) => void;
   setInstanceId: (newInstanceId: string) => void;
+  setInstanceLoading: (newInstanceLoading: boolean) => void;
   setManagingImageId: (newImageId: string | null) => void;
   setManagingImageSize: (newWidth: number, newHeight: number) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
@@ -59,15 +62,16 @@ interface StandaloneUseCaseState {
   setUploadingImage: (newUploadingImage: boolean) => void;
   setExporting: (newSaving: boolean) => void;
   setSaving: (newSaving: boolean) => void;
+  setSidebarVisible: (newVisible: boolean) => void;
   setSidebarActive: (newActive: "comments" | "measures" | null) => void;
   setCommentsShow: (newShow: boolean) => void;
   setCommentsStatus: (newStatus: ThreadStatus | "all") => void;
   setConfigurationOpen: (newOpen: boolean) => void;
   setNodePropertiesAction: (
-    newNodePropertiesAction: NodePropertiesAction
+    newNodePropertiesAction: NodePropertiesAction,
   ) => void;
   setNodePropertiesCreateProps: (
-    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined,
   ) => void;
   setMeasureUnit: (newUnit: string) => void;
   setMeasureId: (newMeasureId: string | null) => void;
@@ -77,6 +81,7 @@ interface StandaloneUseCaseState {
 export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
   user: undefined,
   instanceId: "undefined",
+  instanceLoading: false,
   configuration: {
     open: false,
   },
@@ -101,6 +106,7 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
     loading: false,
   },
   sidebar: {
+    visible: false,
     active: "measures",
   },
   comments: {
@@ -149,10 +155,15 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
       ...state,
       actions: { ...state.actions, saving: newSaving },
     })),
+  setSidebarVisible: (newVisible) =>
+    set((state) => ({
+      ...state,
+      sidebar: { ...state.sidebar, visible: newVisible },
+    })),
   setSidebarActive: (newActive) =>
     set((state) => ({
       ...state,
-      sidebar: { active: newActive },
+      sidebar: { ...state.sidebar, active: newActive },
     })),
   setCommentsShow: (newShow) =>
     set((state) => ({
@@ -211,5 +222,10 @@ export const useStandaloneUseCase = create<StandaloneUseCaseState>()((set) => ({
         ...state.measurement,
         open: newOpen,
       },
+    })),
+  setInstanceLoading: (newInstanceLoading) =>
+    set((state) => ({
+      ...state,
+      instanceLoading: newInstanceLoading,
     })),
 }));

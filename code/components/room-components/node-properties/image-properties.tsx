@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -14,7 +12,7 @@ export function ImageProperties() {
   const node = useWeave((state) => state.selection.node);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const actualNode = React.useMemo(() => {
@@ -31,22 +29,22 @@ export function ImageProperties() {
   }
 
   return (
-    <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
-      <div className="w-full flex justify-between items-center gap-3">
+    <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
+      {/* <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
             Image Info
           </span>
         </div>
-      </div>
+      </div> */}
       <div className="grid grid-cols-2 gap-3 w-full">
         <InputNumber
-          label="Width"
+          label="Real Image Width"
           value={actualNode.props.imageInfo.width}
           disabled={true}
         />
         <InputNumber
-          label="Height"
+          label="Real Image Height"
           value={actualNode.props.imageInfo.height}
           disabled={true}
         />

@@ -8,36 +8,50 @@ import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pub
 import React from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { getRoom } from "@/api/get-room";
+import { useGetSession } from "./use-get-session";
 
 function useGetAzureWebPubsubProvider({
   loadedParams,
+  pagesManaged,
   getUser,
 }: {
   loadedParams: boolean;
+  pagesManaged: boolean;
   getUser: () => WeaveUser;
 }) {
   const [wsProvider, setWsProvider] =
     React.useState<WeaveStoreAzureWebPubsub | null>(null);
   const room = useCollaborationRoom((state) => state.room);
-  const user = useCollaborationRoom((state) => state.user);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
 
-  const { data: roomData, isFetched } = useQuery({
-    queryKey: ["roomData", room ?? ""],
+  const { session } = useGetSession();
+
+  const { data: pageData, isFetched: pageDataIsFetched } = useQuery({
+    queryKey: ["roomData", pageId ?? ""],
     queryFn: () => {
-      return getRoom(room ?? "");
+      return getRoom(pageId ?? "");
     },
     initialData: undefined,
     staleTime: 0,
+    gcTime: 0,
     retry: false,
-    enabled: typeof room !== "undefined" && typeof user !== "undefined",
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled:
+      pagesManaged &&
+      typeof pageId !== "undefined" &&
+      typeof session !== "undefined",
   });
 
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    if (loadedParams && isFetched && room && user && !wsProvider) {
+    if (loadedParams && pageDataIsFetched && room && session && !wsProvider) {
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+      const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
       const store = new WeaveStoreAzureWebPubsub(
-        roomData,
+        pageData,
         {
           getUser,
           undoManagerOptions: {
@@ -45,23 +59,23 @@ function useGetAzureWebPubsubProvider({
           },
         },
         {
-          roomId: room,
-
-          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
-        }
+          roomId: pageId ?? "",
+          url: `${apiEndpoint}/${hubName}/rooms/[roomId]/connect`,
+        },
       );
 
       setWsProvider(store);
     }
   }, [
     getUser,
-    isFetched,
+    pageId,
+    pageDataIsFetched,
     wsProvider,
-    roomData,
+    pageData,
     queryClient,
     loadedParams,
     room,
-    user,
+    session,
   ]);
 
   return wsProvider;

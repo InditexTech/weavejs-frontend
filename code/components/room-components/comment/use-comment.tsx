@@ -11,6 +11,7 @@ import React from "react";
 import { ThreadEntity } from "../hooks/types";
 import { getThread } from "@/api/get-thread";
 import { WeaveCommentNode } from "@inditextech/weave-sdk";
+import { useGetSession } from "../hooks/use-get-session";
 
 type UseCommentProps = {
   node: WeaveElementInstance;
@@ -19,9 +20,10 @@ type UseCommentProps = {
 export const useComment = ({ node }: Readonly<UseCommentProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
 
   const commentId: string | null = React.useMemo(() => {
     if (!instance) return null;
@@ -37,12 +39,12 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
   }, [instance, node]);
 
   const comment = useQuery({
-    queryKey: ["comment", room ?? "", commentId],
+    queryKey: ["comment", pageId ?? "", commentId],
     queryFn: () => {
       return getThread({
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         threadId: commentId ?? "",
-        userId: user?.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
       });
     },
@@ -52,14 +54,14 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
   const answers = useQuery({
     queryKey: [
       "comment-answers",
-      room ?? "",
+      pageId ?? "",
       node.getAttrs().commentModel.threadId,
     ],
     queryFn: () => {
       return getThreadAnswers(
-        room ?? "",
+        pageId ?? "",
         node.getAttrs().commentModel.threadId,
-        false
+        false,
       );
     },
     enabled: typeof node !== "undefined",
@@ -68,14 +70,14 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
   const queryClient = useQueryClient();
 
   const handleRefreshComment = React.useCallback(() => {
-    const queryKeyComments = ["comment", room ?? "", commentId];
+    const queryKeyComments = ["comment", pageId ?? "", commentId];
     queryClient.invalidateQueries({ queryKey: queryKeyComments });
-  }, [queryClient, room, commentId]);
+  }, [queryClient, pageId, commentId]);
 
   const handleRefreshCommentAnswers = React.useCallback(() => {
-    const queryKeyCommentAnswers = ["comment-answers", room ?? "", commentId];
+    const queryKeyCommentAnswers = ["comment-answers", pageId ?? "", commentId];
     queryClient.invalidateQueries({ queryKey: queryKeyCommentAnswers });
-  }, [queryClient, room, commentId]);
+  }, [queryClient, pageId, commentId]);
 
   return {
     commentId,

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,8 +19,9 @@ import { Label } from "@/components/ui/label";
 import React from "react";
 import { X } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
-import { merge } from "lodash";
+import merge from "lodash/merge";
 import { useWeave } from "@inditextech/weave-react";
+import { cn } from "@/lib/utils";
 
 export function AppConfigurationDialog() {
   const instance = useWeave((state) => state.instance);
@@ -31,46 +30,46 @@ export function AppConfigurationDialog() {
 
   const room = useCollaborationRoom((state) => state.room);
   const configurationOpen = useCollaborationRoom(
-    (state) => state.configuration.open
+    (state) => state.configuration.open,
   );
   const setConfigurationOpen = useCollaborationRoom(
-    (state) => state.setConfigurationOpen
+    (state) => state.setConfigurationOpen,
   );
   const setMeasurement = useCollaborationRoom((state) => state.setMeasurement);
   const upscaleEnabled = useCollaborationRoom(
-    (state) => state.configuration.upscale.enabled
+    (state) => state.configuration.upscale.enabled,
   );
   const upscaleBaseWidth = useCollaborationRoom(
-    (state) => state.configuration.upscale.baseWidth
+    (state) => state.configuration.upscale.baseWidth,
   );
   const upscaleBaseHeight = useCollaborationRoom(
-    (state) => state.configuration.upscale.baseHeight
+    (state) => state.configuration.upscale.baseHeight,
   );
   const upscaleMultiplier = useCollaborationRoom(
-    (state) => state.configuration.upscale.multiplier
+    (state) => state.configuration.upscale.multiplier,
   );
   const measurementUnits = useCollaborationRoom(
-    (state) => state.measurement.units
+    (state) => state.measurement.units,
   );
   const measurementReferenceMeasureUnits = useCollaborationRoom(
-    (state) => state.measurement.referenceMeasureUnits
+    (state) => state.measurement.referenceMeasureUnits,
   );
   const measurementReferenceMeasurePixels = useCollaborationRoom(
-    (state) => state.measurement.referenceMeasurePixels
+    (state) => state.measurement.referenceMeasurePixels,
   );
   const setConfiguration = useCollaborationRoom(
-    (state) => state.setConfiguration
+    (state) => state.setConfiguration,
   );
 
   const [upscale, setUpscale] = React.useState<boolean>(upscaleEnabled);
   const [baseWidthValue, setBaseWidthValue] = React.useState<string>(
-    `${upscaleBaseWidth}`
+    `${upscaleBaseWidth}`,
   );
   const [baseHeightValue, setBaseHeightValue] = React.useState<string>(
-    `${upscaleBaseHeight}`
+    `${upscaleBaseHeight}`,
   );
   const [multiplierValue, setMultiplierValue] = React.useState<string>(
-    `${upscaleMultiplier}`
+    `${upscaleMultiplier}`,
   );
   const [units, setUnits] = React.useState<string>(`${measurementUnits}`);
   const [referenceMeasureUnits, setReferenceMeasureUnits] =
@@ -106,22 +105,30 @@ export function AppConfigurationDialog() {
               onValueChange={setSelectedTab}
               className="w-full h-full"
             >
-              <div className="bg-[#c9c9c9] w-full">
-                <TabsList className="bg-transparent p-3 h-10 gap-3">
-                  <TabsTrigger
-                    className="font-inter text-base cursor-pointer rounded-none uppercase"
-                    value="performance"
-                  >
-                    Performance
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="font-inter text-base cursor-pointer rounded-none uppercase"
-                    value="measuring"
-                  >
-                    Measurement
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+              <TabsList className="bg-transparent p-0 h-8 gap-3 my-3">
+                <TabsTrigger
+                  className={cn(
+                    "hover:text-black font-inter text-lg cursor-pointer rounded-none uppercase !shadow-none",
+                    {
+                      ["!bg-[#f0f0f0] "]: selectedTab === "performance",
+                    },
+                  )}
+                  value="performance"
+                >
+                  Performance
+                </TabsTrigger>
+                <TabsTrigger
+                  className={cn(
+                    "hover:text-black font-inter text-lg cursor-pointer rounded-none uppercase !shadow-none",
+                    {
+                      ["!bg-[#f0f0f0] "]: selectedTab === "measuring",
+                    },
+                  )}
+                  value="measuring"
+                >
+                  Measurement
+                </TabsTrigger>
+              </TabsList>
               <TabsContent value="performance">
                 <DialogDescription className="font-inter text-sm my-5 mb-7">
                   Configuration that can help improve performance.
@@ -286,7 +293,7 @@ export function AppConfigurationDialog() {
                             (
                               measurementReferenceMeasurePixels /
                               Number.parseFloat(referenceMeasureUnits)
-                            ).toFixed(6)
+                            ).toFixed(6),
                           ).valueOf()}`
                         : "not defined"}
                     </div>
@@ -323,7 +330,7 @@ export function AppConfigurationDialog() {
 
                   if (selectedTab === "performance") {
                     const actualSavedConfig = JSON.parse(
-                      sessionStorage.getItem("weave_ai_configuration") || "{}"
+                      sessionStorage.getItem("weave_ai_configuration") || "{}",
                     );
 
                     if (upscale) {
@@ -339,14 +346,14 @@ export function AppConfigurationDialog() {
 
                       sessionStorage.setItem(
                         "weave_ai_configuration",
-                        JSON.stringify(finalConfiguration)
+                        JSON.stringify(finalConfiguration),
                       );
 
                       setConfiguration(
                         upscale,
                         Number.parseInt(baseWidthValue),
                         Number.parseInt(baseHeightValue),
-                        Number.parseInt(multiplierValue)
+                        Number.parseInt(multiplierValue),
                       );
                     } else {
                       const finalConfiguration = merge(actualSavedConfig, {
@@ -361,12 +368,12 @@ export function AppConfigurationDialog() {
 
                       sessionStorage.setItem(
                         "weave_ai_configuration",
-                        JSON.stringify(finalConfiguration)
+                        JSON.stringify(finalConfiguration),
                       );
 
                       sessionStorage.setItem(
                         "weave_ai_configuration",
-                        JSON.stringify(finalConfiguration)
+                        JSON.stringify(finalConfiguration),
                       );
 
                       setConfiguration(false, 1920, 1080, 1);
@@ -376,26 +383,26 @@ export function AppConfigurationDialog() {
                   if (selectedTab === "measuring") {
                     const actualSavedConfig = JSON.parse(
                       sessionStorage.getItem(
-                        `weave_measurement_config_${room}`
-                      ) || "{}"
+                        `weave_measurement_config_${room}`,
+                      ) || "{}",
                     );
 
                     const updatedConfig = {
                       units,
                       referenceMeasureUnits: Number.parseFloat(
-                        referenceMeasureUnits
+                        referenceMeasureUnits,
                       ),
                       referenceMeasurePixels: measurementReferenceMeasurePixels,
                     };
 
                     const finalConfiguration = merge(
                       actualSavedConfig,
-                      updatedConfig
+                      updatedConfig,
                     );
 
                     sessionStorage.setItem(
                       `weave_measurement_config_${room}`,
-                      JSON.stringify(finalConfiguration)
+                      JSON.stringify(finalConfiguration),
                     );
 
                     const scale =
@@ -408,7 +415,7 @@ export function AppConfigurationDialog() {
 
                     setMeasurement(
                       units,
-                      Number.parseFloat(referenceMeasureUnits)
+                      Number.parseFloat(referenceMeasureUnits),
                     );
                   }
 

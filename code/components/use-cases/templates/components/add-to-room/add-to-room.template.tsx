@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import React from "react";
 import { TemplateEntity } from "../templates/types";
 import { useAddToRoom } from "../../store/add-to-room";
@@ -34,15 +30,19 @@ export const AddToRoomTemplate = ({ template }: Readonly<TemplateProps>) => {
     <div
       key={template.templateId}
       className={cn(
-        "group block relative flex gap-0 w-full object-cover bg-white relative overflow-hidden cursor-pointer",
+        "group block relative flex rounded-md gap-0 w-full object-cover bg-white relative overflow-hidden cursor-pointer",
         {
-          ["after:absolute after:border-[2px] after:border-black after:box-border after:content-[''] after:inset-0"]:
+          ["after:absolute after:rounded-md after:border-[1px] after:border-black after:box-border after:content-[''] after:inset-0"]:
             isSelected,
           ["cursor-default bg-[#cc0000]"]:
             selectedImages.length > amountOfImageTemplates,
         },
       )}
       onClick={() => {
+        if (isSelected) {
+          setTemplate(undefined);
+          return;
+        }
         if (selectedImages.length <= amountOfImageTemplates) {
           setTemplate(template);
         }

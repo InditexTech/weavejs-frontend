@@ -89,6 +89,8 @@ export const initStandaloneInstanceImage = ({
   width: number;
   height: number;
 }) => {
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+
   const model = {
     weave: {
       key: "stage",
@@ -130,7 +132,7 @@ export const initStandaloneInstanceImage = ({
                     locked: true,
                     imageWidth: width,
                     imageHeight: height,
-                    imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/standalone/${instanceId}/images/${imageId}`,
+                    imageURL: `${apiEndpoint}/weavejs/standalone/${instanceId}/images/${imageId}`,
                   },
                 },
               ],

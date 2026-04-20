@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -32,24 +28,25 @@ import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useTemplates } from "@/store/templates";
 import { useWeave } from "@inditextech/weave-react";
-import { getImageBase64 } from "@/components/utils/images";
+import { WEAVE_EXPORT_RETURN_FORMAT } from "@inditextech/weave-types";
 import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { postTemplate } from "@/api/post-template";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { getSelectionAsTemplate } from "@/components/utils/templates";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import Konva from "konva";
 
 export function SaveTemplateDialog() {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const room = useCollaborationRoom((state) => state.room);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const [templateData, setTemplateData] = React.useState<string>("");
   const [templateImage, setTemplateImage] = React.useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [generatingImagePreview, setGeneratingImagePreview] =
     React.useState<boolean>(false);
@@ -59,7 +56,7 @@ export function SaveTemplateDialog() {
 
   const saveDialogVisible = useTemplates((state) => state.saveDialog.visible);
   const setSaveDialogVisible = useTemplates(
-    (state) => state.setSaveDialogVisible
+    (state) => state.setSaveDialogVisible,
   );
 
   const instance = useWeave((state) => state.instance);
@@ -68,7 +65,7 @@ export function SaveTemplateDialog() {
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   React.useEffect(() => {
@@ -90,18 +87,21 @@ export function SaveTemplateDialog() {
       }
 
       setGeneratingImagePreview(true);
-      const selectionPreview = await getImageBase64({
-        instance,
-        nodes: selectedNodes.map((node) => node.getAttrs().id ?? ""),
-        options: {
+
+      const selectionPreviewURL = (await instance.exportNodes(
+        selectedNodes,
+        (nodes: Konva.Node[]) => nodes,
+        {
           format: "image/png",
           padding: 40,
           backgroundColor: "#D6D6D6",
           pixelRatio: 1,
         },
-      });
+        WEAVE_EXPORT_RETURN_FORMAT.DATA_URL,
+      )) as string;
+
       setGeneratingImagePreview(false);
-      setTemplateImage(selectionPreview.url);
+      setTemplateImage(selectionPreviewURL);
 
       const template = getSelectionAsTemplate(instance);
       setTemplateData(JSON.stringify(template));
@@ -176,12 +176,14 @@ export function SaveTemplateDialog() {
 
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (event: any) => {
+    (e: any) => {
       if (!saveDialogVisible) return;
 
       if (!templateImage) return;
 
-      if (event.key === "Enter") {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
         mutationGenerate.mutate({
           name,
           templateImage,
@@ -189,7 +191,7 @@ export function SaveTemplateDialog() {
         });
       }
     },
-    [name, templateImage, templateData, saveDialogVisible, mutationGenerate]
+    [name, templateImage, templateData, saveDialogVisible, mutationGenerate],
   );
 
   React.useEffect(() => {

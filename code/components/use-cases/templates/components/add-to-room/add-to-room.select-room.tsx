@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import React from "react";
@@ -11,9 +9,7 @@ import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTemplatesUseCase } from "../../store/store";
-import { getRooms } from "@/api/get-rooms";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { getRooms } from "@/api/rooms/get-rooms";
 import { cn } from "@/lib/utils";
 import { useAddToRoom } from "../../store/add-to-room";
 import { CheckIcon } from "lucide-react";
@@ -27,12 +23,13 @@ export function AddToRoomSelectRoom() {
   const setRoom = useAddToRoom((state) => state.setRoom);
   const setStep = useAddToRoom((state) => state.setStep);
 
-  const [rooms, setRooms] = React.useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [rooms, setRooms] = React.useState<any[]>([]);
 
   const query = useInfiniteQuery({
     queryKey: ["getRooms"],
     queryFn: async ({ pageParam }) => {
-      return await getRooms(ROOMS_LIMIT, pageParam as string | undefined);
+      return await getRooms(pageParam, ROOMS_LIMIT);
     },
     select: (newData) => newData, // keep shape stable
     structuralSharing: true,
@@ -47,7 +44,7 @@ export function AddToRoomSelectRoom() {
 
   React.useEffect(() => {
     if (!query.data) return;
-    setRooms(query.data?.pages.flatMap((page) => page.rooms) ?? []);
+    setRooms(query.data?.pages.flatMap((page) => page.items) ?? []);
   }, [query.data]);
 
   const { ref, inView } = useInView({ threshold: 1 });
@@ -58,39 +55,35 @@ export function AddToRoomSelectRoom() {
     }
   }, [inView, query]);
 
-  const roomName = React.useMemo(() => {
-    return room ? room.id : "";
-  }, [room]);
-
-  const isCreatingNewRoom = React.useMemo(() => {
-    return room ? room.create : false;
-  }, [room]);
-
   return (
     <>
-      <div className="w-full h-full grid grid-cols grid-rows-[auto_1fr_auto_auto] gap-5">
+      <div className="w-full h-full grid grid-cols grid-rows-[auto_1fr] gap-5">
         <DialogDescription className="font-inter text-sm my-0">
           Select the room where you want to add the template.
         </DialogDescription>
-        <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-20px-62px-25px-48px-140px-500px)] border border-[#c9c9c9]">
+        <div className="w-full h-[calc(100dvh-48px-12px-72px-25px-48px-140px-48px)] border border-[#c9c9c9]">
           <ScrollArea className="w-full h-full">
             {rooms.length > 0 &&
-              rooms.map((room, index) => {
+              rooms.map((roomInfo, index) => {
                 return (
                   <div
-                    key={room}
+                    key={roomInfo.roomId}
                     className={cn(
-                      "flex gap-3 justify-between items-center font-inter text-xl p-5 py-3 cursor-pointer border-t border-[#c9c9c9]",
+                      "flex gap-3 h-[40px] justify-between items-center font-inter text-sm p-2 py-2 cursor-pointer border-t border-[#c9c9c9]",
                       {
                         ["border-t-0"]: index === 0,
                       },
                     )}
                     onClick={() => {
-                      setRoom({ id: room, create: false });
+                      setRoom({
+                        id: roomInfo.roomId,
+                        name: roomInfo.name,
+                        create: false,
+                      });
                     }}
                   >
-                    <div>{room}</div>
-                    {roomName === room && (
+                    <div>{roomInfo?.name}</div>
+                    {room?.id === roomInfo?.roomId && (
                       <div>
                         <CheckIcon strokeWidth={1} />
                       </div>
@@ -106,28 +99,6 @@ export function AddToRoomSelectRoom() {
             )}
           </ScrollArea>
         </div>
-        <DialogDescription className="font-inter text-sm my-0">
-          Or you can also create a new room.
-        </DialogDescription>
-        <div className="grid grid-cols-1 gap-5">
-          <div className="flex flex-col justify-start items-start gap-0">
-            <Label className="mb-2">Room name</Label>
-            <Input
-              type="text"
-              className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
-              value={isCreatingNewRoom ? roomName : ""}
-              onChange={(e) => {
-                setRoom({ id: e.target.value, create: true });
-              }}
-              onFocus={() => {
-                window.weaveOnFieldFocus = true;
-              }}
-              onBlurCapture={() => {
-                window.weaveOnFieldFocus = false;
-              }}
-            />
-          </div>
-        </div>
       </div>
       <div className="w-full min-h-[1px] h-[1px] bg-[#c9c9c9] my-3"></div>
       <DialogFooter>
@@ -136,7 +107,7 @@ export function AddToRoomSelectRoom() {
           className="cursor-pointer font-inter rounded-none"
           disabled={!room || room.id.trim() === ""}
           onClick={() => {
-            setStep("select-template");
+            setStep("select-page");
           }}
         >
           CONTINUE

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import {
@@ -15,16 +13,28 @@ import Masonry from "react-responsive-masonry";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTemplatesUseCase } from "../../store/store";
-import { ImagesIcon, ImageUpIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { ScaleLoader } from "react-spinners";
+import {
+  ImagesIcon,
+  ImageUpIcon,
+  LayoutPanelTop,
+  ListChecks,
+  PlusIcon,
+  TrashIcon,
+} from "lucide-react";
 import { getTemplatesImages } from "@/api/templates/get-templates-images";
 import { UploadImage } from "../upload-image";
 import { useAddToRoom } from "../../store/add-to-room";
 import { delTemplatesImage } from "@/api/templates/del-templates-image";
+import { Badge } from "@/components/ui/badge";
+import { ToolbarButton } from "@/components/room-components/toolbar/toolbar-button";
+import { Divider } from "@/components/room-components/overlay/divider";
 
 export const Images = () => {
   const instanceId = useTemplatesUseCase((state) => state.instanceId);
   const selectedImages = useTemplatesUseCase((state) => state.images.selected);
+  const templatesManage = useTemplatesUseCase(
+    (state) => state.templates.manage,
+  );
   const setShowSelectFileImage = useTemplatesUseCase(
     (state) => state.setShowSelectFileImage,
   );
@@ -33,6 +43,9 @@ export const Images = () => {
   );
   const setAddToRoomOpen = useTemplatesUseCase(
     (state) => state.setAddToRoomOpen,
+  );
+  const setTemplatesManage = useTemplatesUseCase(
+    (state) => state.setTemplatesManage,
   );
 
   const setRoom = useAddToRoom((state) => state.setRoom);
@@ -88,6 +101,8 @@ export const Images = () => {
     [mutationDelete],
   );
 
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+
   const images = React.useMemo(() => {
     if (!data) {
       return [];
@@ -102,21 +117,19 @@ export const Images = () => {
           {isFetching && (
             <div className="w-full h-full flex justify-center items-center">
               <div className="w-full h-full flex flex-col gap-1 justify-center items-center">
-                <ScaleLoader />
-                <div className="font-inter text-xl">loading</div>
+                <div className="font-light text-xl uppercase">loading</div>
               </div>
             </div>
           )}
           {isFetched && !isFetching && images.length > 0 && (
             <>
-              <ScrollArea className="w-full h-[calc(100dvh-65px-65px)]">
-                <Masonry sequential columnsCount={4} gutter="1px">
+              <ScrollArea className="w-full h-[calc(100dvh-55px-40px)]">
+                <Masonry columnsCount={6} gutter="1px">
                   {images.map((image) => (
                     <div key={image} className="relative w-full cursor-pointer">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         className="w-full object-cover"
-                        src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/templates/${instanceId}/images/${image}`}
+                        src={`${apiEndpoint}/weavejs/templates/${instanceId}/images/${image}`}
                         alt={`image ${image} thumbnail`}
                         onClick={() => {
                           if (selectedImages.includes(image)) {
@@ -146,11 +159,47 @@ export const Images = () => {
                   ))}
                 </Masonry>
               </ScrollArea>
-              <div className="w-full h-[65px] p-5 py-3 bg-white border-t border-[#c9c9c9] flex justify-between items-center">
+              <div className="w-full h-[40px] px-[24px] bg-white border-t-[0.5px] border-[#c9c9c9] flex justify-between items-center">
                 <div className="flex justify-start items-center gap-3">
-                  <span className="text-base">ACTIONS</span>
-                  <button
-                    className="bg-black font-inter text-sm text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-gray-800"
+                  <Badge variant="default" className="cursor-default uppercase">
+                    actions
+                  </Badge>
+                  <Divider className="h-[20px]" />
+                  <ToolbarButton
+                    icon={<LayoutPanelTop strokeWidth={1} />}
+                    onClick={() => {
+                      setTemplatesManage(!templatesManage);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Manage templates</p>
+                      </div>
+                    }
+                    size="small"
+                    variant="squared"
+                    tooltipSideOffset={14}
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <ToolbarButton
+                    icon={<ImageUpIcon strokeWidth={1} />}
+                    onClick={() => {
+                      setShowSelectFileImage(true);
+                    }}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Upload image</p>
+                      </div>
+                    }
+                    size="small"
+                    variant="squared"
+                    tooltipSideOffset={14}
+                    tooltipSide="bottom"
+                    tooltipAlign="center"
+                  />
+                  <Divider className="h-[20px]" />
+                  <ToolbarButton
+                    icon={<ListChecks size={20} strokeWidth={1} />}
                     onClick={() => {
                       if (selectedImages.length > 0) {
                         setSelectedImages([]);
@@ -163,20 +212,31 @@ export const Images = () => {
                         }
                       }
                     }}
-                  >
-                    TOGGLE ALL
-                  </button>
-                  {selectedImages.length > 0 && (
-                    <span className="text-xs">
-                      SELECTED {`${selectedImages.length}`} IMAGES
-                    </span>
-                  )}
+                    label={
+                      <div className="flex gap-3 justify-start items-center">
+                        <p>Toggle all</p>
+                      </div>
+                    }
+                    size="small"
+                    variant="squared"
+                    tooltipSideOffset={14}
+                    tooltipSide="top"
+                    tooltipAlign="center"
+                  />
                 </div>
-                <div className="flex justify-end items-center gap-1">
+                <div className="flex justify-end items-center gap-3">
                   {selectedImages.length > 0 && (
                     <>
-                      <button
-                        className="bg-[#cc0000] font-inter text-sm text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-[#1D4ED8]"
+                      <Badge variant="outline" className="cursor-default ">
+                        {`${selectedImages.length}`} IMAGE(S) SELECTED
+                      </Badge>
+                      <Divider className="h-[20px]" />
+                    </>
+                  )}
+                  {selectedImages.length > 0 && (
+                    <>
+                      <ToolbarButton
+                        icon={<TrashIcon size={20} strokeWidth={1} />}
                         onClick={() => {
                           for (const image of selectedImages) {
                             handleDeleteImage(image);
@@ -184,12 +244,19 @@ export const Images = () => {
 
                           setSelectedImages([]);
                         }}
-                      >
-                        DELETE SELECTED IMAGES{" "}
-                        <TrashIcon size={20} strokeWidth={1} />
-                      </button>
-                      <button
-                        className="bg-[#2563EB] font-inter text-sm text-white p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-[#1D4ED8]"
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Delete selected</p>
+                          </div>
+                        }
+                        size="small"
+                        variant="squared"
+                        tooltipSideOffset={14}
+                        tooltipSide="top"
+                        tooltipAlign="end"
+                      />
+                      <ToolbarButton
+                        icon={<PlusIcon size={20} strokeWidth={1} />}
                         onClick={() => {
                           setRoom(undefined);
                           setTemplate(undefined);
@@ -197,10 +264,17 @@ export const Images = () => {
                           setStep("select-room");
                           setAddToRoomOpen(true);
                         }}
-                      >
-                        ADD SELECTED IMAGES TO ROOM{" "}
-                        <PlusIcon size={20} strokeWidth={1} />
-                      </button>
+                        label={
+                          <div className="flex gap-3 justify-start items-center">
+                            <p>Add to room</p>
+                          </div>
+                        }
+                        size="small"
+                        variant="squared"
+                        tooltipSideOffset={14}
+                        tooltipSide="top"
+                        tooltipAlign="end"
+                      />
                     </>
                   )}
                 </div>
@@ -209,10 +283,12 @@ export const Images = () => {
           )}
           {isFetched && !isFetching && images.length === 0 && (
             <div className="w-full h-full flex justify-center items-center">
-              <div className="w-full p-5 flex flex-col gap-2 justify-center items-center">
-                <ImagesIcon strokeWidth={1} size={32} />
-                <div className="font-inter text-base mb-3">
-                  No images loaded
+              <div className="w-full p-5 flex flex-col gap-8 justify-center items-center">
+                <div className="flex flex-col justify-center items-center gap-2">
+                  <ImagesIcon strokeWidth={1} size={48} />
+                  <div className="font-light text-base mb-3 uppercase">
+                    No images loaded
+                  </div>
                 </div>
                 <button
                   className="bg-black text-white font-inter text-sm p-2 px-5 flex justify-center items-center gap-2 rounded-none cursor-pointer hover:bg-gray-800"
@@ -220,7 +296,7 @@ export const Images = () => {
                     setShowSelectFileImage(true);
                   }}
                 >
-                  UPLOAD IMAGE <ImageUpIcon size={20} strokeWidth={1} />
+                  UPLOAD IMAGE
                 </button>
               </div>
             </div>

@@ -3,15 +3,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import { useCollaborationRoom } from "@/store/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postImage } from "@/api/post-image";
 import { postImage as postImageV2 } from "@/api/v2/post-image";
 import { useWeave } from "@inditextech/weave-react";
 import {
-  ImageInfo,
-  type ImagesToolActionTriggerParams,
-} from "@/components/actions/images-tool/types";
+  getDownscaleRatio,
+  getImageSizeFromFile,
+  getPositionRelativeToContainerOnPosition,
+  WEAVE_IMAGES_TOOL_ACTION_NAME,
+  WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
+  WeaveImagesFile,
+  WeaveImagesToolActionTriggerParams,
+} from "@inditextech/weave-sdk";
+import Konva from "konva";
 
 export function UploadImages() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,83 +31,189 @@ export function UploadImages() {
   const showSelectFiles = useCollaborationRoom(
     (state) => state.images.showSelectFiles,
   );
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage,
-  );
   const setShowSelectFilesImages = useCollaborationRoom(
     (state) => state.setShowSelectFilesImages,
   );
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads,
   );
+  const setAddingImages = useCollaborationRoom(
+    (state) => state.setAddingImages,
+  );
 
   const queryClient = useQueryClient();
 
-  const mutationUploadMulti = useMutation({
-    mutationFn: async (files: FileList) => {
-      let promises = [];
+  const mutationUpload = useMutation({
+    mutationFn: async (file: File) => {
       if (workloadsEnabled) {
-        promises = Array.from(files).map((file) =>
-          postImageV2(room ?? "", file),
-        );
-      } else {
-        promises = Array.from(files).map((file) => postImage(room ?? "", file));
+        return await postImageV2(room ?? "", file);
       }
-      return await Promise.allSettled(promises);
+      return await postImage(room ?? "", file);
     },
   });
 
   const handleUploadFiles = React.useCallback(
-    async (files: FileList) => {
-      setUploadingImage(true);
-      mutationUploadMulti.mutate(files, {
-        onSuccess: (data) => {
-          const queryKey = ["getImages", room];
-          queryClient.invalidateQueries({ queryKey });
+    async (files: File[], position?: Konva.Vector2d) => {
+      if (!instance) {
+        return;
+      }
 
-          const images: ImageInfo[] = [];
-          for (const uploadInfo of data) {
-            if (uploadInfo.status === "fulfilled") {
-              const room = uploadInfo.value.fileName.split("/")[0];
-              const imageId = uploadInfo.value.fileName.split("/")[1];
-              images.push({
-                imageId,
-                url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
-              });
-            }
-          }
+      const images: WeaveImagesFile[] = [];
 
-          if (instance && images.length > 0) {
-            instance.triggerAction<ImagesToolActionTriggerParams, void>(
-              "imagesTool",
-              {
-                images,
-                padding: 20,
-              },
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ) as any;
-          }
+      for (const file of files) {
+        const imageId = uuidv4();
+        const imageSize = await getImageSizeFromFile(file);
+        const downscaleRatio = getDownscaleRatio(
+          imageSize.width,
+          imageSize.height,
+        );
+        images.push({
+          file,
+          width: imageSize.width,
+          height: imageSize.height,
+          downscaleRatio,
+          imageId,
+        });
+      }
+
+      let toastId: string | number | undefined = undefined;
+
+      const uploadImageFunction = async (file: File) => {
+        const data = await mutationUpload.mutateAsync(file);
+        const room = data.image.roomId;
+        const imageId = data.image.imageId;
+
+        const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+
+        return `${apiEndpoint}/weavejs/rooms/${room}/images/${imageId}`;
+      };
+
+      const handleOnSelectedPositionImages = () => {
+        instance.removeEventListener(
+          "onSelectedPositionImages",
+          handleOnSelectedPositionImages,
+        );
+        setAddingImages(true);
+      };
+
+      instance.addEventListener(
+        "onSelectedPositionImages",
+        handleOnSelectedPositionImages,
+      );
+
+      const handleOnFinishedImages = () => {
+        instance.removeEventListener(
+          "onFinishedImages",
+          handleOnFinishedImages,
+        );
+        setAddingImages(false);
+      };
+
+      instance.addEventListener("onFinishedImages", handleOnFinishedImages);
+
+      const onStartUploading = () => {
+        toastId = toast.loading("Uploading images...", {
+          duration: Infinity,
+          dismissible: false,
+        });
+      };
+
+      const onFinishedUploading = () => {
+        toast.dismiss(toastId);
+        toast.success("Images uploaded successfully");
+
+        const queryKey = ["getImages", room];
+        queryClient.invalidateQueries({ queryKey });
+      };
+
+      instance.triggerAction<WeaveImagesToolActionTriggerParams, void>(
+        WEAVE_IMAGES_TOOL_ACTION_NAME,
+        {
+          type: WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE,
+          images,
+          uploadImageFunction,
+          onStartUploading,
+          onFinishedUploading,
+          forceMainContainer: false,
+          ...(position && { position }),
         },
-        onError: () => {
-          console.error("Error uploading image");
-        },
-        onSettled: () => {
-          setUploadingImage(false);
-        },
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as any;
     },
-    [instance, queryClient, room, mutationUploadMulti, setUploadingImage],
+    [instance, queryClient, room, mutationUpload, setAddingImages],
   );
 
   React.useEffect(() => {
-    if (showSelectFiles && inputFileRef.current) {
-      inputFileRef.current.addEventListener("cancel", () => {
-        instance?.cancelAction("imageTool");
-      });
+    const onStageDrop = (e: DragEvent) => {
+      if (!instance) {
+        return;
+      }
+
+      if (instance.isDragStarted()) {
+        return;
+      }
+
+      instance.getStage().setPointersPositions(e);
+      const position: Konva.Vector2d | null | undefined =
+        getPositionRelativeToContainerOnPosition(instance);
+
+      if (!position) {
+        return;
+      }
+
+      const { mousePoint } = instance.getMousePointer(position);
+
+      if (e.dataTransfer?.items) {
+        if (e.dataTransfer?.items.length > 1) {
+          const files = [];
+          for (const item of e.dataTransfer.items) {
+            if (item.kind === "file" && item.type.startsWith("image/")) {
+              const file = item.getAsFile();
+              if (file) {
+                files.push(file);
+              }
+            }
+          }
+
+          if (files.length > 0) {
+            handleUploadFiles(files, mousePoint);
+          }
+        }
+        return;
+      }
+      if (e.dataTransfer?.files) {
+        if (e.dataTransfer?.files.length > 1) {
+          const files = [];
+          for (const file of e.dataTransfer.files) {
+            if (file.type.startsWith("image/")) {
+              files.push(file);
+            }
+          }
+          if (files.length > 0) {
+            handleUploadFiles(files, mousePoint);
+          }
+        }
+        return;
+      }
+    };
+
+    if (instance) {
+      instance.addEventListener("onStageDrop", onStageDrop);
+    }
+
+    return () => {
+      if (instance) {
+        instance.removeEventListener("onStageDrop", onStageDrop);
+      }
+    };
+  }, [instance, mutationUpload, handleUploadFiles]);
+
+  React.useEffect(() => {
+    if (showSelectFiles) {
       inputFileRef.current.click();
       setShowSelectFilesImages(false);
     }
-  }, [instance, showSelectFiles, setShowSelectFilesImages]);
+  }, [showSelectFiles, setShowSelectFilesImages]);
 
   return (
     <input
@@ -115,7 +229,7 @@ export function UploadImages() {
       onChange={(e) => {
         const files = e.target.files;
         if (files) {
-          handleUploadFiles(files);
+          handleUploadFiles(Array.from(files));
         }
       }}
     />

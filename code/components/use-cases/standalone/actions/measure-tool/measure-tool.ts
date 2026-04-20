@@ -40,13 +40,14 @@ export class MeasureToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
+  initialize = undefined;
 
   constructor(params?: MeasureToolParams) {
     super();
 
     this.config = mergeExceptArrays(
       MEASURE_TOOL_DEFAULT_CONFIG,
-      params?.config ?? {}
+      params?.config ?? {},
     );
 
     this.initialized = false;
@@ -140,7 +141,7 @@ export class MeasureToolAction extends WeaveAction {
             y: 1 / stage.scaleY(),
           });
         }
-      }
+      },
     );
 
     this.buildCrosshairCursor();
@@ -291,7 +292,7 @@ export class MeasureToolAction extends WeaveAction {
               let realContainer = this.measureContainer;
               if (realContainer?.getAttrs().nodeId !== undefined) {
                 realContainer = stage.findOne(
-                  `#${realContainer?.getAttrs().nodeId}`
+                  `#${realContainer?.getAttrs().nodeId}`,
                 ) as Konva.Layer | Konva.Group;
               }
 
@@ -305,7 +306,7 @@ export class MeasureToolAction extends WeaveAction {
               .findOne(`#${this.measureId}`);
 
             const distance = nodeHandler.getDistance(
-              nodeInstance as Konva.Group
+              nodeInstance as Konva.Group,
             );
             this.instance.emitEvent("onCreateMeasure", {
               nodeId: this.measureId,
@@ -314,7 +315,7 @@ export class MeasureToolAction extends WeaveAction {
 
             this.cancelAction();
           }
-        }
+        },
       );
 
       this.instance.addNode(node, "mainLayer");

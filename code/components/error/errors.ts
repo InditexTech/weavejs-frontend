@@ -4,13 +4,20 @@
 
 const errors = {
   "room-required-parameters": {
-    description: "No room or username defined.",
-    action: "Back to Home",
+    description:
+      "No room defined, please provide the required parameters to access a room",
+    action: "BACK TO HOME",
     href: "/",
   },
   "room-failed-connection": {
-    description: "Failed to obtain the room connection endpoint.",
-    action: "Back to Home",
+    description: "A connection error has raised when connecting to the room",
+    action: "BACK TO HOME",
+    href: "/",
+  },
+  "room-connection-url": {
+    description:
+      "Failed to obtain the room connection endpoint, please contact the support team if the problem persists",
+    action: "BACK TO HOME",
     href: "/",
   },
 };
@@ -31,8 +38,9 @@ const COMMON_ERRORS: CommonErrors = {
 export const getError = (errorCode: string) => {
   return (
     COMMON_ERRORS[errorCode] || {
-      description: "An unknown error occurred.",
-      action: "Back to Home",
+      description:
+        "An unknown error has occurred, please contact the support team if the problem persists",
+      action: "BACK TO HOME",
       href: "/",
     }
   );

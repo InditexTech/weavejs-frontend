@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import { useInView } from "react-intersection-observer";
@@ -32,6 +30,7 @@ import { TemplateEntity } from "./types";
 import Konva from "konva";
 import { setTemplateOnPosition } from "@/components/utils/templates";
 import { SidebarHeader } from "../sidebar-header";
+import { useGetSession } from "../hooks/use-get-session";
 // import { eventBus } from "@/components/utils/events-bus";
 
 const TEMPLATES_LIMIT = 20;
@@ -45,15 +44,16 @@ export const TemplatesLibrary = () => {
   const [templates, setTemplates] = React.useState<TemplateEntity[]>([]);
   const [showSelection, setShowSelection] = React.useState<boolean>(false);
 
-  const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
+  const { session } = useGetSession();
+
   const mutationDelete = useMutation({
     mutationFn: async (templateId: string) => {
       return await delTemplate(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
         templateId,
@@ -223,12 +223,19 @@ export const TemplatesLibrary = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
+  //   return null;
+  // }
 
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.templates,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.templates,
+      })}
+    >
       <SidebarHeader
         actions={
           <div className="flex justify-end items-center gap-4">
@@ -282,39 +289,40 @@ export const TemplatesLibrary = () => {
           </div>
         </div>
       )}
-      <ScrollArea
-        className={cn("w-full overflow-auto", {
-          ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
-          ["h-[calc(100%-65px-73px)]"]: !showSelection,
-        })}
-      >
-        <div
-          className="w-full weaveDraggable p-0 py-[24px] pb-0 flex flex-col gap-[24px]"
-          onDragStart={(e) => {
-            if (!instance) {
-              return;
-            }
 
-            if (e.target instanceof HTMLImageElement) {
-              instance.startDrag("add-template-to-room");
-              instance.setDragProperties<{ templateData: string }>({
-                templateData: e.target.dataset.templateData ?? "",
-              });
-            }
-          }}
+      {templates.length === 0 && (
+        <div className="col-span-1 w-full h-[calc(100%-57px)] px-5 flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+          <b className="font-normal text-[18px]">No templates</b>
+          <span className="text-[14px]">
+            Save a node or a selection of nodes
+            <br />
+            as a template.
+          </span>
+        </div>
+      )}
+      {templates.length > 0 && (
+        <ScrollArea
+          className={cn("w-full overflow-auto", {
+            ["h-[calc(100%-57px-40px-40px)]"]: showSelection,
+            ["h-[calc(100%-57px)]"]: !showSelection,
+          })}
         >
-          {templates.length === 0 && (
-            <div className="col-span-1 w-full h-full mt-[24px] px-5 flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-              <b className="font-normal text-[18px]">No templates</b>
-              <span className="text-[14px]">
-                Save a node or a selection of nodes
-                <br />
-                as a template.
-              </span>
-            </div>
-          )}
-          {templates.length > 0 &&
-            templates.map((template) => {
+          <div
+            className="w-full weaveDraggable p-0 py-[24px] pb-0 flex flex-col gap-[24px]"
+            onDragStart={(e) => {
+              if (!instance) {
+                return;
+              }
+
+              if (e.target instanceof HTMLImageElement) {
+                instance.startDrag("add-template-to-room");
+                instance.setDragProperties<{ templateData: string }>({
+                  templateData: e.target.dataset.templateData ?? "",
+                });
+              }
+            }}
+          >
+            {templates.map((template) => {
               const isChecked = selectedTemplates.includes(template);
 
               const templateComponent = (
@@ -358,14 +366,15 @@ export const TemplatesLibrary = () => {
                 </div>
               );
             })}
-          <div ref={ref} className="h-[0px]" />
-          {query.isFetchingNextPage && (
-            <p className="font-inter text-xs uppercase text-center py-4">
-              loading more...
-            </p>
-          )}
-        </div>
-      </ScrollArea>
+            <div ref={ref} className="h-[0px]" />
+            {query.isFetchingNextPage && (
+              <p className="font-inter text-xs uppercase text-center py-4">
+                loading more...
+              </p>
+            )}
+          </div>
+        </ScrollArea>
+      )}
       {showSelection && (
         <TemplatesLibraryActions selectedTemplates={selectedTemplates} />
       )}

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import Konva from "konva";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -64,10 +62,15 @@ export const NODES = () => [
   }),
   new WeaveImageNode({
     config: {
+      style: {
+        cursor: {
+          loading: "url(/cursors/cloud-sync.svg) 16 16, wait",
+        },
+      },
       performance: {
         cache: {
-          enabled: true,
-          pixelRatio: 2,
+          enabled: false,
+          // pixelRatio: 2,
         },
       },
       transform: {
@@ -79,6 +82,7 @@ export const NODES = () => [
         ],
         keepRatio: true,
       },
+      useFallbackImage: true,
       urlTransformer: (
         url: string,
         //node?: Konva.Node

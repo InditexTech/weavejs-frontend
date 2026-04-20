@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +20,11 @@ import { useCollaborationRoom } from "@/store/store";
 const TIME_UNTIL_DISCONNECTION_SECONDS = 20; // 20 seconds
 
 export const ManageIdleDisconnection = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
   const timeElapsedIntervalRef = React.useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
   const [disconnectionStarted, setDisconnectionStarted] =
     React.useState<boolean>(false);
@@ -50,14 +50,15 @@ export const ManageIdleDisconnection = () => {
       timeoutRef.current = setTimeout(async () => {
         setShowIdleWarning(false);
         sessionStorage.removeItem(`weave.js_${room}`);
+        console.log("AQUI disconnect?");
         await instance?.getStore().disconnect();
-        router.push("/");
+        navigate({ to: "/" });
       }, TIME_UNTIL_DISCONNECTION_SECONDS * 1000);
       timeElapsedIntervalRef.current = setInterval(() => {
         setDisconnectionCounter((prev) => prev - 1);
       }, 1000);
     }
-  }, [instance, router, room, userInactive, disconnectionStarted]);
+  }, [instance, navigate, room, userInactive, disconnectionStarted]);
 
   if (!showIdleWarning) {
     return null;

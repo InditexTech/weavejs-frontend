@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { NumberInput } from "./number-input";
 import { cn } from "@/lib/utils";
@@ -36,14 +34,14 @@ export const InputNumber = ({
         input.blur();
       }
     },
-    []
+    [],
   );
 
   const handleOnValueChange = React.useCallback(
     (numberValue: number | undefined) => {
       onChange?.(numberValue ?? 0);
     },
-    [onChange]
+    [onChange],
   );
 
   return (
@@ -55,7 +53,7 @@ export const InputNumber = ({
       decimalScale={2}
       className={cn(
         "w-full text-[3px] font-normal text-gray-700 text-right focus:outline-none bg-transparent",
-        className
+        className,
       )}
       value={Number(value)}
       onClick={(e) => e.stopPropagation()}

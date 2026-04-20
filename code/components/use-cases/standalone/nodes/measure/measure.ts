@@ -23,13 +23,14 @@ export class MeasureNode extends WeaveNode {
   protected nodeType: string = MEASURE_NODE_TYPE;
   protected eventsInitiated: boolean;
   protected handlePointCircleRadius: number = 6;
+  initialize = undefined;
 
   constructor(params?: Partial<MeasureNodeParams>) {
     super();
 
     this.config = mergeExceptArrays(
       MEASURE_NODE_DEFAULT_CONFIG,
-      params?.config ?? {}
+      params?.config ?? {},
     );
 
     this.eventsInitiated = false;
@@ -61,7 +62,7 @@ export class MeasureNode extends WeaveNode {
           unit,
           unitPerPixel: newUnitPerPixel,
         });
-      }
+      },
     );
 
     this.instance.addEventListener<{ unit: string; unitPerPixel: number }>(
@@ -78,10 +79,10 @@ export class MeasureNode extends WeaveNode {
           measure.setAttr("unitPerPixel", unitPerPixel);
 
           this.instance.updateNode(
-            this.serialize(measure as WeaveElementInstance)
+            this.serialize(measure as WeaveElementInstance),
           );
         }
-      }
+      },
     );
 
     this.instance.addEventListener<{
@@ -105,7 +106,7 @@ export class MeasureNode extends WeaveNode {
         measure.setAttr("unitPerPixel", unitPerPixel);
 
         this.instance.updateNode(
-          this.serialize(measure as WeaveElementInstance)
+          this.serialize(measure as WeaveElementInstance),
         );
 
         const measureNodes = stage.find<Konva.Group>(`.${MEASURE_NODE_TYPE}`);
@@ -119,7 +120,7 @@ export class MeasureNode extends WeaveNode {
             measure.setAttr("unitPerPixel", unitPerPixel);
 
             this.instance.updateNode(
-              this.serialize(measure as WeaveElementInstance)
+              this.serialize(measure as WeaveElementInstance),
             );
           }
         }
@@ -155,7 +156,7 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       fromPoint,
-      (separation + separationLine.padding) * orientation
+      (separation + separationLine.padding) * orientation,
     );
 
     const linePerpFrom = new Konva.Line({
@@ -182,7 +183,7 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      (separation + separationLine.padding) * orientation
+      (separation + separationLine.padding) * orientation,
     );
 
     const linePerpTo = new Konva.Line({
@@ -201,7 +202,7 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       fromPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     // Circle drawn at the end of the 'fromPoint' perpendicular line
@@ -221,7 +222,7 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     // Circle drawn at the end of the 'toPoint' perpendicular line
@@ -279,7 +280,7 @@ export class MeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         midPoint,
-        (textSize.height + separationLine.padding) * orientation
+        (textSize.height + separationLine.padding) * orientation,
       );
       measureText.x(perpPointTextMid.left.x);
       measureText.y(perpPointTextMid.left.y);
@@ -295,7 +296,7 @@ export class MeasureNode extends WeaveNode {
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
         : textOffsetX + textConfig.padding,
-      false
+      false,
     );
 
     // A point perpendicular from the mid point of the measure line, at a distance
@@ -306,7 +307,7 @@ export class MeasureNode extends WeaveNode {
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
         : textOffsetX + textConfig.padding,
-      true
+      true,
     );
 
     // A line draw from the 'fromPoint' perpendicular line circle center to the pointLeftText
@@ -371,7 +372,7 @@ export class MeasureNode extends WeaveNode {
             this.updateSelectionHandlers(measure);
           }
         }
-      }
+      },
     );
 
     this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
@@ -396,7 +397,7 @@ export class MeasureNode extends WeaveNode {
         if (!isSelected) {
           this.destroySelectionHandlers(measure);
         }
-      }
+      },
     );
 
     this.initEvents();
@@ -425,17 +426,17 @@ export class MeasureNode extends WeaveNode {
     const angle = this.getAngle(fromPoint, toPoint);
     const moveToCircleAct = node.findOne(`#moveToCircle-${node.getAttrs().id}`);
     const crosshairFromAct = node.findOne(
-      `#crosshairFrom-${node.getAttrs().id}`
+      `#crosshairFrom-${node.getAttrs().id}`,
     );
     const moveFromCircleAct = node.findOne(
-      `#moveFromCircle-${node.getAttrs().id}`
+      `#moveFromCircle-${node.getAttrs().id}`,
     );
     const crosshairToAct = node.findOne(`#crosshairTo-${node.getAttrs().id}`);
     const moveSeparationRectAct = node.findOne(
-      `#moveSeparationRect-${node.getAttrs().id}`
+      `#moveSeparationRect-${node.getAttrs().id}`,
     );
     const measureText = node.findOne(
-      `#measureText-${node.getAttrs().id}`
+      `#measureText-${node.getAttrs().id}`,
     ) as Konva.Text;
 
     if (
@@ -467,7 +468,7 @@ export class MeasureNode extends WeaveNode {
       "crosshairFrom",
       node,
       fromPoint,
-      angle
+      angle,
     );
 
     const moveToCircle = new Konva.Circle({
@@ -487,28 +488,28 @@ export class MeasureNode extends WeaveNode {
       "crosshairTo",
       node,
       toPoint,
-      angle
+      angle,
     );
 
     const fromPerp = this.perpendicularPoint(
       fromPoint,
       toPoint,
       fromPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     const toPerp = this.perpendicularPoint(
       fromPoint,
       toPoint,
       toPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     const pointMidMeasure = this.pointFromMid(
       fromPerp.left,
       toPerp.left,
       0,
-      false
+      false,
     );
 
     const isTextBiggerThanMeasureSpace =
@@ -522,7 +523,7 @@ export class MeasureNode extends WeaveNode {
       fromPerp.left,
       toPerp.left,
       pointMidMeasure,
-      multiplier * (textSize?.height ?? 0) * orientation
+      multiplier * (textSize?.height ?? 0) * orientation,
     );
 
     const moveSeparationRect = new Konva.Rect({
@@ -578,7 +579,7 @@ export class MeasureNode extends WeaveNode {
       });
       this.onUpdate(
         realNode as WeaveElementInstance,
-        this.serialize(realNode as WeaveElementInstance).props
+        this.serialize(realNode as WeaveElementInstance).props,
       );
     });
 
@@ -600,7 +601,7 @@ export class MeasureNode extends WeaveNode {
         fromPoint: newFromPoint,
       });
       this.instance.updateNode(
-        this.serialize(realNode as WeaveElementInstance)
+        this.serialize(realNode as WeaveElementInstance),
       );
     });
 
@@ -628,7 +629,7 @@ export class MeasureNode extends WeaveNode {
       });
       this.onUpdate(
         realNode as WeaveElementInstance,
-        this.serialize(realNode as WeaveElementInstance).props
+        this.serialize(realNode as WeaveElementInstance).props,
       );
     });
 
@@ -650,7 +651,7 @@ export class MeasureNode extends WeaveNode {
         toPoint: newToPoint,
       });
       this.instance.updateNode(
-        this.serialize(realNode as WeaveElementInstance)
+        this.serialize(realNode as WeaveElementInstance),
       );
     });
 
@@ -684,13 +685,13 @@ export class MeasureNode extends WeaveNode {
         fromPoint,
         toPoint,
         midPoint,
-        multiplier * (textSize?.height ?? 0) * orientation
+        multiplier * (textSize?.height ?? 0) * orientation,
       );
 
       const pointInLine = this.projectPointToLine(
         separatorPoint.left,
         originalSeparationHandlerPosition,
-        pos
+        pos,
       );
 
       if (isNaN(pointInLine.t)) {
@@ -698,7 +699,7 @@ export class MeasureNode extends WeaveNode {
           fromPoint,
           toPoint,
           separatorPoint.left,
-          (multiplier * (textSize?.height ?? 0) + 1) * orientation
+          (multiplier * (textSize?.height ?? 0) + 1) * orientation,
         );
         moveSeparationRect.position(point);
         originalSeparationHandlerPosition = point;
@@ -726,7 +727,7 @@ export class MeasureNode extends WeaveNode {
 
       this.onUpdate(
         realNode as WeaveElementInstance,
-        this.serialize(realNode as WeaveElementInstance).props
+        this.serialize(realNode as WeaveElementInstance).props,
       );
     });
 
@@ -748,13 +749,13 @@ export class MeasureNode extends WeaveNode {
         fromPoint,
         toPoint,
         midPoint,
-        multiplier * (textSize?.height ?? 0) * orientation
+        multiplier * (textSize?.height ?? 0) * orientation,
       );
 
       const pointInLine = this.projectPointToLine(
         separatorPoint.left,
         originalSeparationHandlerPosition,
-        pos
+        pos,
       );
 
       moveSeparationRect.position(pointInLine);
@@ -774,7 +775,7 @@ export class MeasureNode extends WeaveNode {
       });
 
       this.instance.updateNode(
-        this.serialize(realNode as WeaveElementInstance)
+        this.serialize(realNode as WeaveElementInstance),
       );
     });
   }
@@ -788,19 +789,19 @@ export class MeasureNode extends WeaveNode {
     const toPoint = node.getAttrs().toPoint as { x: number; y: number };
 
     const moveToCircle = node.findOne(
-      `#moveToCircle-${node.getAttrs().id}`
+      `#moveToCircle-${node.getAttrs().id}`,
     ) as Konva.Circle;
     const crosshairFrom = node.findOne(
-      `#crosshairFrom-${node.getAttrs().id}`
+      `#crosshairFrom-${node.getAttrs().id}`,
     ) as Konva.Group;
     const moveFromCircle = node.findOne(
-      `#moveFromCircle-${node.getAttrs().id}`
+      `#moveFromCircle-${node.getAttrs().id}`,
     ) as Konva.Circle;
     const crosshairTo = node.findOne(
-      `#crosshairTo-${node.getAttrs().id}`
+      `#crosshairTo-${node.getAttrs().id}`,
     ) as Konva.Group;
     const moveSeparationRect = node.findOne(
-      `#moveSeparationRect-${node.getAttrs().id}`
+      `#moveSeparationRect-${node.getAttrs().id}`,
     ) as Konva.Rect;
 
     if (moveToCircle) {
@@ -821,7 +822,7 @@ export class MeasureNode extends WeaveNode {
 
     if (moveSeparationRect) {
       const measureText = node.findOne(
-        `#measureText-${node.getAttrs().id}`
+        `#measureText-${node.getAttrs().id}`,
       ) as Konva.Text;
 
       const angle = this.getAngle(fromPoint, toPoint);
@@ -833,21 +834,21 @@ export class MeasureNode extends WeaveNode {
         fromPoint,
         toPoint,
         fromPoint,
-        separation * orientation
+        separation * orientation,
       );
 
       const toPerp = this.perpendicularPoint(
         fromPoint,
         toPoint,
         toPoint,
-        separation * orientation
+        separation * orientation,
       );
 
       const pointMidMeasure = this.pointFromMid(
         fromPerp.left,
         toPerp.left,
         0,
-        false
+        false,
       );
 
       const isTextBiggerThanMeasureSpace =
@@ -862,7 +863,7 @@ export class MeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         pointMidMeasure,
-        multiplier * (textSize?.height ?? 0) * orientation
+        multiplier * (textSize?.height ?? 0) * orientation,
       );
 
       moveSeparationRect.x(separatorPoint.left.x);
@@ -876,11 +877,11 @@ export class MeasureNode extends WeaveNode {
     const moveToCircle = node.findOne(`#moveToCircle-${node.getAttrs().id}`);
     const crosshairFrom = node.findOne(`#crosshairFrom-${node.getAttrs().id}`);
     const moveFromCircle = node.findOne(
-      `#moveFromCircle-${node.getAttrs().id}`
+      `#moveFromCircle-${node.getAttrs().id}`,
     );
     const crosshairTo = node.findOne(`#crosshairTo-${node.getAttrs().id}`);
     const moveSeparationRect = node.findOne(
-      `#moveSeparationRect-${node.getAttrs().id}`
+      `#moveSeparationRect-${node.getAttrs().id}`,
     );
 
     if (moveToCircle) {
@@ -904,7 +905,7 @@ export class MeasureNode extends WeaveNode {
     from: Konva.Vector2d,
     to: Konva.Vector2d,
     distance: number,
-    towardsSecond = true
+    towardsSecond = true,
   ) {
     // midpoint
     const mx = (from.x + to.x) / 2;
@@ -941,7 +942,7 @@ export class MeasureNode extends WeaveNode {
     from: Konva.Vector2d,
     to: Konva.Vector2d,
     point: Konva.Vector2d,
-    distance: number
+    distance: number,
   ) {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
@@ -971,7 +972,7 @@ export class MeasureNode extends WeaveNode {
 
   onUpdate(
     nodeInstance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ): void {
     nodeInstance.setAttrs({
       ...nextProps,
@@ -993,11 +994,11 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       fromPoint,
-      (separation + separationLine.padding) * orientation
+      (separation + separationLine.padding) * orientation,
     );
 
     const linePerpFrom = measure.findOne(
-      `#linePerpFrom-${nextProps.id}`
+      `#linePerpFrom-${nextProps.id}`,
     ) as Konva.Line;
     linePerpFrom?.points([
       fromPoint.x,
@@ -1010,11 +1011,11 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      (separation + separationLine.padding) * orientation
+      (separation + separationLine.padding) * orientation,
     );
 
     const linePerpTo = measure.findOne(
-      `#linePerpTo-${nextProps.id}`
+      `#linePerpTo-${nextProps.id}`,
     ) as Konva.Line;
     linePerpTo?.points([
       toPoint.x,
@@ -1027,11 +1028,11 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       fromPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     const fromCircle = measure.findOne(
-      `#fromCircle-${nextProps.id}`
+      `#fromCircle-${nextProps.id}`,
     ) as Konva.Circle;
     fromCircle?.position({
       x: fromPerp.left.x,
@@ -1042,11 +1043,11 @@ export class MeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      separation * orientation
+      separation * orientation,
     );
 
     const toCircle = measure.findOne(
-      `#toCircle-${nextProps.id}`
+      `#toCircle-${nextProps.id}`,
     ) as Konva.Circle;
     toCircle?.position({
       x: toPerp.left.x,
@@ -1069,7 +1070,7 @@ export class MeasureNode extends WeaveNode {
       : `${distance.toFixed(2)} px`;
 
     const measureText = measure.findOne(
-      `#measureText-${nextProps.id}`
+      `#measureText-${nextProps.id}`,
     ) as Konva.Text;
 
     const angle = this.getAngle(fromPoint, toPoint);
@@ -1089,7 +1090,7 @@ export class MeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         midPoint,
-        (textSize.height + separationLine.padding) * orientation
+        (textSize.height + separationLine.padding) * orientation,
       );
       measureText.x(perpPointTextMid.left.x);
       measureText.y(perpPointTextMid.left.y);
@@ -1101,7 +1102,7 @@ export class MeasureNode extends WeaveNode {
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
         : textOffsetX + textConfig.padding,
-      false
+      false,
     );
 
     const pointRightText = this.pointFromMid(
@@ -1110,7 +1111,7 @@ export class MeasureNode extends WeaveNode {
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
         : textOffsetX + textConfig.padding,
-      true
+      true,
     );
 
     const lineLeft = measure.findOne(`#lineLeft-${nextProps.id}`) as Konva.Line;
@@ -1122,7 +1123,7 @@ export class MeasureNode extends WeaveNode {
     ]);
 
     const lineRight = measure.findOne(
-      `#lineRight-${nextProps.id}`
+      `#lineRight-${nextProps.id}`,
     ) as Konva.Line;
     lineRight?.points([
       pointRightText.x,
@@ -1135,11 +1136,11 @@ export class MeasureNode extends WeaveNode {
       fromPerp.left,
       toPerp.left,
       0,
-      false
+      false,
     );
 
     const crosshairFrom = measure.findOne(
-      `#crosshairFrom-${measure.getAttrs().id}`
+      `#crosshairFrom-${measure.getAttrs().id}`,
     );
 
     if (crosshairFrom) {
@@ -1149,7 +1150,7 @@ export class MeasureNode extends WeaveNode {
     }
 
     const crosshairTo = measure.findOne(
-      `#crosshairTo-${measure.getAttrs().id}`
+      `#crosshairTo-${measure.getAttrs().id}`,
     );
 
     if (crosshairTo) {
@@ -1159,7 +1160,7 @@ export class MeasureNode extends WeaveNode {
     }
 
     const moveSeparationRect = measure.findOne(
-      `#moveSeparationRect-${measure.getAttrs().id}`
+      `#moveSeparationRect-${measure.getAttrs().id}`,
     );
 
     if (moveSeparationRect) {
@@ -1176,7 +1177,7 @@ export class MeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         pointMidMeasure,
-        multiplier * textSize.height * orientation
+        multiplier * textSize.height * orientation,
       );
 
       moveSeparationRect.x(separatorPoint.left.x);
@@ -1188,7 +1189,7 @@ export class MeasureNode extends WeaveNode {
   private projectPointToLine(
     fromPoint: Konva.Vector2d,
     toPoint: Konva.Vector2d,
-    pointToProject: Konva.Vector2d
+    pointToProject: Konva.Vector2d,
   ): { x: number; y: number; t: number; flipped: boolean } {
     const dx = toPoint.x - fromPoint.x;
     const dy = toPoint.y - fromPoint.y;
@@ -1215,7 +1216,7 @@ export class MeasureNode extends WeaveNode {
     name: string,
     node: Konva.Group,
     point: Vector2d,
-    angle: number
+    angle: number,
   ) {
     const props = node.getAttrs();
 
@@ -1257,7 +1258,7 @@ export class MeasureNode extends WeaveNode {
     fromPoint: Konva.Vector2d,
     toPoint: Konva.Vector2d,
     point: Konva.Vector2d,
-    distance: number
+    distance: number,
   ) {
     const dx = toPoint.x - fromPoint.x;
     const dy = toPoint.y - fromPoint.y;
@@ -1300,10 +1301,10 @@ export class MeasureNode extends WeaveNode {
     const scale = stage.scaleX();
 
     const fromCircle = node.findOne(
-      `#fromCircle-${node.getAttrs().id}`
+      `#fromCircle-${node.getAttrs().id}`,
     ) as Konva.Circle;
     const toCircle = node.findOne(
-      `#toCircle-${node.getAttrs().id}`
+      `#toCircle-${node.getAttrs().id}`,
     ) as Konva.Circle;
 
     if (fromCircle && toCircle) {

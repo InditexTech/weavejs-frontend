@@ -50,6 +50,7 @@ interface IAChatState {
     state: "idle" | "validating";
     visible: boolean;
   };
+  hidden: boolean;
   status: ChatStatus | undefined;
   defined: boolean;
   threadId: string;
@@ -61,7 +62,7 @@ interface IAChatState {
   sendMessage:
     | ((
         message: PromptInputMessage,
-        options?: ChatRequestOptions
+        options?: ChatRequestOptions,
       ) => Promise<void>)
     | null;
   setEnabled: (newEnabled: boolean) => void;
@@ -75,8 +76,8 @@ interface IAChatState {
   setSendMessage: (
     newSendMessage: (
       message: PromptInputMessage,
-      options?: ChatRequestOptions
-    ) => Promise<void>
+      options?: ChatRequestOptions,
+    ) => Promise<void>,
   ) => void;
   setImageModel: (newModel: AvailableImageModels) => void;
   setImageSize: (newSize: unknown) => void;
@@ -85,6 +86,7 @@ interface IAChatState {
   setImageAspectRatio: (newAspectRatio: unknown) => void;
   setSetupState: (newState: "idle" | "validating") => void;
   setSetupVisible: (newVisible: boolean) => void;
+  setHidden: (newHidden: boolean) => void;
 }
 
 export const useIAChat = create<IAChatState>()((set) => {
@@ -99,6 +101,7 @@ export const useIAChat = create<IAChatState>()((set) => {
       state: "idle",
       visible: false,
     },
+    hidden: false,
     status: undefined,
     sendMessage: null,
     scrollToBottom: null,
@@ -256,6 +259,11 @@ export const useIAChat = create<IAChatState>()((set) => {
       set((state) => ({
         ...state,
         setup: { ...state.setup, visible: newVisible },
+      })),
+    setHidden: (newHidden) =>
+      set((state) => ({
+        ...state,
+        hidden: newHidden,
       })),
   };
 });

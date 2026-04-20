@@ -2,11 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useWeave } from "@inditextech/weave-react";
 import {
   DropdownMenu,
@@ -21,10 +19,11 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { useGetOs } from "@/components/room-components/hooks/use-get-os";
 import { useStandaloneUseCase } from "../../store/store";
+import { useCollaborationRoom } from "@/store/store";
 
 export function Menu() {
   const os = useGetOs();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const instance = useWeave((state) => state.instance);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -33,7 +32,14 @@ export function Menu() {
   const setUser = useStandaloneUseCase((state) => state.setUser);
   const setInstanceId = useStandaloneUseCase((state) => state.setInstanceId);
   const setManagingImageId = useStandaloneUseCase(
-    (state) => state.setManagingImageId
+    (state) => state.setManagingImageId,
+  );
+
+  const room = useCollaborationRoom((state) => state.room);
+  const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
+  const setRoomsRoomId = useCollaborationRoom((state) => state.setRoomsRoomId);
+  const setRoomsDeleteVisible = useCollaborationRoom(
+    (state) => state.setRoomsDeleteVisible,
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -45,15 +51,21 @@ export function Menu() {
     setUser(undefined);
     setInstanceId("undefined");
     setManagingImageId(null);
-    router.push("/use-cases/standalone");
+    navigate({ to: "/use-cases/standalone" });
   }, [
     instance,
     instanceId,
-    router,
+    navigate,
     setInstanceId,
     setManagingImageId,
     setUser,
   ]);
+
+  const handleArchiveRoom = React.useCallback(async () => {
+    setMenuOpen(false);
+    setRoomsRoomId(room ?? "");
+    setRoomsDeleteVisible(true);
+  }, [room, setRoomsRoomId, setRoomsDeleteVisible]);
 
   const handlePrintToConsoleState = React.useCallback(() => {
     if (instance) {
@@ -79,8 +91,8 @@ export function Menu() {
             ["font-extralight"]: !menuOpen,
           })}
         >
-          <div className="flex gap-1 justify-start items-center">
-            <div className="h-[40px] 2xl:h-[60px] flex justify-start items-center">
+          <div className="flex gap-1 justify-start items-center min-w-[50px]">
+            <div className="h-[54px] flex justify-start items-center">
               <Logo kind="only-logo" variant="no-text" />
             </div>
             {menuOpen ? (
@@ -96,10 +108,22 @@ export function Menu() {
           }}
           align="start"
           side="bottom"
-          alignOffset={-12}
-          sideOffset={9}
-          className="font-inter rounded-none"
+          alignOffset={-8}
+          sideOffset={8}
+          className="font-inter rounded-none !shadow-none !drop-shadow"
         >
+          {roomInfo?.roomUser?.role === "owner" &&
+            roomInfo?.room.status !== "archived" && (
+              <>
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer text-[#ff2c2c] hover:rounded-none"
+                  onPointerDown={handleArchiveRoom}
+                >
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             disabled={
@@ -118,7 +142,7 @@ export function Menu() {
             className="text-foreground cursor-pointer hover:rounded-none"
             onPointerDown={handleExitRoom}
           >
-            Close
+            Exit
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

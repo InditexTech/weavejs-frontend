@@ -36,6 +36,7 @@ import {
   Ruler,
   Video,
   Focus,
+  X,
 } from "lucide-react";
 import {
   HoverCard,
@@ -49,10 +50,10 @@ import {
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import { SidebarSelector } from "../sidebar-selector";
-// import { SidebarHeader } from "../sidebar-header";
-import { stringToColor } from "@/lib/utils";
+import { cn, stringToColor } from "@/lib/utils";
 import { OPERATIONS_MAP } from "@/components/utils/weave/constants";
+import { ToolbarButton } from "../toolbar/toolbar-button";
+import { useGetSession } from "../hooks/use-get-session";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -276,12 +277,16 @@ export const ElementsTree = () => {
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
   const usersLocks = useWeave((state) => state.usersLocks);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
   );
 
-  // const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+  const viewType = useCollaborationRoom((state) => state.viewType);
+  const setShowLeftSidebarFloating = useCollaborationRoom(
+    (state) => state.setShowLeftSidebarFloating,
+  );
 
   const [elementsTree, setElementsTree] = React.useState<WeaveStateElement[]>(
     [],
@@ -365,7 +370,7 @@ export const ElementsTree = () => {
         { user: WeaveUser; operation: string }
       > = {};
       for (const userId of users) {
-        if (userId === user?.id) continue;
+        if (userId === session?.user.id) continue;
 
         const userLock = usersLocks[userId] as WeaveUserMutexLock<unknown>;
 
@@ -378,7 +383,7 @@ export const ElementsTree = () => {
       }
 
       return lockedNodes;
-    }, [user, usersLocks]);
+    }, [session, usersLocks]);
 
   const treeData = React.useMemo<TreeDataItem[]>(() => {
     if (!instance) return [];
@@ -395,19 +400,32 @@ export const ElementsTree = () => {
     return null;
   }
 
-  // if (sidebarActive !== SIDEBAR_ELEMENTS.nodesTree) {
-  //   return null;
-  // }
-
   return (
-    <div className="w-full h-full">
-      <div className="flex px-[28px] py-[16px] gap-2 rounded-none font-inter font-light text-base justify-start items-center uppercase border-b-[0.5px] border-[#c9c9c9]">
+    <div
+      className={cn("w-full", {
+        ["h-[calc(100%-57px-81px)]"]: viewType === "fixed",
+        ["h-[calc(100%)]"]: viewType === "floating",
+      })}
+    >
+      <div className="flex px-[28px] py-[16px] gap-2 rounded-none font-inter font-light text-base justify-between items-center uppercase border-t-[0.5px] border-b-[0.5px] border-[#c9c9c9]">
         <div>Elements</div>
+        {viewType === "floating" && (
+          <div>
+            <ToolbarButton
+              icon={<X strokeWidth={1} />}
+              onClick={() => {
+                setShowLeftSidebarFloating(false);
+              }}
+              size="small"
+              variant="squared"
+              tooltipSideOffset={4}
+              tooltipSide="top"
+              tooltipAlign="start"
+            />
+          </div>
+        )}
       </div>
-      {/* <SidebarHeader>
-        <SidebarSelector title="Elements Tree" />
-      </SidebarHeader> */}
-      <ScrollArea className="w-full h-[calc(100%-65px-57px-33px)]">
+      <ScrollArea className="w-full h-[calc(100%-57px-33px)]">
         <div className="flex flex-col gap-2 w-full h-full">
           {elementsTree.length === 0 && (
             <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
@@ -437,7 +455,7 @@ export const ElementsTree = () => {
           )}
         </div>
       </ScrollArea>
-      <div className="px-[24px] py-[8px] text-xs border-t border-[#c9c9c9]">
+      <div className="px-[24px] py-[8px] text-xs border-t-[0.5px] border-[#c9c9c9]">
         Nodes: {amountOfNodes}
       </div>
     </div>

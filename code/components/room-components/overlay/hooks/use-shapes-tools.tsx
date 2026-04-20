@@ -2,7 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Circle, Hexagon, Square, Star, Tag } from "lucide-react";
+import {
+  Brush,
+  Circle,
+  Hexagon,
+  MoveUpRight,
+  PenLine,
+  Square,
+  Star,
+} from "lucide-react";
 import React from "react";
 import { ShortcutElement } from "../../help/shortcut-element";
 import { SYSTEM_OS } from "@/lib/utils";
@@ -22,7 +30,7 @@ export const useShapesTools = () => {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const SHAPES_TOOLS: Record<
@@ -99,24 +107,72 @@ export const useShapesTools = () => {
         onClick: () => triggerTool("starTool"),
         active: () => actualAction === "starTool",
       },
-      colorTokenTool: {
-        icon: <Tag className="px-2" size={40} strokeWidth={1} />,
+      strokeTool: {
+        icon: <PenLine className="px-2" size={40} strokeWidth={1} />,
         label: (
           <div className="flex gap-3 justify-start items-center">
-            <p>Color Token Reference tool</p>
+            <p>Line tool</p>
             <ShortcutElement
               shortcuts={{
-                [SYSTEM_OS.MAC]: "K",
-                [SYSTEM_OS.OTHER]: "K",
+                [SYSTEM_OS.MAC]: "L",
+                [SYSTEM_OS.OTHER]: "L",
               }}
             />
           </div>
         ),
-        onClick: () => triggerTool("colorTokenTool"),
-        active: () => actualAction === "colorTokenTool",
+        onClick: () => {
+          triggerTool("strokeTool");
+        },
+        active: () => actualAction === "strokeTool",
+      },
+      arrowTool: {
+        icon: <MoveUpRight className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Arrow tool</p>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "L",
+                [SYSTEM_OS.OTHER]: "L",
+              }}
+            />
+          </div>
+        ),
+        onClick: () => {
+          if (!instance) return;
+
+          triggerTool("arrowTool");
+
+          instance.updatePropsAction("arrowTool", {
+            stroke: "#000000ff",
+            strokeWidth: 1,
+            opacity: 1,
+            tipStartStyle: "none",
+            tipEndStyle: "arrow",
+            tipEndBase: 5,
+            tipEndHeight: (Math.sqrt(3) / 2) * 5,
+          });
+        },
+        active: () => actualAction === "arrowTool",
+      },
+      brushTool: {
+        icon: <Brush className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Brush tool</p>
+            <ShortcutElement
+              shortcuts={{
+                [SYSTEM_OS.MAC]: "B",
+                [SYSTEM_OS.OTHER]: "B",
+              }}
+            />
+          </div>
+        ),
+        onClick: () => triggerTool("brushTool"),
+        active: () => actualAction === "brushTool",
       },
     }),
-    [actualAction, triggerTool]
+    [instance, actualAction, triggerTool],
   );
 
   return SHAPES_TOOLS;

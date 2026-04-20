@@ -15,7 +15,7 @@ type CommentCreateProps = {
   finish: (
     node: WeaveElementInstance,
     content: string,
-    action: WeaveCommentNodeCreateAction
+    action: WeaveCommentNodeCreateAction,
   ) => void;
   close: () => void;
 };
@@ -40,7 +40,7 @@ export const CommentCreating = ({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setContent(e.target.value);
     },
-    []
+    [],
   );
 
   const handleCreateComment = React.useCallback(() => {
@@ -63,8 +63,8 @@ export const CommentCreating = ({
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        e.stopPropagation();
         e.preventDefault();
+        e.stopPropagation();
         handleCloseComment();
       }
     };
@@ -94,7 +94,7 @@ export const CommentCreating = ({
 
       e.stopPropagation();
     },
-    [content, handleCloseComment, handleCreateComment]
+    [content, handleCloseComment, handleCreateComment],
   );
 
   return (

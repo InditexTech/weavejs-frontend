@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import Image from "next/image";
+import { Image } from "@unpic/react";
 import { PresentationImage } from "./utils";
 
 type FramePresentationImageProps = {

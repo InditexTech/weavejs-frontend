@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -31,6 +29,7 @@ export function AddToRoomConfirmation() {
   );
 
   const room = useAddToRoom((state) => state.room);
+  const page = useAddToRoom((state) => state.page);
   const template = useAddToRoom((state) => state.template);
   const frameName = useAddToRoom((state) => state.frameName);
   const setStep = useAddToRoom((state) => state.setStep);
@@ -79,6 +78,8 @@ export function AddToRoomConfirmation() {
     },
   });
 
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+
   if (!template || !room) {
     return null;
   }
@@ -89,17 +90,17 @@ export function AddToRoomConfirmation() {
         <DialogDescription className="font-inter text-sm my-0">
           Check the selection and confirm to add the images to the room.
         </DialogDescription>
-        <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-25px-48px-120px-196px-500px)] grid grid-cols-1 grid-rows-1">
+        <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-25px-48px-120px-196px-48px)] grid grid-cols-1 grid-rows-1">
           <div className="col-span-2 font-inter text-base text-right border border-[#c9c9c9]">
-            <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-25px-48px-120px-196px-500px)]">
+            <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-25px-48px-120px-196px-48px)]">
               <ScrollArea className="w-full h-full">
-                <Masonry sequential columnsCount={2} gutter="1px">
+                <Masonry columnsCount={4} gutter="1px">
                   {selectedImages.map((image) => {
                     return (
                       <img
                         key={image}
                         className="object-cover w-full h-full"
-                        src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/templates/${instanceId}/images/${image}`}
+                        src={`${apiEndpoint}/weavejs/templates/${instanceId}/images/${image}`}
                         alt={`image ${image} thumbnail`}
                       />
                     );
@@ -113,18 +114,18 @@ export function AddToRoomConfirmation() {
           <div className="w-full flex flex-col justify-start items-start gap-3">
             <div className="w-full flex flex-col gap-0">
               <div className="font-inter text-sm text-muted-foreground uppercase">
-                Action
+                Room
               </div>
-              <div className="font-inter text-base text-left uppercase">
-                {room?.create ? "Create" : "Add"}
+              <div className="font-inter text-base text-left">
+                {room?.name || ""}
               </div>
             </div>
             <div className="w-full flex flex-col gap-0">
               <div className="font-inter text-sm text-muted-foreground uppercase">
-                Room
+                Page
               </div>
               <div className="font-inter text-base text-left">
-                {room?.id || ""}
+                {page?.name || ""}
               </div>
             </div>
             <div className="w-full flex flex-col gap-0">
@@ -148,7 +149,7 @@ export function AddToRoomConfirmation() {
                 )}
               >
                 <img
-                  className="bg-[#d6d6d6] w-full aspect-video block object-contain relative"
+                  className="bg-[#d6d6d6] w-full rounded-md aspect-video block object-contain relative"
                   src={template.templateImage}
                   alt="A template"
                   data-template-data={template.templateData}
@@ -177,8 +178,7 @@ export function AddToRoomConfirmation() {
             onClick={() => {
               setProcessing(true);
               mutationAddToRoom.mutate({
-                ...(room.create && { roomName: room.id }),
-                ...(!room.create && { roomId: room.id }),
+                roomId: page?.id ?? "",
                 frameName,
                 templateInstanceId: instanceId,
                 templateId: template.templateId,

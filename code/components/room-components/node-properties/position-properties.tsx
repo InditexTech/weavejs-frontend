@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 // import { Pin, PinOff } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
@@ -18,7 +16,7 @@ export function PositionProperties() {
   const nodes = useWeave((state) => state.selection.nodes);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const updateElement = React.useCallback(
@@ -29,7 +27,7 @@ export function PositionProperties() {
         return;
       }
     },
-    [instance, nodePropertiesAction]
+    [instance, nodePropertiesAction],
   );
 
   const onRotationChange = React.useCallback(
@@ -57,18 +55,18 @@ export function PositionProperties() {
       function rotateAroundPoint(
         shape: WeaveStateElement,
         deltaDeg: number,
-        point: { x: number; y: number }
+        point: { x: number; y: number },
       ) {
         const angleRad = degToRad(deltaDeg);
         const x = Math.round(
           point.x +
             ((shape.props.x || 0) - point.x) * Math.cos(angleRad) -
-            ((shape.props.y || 0) - point.y) * Math.sin(angleRad)
+            ((shape.props.y || 0) - point.y) * Math.sin(angleRad),
         );
         const y = Math.round(
           point.y +
             ((shape.props.x || 0) - point.x) * Math.sin(angleRad) +
-            ((shape.props.y || 0) - point.y) * Math.cos(angleRad)
+            ((shape.props.y || 0) - point.y) * Math.cos(angleRad),
         );
         return {
           ...shape,
@@ -93,11 +91,11 @@ export function PositionProperties() {
       };
       updatedNode = rotateAroundCenter(
         updatedNode,
-        value - (updatedNode.props.rotation || 0)
+        value - (updatedNode.props.rotation || 0),
       );
       updateElement(updatedNode);
     },
-    [instance, node, updateElement]
+    [instance, node, updateElement],
   );
 
   if (nodes && nodes.length > 1) return null;
@@ -115,14 +113,14 @@ export function PositionProperties() {
   }
 
   return (
-    <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
-      <div className="w-full flex justify-between items-center gap-3">
+    <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
+      {/* <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
             Position
           </span>
         </div>
-      </div>
+      </div> */}
       <div className="grid grid-cols-1 gap-3 w-full">
         <div className="grid grid-cols-3 gap-3 w-full">
           <InputNumber

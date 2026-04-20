@@ -18,21 +18,25 @@ import Konva from "konva";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 
 export class ImageTemplateToolAction extends WeaveAction {
-  protected initialized: boolean = false;
-  protected moved: boolean;
-  protected tempImageTemplateNode: Konva.Rect | null;
-  protected state: ImageTemplateToolActionState;
-  protected pointers: Map<number, Vector2d>;
-  protected imageTemplateId: string | null;
+  protected initialized!: boolean;
+  protected moved!: boolean;
+  protected tempImageTemplateNode!: Konva.Rect | null;
+  protected state!: ImageTemplateToolActionState;
+  protected pointers!: Map<number, Vector2d>;
+  protected imageTemplateId!: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint!: Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = IMAGE_TEMPLATE_TOOL_STATE.IDLE;
@@ -78,6 +82,8 @@ export class ImageTemplateToolAction extends WeaveAction {
 
     stage.container().addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
         this.cancelAction();
         return;
       }

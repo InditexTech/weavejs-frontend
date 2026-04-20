@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import Konva from "konva";
 import { ToolbarButton } from "../toolbar/toolbar-button";
@@ -31,7 +29,6 @@ export function ToolsNodeOverlayV2() {
 
   const nodePropertiesAction: "create" | "update" | undefined =
     useCollaborationRoom((state) => state.nodeProperties.action);
-  const showUI = useCollaborationRoom((state) => state.ui.show);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -55,17 +52,17 @@ export function ToolsNodeOverlayV2() {
     instance.addEventListener("onImageTemplateFreed", handleImageTemplateFreed);
     instance.addEventListener(
       "onImageTemplateLocked",
-      handleImageTemplateLocked
+      handleImageTemplateLocked,
     );
 
     return () => {
       instance.removeEventListener(
         "onImageTemplateFreed",
-        handleImageTemplateFreed
+        handleImageTemplateFreed,
       );
       instance.removeEventListener(
         "onImageTemplateLocked",
-        handleImageTemplateLocked
+        handleImageTemplateLocked,
       );
     };
   }, [instance, movingImageTemplate]);
@@ -83,7 +80,7 @@ export function ToolsNodeOverlayV2() {
 
   const isImageTemplate = React.useMemo(
     () => actualNode && (actualNode.type ?? "") === "image-template",
-    [actualNode]
+    [actualNode],
   );
 
   const imageTemplateFit = React.useMemo(() => {
@@ -110,8 +107,8 @@ export function ToolsNodeOverlayV2() {
       actualNodeTools.push(
         <React.Fragment key="image-edition-tools">
           <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<LockOpen className="px-2" size={40} strokeWidth={1} />}
+            className="rounded-none !w-[40px]"
+            icon={<LockOpen size={40} strokeWidth={1} />}
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
             }
@@ -140,7 +137,7 @@ export function ToolsNodeOverlayV2() {
             tooltipSide="left"
             tooltipAlign="center"
           />
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
@@ -170,8 +167,8 @@ export function ToolsNodeOverlayV2() {
       actualNodeTools.push(
         <React.Fragment key="image-tools">
           <ToolbarButton
-            className="rounded-full !w-[40px]"
-            icon={<Lock className="px-2" size={40} strokeWidth={1} />}
+            className="rounded-none !w-[40px]"
+            icon={<Lock size={40} strokeWidth={1} />}
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
             }
@@ -208,16 +205,12 @@ export function ToolsNodeOverlayV2() {
             tooltipSide="left"
             tooltipAlign="center"
           />
-        </React.Fragment>
+        </React.Fragment>,
       );
     }
 
     return actualNodeTools;
   }, [instance, nodes, actualNode, singleLocked, weaveConnectionStatus]);
-
-  if (!showUI) {
-    return null;
-  }
 
   if (imageTemplateTools.length === 0 && imageTools.length === 0) {
     return null;
@@ -238,7 +231,7 @@ export function ToolsNodeOverlayV2() {
       {(imageTemplateTools.length > 0 || imageTools.length > 0) && (
         <Toolbar
           orientation="vertical"
-          className="grid grid-cols-1 w-auto justify-start items-center rounded-3xl"
+          className="grid grid-cols-1 w-auto justify-start items-center rounded-none"
         >
           {imageTemplateTools}
           {imageTools}

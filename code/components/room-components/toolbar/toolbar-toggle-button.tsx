@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { cn } from "@/lib/utils";
 import React from "react";
 

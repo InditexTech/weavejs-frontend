@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
@@ -11,6 +9,7 @@ import {
   WeaveBrushToolAction,
   WeaveFrameToolAction,
   WeaveImageToolAction,
+  WeaveImagesToolAction,
   WeavePenToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
@@ -31,13 +30,13 @@ import {
 } from "@inditextech/weave-sdk";
 import { type WeaveUser } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../../actions/color-token-tool/color-token-tool";
-import { ImagesToolAction } from "../../actions/images-tool/images-tool";
 import { ImageTemplateToolAction } from "../../actions/image-template-tool/image-template-tool";
 import { MaskToolAction } from "../../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { ThreadEntity } from "../../room-components/hooks/types";
+import { FitToPageToolAction } from "@/components/actions/fit-to-page-tool/fit-to-page-tool";
 
 export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
@@ -48,6 +47,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeavePenToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),
+  new WeaveImagesToolAction(),
   new WeaveFrameToolAction(),
   new WeaveStarToolAction(),
   new WeaveStrokeToolAction(),
@@ -64,7 +64,6 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveAlignNodesToolAction(),
   new WeaveExportNodesToolAction(),
   new WeaveMeasureToolAction(),
-  new ImagesToolAction(),
   new MaskToolAction(),
   new FuzzyMaskToolAction(),
   new MaskEraserToolAction(),
@@ -96,4 +95,5 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
       },
     },
   }),
+  new FitToPageToolAction(),
 ];

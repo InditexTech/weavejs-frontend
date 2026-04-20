@@ -3,29 +3,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { formatDistanceToNow } from "date-fns";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { useCollaborationRoom } from "@/store/store";
-import { Trash, CircleCheckBig, Ellipsis, Check, Clock } from "lucide-react";
+import { Ellipsis, Check, Clock } from "lucide-react";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { getThreads } from "@/api/get-threads";
 import { useWeave } from "@inditextech/weave-react";
-import { ThreadEntity, ThreadStatus } from "../hooks/types";
-import { getUserShort } from "@/components/utils/users";
-import { putThread } from "@/api/put-thread";
-import { delThread } from "@/api/del-thread";
+import { ThreadEntity } from "../hooks/types";
 import { eventBus } from "@/components/utils/events-bus";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,19 +27,20 @@ import {
   WeaveCommentsRendererPlugin,
 } from "@inditextech/weave-sdk";
 import { SidebarHeader } from "../sidebar-header";
+import { cn } from "@/lib/utils";
+import { ToolbarButton } from "../toolbar/toolbar-button";
+import { CommentsComment } from "./comments.comment";
 
 export const Comments = () => {
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
-  const user = useCollaborationRoom((state) => state.user);
-  const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const commentsStatus = useCollaborationRoom((state) => state.comments.status);
   const setCommentsStatus = useCollaborationRoom(
-    (state) => state.setCommentsStatus
+    (state) => state.setCommentsStatus,
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -54,121 +48,21 @@ export const Comments = () => {
   const queryClient = useQueryClient();
 
   const handleRefreshComments = React.useCallback(() => {
-    const queryKey = ["comments", room ?? ""];
+    const queryKey = ["comments", pageId ?? ""];
     queryClient.invalidateQueries({ queryKey });
-  }, [queryClient, room]);
+  }, [queryClient, pageId]);
 
   const { data, refetch, error, isLoading } = useQuery({
-    queryKey: ["comments", room ?? ""],
+    queryKey: ["comments", pageId ?? ""],
     queryFn: () => {
-      if (!room) {
+      if (!pageId) {
         return Promise.resolve({ items: [], total: 0 });
       }
 
-      return getThreads(room ?? "", commentsStatus, true);
+      return getThreads(pageId ?? "", commentsStatus, true);
     },
     enabled: typeof instance !== "undefined",
   });
-
-  const mutateMarkResolvedThread = useMutation({
-    mutationFn: async ({
-      threadId,
-      status,
-    }: {
-      threadId: string;
-      status: ThreadStatus;
-    }) => {
-      if (!user) {
-        return { answer: undefined };
-      }
-
-      return await putThread({
-        userId: user.name ?? "",
-        clientId: clientId ?? "",
-        threadId,
-        roomId: room ?? "",
-        status,
-      });
-    },
-    onSuccess() {
-      eventBus.emit("onCommentsChanged");
-      handleRefreshComments();
-    },
-    onError(error) {
-      console.error(error);
-      toast.error("Failed to create thread answer");
-    },
-  });
-
-  const mutateDeleteThread = useMutation({
-    mutationFn: async ({ threadId }: { threadId: string }) => {
-      if (!user) {
-        return { status: "KO", message: "User not defined" };
-      }
-
-      return await delThread({
-        userId: user.name ?? "",
-        clientId: clientId ?? "",
-        roomId: room ?? "",
-        threadId,
-      });
-    },
-    onSuccess() {
-      if (!instance) return;
-
-      eventBus.emit("onCommentsChanged");
-
-      const commentHandler =
-        instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>("comment");
-
-      if (commentHandler) {
-        commentHandler.setCommentViewing(null);
-      }
-
-      handleRefreshComments();
-    },
-    onError(error) {
-      console.error(error);
-      toast.error("Failed to delete thread");
-    },
-  });
-
-  const handleMarkResolvedComment = React.useCallback(
-    (threadId: string) => {
-      mutateMarkResolvedThread.mutate({
-        threadId,
-        status: "resolved",
-      });
-    },
-    [mutateMarkResolvedThread]
-  );
-
-  const handleDeleteComment = React.useCallback(
-    (threadId: string) => {
-      mutateDeleteThread.mutate({
-        threadId,
-      });
-    },
-    [mutateDeleteThread]
-  );
-
-  const handleFocusOnNode = React.useCallback(
-    (threadId: string) => {
-      if (!instance) {
-        return;
-      }
-
-      const node = instance.getStage().findOne(`#${threadId}`);
-
-      const commentsHandler =
-        instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>("comment");
-
-      if (node && commentsHandler) {
-        commentsHandler.focusOn(threadId, 0.5);
-      }
-    },
-    [instance]
-  );
 
   React.useEffect(() => {
     const handlerCommentsChanged = () => {
@@ -198,32 +92,49 @@ export const Comments = () => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && data?.items) {
       const commentsRendererPlugin =
         instance.getPlugin<WeaveCommentsRendererPlugin<ThreadEntity>>(
-          "commentsRenderer"
+          "commentsRenderer",
         );
       commentsRendererPlugin?.setComments(data.items);
       commentsRendererPlugin?.render();
     }
   }, [instance, status, roomLoaded, data?.items, error, isLoading]);
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.comments) {
-    return null;
-  }
-
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.comments,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.comments,
+      })}
+    >
       <SidebarHeader
         actions={
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="cursor-pointer flex justify-center items-center w-[20px] h-[32px] text-center bg-transparent hover:text-[#c9c9c9]">
-                <Ellipsis size={20} strokeWidth={1} />
-              </button>
+              <ToolbarButton
+                icon={
+                  <Ellipsis
+                    size={20}
+                    className="group-disabled:text-[#cccccc]"
+                    strokeWidth={1}
+                  />
+                }
+                onClick={() => {
+                  setMenuOpen(!menuOpen);
+                }}
+                size="small"
+                variant="squared"
+                tooltipSideOffset={4}
+                tooltipSide="bottom"
+                tooltipAlign="end"
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               side="bottom"
               align="end"
               sideOffset={12}
-              className="rounded-none p-0"
+              className="rounded-none p-0 !shadow-none !drop-shadow"
             >
               <DropdownMenuItem
                 className="text-foreground cursor-default hover:rounded-none w-full text-xs"
@@ -239,12 +150,12 @@ export const Comments = () => {
 
                   const commentsHandler =
                     instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>(
-                      "comment"
+                      "comment",
                     );
 
                   if (commentsHandler) {
                     commentsHandler.setShowResolved(
-                      newCommentsStatus === "all"
+                      newCommentsStatus === "all",
                     );
                   }
 
@@ -261,108 +172,26 @@ export const Comments = () => {
         <SidebarSelector title="Comments" />
       </SidebarHeader>
       {isLoading && (
-        <div className="w-full h-[calc(100%-95px)] font-inter text-sm flex justify-center items-center">
+        <div className="w-full h-[calc(100%-57px-40px)] font-inter text-sm flex justify-center items-center">
           Loading...
         </div>
       )}
       {!isLoading && data.items.length === 0 && (
-        <div className="w-full h-[calc(100%-95px)] font-inter text-sm flex justify-center items-center">
+        <div className="w-full h-[calc(100%-57px-40px)] font-inter text-sm flex justify-center items-center">
           No comments yet
         </div>
       )}
       {!isLoading && data.items.length > 0 && (
-        <ScrollArea className="w-full h-[calc(100%-65px-73px-40px)] overflow-auto">
+        <ScrollArea className="w-full h-[calc(100%-57px-40px)] overflow-auto">
           <div className="flex flex-col gap-3 w-full p-5">
             {data.items.map((thread: ThreadEntity, index: number) => {
               return (
-                <div
-                  role="button"
-                  tabIndex={0}
+                <CommentsComment
                   key={thread.threadId}
-                  className="w-full group p-3 hover:bg-[#ededed99] cursor-pointer flex flex-col gap-3"
-                  onClick={() => {
-                    handleFocusOnNode(thread.threadId);
-                  }}
-                >
-                  <div className="w-full flex justify-between items-center gap-5 group">
-                    <div className="flex gap-3 justify-start items-center">
-                      <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
-                        <AvatarFallback className="bg-transparent uppercase">
-                          {getUserShort(thread.userMetadata.name ?? "")}
-                        </AvatarFallback>
-                      </AvatarUI>
-                    </div>
-                    <div className="flex gap-1 justify-end items-center hidden group-hover:block">
-                      <Button
-                        className="rounded-none w-[20px] h-[20px] cursor-pointer"
-                        variant="link"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDeleteComment(thread.threadId);
-                        }}
-                      >
-                        <Trash strokeWidth={1} size={16} className="text-red" />
-                      </Button>
-                      {thread.status === "pending" && (
-                        <Button
-                          className="rounded-none w-[20px] h-[20px] cursor-pointer"
-                          variant="link"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleMarkResolvedComment(thread.threadId);
-                          }}
-                        >
-                          <CircleCheckBig strokeWidth={1} size={16} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="w-full flex flex-col justify-center items-start gap-1">
-                    <div className="w-full flex justify-between items-center gap-2">
-                      <div className="flex justify-start items-center gap-1">
-                        <div className="font-inter text-xs font-bold">
-                          #{data.items.length - index} ·
-                        </div>
-                        <div className="font-inter text-xs font-bold truncate">
-                          {thread.userMetadata.name ?? ""}
-                        </div>
-                      </div>
-                      <div className="font-inter text-xs text-[#C9C9C9] truncate">
-                        {formatDistanceToNow(
-                          new Date(thread.updatedAt).toISOString(),
-                          { addSuffix: true }
-                        )}
-                      </div>
-                    </div>
-                    <div className="font-inter text-xs text-left whitespace-pre-line line-clamp-[9]">
-                      {thread.content}
-                    </div>
-                    <div className="w-full flex justify-between items-center">
-                      {thread.replies > 0 ? (
-                        <a
-                          href="#"
-                          className="font-inter text-xs mt-3 text-[#1a1aff] hover:underline"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleFocusOnNode(thread.threadId);
-                          }}
-                        >
-                          {thread.replies}{" "}
-                          {thread.replies === 1 ? "reply" : "replies"}
-                        </a>
-                      ) : (
-                        <div />
-                      )}
-                      {thread.status === "resolved" && (
-                        <div className="flex flex-inline gap-1 font-inter text-xs mt-3 text-[#238830]">
-                          <Check strokeWidth={1} size={16} /> resolved
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  thread={thread}
+                  index={index}
+                  amountOfComments={data.items.length}
+                />
               );
             })}
           </div>
@@ -387,7 +216,7 @@ export const Comments = () => {
               </div>
               <Badge variant="secondary" className="font-inter !text-xs">
                 {data?.items?.filter(
-                  (c: ThreadEntity) => c.status === "resolved"
+                  (c: ThreadEntity) => c.status === "resolved",
                 ).length ?? 0}
               </Badge>
             </div>

@@ -10,29 +10,23 @@ import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
 import {
   Loader2Icon,
-  Download,
-  Presentation,
   SkipBack,
   SkipForward,
   SquareCheck,
   StepBack,
   StepForward,
   XIcon,
+  FileDown,
 } from "lucide-react";
 import { generatePresentation, PresentationImage, toImageAsync } from "./utils";
 import { FrameImage } from "./frames-library.image";
 import { FramePresentationImage } from "./frames-library.presentation-image";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
 import { cn } from "@/lib/utils";
+import { ToolbarButton } from "../toolbar/toolbar-button";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -43,16 +37,14 @@ export const FramesLibrary = () => {
   const setFramesExportVisible = useCollaborationRoom(
     (state) => state.setFramesExportVisible,
   );
-  const exporting = useCollaborationRoom(
-    (state) => state.frames.export.exporting,
+  const framesImages = useCollaborationRoom((state) => state.frames.images);
+  const setFramesImages = useCollaborationRoom(
+    (state) => state.setFramesImages,
   );
 
   const [framesAvailable, setFramesAvailable] = React.useState<Konva.Node[]>(
     [],
   );
-  const [framesImages, setFramesImages] = React.useState<
-    Record<string, HTMLImageElement>
-  >({});
   const [loadingFrames, setLoadingFrames] = React.useState<boolean>(false);
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
@@ -102,7 +94,8 @@ export const FramesLibrary = () => {
 
   React.useEffect(() => {
     const loadImage = async (node: Konva.Node) => {
-      if (!instance) return;
+      if (!instance)
+        throw new Error("Instance is required to load frame image");
 
       const nodeAttrs = node.getAttrs();
       try {
@@ -115,15 +108,31 @@ export const FramesLibrary = () => {
           width: bounds.width,
           height: bounds.height,
         });
-        setFramesImages((prev) => ({ ...prev, [nodeAttrs.id ?? ""]: img }));
+        return { nodeAttrs, img };
       } catch (ex) {
         console.error(ex);
+        throw ex;
       }
     };
 
     const loadImages = async () => {
-      const images = framesAvailable.map((frame) => loadImage(frame));
-      await Promise.allSettled(images);
+      const imagesPromises = framesAvailable.map((frame) => loadImage(frame));
+      const images = await Promise.allSettled<{
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nodeAttrs: any;
+        img: HTMLImageElement;
+      }>(imagesPromises);
+      setFramesImages({});
+      const imagesMap: Record<string, HTMLImageElement> = {};
+      for (let i = 0; i < images.length; i++) {
+        const result = images[i];
+        if (result.status === "fulfilled") {
+          const { nodeAttrs, img } = result.value;
+          imagesMap[nodeAttrs.id ?? ""] = img;
+        }
+      }
+      setFramesImages(imagesMap);
+
       setLoadingFrames(false);
     };
 
@@ -132,7 +141,7 @@ export const FramesLibrary = () => {
         loadImages();
       }, 50);
     }
-  }, [instance, framesAvailable, loadingFrames]);
+  }, [instance, framesImages, framesAvailable, loadingFrames, setFramesImages]);
 
   const exportFramesHandler = React.useCallback(async () => {
     if (!instance) {
@@ -197,166 +206,155 @@ export const FramesLibrary = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.frames) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.frames) {
+  //   return null;
+  // }
 
   return (
     <>
-      <div className="w-full h-full">
+      <div
+        className={cn("w-full h-full", {
+          ["hidden pointer-events-none"]:
+            sidebarActive !== SIDEBAR_ELEMENTS.frames,
+          ["block pointer-events-auto"]:
+            sidebarActive === SIDEBAR_ELEMENTS.frames,
+        })}
+      >
         <SidebarHeader
           actions={
             <>
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
-                      disabled={selectedFrames.length === 0}
-                      onClick={() => {
-                        setActualFrame(0);
-                        setPresentationMode((prev) => !prev);
-                      }}
-                    >
-                      <Presentation
-                        className="group-disabled:text-[#cccccc]"
-                        size={20}
-                        strokeWidth={1}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    align="center"
-                    className="rounded-none"
-                  >
-                    Presentation mode
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="cursor-pointer bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
-                      onClick={() => {
-                        if (selectedFrames.length === 0) {
-                          const frames = framesAvailable.map((frame) => {
-                            const attrs = frame.getAttrs();
-                            return attrs.id ?? "";
-                          });
-                          setSelectedFrames(frames);
-                        } else {
-                          setSelectedFrames([]);
-                        }
-                      }}
-                    >
-                      <SquareCheck size={20} strokeWidth={1} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    align="center"
-                    className="rounded-none"
-                  >
-                    Select all frames
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[32px] hover:text-[#c9c9c9]"
-                      disabled={selectedFrames.length === 0 || exporting}
-                      onClick={exportFramesHandler}
-                    >
-                      <Download
-                        className="group-disabled:text-[#cccccc]"
-                        size={20}
-                        strokeWidth={1}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    align="center"
-                    className="rounded-none"
-                  >
-                    Export as PDF
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {/* <ToolbarButton
+                icon={
+                  <Presentation
+                    size={20}
+                    className="group-disabled:text-[#cccccc]"
+                    strokeWidth={1}
+                  />
+                }
+                onClick={() => {
+                  setActualFrame(0);
+                  setPresentationMode((prev) => !prev);
+                }}
+                label="Presentation mode"
+                size="small"
+                variant="squared"
+                tooltipSideOffset={4}
+                tooltipSide="bottom"
+                tooltipAlign="end"
+              /> */}
+              <ToolbarButton
+                icon={
+                  <SquareCheck
+                    size={20}
+                    className="group-disabled:text-[#cccccc]"
+                    strokeWidth={1}
+                  />
+                }
+                onClick={() => {
+                  if (selectedFrames.length === 0) {
+                    const frames = framesAvailable.map((frame) => {
+                      const attrs = frame.getAttrs();
+                      return attrs.id ?? "";
+                    });
+                    setSelectedFrames(frames);
+                  } else {
+                    setSelectedFrames([]);
+                  }
+                }}
+                label="Select all frames"
+                size="small"
+                variant="squared"
+                tooltipSideOffset={4}
+                tooltipSide="bottom"
+                tooltipAlign="end"
+              />
+              <ToolbarButton
+                icon={
+                  <FileDown
+                    size={20}
+                    className="group-disabled:text-[#cccccc]"
+                    strokeWidth={1}
+                  />
+                }
+                disabled={selectedFrames.length === 0}
+                onClick={exportFramesHandler}
+                label="Export frames as PDF"
+                size="small"
+                variant="squared"
+                tooltipSideOffset={4}
+                tooltipSide="bottom"
+                tooltipAlign="end"
+              />
             </>
           }
         >
           <SidebarSelector title="Frames" />
         </SidebarHeader>
-        <ScrollArea className="w-full h-[calc(100vh-65px-73px)]">
-          <div
-            className={cn("flex flex-col gap-[24px] w-full h-full", {
-              ["p-0"]:
-                loadingFrames ||
-                (!loadingFrames && framesAvailable.length === 0),
-              ["p-[24px]"]: !loadingFrames && framesAvailable.length > 0,
-            })}
-          >
-            {loadingFrames && (
-              <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-                <b className="font-normal text-[18px]">Loading frames</b>
-                <span className="text-[14px]">Please wait...</span>
-              </div>
-            )}
-            {!loadingFrames && framesAvailable.length === 0 && (
-              <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-                <b className="font-normal text-[18px]">No frames created</b>
-                <span className="text-[14px]">
-                  Add a frame to the whiteboard
-                </span>
-              </div>
-            )}
-            {!loadingFrames &&
-              framesAvailable.map((node) => {
+        {!loadingFrames && framesAvailable.length === 0 && (
+          <div className="col-span-1 w-full h-[calc(100%-57px)] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+            <b className="font-normal text-[18px]">No frames created</b>
+            <span className="text-[14px]">Add a frame to the whiteboard</span>
+          </div>
+        )}
+        {loadingFrames && (
+          <div className="col-span-1 w-full h-[calc(100%-57px)] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+            <b className="font-normal text-[18px]">Loading frames</b>
+            <span className="text-[14px]">Please wait...</span>
+          </div>
+        )}
+        {!loadingFrames && framesAvailable.length > 0 && (
+          <ScrollArea className="w-full h-[calc(100%-57px)]">
+            <div
+              className={cn("flex flex-col gap-3 w-full h-full", {
+                ["p-0"]:
+                  loadingFrames ||
+                  (!loadingFrames && framesAvailable.length === 0),
+                ["p-[24px]"]: !loadingFrames && framesAvailable.length > 0,
+              })}
+            >
+              {framesAvailable.map((node, index) => {
                 const attrs = node.getAttrs();
 
                 return (
                   <div
                     key={attrs.id}
-                    className="w-full bg-light-background-1 flex flex-col gap-3"
+                    className="w-full bg-light-background-1 flex flex-col gap-1"
                   >
-                    <div className="w-full flex justify-between items-center">
-                      <div className="w-full text-[14px] font-inter font-light">
-                        {attrs.title}
-                      </div>
-                      <div className="font-label-l-regular">
-                        <Checkbox
-                          className="cursor-pointer rounded-none"
-                          checked={
-                            selectedFrames.findIndex((e) => e === attrs.id) !==
-                            -1
-                          }
-                          onCheckedChange={() => {
-                            setSelectedFrames((prev) => {
-                              const newElements = new Set(prev);
-                              if (newElements.has(attrs.id ?? "")) {
-                                newElements.delete(attrs.id ?? "");
-                              } else {
-                                newElements.add(attrs.id ?? "");
+                    {framesImages[node.getAttrs().id ?? ""] && (
+                      <FrameImage
+                        image={framesImages[node.getAttrs().id ?? ""]}
+                        actions={
+                          <div className="font-label-l-regular">
+                            <Checkbox
+                              className="cursor-pointer rounded-none bg-white"
+                              checked={
+                                selectedFrames.findIndex(
+                                  (e) => e === attrs.id,
+                                ) !== -1
                               }
-                              return Array.from(newElements);
-                            });
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <FrameImage
-                      image={framesImages[node.getAttrs().id ?? ""]}
-                    />
+                              onCheckedChange={() => {
+                                setSelectedFrames((prev) => {
+                                  const newElements = new Set(prev);
+                                  if (newElements.has(attrs.id ?? "")) {
+                                    newElements.delete(attrs.id ?? "");
+                                  } else {
+                                    newElements.add(attrs.id ?? "");
+                                  }
+                                  return Array.from(newElements);
+                                });
+                              }}
+                            />
+                          </div>
+                        }
+                        title={`${index + 1}. ${attrs.title}`}
+                      />
+                    )}
                   </div>
                 );
               })}
-          </div>
-        </ScrollArea>
+            </div>
+          </ScrollArea>
+        )}
       </div>
       {presentationMode && (
         <div className="fixed z-10 top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">

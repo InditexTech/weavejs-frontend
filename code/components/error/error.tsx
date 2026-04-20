@@ -2,81 +2,53 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
-import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Bug } from "lucide-react";
 import { Logo } from "@/components/utils/logo";
-import { useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { getError } from "./errors";
-import { motion } from "framer-motion";
+import { Divider } from "../room-components/overlay/divider";
 
 export const Error = () => {
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
 
-  const errorCode = searchParams.get("errorCode");
+  const searchParams: { error: string | undefined } = useSearch({
+    strict: false,
+  });
+
+  const errorCode = searchParams.error as string | undefined;
 
   const { description, action, href } = getError(errorCode || "");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background relative gap-5">
-      <motion.section
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative flex h-full w-full flex-col items-center justify-center"
-      >
-        <div className="max-w-[520px] w-full flex flex-col items-center justify-between gap-0 border border-[#c9c9c9]">
-          <div className="w-full flex justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 py-8 rounded-xl">
-            <Logo kind="landscape" variant="no-text" />
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-col items-end justify-center"
-            >
-              <h1 className="text-1xl font-inter font-light text-muted-foreground uppercase">
-                SHOWCASE
-              </h1>
-            </motion.div>
-          </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-transparent relative gap-5">
+      <div className="max-w-lg flex flex-col items-center justify-center w-full shadow-none">
+        <div className="w-full flex flex-col gap-2 justify-center items-center">
+          <Logo kind="landscape" variant="no-text" />
+          <h1 className="text-4xl font-inter font-light text-muted-foreground uppercase">
+            SHOWCASE
+          </h1>
         </div>
-      </motion.section>
-      <div className="max-w-[520px] w-full flex flex-col items-center justify-between gap-0 border border-[#c9c9c9]">
-        <div className="w-full z-1 flex flex-col gap-2 items-center justify-center bg-transparent">
-          <Card className="w-full shadow-none border-0 py-8 gap-0">
-            <CardHeader className="flex flex-col items-center text-center gap-0">
-              <div className="rounded-full bg-destructive/10 p-3">
-                <AlertCircle className="h-10 w-10 text-destructive" />
-              </div>
-              <h3 className="text-xl font-inter font-extralight text-muted-foreground mt-2">
-                An error has occurred
-              </h3>
-            </CardHeader>
-
-            <CardContent className="text-center py-6 pb-8">
-              <p>
-                <span className="font-inter">{description}</span>
-              </p>
-            </CardContent>
-
-            <CardFooter className="flex flex-col">
-              <Button
-                asChild
-                className="uppercase cursor-pointer font-inter rounded-none"
-              >
-                <Link href={href}>{action}</Link>
-              </Button>
-            </CardFooter>
-          </Card>
+        <div className="w-full flex flex-col justify-center items-center text-black gap-8 mt-8">
+          <Bug size={48} strokeWidth={1} />
+          <div className="w-full flex flex-col gap-2 justify-center items-center">
+            <div className="text-center text-base text-[#757575]">
+              <p className="uppercase">Oops an error has occurred</p>
+            </div>
+            <div className="text-center text-base text-[#757575]">
+              <p>{description}</p>
+            </div>
+          </div>
+          <Divider className="h-[1px] w-full" />
+          <Button
+            className="cursor-pointer font-inter font-light rounded-none uppercase"
+            onClick={async () => {
+              navigate({ to: href });
+            }}
+          >
+            {action}
+          </Button>
         </div>
       </div>
     </div>

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import {
   DropdownMenu,
@@ -24,7 +22,7 @@ export const RightSidebarTitle = () => {
 
   const activeSidebar = useStandaloneUseCase((state) => state.sidebar.active);
   const setActiveSidebar = useStandaloneUseCase(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   return (

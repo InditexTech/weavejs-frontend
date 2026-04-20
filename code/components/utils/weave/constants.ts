@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 export const OPERATIONS_MAP: Record<string, string> = {
   ["node-transform"]: "transforming element",
   ["node-drag"]: "dragging element",

@@ -2,15 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
-// import { Badge } from "@/components/ui/badge";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
 import { cn } from "@/lib/utils";
+import { downscaleImageFromURL } from "@inditextech/weave-sdk";
 
 type UploadedImageProps = { image: ImageEntity; selected: boolean };
 
@@ -18,13 +14,32 @@ export const UploadedImage = ({
   image,
   selected,
 }: Readonly<UploadedImageProps>) => {
+  const [downscaledImageDataUrl, setDownscaledImageDataUrl] = React.useState<
+    string | null
+  >(null);
+
   const instance = useWeave((state) => state.instance);
 
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
-
   const imageUrl = React.useMemo(() => {
-    return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${image.roomId}/images/${image.imageId}`;
+    const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+    const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+    return `${apiEndpoint}/${hubName}/rooms/${image.roomId}/images/${image.imageId}`;
   }, [image]);
+
+  React.useEffect(() => {
+    const getDownscaledImage = async () => {
+      const dataURL = await downscaleImageFromURL(imageUrl, {
+        maxWidth: 200,
+        maxHeight: 200,
+      });
+      setDownscaledImageDataUrl(dataURL);
+    };
+
+    if (imageUrl) {
+      getDownscaledImage();
+    }
+  }, [imageUrl]);
 
   if (!image) {
     return null;
@@ -34,7 +49,7 @@ export const UploadedImage = ({
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
+  if (!downscaledImageDataUrl) {
     return null;
   }
 
@@ -46,12 +61,11 @@ export const UploadedImage = ({
         {
           ["cursor-pointer hover:bg-black"]:
             ["completed"].includes(image.status) && image.removalJobId === null,
-          ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
+          ["after:content-[''] after:pointer-events-none after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
-        }
+        },
       )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
         style={{
@@ -59,6 +73,8 @@ export const UploadedImage = ({
         }}
         id={image.imageId}
         data-image-id={image.imageId}
+        data-image-url={imageUrl}
+        data-image-fallback={downscaledImageDataUrl}
         draggable="true"
         src={imageUrl}
         alt="An image"
@@ -68,18 +84,6 @@ export const UploadedImage = ({
         ["pending", "working"].includes(image.removalStatus) && (
           <div className="pulseOverlay"></div>
         )}
-      {/* {image.removalJobId !== null &&
-        image.removalStatus !== null &&
-        ["pending", "working"].includes(image.removalStatus) && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex justify-center items-center">
-            <Badge
-              className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-              variant="default"
-            >
-              REMOVING
-            </Badge>
-          </div>
-        )} */}
     </div>
   );
 };

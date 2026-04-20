@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
@@ -149,37 +147,31 @@ export function ArrowProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (
-    actualAction &&
-    ["selectionTool"].includes(actualAction) &&
-    !["stroke-single", "connector"].includes(actualNode.type)
-  ) {
+  if (["stroke", "connector"].includes(actualNode.type)) {
     return null;
   }
 
   if (
     actualAction &&
-    !["selectionTool", "strokeTool", "arrowTool", "connectorTool"].includes(
-      actualAction,
-    )
+    !["selectionTool", "connectorTool"].includes(actualAction)
   ) {
     return null;
   }
 
   return (
     <>
-      <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
-        <div className="w-full flex justify-between items-center gap-3">
+      <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
+        {/* <div className="w-full flex justify-between items-center gap-3">
           <div className="cursor-pointer hover:no-underline items-center py-0">
             <span className="text-[13px] font-inter font-light uppercase">
               Properties
             </span>
           </div>
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 gap-3 w-full">
           <div className="grid grid-cols-2 gap-3 w-full">
             <InputColor
-              label="Color (#RGBA)"
+              label="Line color (#RGBA)"
               value={actualNode.props.stroke}
               onChange={(value) => {
                 const updatedNode: WeaveStateElement = {
@@ -194,7 +186,7 @@ export function ArrowProperties() {
             />
             <InputSelect
               hideSearch
-              label="Width"
+              label="Line width"
               options={[
                 { label: "Small", value: "1" },
                 { label: "Medium", value: "3" },
@@ -253,9 +245,9 @@ export function ArrowProperties() {
             <div className="col-span-2">
               <InputSelect
                 hideSearch
-                label="Style"
+                label="Line style"
                 options={
-                  ARROW_DASH_OPTIONS[arrowSizeIndex].map((opt) => ({
+                  ARROW_DASH_OPTIONS[arrowSizeIndex]?.map((opt) => ({
                     label: opt.label,
                     value: opt.value.map((v) => `${v}`).join(","),
                   })) || []

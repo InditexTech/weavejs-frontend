@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
@@ -25,7 +23,7 @@ export type ContextMenuOption = {
       icon?: React.ReactNode;
       disabled?: boolean;
       onClick: (
-        e?: React.MouseEvent<HTMLButtonElement>
+        e?: React.MouseEvent<HTMLButtonElement>,
       ) => void | Promise<void>;
     }
   | {
@@ -53,7 +51,7 @@ function ContextMenuButton({
         {
           ["hover:bg-accent"]: !disabled,
           ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
-        }
+        },
       )}
       style={{
         userSelect: "none",
@@ -92,11 +90,11 @@ export const ContextMenuRender = ({
 
       X = Math.max(
         20,
-        Math.min(X, window.innerWidth - boundingRect.width - 20)
+        Math.min(X, window.innerWidth - boundingRect.width - 20),
       );
       Y = Math.max(
         20,
-        Math.min(Y, window.innerHeight - boundingRect.height - 20)
+        Math.min(Y, window.innerHeight - boundingRect.height - 20),
       );
 
       ref.current.style.top = `${Y}px`;
@@ -143,7 +141,7 @@ export const ContextMenuRender = ({
   return (
     <div
       ref={ref}
-      className="fixed w-[300px] bg-white flex flex-col border border-[#c9c9c9] shadow-none"
+      className="fixed w-[300px] bg-white flex flex-col border border-[#c9c9c9] drop-shadow shadow-none"
       style={{
         pointerEvents: show && options.length > 0 ? "auto" : "none",
         display: show && options.length > 0 ? "block" : "none",

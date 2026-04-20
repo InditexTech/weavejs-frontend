@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import {
   DropdownMenu,
@@ -17,7 +15,6 @@ import {
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import {
   SwatchBook,
-  // ListTree,
   Projector,
   Images,
   ChevronDown,
@@ -61,12 +58,12 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   return (
     <DropdownMenu
       onOpenChange={(open: boolean) => setMenuOpen(open)}
-      // open={menuOpen}
+      open={menuOpen}
       modal={false}
     >
       <DropdownMenuTrigger
         className={cn(
-          "flex gap-2 rounded-none h-[32px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
+          "flex gap-2 rounded-none h-[32px] font-inter font-light text-lg hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
@@ -94,6 +91,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
+                  setMenuOpen(false);
                   sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
                 }}
               >
@@ -103,22 +101,11 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               <DropdownMenuSeparator />
             </>
           )}
-          {/* <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-            }}
-          >
-            <ListTree strokeWidth={1} /> Elements
-            <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
-            </DropdownMenuShortcut>
-          </DropdownMenuItem> */}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
+              setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
@@ -131,6 +118,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
+              setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.videos);
             }}
           >
@@ -143,6 +131,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
+              setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
@@ -155,6 +144,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
+              setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.templates);
             }}
           >
@@ -167,6 +157,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
+              setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
@@ -180,6 +171,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               className="text-foreground cursor-pointer hover:rounded-none w-full"
               onPointerDown={(e) => {
                 e.stopPropagation();
+                setMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.comments);
               }}
             >
@@ -196,6 +188,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
                 className="text-foreground cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
+                  setMenuOpen(false);
                   sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
                 }}
               >

@@ -32,21 +32,23 @@ import { delStandaloneThread } from "@/api/standalone/del-standalone-thread";
 import { getStandaloneThreads } from "@/api/standalone/get-standalone-threads";
 import { useComment } from "../../hooks/use-comment";
 import { RightSidebarTitle } from "../page/right-sidebar-title";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 export const Comments = () => {
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
-  const user = useStandaloneUseCase((state) => state.user);
+  const { session } = useGetSession();
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const activeSidebar = useStandaloneUseCase((state) => state.sidebar.active);
   const commentsStatus = useStandaloneUseCase((state) => state.comments.status);
   const setCommentsStatus = useStandaloneUseCase(
-    (state) => state.setCommentsStatus
+    (state) => state.setCommentsStatus,
   );
 
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -64,7 +66,7 @@ export const Comments = () => {
         instanceId,
         managingImageId,
         commentsStatus,
-        true
+        true,
       );
     },
     staleTime: 0,
@@ -82,14 +84,14 @@ export const Comments = () => {
       threadId: string;
       status: ThreadStatus;
     }) => {
-      if (!user || !managingImageId) {
+      if (!session || !managingImageId) {
         return { answer: undefined };
       }
 
       return await putStandaloneThread({
         instanceId: instanceId,
         imageId: managingImageId,
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         threadId,
         status,
       });
@@ -105,7 +107,7 @@ export const Comments = () => {
 
   const mutateDeleteThread = useMutation({
     mutationFn: async ({ threadId }: { threadId: string }) => {
-      if (!user) {
+      if (!session) {
         return { status: "KO", message: "User not defined" };
       }
 
@@ -116,7 +118,7 @@ export const Comments = () => {
       return await delStandaloneThread({
         instanceId: instanceId,
         imageId: managingImageId,
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         threadId,
       });
     },
@@ -145,7 +147,7 @@ export const Comments = () => {
         status: "resolved",
       });
     },
-    [mutateMarkResolvedThread]
+    [mutateMarkResolvedThread],
   );
 
   const handleDeleteComment = React.useCallback(
@@ -154,7 +156,7 @@ export const Comments = () => {
         threadId,
       });
     },
-    [mutateDeleteThread]
+    [mutateDeleteThread],
   );
 
   const handleFocusOnNode = React.useCallback(
@@ -172,7 +174,7 @@ export const Comments = () => {
         commentsHandler.focusOn(threadId, 0.5);
       }
     },
-    [instance]
+    [instance],
   );
 
   React.useEffect(() => {
@@ -191,7 +193,7 @@ export const Comments = () => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && data?.items) {
       const commentsRendererPlugin =
         instance.getPlugin<WeaveCommentsRendererPlugin<ThreadEntity>>(
-          "commentsRenderer"
+          "commentsRenderer",
         );
       commentsRendererPlugin?.setComments(data.items);
       commentsRendererPlugin?.render();
@@ -233,12 +235,12 @@ export const Comments = () => {
 
                   const commentsHandler =
                     instance.getNodeHandler<WeaveCommentNode<ThreadEntity>>(
-                      "comment"
+                      "comment",
                     );
 
                   if (commentsHandler) {
                     commentsHandler.setShowResolved(
-                      newCommentsStatus === "all"
+                      newCommentsStatus === "all",
                     );
                   }
 
@@ -258,7 +260,7 @@ export const Comments = () => {
         </div>
       )}
       {!isLoading && data.items.length === 0 && (
-        <div className="w-full h-[calc(100%-65px)] font-inter text-sm flex justify-center items-center">
+        <div className="w-full h-[calc(100%-65px-40px)] font-inter text-sm flex justify-center items-center">
           No comments yet
         </div>
       )}
@@ -285,7 +287,7 @@ export const Comments = () => {
                       </AvatarUI>
                     </div>
                     <div className="flex gap-1 justify-end items-center hidden group-hover:block">
-                      {thread.userMetadata.name === user?.name && (
+                      {thread.userMetadata.name === session?.user.name && (
                         <Button
                           className="rounded-none w-[20px] h-[20px] cursor-pointer"
                           variant="link"
@@ -330,7 +332,7 @@ export const Comments = () => {
                       <div className="font-inter text-xs text-[#C9C9C9] truncate">
                         {formatDistanceToNow(
                           new Date(thread.updatedAt).toISOString(),
-                          { addSuffix: true }
+                          { addSuffix: true },
                         )}
                       </div>
                     </div>
@@ -385,7 +387,7 @@ export const Comments = () => {
               </div>
               <Badge variant="secondary" className="font-inter !text-xs">
                 {data?.items?.filter(
-                  (c: ThreadEntity) => c.status === "resolved"
+                  (c: ThreadEntity) => c.status === "resolved",
                 ).length ?? 0}
               </Badge>
             </div>

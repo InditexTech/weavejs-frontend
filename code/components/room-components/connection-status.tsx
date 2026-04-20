@@ -2,68 +2,49 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 import { Cloud, CloudCog, CloudOff } from "lucide-react";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { cn } from "@/lib/utils";
+import { useWeave } from "@inditextech/weave-react";
 
-type ConnectionStatusProps = {
-  weaveConnectionStatus: string;
-};
+export const ConnectionStatus = () => {
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const isRoomSwitching = useWeave((state) => state.room.switching);
 
-export const ConnectionStatus = ({
-  weaveConnectionStatus,
-}: Readonly<ConnectionStatusProps>) => {
   return (
-    <div className="flex">
-      <div
-        className={cn(
-          "bg-light-background-1 w-[32px] rounded-none w-auto h-[20px] px-1 flex justify-center items-center",
-          {
-            ["bg-[#C2F0E8] text-black"]:
-              weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
-            ["bg-[#FDD9B4] text-black"]:
-              weaveConnectionStatus ===
-              WEAVE_STORE_CONNECTION_STATUS.CONNECTING,
-            ["bg-[#FDB4BB] text-white"]:
-              weaveConnectionStatus ===
-                WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED ||
-              weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR,
-          }
+    <>
+      {isRoomSwitching && (
+        <Badge>
+          <Cloud size={18} strokeWidth={1} /> changing page
+        </Badge>
+      )}
+      {!isRoomSwitching &&
+        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
+          <Badge>
+            <Cloud size={18} strokeWidth={1} /> connected
+          </Badge>
         )}
-      >
-        {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
-          <>
-            <Cloud size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">connected</span>
-          </>
-        )}
-        {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTING && (
-          <>
+      {!isRoomSwitching &&
+        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTING && (
+          <Badge>
             <CloudCog size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">
-              connecting
-            </span>
-          </>
+            connecting
+          </Badge>
         )}
-        {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
-          <>
-            <CloudOff size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">error</span>
-          </>
+      {!isRoomSwitching &&
+        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
+          <Badge>
+            <CloudOff size={18} strokeWidth={1} /> error
+          </Badge>
         )}
-        {weaveConnectionStatus ===
+      {!isRoomSwitching &&
+        weaveConnectionStatus ===
           WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED && (
-          <>
-            <CloudOff size={18} strokeWidth={1} />
-            <span className="ml-1 font-inter text-xs uppercase">
-              disconnected
-            </span>
-          </>
+          <Badge>
+            <CloudOff size={18} strokeWidth={1} /> disconnected
+          </Badge>
         )}
-      </div>
-    </div>
+    </>
   );
 };

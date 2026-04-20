@@ -24,13 +24,14 @@ import { ThreadStatus } from "./types";
 import { useStandaloneUseCase } from "../../store/store";
 import { putStandaloneThread } from "@/api/standalone/put-standalone-thread";
 import { delStandaloneThread } from "@/api/standalone/del-standalone-thread";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 type CommentViewingProps = {
   node: WeaveElementInstance;
   finish: (
     node: WeaveElementInstance,
     content: string,
-    action: WeaveCommentNodeViewAction
+    action: WeaveCommentNodeViewAction,
   ) => void;
   close: () => void;
 };
@@ -46,10 +47,11 @@ export const CommentViewing = ({
 
   const instance = useWeave((state) => state.instance);
 
-  const user = useStandaloneUseCase((state) => state.user);
+  const { session } = useGetSession();
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
 
   const {
@@ -75,12 +77,12 @@ export const CommentViewing = ({
       threadId: string;
       status: ThreadStatus;
     }) => {
-      if (!user || !managingImageId) {
+      if (!session || !managingImageId) {
         return { answer: undefined };
       }
 
       return await putStandaloneThread({
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
         threadId,
@@ -112,7 +114,7 @@ export const CommentViewing = ({
       node: WeaveElementInstance;
       threadId: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { status: "KO", message: "User not defined" };
       }
 
@@ -121,7 +123,7 @@ export const CommentViewing = ({
       }
 
       return await delStandaloneThread({
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
         threadId,
@@ -176,7 +178,6 @@ export const CommentViewing = ({
   React.useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        e.stopPropagation();
         handleCloseComment();
       }
     };
@@ -231,7 +232,7 @@ export const CommentViewing = ({
           Comment
         </div>
         <div className="flex justify-end items-center gap-1">
-          {commentData?.thread?.userMetadata.name === user?.name &&
+          {commentData?.thread?.userMetadata.name === session?.user.name &&
             commentData?.thread?.status !== "resolved" && (
               <Button
                 className="rounded-none cursor-pointer w-[24px] h-[24px] color-red"

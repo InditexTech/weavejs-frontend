@@ -2,13 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { WeaveStateElement } from "@inditextech/weave-types";
-import { Eye, EyeOff } from "lucide-react";
 import { InputColor } from "./../inputs/input-color";
-import { ToggleIconButton } from "./../toggle-icon-button";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 
@@ -67,7 +63,9 @@ export function FillProperties() {
     actualAction &&
     ["selectionTool"].includes(actualAction) &&
     [
+      "stroke",
       "image-template",
+      "color-token",
       "line",
       "arrow",
       "stroke-single",
@@ -85,10 +83,12 @@ export function FillProperties() {
   if (
     actualAction &&
     ![
+      "brushTool",
       "selectionTool",
       "strokeTool",
       "arrowTool",
       "rectangleTool",
+      "colorTokenTool",
       "ellipseTool",
       "starTool",
     ].includes(actualAction)
@@ -97,8 +97,8 @@ export function FillProperties() {
   }
 
   return (
-    <div className="border-b border-b-[0.5px] border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
-      <div className="w-full flex justify-between items-center gap-3">
+    <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
+      {/* <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
             Fill
@@ -121,10 +121,10 @@ export function FillProperties() {
             updateElement(updatedNode);
           }}
         />
-      </div>
+      </div> */}
       <div className="grid grid-cols-1 gap-3 w-full">
         <InputColor
-          label="Color (#RGBA)"
+          label="Fill color (#RGBA)"
           value={actualNode.props.fill}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {

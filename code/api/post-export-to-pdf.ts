@@ -10,7 +10,10 @@ export const postExportToPDF = async (
   options: WeaveExportNodesOptions,
   responseType: "base64" | "blob" | "zip" = "zip",
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/export/pdf`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/export/pdf`;
 
   const exportPayload = {
     roomData,

@@ -7,6 +7,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import { MEASURE_NODE_TYPE } from "@/components/use-cases/standalone/nodes/measure/constants";
+import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 
 export const useNodeActionName = () => {
   const instance = useWeave((state) => state.instance);
@@ -83,7 +84,7 @@ export const useNodeActionName = () => {
         return "Regular Polygon";
       case "brushTool":
         return "Stroke";
-      case "imageTool":
+      case WEAVE_IMAGE_TOOL_ACTION_NAME:
         return "Image";
       case "starTool":
         return "Star";

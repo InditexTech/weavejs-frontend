@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 /*
 	Installed from https://reactbits.dev/ts/tailwind/
 */

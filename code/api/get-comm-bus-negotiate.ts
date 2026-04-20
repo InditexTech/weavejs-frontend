@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const getCommBusNegotiate = async (roomId: string, userId: string) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/bus/${userId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/bus/${userId}`;
 
   const response = await fetch(endpoint);
   const data = await response.json();

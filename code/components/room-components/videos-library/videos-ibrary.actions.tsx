@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
@@ -12,9 +10,9 @@ import { WeaveStateElement } from "@inditextech/weave-types";
 import { delVideo } from "@/api/del-video";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { VideoEntity } from "./types";
 import { cn } from "@/lib/utils";
+import { useGetSession } from "../hooks/use-get-session";
 
 type VideoLibraryActions = {
   videos: VideoEntity[];
@@ -29,18 +27,18 @@ export const VideosLibraryActions = ({
 }: Readonly<VideoLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+
+  const { session } = useGetSession();
 
   const mutationDelete = useMutation({
     mutationFn: async (videoId: string) => {
       return await delVideo(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
-        videoId
+        videoId,
       );
     },
     onMutate: () => {
@@ -67,7 +65,7 @@ export const VideosLibraryActions = ({
 
       mutationDelete.mutate(video.videoId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   const realSelectedVideos = React.useMemo(() => {
@@ -79,7 +77,7 @@ export const VideosLibraryActions = ({
 
     for (const video of realSelectedVideos) {
       const appVideo = appVideos.find(
-        (appVideo) => appVideo.props.videoId === video.videoId
+        (appVideo) => appVideo.props.videoId === video.videoId,
       );
       if (typeof appVideo !== "undefined") {
         inUse.push(video);
@@ -104,7 +102,7 @@ export const VideosLibraryActions = ({
           }}
         >
           <Trash strokeWidth={1} size={16} stroke="red" />
-        </button>
+        </button>,
       );
     }
 
@@ -112,10 +110,6 @@ export const VideosLibraryActions = ({
   }, [handleDeleteVideo, inUseSelectedVideos.length, realSelectedVideos]);
 
   if (!instance) {
-    return null;
-  }
-
-  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
     return null;
   }
 

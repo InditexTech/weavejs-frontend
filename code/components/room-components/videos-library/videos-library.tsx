@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import { useInView } from "react-intersection-observer";
@@ -40,6 +38,7 @@ import {
   VIDEO_TOOL_ACTION_NAME,
   WeaveVideoToolAction,
 } from "@inditextech/weave-sdk";
+import { useGetSession } from "../hooks/use-get-session";
 
 const VIDEOS_LIMIT = 20;
 
@@ -51,7 +50,8 @@ export const VideosLibrary = () => {
   const [videos, setVideos] = React.useState<VideoEntity[]>([]);
   const [showSelection, setShowSelection] = React.useState<boolean>(false);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
@@ -62,7 +62,7 @@ export const VideosLibrary = () => {
   const mutationDelete = useMutation({
     mutationFn: async (videoId: string) => {
       return await delVideo(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
         videoId,
@@ -228,12 +228,19 @@ export const VideosLibrary = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
+  //   return null;
+  // }
 
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.videos,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.videos,
+      })}
+    >
       <SidebarHeader
         actions={
           <div className="flex justify-end items-center gap-4">
@@ -287,169 +294,172 @@ export const VideosLibrary = () => {
           </div>
         </div>
       )}
-      <ScrollArea
-        className={cn("w-full overflow-auto", {
-          ["h-[calc(100%-65px-73px-40px-40px)]"]: showSelection,
-          ["h-[calc(100%-65px-73px)]"]: !showSelection,
-        })}
-      >
-        <div
-          className="w-full weaveDraggable p-0"
-          onDragStart={(e) => {
-            if (!instance) {
-              return;
-            }
 
-            if (e.target instanceof HTMLVideoElement) {
-              const videoTool = instance.getActionHandler(
-                VIDEO_TOOL_ACTION_NAME,
-              ) as WeaveVideoToolAction | undefined;
-
-              if (!videoTool) {
+      {videos.length === 0 && (
+        <div className="col-span-1 w-full h-[calc(100%-57px)] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+          <b className="font-normal text-[18px]">No videos</b>
+          <span className="text-[14px]">Add a video to the room.</span>
+        </div>
+      )}
+      {videos.length > 0 && (
+        <ScrollArea
+          className={cn("w-full overflow-auto", {
+            ["h-[calc(100%-57px-40px-40px)]"]: showSelection,
+            ["h-[calc(100%-57px)]"]: !showSelection,
+          })}
+        >
+          <div
+            className="w-full weaveDraggable p-0"
+            onDragStart={(e) => {
+              if (!instance) {
                 return;
               }
 
-              videoTool.setDragAndDropProperties({
-                videoId: e.target.dataset.videoId ?? "",
-                videoParams: {
-                  placeholderUrl: e.target.dataset.videoPlaceholderUrl ?? "",
-                  url: e.target.dataset.videoUrl ?? "",
-                  width: parseInt(e.target.dataset.videoWidth ?? "0"),
-                  height: parseInt(e.target.dataset.videoHeight ?? "0"),
-                },
-              });
-            }
-          }}
-        >
-          {videos.length === 0 && (
-            <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-              <b className="font-normal text-[18px]">No videos</b>
-              <span className="text-[14px]">Add a video to the room.</span>
-            </div>
-          )}
-          <Masonry sequential columnsCount={2} gutter="1px">
-            {videos.length > 0 &&
-              videos.map((video) => {
-                const appVideo = appVideos.find(
-                  (appVideo) => appVideo.props.videoId === video.videoId,
-                );
+              if (e.target instanceof HTMLVideoElement) {
+                const videoTool = instance.getActionHandler(
+                  VIDEO_TOOL_ACTION_NAME,
+                ) as WeaveVideoToolAction | undefined;
 
-                const isChecked = realSelectedVideos.includes(video);
+                if (!videoTool) {
+                  return;
+                }
 
-                const videoComponent = (
-                  <UploadedVideo
-                    key={video.videoId}
-                    selected={isChecked}
-                    video={video}
-                  />
-                );
+                videoTool.setDragAndDropProperties({
+                  videoId: e.target.dataset.videoId ?? "",
+                  videoParams: {
+                    placeholderUrl: e.target.dataset.videoPlaceholderUrl ?? "",
+                    url: e.target.dataset.videoUrl ?? "",
+                    width: parseInt(e.target.dataset.videoWidth ?? "0"),
+                    height: parseInt(e.target.dataset.videoHeight ?? "0"),
+                  },
+                });
+              }
+            }}
+          >
+            <Masonry columnsCount={2} gutter="1px">
+              {videos.length > 0 &&
+                videos.map((video) => {
+                  const appVideo = appVideos.find(
+                    (appVideo) => appVideo.props.videoId === video.videoId,
+                  );
 
-                return (
-                  <div
-                    key={video.videoId}
-                    className="w-full"
-                    onClick={() => {
-                      if (
-                        showSelection &&
-                        !(
-                          ["pending", "working"].includes(video.status) ||
-                          (video.removalJobId !== null &&
-                            video.removalStatus !== null &&
-                            ["pending", "working"].includes(
-                              video.removalStatus,
-                            ))
-                        )
-                      ) {
-                        handleCheckboxChange(!isChecked, video);
-                      }
-                    }}
-                  >
-                    <ContextMenu>
-                      <ContextMenuTrigger>
-                        <div className="group relative w-full">
-                          {videoComponent}
-                          {showSelection &&
-                            typeof appVideo === "undefined" &&
-                            !(
-                              ["pending", "working"].includes(video.status) ||
-                              (video.removalJobId !== null &&
-                                video.removalStatus !== null &&
-                                ["pending", "working"].includes(
-                                  video.removalStatus,
-                                ))
-                            ) && (
-                              <div className="absolute top-[8px] right-[8px] z-10">
-                                <Checkbox
-                                  id="terms"
-                                  className="bg-white rounded-none cursor-pointer"
-                                  value={video.videoId}
-                                  checked={isChecked}
-                                  onCheckedChange={(checked: boolean) => {
-                                    handleCheckboxChange(checked, video);
-                                  }}
-                                />
+                  const isChecked = realSelectedVideos.includes(video);
+
+                  const videoComponent = (
+                    <UploadedVideo
+                      key={video.videoId}
+                      selected={isChecked}
+                      video={video}
+                    />
+                  );
+
+                  return (
+                    <div
+                      key={video.videoId}
+                      className="w-full"
+                      onClick={() => {
+                        if (
+                          showSelection &&
+                          !(
+                            ["pending", "working"].includes(video.status) ||
+                            (video.removalJobId !== null &&
+                              video.removalStatus !== null &&
+                              ["pending", "working"].includes(
+                                video.removalStatus,
+                              ))
+                          )
+                        ) {
+                          handleCheckboxChange(!isChecked, video);
+                        }
+                      }}
+                    >
+                      <ContextMenu>
+                        <ContextMenuTrigger>
+                          <div className="group relative w-full">
+                            {videoComponent}
+                            {showSelection &&
+                              typeof appVideo === "undefined" &&
+                              !(
+                                ["pending", "working"].includes(video.status) ||
+                                (video.removalJobId !== null &&
+                                  video.removalStatus !== null &&
+                                  ["pending", "working"].includes(
+                                    video.removalStatus,
+                                  ))
+                              ) && (
+                                <div className="absolute top-[8px] right-[8px] z-10">
+                                  <Checkbox
+                                    id="terms"
+                                    className="bg-white rounded-none cursor-pointer"
+                                    value={video.videoId}
+                                    checked={isChecked}
+                                    onCheckedChange={(checked: boolean) => {
+                                      handleCheckboxChange(checked, video);
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            {typeof appVideo !== "undefined" && (
+                              <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
+                                <Badge
+                                  className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
+                                  variant="default"
+                                >
+                                  IN USE
+                                </Badge>
                               </div>
                             )}
+                          </div>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
                           {typeof appVideo !== "undefined" && (
-                            <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
-                              <Badge
-                                className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-                                variant="default"
+                            <>
+                              <ContextMenuItem
+                                disabled
+                                className="rounded-none uppercase font-inter text-xs"
                               >
-                                IN USE
-                              </Badge>
-                            </div>
+                                <Info
+                                  strokeWidth={1}
+                                  size={16}
+                                  className="mr-2"
+                                />
+                                In use
+                              </ContextMenuItem>
+                            </>
                           )}
-                        </div>
-                      </ContextMenuTrigger>
-                      <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
-                        {typeof appVideo !== "undefined" && (
-                          <>
-                            <ContextMenuItem
-                              disabled
-                              className="rounded-none uppercase font-inter text-xs"
-                            >
-                              <Info
-                                strokeWidth={1}
-                                size={16}
-                                className="mr-2"
-                              />
-                              In use
-                            </ContextMenuItem>
-                          </>
-                        )}
-                        {typeof appVideo === "undefined" && (
-                          <>
-                            <ContextMenuItem
-                              className="rounded-none uppercase font-inter text-xs"
-                              disabled={typeof appVideo !== "undefined"}
-                              onClick={() => {
-                                handleDeleteVideo(video);
-                              }}
-                            >
-                              <Trash2
-                                strokeWidth={1}
-                                size={16}
-                                className="mr-2"
-                              />
-                              Delete
-                            </ContextMenuItem>
-                          </>
-                        )}
-                      </ContextMenuContent>
-                    </ContextMenu>
-                  </div>
-                );
-              })}
-          </Masonry>
-          <div ref={ref} className="h-[0px]" />
-          {query.isFetchingNextPage && (
-            <p className="font-inter text-xs uppercase text-center py-4">
-              loading more...
-            </p>
-          )}
-        </div>
-      </ScrollArea>
+                          {typeof appVideo === "undefined" && (
+                            <>
+                              <ContextMenuItem
+                                className="rounded-none uppercase font-inter text-xs"
+                                disabled={typeof appVideo !== "undefined"}
+                                onClick={() => {
+                                  handleDeleteVideo(video);
+                                }}
+                              >
+                                <Trash2
+                                  strokeWidth={1}
+                                  size={16}
+                                  className="mr-2"
+                                />
+                                Delete
+                              </ContextMenuItem>
+                            </>
+                          )}
+                        </ContextMenuContent>
+                      </ContextMenu>
+                    </div>
+                  );
+                })}
+            </Masonry>
+            <div ref={ref} className="h-[0px]" />
+            {query.isFetchingNextPage && (
+              <p className="font-inter text-xs uppercase text-center py-4">
+                loading more...
+              </p>
+            )}
+          </div>
+        </ScrollArea>
+      )}
       {showSelection && (
         <VideosLibraryActions
           videos={videos}
