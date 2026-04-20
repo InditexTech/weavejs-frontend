@@ -7,9 +7,12 @@ export const getThreadAnswers = async (
   threadId: string,
   paginated: boolean,
   offset: number = 0,
-  limit: number = 20
+  limit: number = 20,
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/threads/${threadId}/answers?offset=${offset}&limit=${limit}&paginated=${paginated}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/threads/${threadId}/answers?offset=${offset}&limit=${limit}&paginated=${paginated}`;
 
   const response = await fetch(endpoint);
   const data = await response.json();

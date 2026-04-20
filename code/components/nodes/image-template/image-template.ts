@@ -22,6 +22,7 @@ export class ImageTemplateNode extends WeaveNode {
   protected padding = 20;
   protected borderWidth = 1;
   protected templateIdDefault = "Template ID";
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes) {
     const { id } = props;

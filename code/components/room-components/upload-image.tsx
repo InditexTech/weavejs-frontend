@@ -89,7 +89,9 @@ export function UploadImage() {
         const queryKey = ["getImages", room];
         queryClient.invalidateQueries({ queryKey });
 
-        return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+        const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+
+        return `${apiEndpoint}/weavejs/rooms/${room}/images/${imageId}`;
       };
 
       instance.triggerAction<

@@ -6,9 +6,12 @@ export const getChats = async (
   roomId: string,
   resourceId: string,
   limit: number,
-  offset: number
+  offset: number,
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats?limit=${limit}&offset=${offset}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/chats?limit=${limit}&offset=${offset}`;
   const response = await fetch(endpoint, {
     headers: {
       ["x-weave-user-id"]: resourceId,

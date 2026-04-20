@@ -16,24 +16,29 @@ import { Stage } from "konva/lib/Stage";
 import { setupTransformer } from "../utils/utils";
 
 export class FuzzyMaskToolAction extends WeaveAction {
-  protected initialized: boolean = false;
-  protected initialCursor: string | null = null;
-  protected state: FuzzyMaskToolActionState;
-  protected maskId: string | null;
+  protected initialized!: boolean;
+  protected initialCursor!: string | null;
+  protected state!: FuzzyMaskToolActionState;
+  protected maskId!: string | null;
   protected tempCircle: Konva.Circle | undefined;
   protected mask!: Konva.Group | undefined;
   protected maskBg!: Konva.Rect;
   protected maskShape!: Konva.Shape;
   protected maskTransformer!: Konva.Transformer | undefined;
-  protected clickPoint: Vector2d | null;
-  protected allowAdding: boolean = false;
+  protected clickPoint!: Vector2d | null;
+  protected allowAdding!: boolean;
   protected cancelAction!: () => void;
   onInit = undefined;
 
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
+    this.initialCursor = null;
     this.state = FUZZY_MASK_TOOL_STATE.IDLE;
     this.maskId = null;
     this.allowAdding = false;
@@ -56,13 +61,11 @@ export class FuzzyMaskToolAction extends WeaveAction {
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    e.preventDefault();
-
     if (
       e.key === "Escape" &&
       this.instance.getActiveAction() === FUZZY_MASK_TOOL_ACTION_NAME
     ) {
-      e.stopPropagation();
+      e.preventDefault();
       this.allowAdding = false;
       this.cancelAction();
       return;

@@ -11,6 +11,7 @@ import { getStandaloneThread } from "@/api/standalone/get-standalone-thread";
 import { WeaveCommentNode } from "@inditextech/weave-sdk";
 import { ThreadEntity } from "../components/comment/types";
 import { useStandaloneUseCase } from "../store/store";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 type UseCommentProps = {
   node: WeaveElementInstance | null;
@@ -19,10 +20,11 @@ type UseCommentProps = {
 export const useComment = ({ node }: Readonly<UseCommentProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const user = useStandaloneUseCase((state) => state.user);
+  const { session } = useGetSession();
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
 
   const commentId: string | null = React.useMemo(() => {
@@ -47,7 +49,7 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
         threadId: commentId ?? "",
-        userId: user?.name ?? "",
+        userId: session?.user.name ?? "",
       });
     },
     enabled: typeof node !== "undefined" && commentId !== null,
@@ -65,7 +67,7 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
         instanceId,
         managingImageId ?? "",
         commentId ?? "",
-        false
+        false,
       );
     },
     enabled: typeof node !== "undefined" && commentId !== null,
@@ -111,7 +113,7 @@ export const useComment = ({ node }: Readonly<UseCommentProps>) => {
     return () => {
       window.removeEventListener(
         "onStandaloneCommentChanged",
-        handleCommentChanged
+        handleCommentChanged,
       );
     };
   }, [handleRefreshComment, handleRefreshComments]);

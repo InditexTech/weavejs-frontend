@@ -26,6 +26,8 @@ import { useStandaloneUseCase } from "../../store/store";
 import { putStandaloneThread } from "@/api/standalone/put-standalone-thread";
 import { putStandaloneThreadAnswer } from "@/api/standalone/put-standalone-thread-answer";
 import { delStandaloneThreadAnswer } from "@/api/standalone/del-standalone-thread-answer";
+import { useCollaborationRoom } from "@/store/store";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 type CommentAnswerProps = {
   node: WeaveElementInstance;
@@ -34,7 +36,7 @@ type CommentAnswerProps = {
   finish: (
     node: WeaveElementInstance,
     content: string,
-    action: WeaveCommentNodeViewAction
+    action: WeaveCommentNodeViewAction,
   ) => void;
 };
 
@@ -51,10 +53,11 @@ export const CommentAnswer = ({
   const [content, setContent] = React.useState<string>("");
   const [editPersisting, setEditPersisting] = React.useState<boolean>(false);
 
-  const user = useStandaloneUseCase((state) => state.user);
-  const instanceId = useStandaloneUseCase((state) => state.instanceId);
+  const { session } = useGetSession();
+
+  const roomId = useCollaborationRoom((state) => state.room);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
 
   const {
@@ -74,14 +77,14 @@ export const CommentAnswer = ({
       threadId: string;
       content: string;
     }) => {
-      if (!user || !managingImageId) {
+      if (!session || !managingImageId) {
         return { answer: undefined };
       }
 
       return await putStandaloneThread({
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         threadId,
-        instanceId: instanceId ?? "",
+        instanceId: roomId ?? "",
         imageId: managingImageId ?? "",
         content,
       });
@@ -115,13 +118,13 @@ export const CommentAnswer = ({
       answerId: string;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await putStandaloneThreadAnswer({
-        userId: user.name ?? "",
-        instanceId: instanceId ?? "",
+        userId: session?.user.name ?? "",
+        instanceId: roomId ?? "",
         imageId: managingImageId ?? "",
         threadId,
         answerId,
@@ -151,13 +154,13 @@ export const CommentAnswer = ({
       threadId: string;
       answerId: string;
     }) => {
-      if (!user || !managingImageId) {
+      if (!session || !managingImageId) {
         return { answer: undefined };
       }
 
       return await delStandaloneThreadAnswer({
-        userId: user.name ?? "",
-        instanceId: instanceId ?? "",
+        userId: session?.user.name ?? "",
+        instanceId: roomId ?? "",
         imageId: managingImageId ?? "",
         threadId,
         answerId,
@@ -179,7 +182,7 @@ export const CommentAnswer = ({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setContent(e.target.value);
     },
-    []
+    [],
   );
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -213,7 +216,7 @@ export const CommentAnswer = ({
       mutateEditThreadAnswer,
       isMain,
       answer,
-    ]
+    ],
   );
 
   const handleEditThreadOrThreadAnswer = React.useCallback(
@@ -246,7 +249,7 @@ export const CommentAnswer = ({
       isMain,
       mutateEditThread,
       mutateEditThreadAnswer,
-    ]
+    ],
   );
 
   const answerDate = React.useMemo(() => {
@@ -324,7 +327,7 @@ export const CommentAnswer = ({
                 })}
               </div>
             </div>
-            {answer.userMetadata.name === user?.name &&
+            {answer.userMetadata.name === session?.user.name &&
               commentData?.thread?.status !== "resolved" && (
                 <DropdownMenu modal={false} open={menuOpen}>
                   <DropdownMenuTrigger
@@ -333,7 +336,7 @@ export const CommentAnswer = ({
                       {
                         ["font-normal"]: menuOpen,
                         ["font-extralight"]: !menuOpen,
-                      }
+                      },
                     )}
                     asChild
                   >

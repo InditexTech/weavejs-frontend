@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
@@ -28,10 +26,10 @@ export function ConnectionTestsOverlay() {
   >(null);
 
   const connectionTestsShow = useCollaborationRoom(
-    (state) => state.connection.tests.show
+    (state) => state.connection.tests.show,
   );
   const setConnectionTestsShow = useCollaborationRoom(
-    (state) => state.setConnectionTestsShow
+    (state) => state.setConnectionTestsShow,
   );
 
   React.useEffect(() => {
@@ -106,7 +104,7 @@ export function ConnectionTestsOverlay() {
       animate="visible"
       exit="hidden"
       variants={topElementVariants}
-      className="min-w-[280px] absolute right-[16px] bottom-[16px] flex flex-col gap-0 justify-center items-center bg-white border-[0.5px] border-[#c9c9c9]"
+      className="min-w-[280px] absolute right-[16px] bottom-[16px] flex flex-col gap-0 justify-center items-center bg-white border-[0.5px] border-[#c9c9c9] drop-shadow"
     >
       <div className="w-full flex  uppercase gap-1 justify-between items-center text-base p-3 w-full text-center text-black border-b-[0.5px] border-[#c9c9c9]">
         <div>Connection Testing</div>

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 
 function Collapsible({

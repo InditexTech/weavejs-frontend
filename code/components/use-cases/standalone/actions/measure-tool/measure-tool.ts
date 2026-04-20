@@ -40,6 +40,7 @@ export class MeasureToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
+  initialize = undefined;
 
   constructor(params?: MeasureToolParams) {
     super();
@@ -81,7 +82,6 @@ export class MeasureToolAction extends WeaveAction {
         e.code === "Escape" &&
         this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
       ) {
-        e.stopPropagation();
         this.cancelAction();
       }
     });

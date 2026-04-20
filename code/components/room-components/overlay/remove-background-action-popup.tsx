@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";

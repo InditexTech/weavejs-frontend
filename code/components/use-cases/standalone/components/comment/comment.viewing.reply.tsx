@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useComment } from "../../hooks/use-comment";
 import { useStandaloneUseCase } from "../../store/store";
 import { postStandaloneThreadAnswer } from "@/api/standalone/post-standalone-thread-answer";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 type CommentReplyProps = {
   node: WeaveElementInstance;
@@ -20,10 +21,11 @@ type CommentReplyProps = {
 export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const user = useStandaloneUseCase((state) => state.user);
+  const { session } = useGetSession();
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
 
   const [content, setContent] = React.useState<string>("");
@@ -40,13 +42,13 @@ export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
       threadId: string;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await postStandaloneThreadAnswer({
-        userId: user.name ?? "",
-        userMetadata: user,
+        userId: session?.user.name ?? "",
+        userMetadata: session?.user,
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
         threadId,
@@ -74,8 +76,6 @@ export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      e.stopPropagation();
-
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         mutateCreateThreadAnswer.mutate({
@@ -86,14 +86,14 @@ export const CommentReply = ({ node }: Readonly<CommentReplyProps>) => {
         setContent("");
       }
     },
-    [content, node, commentId, mutateCreateThreadAnswer]
+    [content, node, commentId, mutateCreateThreadAnswer],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setContent(e.target.value);
     },
-    []
+    [],
   );
 
   const handleAddCommentReply = React.useCallback(() => {

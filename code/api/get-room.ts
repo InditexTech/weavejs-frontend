@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const getRoom = async (roomId: string) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}`;
   const response = await fetch(endpoint);
 
   if (!response.ok && response.status === 404) {

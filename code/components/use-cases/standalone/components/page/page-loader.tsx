@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { Logo } from "@/components/utils/logo";
 import React from "react";
@@ -88,7 +86,10 @@ export function PageLoader({
             )}
             <AnimatePresence>
               {description && (
-                <div className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] mt-[32px] mb-[24px]">
+                <div
+                  key="description-wrapper"
+                  className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] mt-[32px] mb-[24px]"
+                >
                   <motion.span
                     className="w-full"
                     variants={childVariants}

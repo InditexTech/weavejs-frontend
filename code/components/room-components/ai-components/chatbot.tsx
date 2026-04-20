@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,8 +24,11 @@ import { OrbitProgress } from "react-loading-indicators";
 import { postChat } from "@/api/post-chat";
 import { ChatBotChatInfo } from "./chatbot.chat-info";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useGetSession } from "../hooks/use-get-session";
 
 export const ChatBot = () => {
+  const actualRoomRef = React.useRef<string | null>(null);
+
   const threadId = useIAChat((state) => state.threadId);
   const resourceId = useIAChat((state) => state.resourceId);
   const aiView = useIAChat((state) => state.view);
@@ -35,7 +36,8 @@ export const ChatBot = () => {
   const setResourceId = useIAChat((state) => state.setResourceId);
   const setAiView = useIAChat((state) => state.setView);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const room = useCollaborationRoom((state) => state.room);
   const activeSidebar = useCollaborationRoom((state) => state.sidebar.active);
 
@@ -62,6 +64,7 @@ export const ChatBot = () => {
     data: chatData,
     isFetched,
     isFetching,
+    refetch,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useQuery<any>({
     queryKey: ["getChat", room, threadId, resourceId],
@@ -101,17 +104,16 @@ export const ChatBot = () => {
   ]);
 
   React.useEffect(() => {
-    if (!user) return;
     if (!room) return;
 
     let actualThreadId = "undefined";
     let defineThreadId = false;
 
-    const actualResourceId = `${room}-${user.name ?? "unknown"}`;
+    const actualResourceId = `${room}-${session?.user.id ?? "unknown"}`;
 
-    if (threadId === "undefined") {
+    if (threadId === "undefined" || actualRoomRef.current !== room) {
       const storedThreadId = sessionStorage.getItem(
-        `weave.js_${room}_${user.name}_ai_thread_id`,
+        `weave.js_${room}_${session?.user.id}_ai_thread_id`,
       );
 
       if (storedThreadId) {
@@ -119,7 +121,7 @@ export const ChatBot = () => {
       } else {
         actualThreadId = uuidv4();
         sessionStorage.setItem(
-          `weave.js_${room}_${user.name}_ai_thread_id`,
+          `weave.js_${room}_${session?.user.id}_ai_thread_id`,
           actualThreadId,
         );
       }
@@ -130,64 +132,79 @@ export const ChatBot = () => {
     if (defineThreadId) {
       setThreadId(actualThreadId);
       setResourceId(actualResourceId);
+      actualRoomRef.current = room;
+      refetch();
     }
-  }, [user, room, threadId, resourceId, setThreadId, setResourceId]);
+  }, [
+    session,
+    room,
+    threadId,
+    resourceId,
+    refetch,
+    setThreadId,
+    setResourceId,
+  ]);
 
-  if (activeSidebar !== SIDEBAR_ELEMENTS.aiChat) {
-    return null;
-  }
+  // if (activeSidebar !== SIDEBAR_ELEMENTS.aiChat) {
+  //   return null;
+  // }
 
   return (
     <>
-      <div className="w-full h-full">
+      <div
+        className={cn("w-full h-full", {
+          ["hidden pointer-events-none"]:
+            activeSidebar !== SIDEBAR_ELEMENTS.aiChat,
+          ["block pointer-events-auto"]:
+            activeSidebar === SIDEBAR_ELEMENTS.aiChat,
+        })}
+      >
         <SidebarHeader
           actions={
-            <div className="flex justify-end items-center gap- h-[40px]">
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[20px] hover:text-[#c9c9c9]"
-                      onClick={async () => {
-                        if (!room || !user) return;
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[20px] hover:text-[#c9c9c9]"
+                    onClick={async () => {
+                      if (!room) return;
 
-                        const queryKey = ["getChats", resourceId];
-                        await queryClient.invalidateQueries({ queryKey });
+                      const queryKey = ["getChats", resourceId];
+                      await queryClient.invalidateQueries({ queryKey });
 
-                        const newTreadId = uuidv4();
+                      const newTreadId = uuidv4();
 
-                        sessionStorage.setItem(
-                          `weave.js_${room}_${user.name}_ai_thread_id`,
-                          newTreadId,
-                        );
+                      sessionStorage.setItem(
+                        `weave.js_${room}_${session?.user.id}_ai_thread_id`,
+                        newTreadId,
+                      );
 
-                        await postChat(room, newTreadId, resourceId, {
-                          status: "active",
-                          title: "Untitled chat",
-                        });
+                      await postChat(room, newTreadId, resourceId, {
+                        status: "active",
+                        title: "Untitled chat",
+                      });
 
-                        setThreadId(newTreadId);
-                        setAiView("chat");
-                      }}
-                    >
-                      <MessageCirclePlus
-                        className="group-disabled:text-[#cccccc]"
-                        size={20}
-                        strokeWidth={1}
-                      />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    sideOffset={8}
-                    side="bottom"
-                    align="end"
-                    className="rounded-none"
+                      setThreadId(newTreadId);
+                      setAiView("chat");
+                    }}
                   >
-                    New chat
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+                    <MessageCirclePlus
+                      className="group-disabled:text-[#cccccc]"
+                      size={20}
+                      strokeWidth={1}
+                    />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  sideOffset={8}
+                  side="bottom"
+                  align="end"
+                  className="rounded-none"
+                >
+                  New chat
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           }
         >
           <SidebarSelector title="AI Assistant" />
@@ -195,8 +212,8 @@ export const ChatBot = () => {
         <ChatBotChatInfo chat={chatData?.chat} />
         <div
           className={cn("", {
-            ["h-[calc(100%-67px-80px-65px)]"]: aiView === "chat",
-            ["h-[calc(100%-67px-80px)]"]: aiView === "chats",
+            ["h-[calc(100%-57px-67px)]"]: aiView === "chat",
+            ["h-[calc(100%-57px)]"]: aiView === "chats",
           })}
         >
           {isFetching && aiView === "chat" && (

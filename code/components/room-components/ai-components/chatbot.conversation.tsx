@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import { DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
 import {
@@ -31,14 +27,12 @@ import {
   MessageAttachments,
   MessageAttachment,
 } from "@/components/ai-elements/message";
-import { Bot, CopyIcon, Paperclip, RefreshCcwIcon } from "lucide-react";
+import { Bot, CopyIcon, RefreshCcwIcon } from "lucide-react";
 import React from "react";
 import { useIAChat } from "@/store/ia-chat";
 import { ThreeDot } from "react-loading-indicators";
 import { GeneratedImage } from "@google/genai";
 import { useCollaborationRoom } from "@/store/store";
-import { Button } from "@/components/ui/button";
-import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WeaveImageToolAction,
@@ -63,14 +57,13 @@ export const ChatBotConversation = ({
   const setStatus = useIAChat((state) => state.setStatus);
   const setSendMessage = useIAChat((state) => state.setSendMessage);
 
-  const promptInputAttachmentsController = usePromptInputAttachments();
-
-  const apiEndpoint = `${process.env.NEXT_PUBLIC_APP_HOST}/api/ai/chats/${threadId}`;
+  const appHost = import.meta.env.VITE_APP_HOST;
+  const endpoint = `${appHost}/api/ai/chats/${threadId}`;
 
   const { messages, status, regenerate, sendMessage } = useChat({
     messages: initialMessages,
     transport: new DefaultChatTransport({
-      api: apiEndpoint,
+      api: endpoint,
       headers: {
         ai_room_id: room ?? "",
         ai_resource_id: resourceId,
@@ -89,7 +82,7 @@ export const ChatBotConversation = ({
     <Conversation className="relative size-full">
       <ConversationState />
       <ConversationContent
-        className="gap-4"
+        className="gap-4 !px-5 !py-[24px]"
         onDragStart={(e) => {
           if (e.target instanceof HTMLImageElement) {
             if (!instance) {
@@ -140,9 +133,8 @@ export const ChatBotConversation = ({
           return (
             <React.Fragment key={`${message.id}-${messageIndex}`}>
               {message.parts.map((part, i) => {
-                // console.log("Rendering message part:", part);
                 switch (part.type) {
-                  case "tool-imageGenerationTool":
+                  case "tool-imageGenerationTool": {
                     if (
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       (part.output as any)?.code === "TOOL_EXECUTION_FAILED"
@@ -195,35 +187,6 @@ export const ChatBotConversation = ({
                                         className="relative"
                                       >
                                         <ChatBotImage image={image} />
-                                        <div className="absolute bottom-[12px] right-[12px]">
-                                          <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            className="rounded-none !cursor-pointer uppercase !text-xs w-[40px]"
-                                            onClick={async () => {
-                                              const blob = await fetch(
-                                                image.url,
-                                              ).then((res) => res.blob());
-
-                                              const file = new File(
-                                                [blob],
-                                                "image.png",
-                                                {
-                                                  type: "image/png",
-                                                },
-                                              );
-
-                                              promptInputAttachmentsController.add(
-                                                [file],
-                                              );
-                                            }}
-                                          >
-                                            <Paperclip
-                                              strokeWidth={1}
-                                              size={20}
-                                            />
-                                          </Button>
-                                        </div>
                                       </div>
                                     ))}
                                 </div>
@@ -233,7 +196,8 @@ export const ChatBotConversation = ({
                         </Message>
                       </React.Fragment>
                     );
-                  case "text":
+                  }
+                  case "text": {
                     let isJson = false;
                     try {
                       JSON.parse(part.text);
@@ -290,6 +254,7 @@ export const ChatBotConversation = ({
                         </Message>
                       </React.Fragment>
                     );
+                  }
                   default:
                     return null;
                 }

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
 import React from "react";
 

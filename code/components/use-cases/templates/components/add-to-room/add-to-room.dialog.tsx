@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import {
   Dialog,
   DialogContent,
@@ -19,6 +17,7 @@ import { AddToRoomSelectRoom } from "./add-to-room.select-room";
 import { AddToRoomSelectTemplate } from "./add-to-room.select-template";
 import { AddToRoomConfirmation } from "./add-to-room.confirmation";
 import { AddToRoomDialogSteps } from "./add-to-room.dialog.steps";
+import { AddToRoomSelectPage } from "./add-to-room.select-page";
 
 export function AddToRoomDialog() {
   const step = useAddToRoom((state) => state.step);
@@ -34,7 +33,7 @@ export function AddToRoomDialog() {
       onOpenChange={(open) => setAddToRoomOpen(open)}
     >
       <form>
-        <DialogContent className="w-full rounded-none min-w-4/12 max-w-4/12 min-h-[calc(100dvh-500px)] max-h-[calc(100dvh-500px)]">
+        <DialogContent className="w-full rounded-none min-w-4/12 max-w-4/12 min-h-[calc(100dvh-48px)] max-h-[calc(100dvh-48px)]">
           <div className="w-full h-full flex flex-col gap-5">
             <DialogHeader>
               <div className="w-full flex gap-5 justify-between items-center">
@@ -55,6 +54,7 @@ export function AddToRoomDialog() {
             </DialogHeader>
             <AddToRoomDialogSteps />
             {step === "select-room" && <AddToRoomSelectRoom />}
+            {step === "select-page" && <AddToRoomSelectPage />}
             {step === "select-template" && <AddToRoomSelectTemplate />}
             {step === "confirm" && <AddToRoomConfirmation />}
           </div>

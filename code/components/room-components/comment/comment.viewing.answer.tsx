@@ -27,6 +27,7 @@ import { putThreadAnswer } from "@/api/put-thread-answer";
 import { eventBus } from "@/components/utils/events-bus";
 import { useComment } from "./use-comment";
 import { WeaveCommentNodeViewAction } from "@inditextech/weave-sdk";
+import { useGetSession } from "../hooks/use-get-session";
 
 type CommentAnswerProps = {
   node: WeaveElementInstance;
@@ -35,7 +36,7 @@ type CommentAnswerProps = {
   finish: (
     node: WeaveElementInstance,
     content: string,
-    action: WeaveCommentNodeViewAction
+    action: WeaveCommentNodeViewAction,
   ) => void;
 };
 
@@ -52,9 +53,10 @@ export const CommentAnswer = ({
   const [content, setContent] = React.useState<string>("");
   const [editPersisting, setEditPersisting] = React.useState<boolean>(false);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
 
   const {
     commentId,
@@ -72,15 +74,15 @@ export const CommentAnswer = ({
       threadId: string;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await putThread({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
         threadId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         content,
       });
     },
@@ -112,16 +114,16 @@ export const CommentAnswer = ({
       answerId: string;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await putThreadAnswer({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
         threadId,
         answerId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         content,
       });
     },
@@ -149,16 +151,16 @@ export const CommentAnswer = ({
       threadId: string;
       answerId: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await delThreadAnswer({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
         threadId,
         answerId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
       });
     },
     onSuccess() {
@@ -178,7 +180,7 @@ export const CommentAnswer = ({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setContent(e.target.value);
     },
-    []
+    [],
   );
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -212,7 +214,7 @@ export const CommentAnswer = ({
       mutateEditThreadAnswer,
       isMain,
       answer,
-    ]
+    ],
   );
 
   const handleEditThreadOrThreadAnswer = React.useCallback(
@@ -245,7 +247,7 @@ export const CommentAnswer = ({
       isMain,
       mutateEditThread,
       mutateEditThreadAnswer,
-    ]
+    ],
   );
 
   const answerDate = React.useMemo(() => {
@@ -311,7 +313,7 @@ export const CommentAnswer = ({
         <div className="w-full flex flex-col gap-1 mt-[6px]">
           <div className="flex justify-between gap-3 items-center">
             <div className="w-full flex justify-start items-center gap-2">
-              <div className="font-inter text-xs font-bold truncate">
+              <div className="font-light text-xs truncate">
                 {answer.userMetadata.name ?? ""}
               </div>
               <div
@@ -323,7 +325,7 @@ export const CommentAnswer = ({
                 })}
               </div>
             </div>
-            {answer.userMetadata.name === user?.name &&
+            {answer.userMetadata.name === session?.user.id &&
               commentData?.thread?.status !== "resolved" && (
                 <DropdownMenu modal={false} open={menuOpen}>
                   <DropdownMenuTrigger
@@ -332,7 +334,7 @@ export const CommentAnswer = ({
                       {
                         ["font-normal"]: menuOpen,
                         ["font-extralight"]: !menuOpen,
-                      }
+                      },
                     )}
                     asChild
                   >

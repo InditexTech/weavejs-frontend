@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -13,28 +11,34 @@ import { WeaveStateElement } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-remove-background";
 import { ImageEntity } from "./types";
 import { cn } from "@/lib/utils";
+import { useGetSession } from "../hooks/use-get-session";
 
 type ImagesLibraryActions = {
   images: ImageEntity[];
   appImages: WeaveStateElement[];
   selectedImages: ImageEntity[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setShowSelection: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setSelectedImages: any;
 };
 
 export const ImagesLibraryActions = ({
   images,
   appImages,
   selectedImages,
+  setShowSelection,
+  setSelectedImages,
 }: Readonly<ImagesLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
@@ -56,7 +60,7 @@ export const ImagesLibraryActions = ({
         clientId,
         room ?? "",
         imageId,
-        image
+        image,
       );
     },
     onMutate: () => {
@@ -77,10 +81,10 @@ export const ImagesLibraryActions = ({
   const mutationDelete = useMutation({
     mutationFn: async (imageId: string) => {
       return await delImage(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
-        imageId
+        imageId,
       );
     },
     onMutate: () => {
@@ -107,7 +111,7 @@ export const ImagesLibraryActions = ({
 
       mutationDelete.mutate(image.imageId);
     },
-    [instance, mutationDelete]
+    [instance, mutationDelete],
   );
 
   const handleRemoveBackground = React.useCallback(
@@ -117,7 +121,7 @@ export const ImagesLibraryActions = ({
       }
 
       const element = document.querySelector(
-        `img[id="${image.imageId}"]`
+        `img[id="${image.imageId}"]`,
       ) as HTMLImageElement | null;
 
       if (!element) {
@@ -136,7 +140,7 @@ export const ImagesLibraryActions = ({
         const dataBase64 = dataBase64Url.split(",")[1];
 
         mutationUploadV2.mutate({
-          userId: user?.name ?? "",
+          userId: session?.user.id ?? "",
           clientId: clientId ?? "",
           imageId: uuidv4(),
           image: {
@@ -146,7 +150,7 @@ export const ImagesLibraryActions = ({
         });
       }
     },
-    [instance, clientId, user, mutationUploadV2]
+    [instance, clientId, session, mutationUploadV2],
   );
 
   const realSelectedImages = React.useMemo(() => {
@@ -158,7 +162,7 @@ export const ImagesLibraryActions = ({
 
     for (const image of realSelectedImages) {
       const appImage = appImages.find(
-        (appImage) => appImage.props.imageId === image.imageId
+        (appImage) => appImage.props.imageId === image.imageId,
       );
       if (typeof appImage !== "undefined") {
         inUse.push(image);
@@ -170,7 +174,7 @@ export const ImagesLibraryActions = ({
 
   const allRealImages = React.useMemo(() => {
     return realSelectedImages.every((image) =>
-      ["completed"].includes(image.status)
+      ["completed"].includes(image.status),
     );
   }, [realSelectedImages]);
 
@@ -186,10 +190,13 @@ export const ImagesLibraryActions = ({
             for (const image of realSelectedImages) {
               handleDeleteImage(image);
             }
+            setShowSelection(false);
+
+            setSelectedImages([]);
           }}
         >
           <Trash strokeWidth={1} size={16} stroke="red" />
-        </button>
+        </button>,
       );
     }
 
@@ -202,10 +209,13 @@ export const ImagesLibraryActions = ({
             for (const image of realSelectedImages) {
               handleRemoveBackground(image);
             }
+            setShowSelection(false);
+
+            setSelectedImages([]);
           }}
         >
           <BrushCleaning strokeWidth={1} size={16} />
-        </button>
+        </button>,
       );
     }
 
@@ -216,13 +226,11 @@ export const ImagesLibraryActions = ({
     inUseSelectedImages.length,
     realSelectedImages,
     allRealImages,
+    setSelectedImages,
+    setShowSelection,
   ]);
 
   if (!instance) {
-    return null;
-  }
-
-  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 

@@ -25,13 +25,14 @@ import {
   WEAVE_COMMENT_STATUS,
   WeaveCommentNodeViewAction,
 } from "@inditextech/weave-sdk";
+import { useGetSession } from "../hooks/use-get-session";
 
 type CommentViewingProps = {
   node: WeaveElementInstance;
   finish: (
     node: WeaveElementInstance,
     content: string,
-    action: WeaveCommentNodeViewAction
+    action: WeaveCommentNodeViewAction,
   ) => void;
   close: () => void;
 };
@@ -47,9 +48,10 @@ export const CommentViewing = ({
 
   const instance = useWeave((state) => state.instance);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
 
   const {
     commentId,
@@ -88,15 +90,15 @@ export const CommentViewing = ({
       threadId: string;
       status: ThreadStatus;
     }) => {
-      if (!user) {
+      if (!session) {
         return { answer: undefined };
       }
 
       return await putThread({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
         threadId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         status,
       });
     },
@@ -120,14 +122,14 @@ export const CommentViewing = ({
       node: WeaveElementInstance;
       threadId: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { status: "KO", message: "User not defined" };
       }
 
       return await delThread({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         threadId,
       });
     },
@@ -175,6 +177,7 @@ export const CommentViewing = ({
   React.useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         e.stopPropagation();
         handleCloseComment();
       }
@@ -230,7 +233,7 @@ export const CommentViewing = ({
           Comment
         </div>
         <div className="flex justify-end items-center gap-1">
-          {commentData?.thread?.userMetadata.name === user?.name &&
+          {commentData?.thread?.userMetadata.name === session?.user.id &&
             commentData?.thread?.status !== "resolved" && (
               <Button
                 className="rounded-none cursor-pointer w-[24px] h-[24px] color-red"

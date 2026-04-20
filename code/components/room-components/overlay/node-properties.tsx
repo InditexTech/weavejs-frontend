@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -16,7 +14,6 @@ import { TextProperties } from "./../node-properties/text-properties";
 import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
-import { CropProperties } from "../node-properties/crop-properties";
 import { EyeOff, Lock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
@@ -28,11 +25,11 @@ import { RegularPolygonProperties } from "../node-properties/regular-polygon-pro
 import { AlignProperties } from "../node-properties/align-properties";
 import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ImageTemplateProperties } from "../node-properties/image-template-properties";
-// import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { SidebarSelector } from "../sidebar-selector";
 import { SidebarHeader } from "../sidebar-header";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
+import { cn } from "@/lib/utils";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -48,16 +45,9 @@ export const NodeProperties = () => {
   const setNodePropertiesAction = useCollaborationRoom(
     (state) => state.setNodePropertiesAction,
   );
-
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action,
   );
-
-  // React.useEffect(() => {
-  //   if (!node || !nodes || (nodes && nodes.length === 0)) {
-  //     setSidebarActive(SIDEBAR_ELEMENTS.nodesTree);
-  //   }
-  // }, [node, nodes, setSidebarActive]);
 
   React.useEffect(() => {
     if (
@@ -116,7 +106,14 @@ export const NodeProperties = () => {
   }
 
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.nodeProperties,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.nodeProperties,
+      })}
+    >
       <SidebarHeader
         actions={
           <div className="flex justify-end items-center gap-1">
@@ -188,7 +185,7 @@ export const NodeProperties = () => {
       >
         <SidebarSelector title={title} />
       </SidebarHeader>
-      <ScrollArea className="w-full h-[calc(100%-95px)]">
+      <ScrollArea className="w-full h-[calc(100%-73px)]">
         <div className="w-full flex flex-col">
           <MetaProperties />
           <ImageProperties />
@@ -206,7 +203,7 @@ export const NodeProperties = () => {
           <FillProperties />
           <StrokeProperties />
           <TextProperties />
-          <CropProperties />
+          <div className="w-full h-[24px]"></div>
         </div>
       </ScrollArea>
     </div>

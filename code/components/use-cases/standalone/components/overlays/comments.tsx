@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { MessagesSquareIcon } from "lucide-react";
 import { useStandaloneUseCase } from "../../store/store";
@@ -11,7 +9,7 @@ import { useStandaloneUseCase } from "../../store/store";
 export function Comments() {
   const commentsShow = useStandaloneUseCase((state) => state.comments.show);
   const setCommentsShow = useStandaloneUseCase(
-    (state) => state.setCommentsShow
+    (state) => state.setCommentsShow,
   );
 
   return (

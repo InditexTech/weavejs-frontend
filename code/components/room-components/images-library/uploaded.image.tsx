@@ -2,13 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
-// import { Badge } from "@/components/ui/badge";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { ImageEntity } from "./types";
 import { cn } from "@/lib/utils";
 import { downscaleImageFromURL } from "@inditextech/weave-sdk";
@@ -25,10 +20,11 @@ export const UploadedImage = ({
 
   const instance = useWeave((state) => state.instance);
 
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
-
   const imageUrl = React.useMemo(() => {
-    return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${image.roomId}/images/${image.imageId}`;
+    const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+    const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+    return `${apiEndpoint}/${hubName}/rooms/${image.roomId}/images/${image.imageId}`;
   }, [image]);
 
   React.useEffect(() => {
@@ -53,10 +49,6 @@ export const UploadedImage = ({
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
-    return null;
-  }
-
   if (!downscaledImageDataUrl) {
     return null;
   }
@@ -74,7 +66,6 @@ export const UploadedImage = ({
         },
       )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
         style={{
@@ -93,18 +84,6 @@ export const UploadedImage = ({
         ["pending", "working"].includes(image.removalStatus) && (
           <div className="pulseOverlay"></div>
         )}
-      {/* {image.removalJobId !== null &&
-        image.removalStatus !== null &&
-        ["pending", "working"].includes(image.removalStatus) && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 text-white flex justify-center items-center">
-            <Badge
-              className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-              variant="default"
-            >
-              REMOVING
-            </Badge>
-          </div>
-        )} */}
     </div>
   );
 };

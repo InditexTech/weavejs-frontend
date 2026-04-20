@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,7 +23,7 @@ export const Checkpoint = ({
   <div
     className={cn(
       "flex items-center gap-0.5 text-muted-foreground overflow-hidden",
-      className
+      className,
     )}
     {...props}
   >

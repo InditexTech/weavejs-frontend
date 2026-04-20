@@ -20,6 +20,7 @@ export const MoveToolTrigger = ({
   tooltipAlign = "center",
 }: Readonly<MoveToolTriggerProps>) => {
   const instance = useWeave((state) => state.instance);
+  const isSwitchingRoom = useWeave((state) => state.room.switching);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const actualAction = useWeave((state) => state.actions.actual);
 
@@ -33,15 +34,16 @@ export const MoveToolTrigger = ({
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   return (
     <ToolbarButton
-      className="rounded-full !w-[40px]"
+      className="rounded-none !w-[40px]"
       icon={<Hand className="px-2" size={40} strokeWidth={1} />}
       disabled={
-        weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+        weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
+        isSwitchingRoom
       }
       active={actualAction === "moveTool"}
       onClick={() => {
@@ -60,6 +62,7 @@ export const MoveToolTrigger = ({
       }
       tooltipSide={tooltipSide}
       tooltipAlign={tooltipAlign}
+      size="medium"
     />
   );
 };

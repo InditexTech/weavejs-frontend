@@ -7,7 +7,10 @@ export const getTemplatesImages = async (
   pageSize: number,
   continuationToken: string | undefined,
 ) => {
-  let endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/templates/${instanceId}/images?pageSize=${pageSize}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  let endpoint = `${apiEndpoint}/${hubName}/templates/${instanceId}/images?pageSize=${pageSize}`;
 
   if (continuationToken) {
     endpoint = `${endpoint}&continuationToken=${continuationToken}`;

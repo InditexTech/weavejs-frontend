@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM node:20 as base
+FROM node:20 AS base
 
 # Install dependencies step
 FROM base AS deps
@@ -22,24 +22,23 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+RUN npm run build:img
 
-# Runtime image
+# Runtime image step
 FROM base AS runner
 
 RUN apt-get update -y
 RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libtool autoconf automake
 
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-USER nextjs
-EXPOSE 8080
-ENV PORT 8080
-CMD ["node", "server.js"]
+RUN adduser --system --uid 1001 tts
+RUN mkdir .output
+RUN chown tts:nodejs .output
+COPY --from=builder --chown=nextjs:nodejs /app/.env.production ./.env.production
+COPY --from=builder --chown=nextjs:nodejs /app/.output ./.output
+USER tts
+EXPOSE 3000
+ENV PORT=3000
+CMD ["node", "--env-file=/app/.env.production", ".output/server/index.mjs"]

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import {
   Tooltip,
@@ -36,7 +34,7 @@ export const ChatBotChatInfo = ({ chat }: ChatBotChatInfoProps) => {
   const [editing, setEditing] = React.useState<boolean>(false);
   const [saving, setSaving] = React.useState<boolean>(false);
   const [threadToDelete, setThreadToDelete] = React.useState<string | null>(
-    null
+    null,
   );
   const [openThreadDelete, setOpenThreadDelete] =
     React.useState<boolean>(false);

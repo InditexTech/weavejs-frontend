@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CheckIcon, CopyIcon } from "lucide-react";
@@ -56,7 +54,7 @@ const lineNumberTransformer: ShikiTransformer = {
 export async function highlightCode(
   code: string,
   language: BundledLanguage,
-  showLineNumbers = false
+  showLineNumbers = false,
 ) {
   const transformers: ShikiTransformer[] = showLineNumbers
     ? [lineNumberTransformer]
@@ -107,7 +105,7 @@ export const CodeBlock = ({
       <div
         className={cn(
           "group relative overflow-auto rounded-none border bg-background text-foreground",
-          className
+          className,
         )}
         {...props}
       >

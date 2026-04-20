@@ -52,14 +52,16 @@ export function UploadVideo() {
           const roomId = data.video.roomId;
           const videoId = data.video.videoId;
 
+          const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+
           if (position) {
             instance.triggerAction(
               "videoTool",
               {
                 videoId,
                 videoParams: {
-                  url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}`,
-                  placeholderUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
+                  url: `${apiEndpoint}/weavejs/rooms/${roomId}/videos/${videoId}`,
+                  placeholderUrl: `${apiEndpoint}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
                   width: data.video.width,
                   height: data.video.height,
                 },
@@ -81,8 +83,8 @@ export function UploadVideo() {
             });
 
             finishUploadCallback?.({
-              url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}`,
-              placeholderUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
+              url: `${apiEndpoint}/weavejs/rooms/${roomId}/videos/${videoId}`,
+              placeholderUrl: `${apiEndpoint}/weavejs/rooms/${roomId}/videos/${videoId}/placeholder`,
             });
           }
         },
@@ -123,6 +125,7 @@ export function UploadVideo() {
       const { mousePoint } = instance.getMousePointer(position);
 
       if (e.dataTransfer?.items) {
+        // eslint-disable-next-line no-unsafe-optional-chaining
         [...e.dataTransfer?.items].forEach((item) => {
           if (item.kind === "file" && item.type.startsWith("video/")) {
             const file = item.getAsFile();

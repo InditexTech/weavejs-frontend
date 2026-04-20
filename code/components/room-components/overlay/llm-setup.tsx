@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -69,11 +67,12 @@ export function LlmSetupDialog() {
 
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (event: any) => {
+    (e: any) => {
       if (!setupVisible) return;
 
-      if (event.key === "Enter") {
-        event.stopPropagation();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
         mutationGenerate.mutate(password);
       }
     },
@@ -93,11 +92,11 @@ export function LlmSetupDialog() {
       onOpenChange={(open) => setAiChatSetupVisible(open)}
     >
       <form>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] top-5 translate-y-0">
           <DialogHeader>
             <div className="w-full flex gap-5 justify-between items-center">
               <DialogTitle className="font-inter text-2xl font-normal uppercase">
-                Setup AI Capabilities
+                AI Capabilities
               </DialogTitle>
               <DialogClose asChild>
                 <button
@@ -111,7 +110,9 @@ export function LlmSetupDialog() {
               </DialogClose>
             </div>
             <DialogDescription className="font-inter text-sm mt-5">
-              Enable the AI capabilities to use image editing features.
+              Enable the AI capabilities to use image editing features. Define
+              the password that will be used to authenticate your requests and
+              enable the AI UI.
             </DialogDescription>
             <div className="w-full h-[1px] bg-[#c9c9c9] my-3"></div>
           </DialogHeader>

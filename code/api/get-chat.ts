@@ -5,9 +5,12 @@
 export const getChat = async (
   roomId: string,
   chatId: string,
-  resourceId: string
+  resourceId: string,
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/chats/${chatId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/chats/${chatId}`;
   const response = await fetch(endpoint, {
     headers: {
       ["x-weave-user-id"]: resourceId,

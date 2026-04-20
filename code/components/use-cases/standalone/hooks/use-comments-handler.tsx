@@ -23,6 +23,7 @@ import {
 import { ThreadEntity } from "../components/comment/types";
 import { useStandaloneUseCase } from "../store/store";
 import { useComment } from "./use-comment";
+import { useGetSession } from "@/components/room-components/hooks/use-get-session";
 
 export const useCommentsHandler = () => {
   const [comments, setComments] = React.useState<ThreadEntity[]>([]);
@@ -31,10 +32,11 @@ export const useCommentsHandler = () => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
-  const user = useStandaloneUseCase((state) => state.user);
+  const { session } = useGetSession();
+
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const commentsStatus = useStandaloneUseCase((state) => state.comments.status);
 
@@ -51,7 +53,7 @@ export const useCommentsHandler = () => {
         instanceId,
         managingImageId,
         commentsStatus,
-        true
+        true,
       );
     },
     staleTime: 0,
@@ -70,13 +72,13 @@ export const useCommentsHandler = () => {
       position: Konva.Vector2d;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { thread: undefined, answers: [], total: 0 };
       }
 
       return (await postStandaloneThread({
-        userId: user.name ?? "",
-        userMetadata: user,
+        userId: session?.user.name ?? "",
+        userMetadata: session?.user,
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
         position,
@@ -111,12 +113,12 @@ export const useCommentsHandler = () => {
       node: WeaveElementInstance;
       threadId: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { x: undefined, y: undefined };
       }
 
       return await putStandaloneThread({
-        userId: user.name ?? "",
+        userId: session?.user.name ?? "",
         threadId,
         instanceId: instanceId ?? "",
         imageId: managingImageId ?? "",
@@ -143,7 +145,7 @@ export const useCommentsHandler = () => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       const commentsRendererPlugin =
         instance.getPlugin<WeaveCommentsRendererPlugin<ThreadEntity>>(
-          "commentsRenderer"
+          "commentsRenderer",
         );
       commentsRendererPlugin?.setComments(comments);
       commentsRendererPlugin?.render();
@@ -180,12 +182,12 @@ export const useCommentsHandler = () => {
 
     instance.addEventListener<WeaveCommentNodeOnCreateCommentEvent>(
       "onCommentCreate",
-      createThreadHandler
+      createThreadHandler,
     );
 
     instance.addEventListener<WeaveCommentNodeOnDragEndEvent>(
       "onCommentDragEnd",
-      moveThreadHandler
+      moveThreadHandler,
     );
 
     return () => {

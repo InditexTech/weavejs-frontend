@@ -2,13 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
-// import { Badge } from "@/components/ui/badge";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { VideoEntity } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -20,21 +15,18 @@ export const UploadedVideo = ({
 }: Readonly<UploadedVideoProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
   const videoUrl = React.useMemo(() => {
-    return `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${video.roomId}/videos/${video.videoId}`;
-  }, [video]);
+    return `${apiEndpoint}/${hubName}/rooms/${video.roomId}/videos/${video.videoId}`;
+  }, [video, apiEndpoint, hubName]);
 
   if (!video) {
     return null;
   }
 
   if (!instance) {
-    return null;
-  }
-
-  if (sidebarActive !== SIDEBAR_ELEMENTS.videos) {
     return null;
   }
 
@@ -48,10 +40,9 @@ export const UploadedVideo = ({
             ["completed"].includes(video.status) && video.removalJobId === null,
           ["after:content-[''] after:absolute after:inset-0 after:bg-black/40 after:opacity-100"]:
             selected,
-        }
+        },
       )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <video
         className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
         style={{
@@ -62,8 +53,8 @@ export const UploadedVideo = ({
         data-video-id={video.videoId}
         data-video-width={video.width}
         data-video-height={video.height}
-        data-video-url={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${video.roomId}/videos/${video.videoId}`}
-        data-video-placeholder-url={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${video.roomId}/videos/${video.videoId}/placeholder`}
+        data-video-url={`${apiEndpoint}/${hubName}/rooms/${video.roomId}/videos/${video.videoId}`}
+        data-video-placeholder-url={`${apiEndpoint}/${hubName}/rooms/${video.roomId}/videos/${video.videoId}/placeholder`}
         draggable="true"
       >
         <source src={videoUrl} />

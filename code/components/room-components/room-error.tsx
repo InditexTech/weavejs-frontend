@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { motion } from "framer-motion";
 import { Logo } from "../utils/logo";
 

@@ -2,59 +2,61 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { createPortal } from "react-dom";
 import { Toaster } from "@/components/ui/sonner";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weave-react";
 import { RoomLayout } from "./room.layout";
 import { RoomLoader } from "../room-components/room-loader/room-loader";
-import { AnimatePresence } from "framer-motion";
 import useGetAzureWebPubSubProvider from "../room-components/hooks/use-get-azure-web-pubsub-provider";
 // import useGetWebsocketsProvider from "../room-components/hooks/use-get-websockets-provider";
 import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
 import { UploadImage } from "../room-components/upload-image";
 import { UploadImages } from "../room-components/upload-images";
-import UserForm from "../room-components/user-form";
 import { HelpDrawer } from "../room-components/help/help-drawer";
 import { useTasksEvents } from "../room-components/hooks/use-tasks-events";
 import { useCommentsHandler } from "../room-components/hooks/use-comments-handler";
 import { UploadVideo } from "../room-components/upload-video";
+import { AnimatePresence } from "framer-motion";
 import ChatBotPromptProvider from "../room-components/ai-components/chatbot.prompt.provider";
 import useGetRendererKonvaBase from "../room-components/hooks/use-get-renderer-konva-base";
 import { NODES } from "../utils/weave/nodes";
 import { PLUGINS } from "../utils/weave/plugins";
 import { ACTIONS } from "../utils/weave/actions";
 import { FONTS } from "../utils/weave/fonts";
-// import useGetRendererKonvaReactReconciler from "../room-components/hooks/use-get-renderer-konva-react-reconciler";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const statusMap: any = {
-  [WEAVE_INSTANCE_STATUS.IDLE]: "Idle",
-  [WEAVE_INSTANCE_STATUS.STARTING]: "Starting Weave...",
-  [WEAVE_INSTANCE_STATUS.LOADING_FONTS]: "Fetching fonts...",
-  [WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM]: "Connecting to room...",
-  [WEAVE_INSTANCE_STATUS.LOADING_ROOM]: "Loading room...",
-  [WEAVE_INSTANCE_STATUS.RUNNING]: "Running",
-};
+import { useBreakpoint } from "../room-components/overlay/hooks/use-breakpoint";
+import { useManageRoomPages } from "../room-components/hooks/use-manage-room-pages";
+import { useChangePage } from "../room-components/hooks/use-change-page";
+import { useUpdatePageThumbnail } from "../room-components/hooks/use-update-page-thumbnail";
+import { useLoadPage } from "../room-components/hooks/use-load-page";
+import { useGetSession } from "../room-components/hooks/use-get-session";
+import { EditRoomDialog } from "../room-components/overlay/edit-room";
+import { DeleteRoomDialog } from "../room-components/overlay/delete-room";
+import { EditRoomPageDialog } from "../room-components/overlay/edit-room-page";
+import { DeleteRoomPageDialog } from "../room-components/overlay/delete-room-page";
+import { Logo } from "../utils/logo";
+import { useLoadRoom } from "../room-components/hooks/use-load-room";
+import { SignOverlay } from "../sign-overlay/sign-overlay";
 
 export const Room = () => {
   return (
-    <>
-      <RoomInternal />
-      <Toasts />
-    </>
+    <AnimatePresence>
+      <RoomInternal key="internal" />
+      <Toasts key="toasts" />
+    </AnimatePresence>
   );
 };
 
 const RoomInternal = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
+
+  const [initialized, setInitialized] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
+  const clientId = useCollaborationRoom((state) => state.clientId);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
@@ -62,7 +64,7 @@ const RoomInternal = () => {
     (state) => state.commBus.connected,
   );
   const room = useCollaborationRoom((state) => state.room);
-  const user = useCollaborationRoom((state) => state.user);
+  const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
   const loadingFetchConnectionUrl = useCollaborationRoom(
     (state) => state.fetchConnectionUrl.loading,
   );
@@ -72,17 +74,60 @@ const RoomInternal = () => {
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError,
   );
-  const setUser = useCollaborationRoom((state) => state.setUser);
   const setMeasurement = useCollaborationRoom((state) => state.setMeasurement);
   const setReferenceMeasurePixels = useCollaborationRoom(
     (state) => state.setReferenceMeasurePixels,
   );
+  const setViewType = useCollaborationRoom((state) => state.setViewType);
+  const setPagesListVisible = useCollaborationRoom(
+    (state) => state.setPagesListVisible,
+  );
+  const setPagesGridVisible = useCollaborationRoom(
+    (state) => state.setPagesGridVisible,
+  );
+  const setPresentationVisible = useCollaborationRoom(
+    (state) => state.setPresentationVisible,
+  );
+  const setShowRightSidebarFloating = useCollaborationRoom(
+    (state) => state.setShowRightSidebarFloating,
+  );
 
   const { loadedParams } = useHandleRouteParams();
 
+  const pagesManaged = useManageRoomPages(room ?? "");
+
+  const { session, isPending } = useGetSession();
+
+  React.useEffect(() => {
+    if (roomInfo) {
+      document.title = `${roomInfo.room.name} | Showcase | Weave.js`;
+    } else {
+      document.title = `Room | Showcase | Weave.js`;
+    }
+  }, [roomInfo]);
+
+  React.useEffect(() => {
+    setPagesListVisible(false);
+    setPagesGridVisible(false);
+    setPresentationVisible(false);
+    setShowRightSidebarFloating(false);
+  }, [
+    setPagesListVisible,
+    setPagesGridVisible,
+    setPresentationVisible,
+    setShowRightSidebarFloating,
+  ]);
+
   const getUser = React.useCallback(() => {
-    return user as WeaveUser;
-  }, [user]);
+    return {
+      id: `${session?.user.id}-${clientId}`,
+      userId: session?.user.id,
+      clientId: clientId,
+      name: session?.user.name,
+      email: session?.user.email,
+      image: session?.user.image,
+    } as WeaveUser;
+  }, [session, clientId]);
 
   const upscaleConfiguration = useCollaborationRoom(
     (state) => state.configuration.upscale,
@@ -98,6 +143,16 @@ const RoomInternal = () => {
       },
     };
   }, [upscaleConfiguration]);
+
+  const breakpoint = useBreakpoint();
+
+  React.useEffect(() => {
+    if (["2xl"].includes(breakpoint)) {
+      setViewType("floating");
+    } else {
+      setViewType("floating");
+    }
+  }, [breakpoint, setViewType]);
 
   React.useEffect(() => {
     if (room) {
@@ -116,42 +171,12 @@ const RoomInternal = () => {
     }
   }, [room, setMeasurement, setReferenceMeasurePixels]);
 
-  React.useEffect(() => {
-    if (room && !user) {
-      const userStorage = sessionStorage.getItem(`weave.js_${room}`);
-      try {
-        const userMapped = JSON.parse(userStorage ?? "");
-        if (userMapped) {
-          setUser(userMapped);
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_) {}
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room, user]);
-
-  const loadingDescription = React.useMemo(() => {
-    if (!comBusConnected) {
-      return "Connecting to the bus...";
-    }
-    if (!loadedParams) {
-      return "Fetching room parameters...";
-    }
-    if (loadingFetchConnectionUrl) {
-      return "Connecting to the room...";
-    }
-    if (status !== WEAVE_INSTANCE_STATUS.RUNNING) {
-      return statusMap[status];
-    }
-
-    return "";
-  }, [loadedParams, loadingFetchConnectionUrl, status, comBusConnected]);
-
   const rendererProvider = useGetRendererKonvaBase();
   // const rendererProvider = useGetRendererKonvaReactReconciler();
 
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
+    pagesManaged,
     getUser,
   });
 
@@ -173,20 +198,65 @@ const RoomInternal = () => {
 
   React.useEffect(() => {
     if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
-      router.push("/error?errorCode=room-failed-connection");
+      navigate({
+        to: "/error",
+        search: { errorCode: "room-failed-connection" },
+      });
     }
 
-    if (!room && !user && loadedParams) {
-      router.push("/error?errorCode=room-required-parameters");
+    if (!room && !session && loadedParams) {
+      navigate({
+        to: "/error",
+        search: { errorCode: "room-required-parameters" },
+      });
     }
 
     if (errorFetchConnectionUrl) {
-      router.push("/error?errorCode=room-failed-connection");
+      navigate({ to: "/error", search: { errorCode: "room-connection-url" } });
     }
-  }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
+  }, [navigate, room, session, status, loadedParams, errorFetchConnectionUrl]);
 
+  React.useEffect(() => {
+    if (
+      !(
+        !loadedParams ||
+        loadingFetchConnectionUrl ||
+        !comBusConnected ||
+        status !== WEAVE_INSTANCE_STATUS.RUNNING ||
+        (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)
+      )
+    ) {
+      const ele = document.getElementById("room-loader-animation");
+      if (ele) {
+        ele.style.transition = "opacity 0.5s ease";
+        ele.style.opacity = "0";
+        ele.style.pointerEvents = "none";
+      }
+    }
+  }, [
+    loadedParams,
+    loadingFetchConnectionUrl,
+    comBusConnected,
+    status,
+    roomLoaded,
+  ]);
+
+  React.useEffect(() => {
+    if (
+      !initialized &&
+      pagesManaged &&
+      status === WEAVE_INSTANCE_STATUS.RUNNING
+    ) {
+      setInitialized(true);
+    }
+  }, [status, initialized, pagesManaged, setInitialized]);
+
+  useLoadRoom();
   useTasksEvents();
   useCommentsHandler();
+  useLoadPage();
+  useUpdatePageThumbnail();
+  useChangePage();
 
   const isBrowser =
     typeof window !== "undefined" && typeof window.document !== "undefined";
@@ -199,7 +269,7 @@ const RoomInternal = () => {
     return null;
   }
 
-  if (!room && !user && loadedParams) {
+  if (!room && !session && loadedParams) {
     return null;
   }
 
@@ -207,48 +277,26 @@ const RoomInternal = () => {
     return null;
   }
 
+  if (isPending) {
+    return (
+      <main className="absolute top-0 left-0 right-0 bottom-0 w-full h-full block flex justify-center items-center">
+        <div className="flex flex-col gap-3 justify-center items-center">
+          <Logo kind="landscape" variant="no-text" />
+          <div className="text-lg text-[#757575]">loading</div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
-      <AnimatePresence>
-        {(!loadedParams ||
-          loadingFetchConnectionUrl ||
-          !comBusConnected ||
-          status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-          (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-          <>
-            <RoomLoader
-              key="loader"
-              roomId={room ? room : "-"}
-              content={
-                loadedParams && room && !user ? (
-                  <div className="text-center">
-                    <p>ENTER YOUR USERNAME</p>
-                    <p>TO ACCESS THE ROOM</p>
-                  </div>
-                ) : (
-                  "LOADING ROOM"
-                )
-              }
-              description={
-                <>
-                  {loadedParams && room && !user ? (
-                    <div className="w-full">
-                      <UserForm />
-                    </div>
-                  ) : (
-                    loadingDescription
-                  )}
-                </>
-              }
-            />
-          </>
-        )}
-      </AnimatePresence>
-      {loadedParams &&
+      {roomInfo &&
+        loadedParams &&
         room &&
-        user &&
+        session &&
         storeProvider &&
         rendererProvider &&
+        pagesManaged &&
         comBusConnected && (
           <ChatBotPromptProvider>
             <WeaveProvider
@@ -269,26 +317,40 @@ const RoomInternal = () => {
               <UploadVideo />
               <RoomLayout inShadowDom={false} />
               <HelpDrawer />
+              <EditRoomDialog />
+              <DeleteRoomDialog />
+              <EditRoomPageDialog />
+              <DeleteRoomPageDialog />
             </WeaveProvider>
           </ChatBotPromptProvider>
         )}
+      {!initialized && (
+        <main className="absolute top-0 left-0 right-0 bottom-0 w-full h-full block flex justify-center items-center">
+          <RoomLoader />
+        </main>
+      )}
+      <SignOverlay />
     </>
   );
 };
 
 const Toasts = () => {
+  const viewType = useCollaborationRoom((state) => state.viewType);
+
   const toasterContent = (
     <>
       <Toaster
-        offset={16}
-        mobileOffset={16}
+        expand
+        visibleToasts={3}
+        offset={{ bottom: 48, right: 8 }}
+        // mobileOffset={viewType === "floating" ? 56 : 8}
         position="bottom-right"
         toastOptions={{
           classNames: {
-            toast: "w-full font-inter font-light text-xs drop-shadow-md",
+            toast: "w-full !font-light text-xs drop-shadow",
             content: "w-full",
-            title: "w-full font-inter font-semibold text-sm",
-            description: "w-full font-inter font-light text-xs !text-black",
+            title: "w-full !font-light text-sm",
+            description: "w-full !font-light text-xs !text-black",
           },
           style: {
             borderRadius: "0px",
@@ -298,15 +360,15 @@ const Toasts = () => {
       />
       <Toaster
         id="info"
-        offset={16}
-        mobileOffset={16}
+        offset={viewType === "floating" ? 63 : 8}
+        mobileOffset={viewType === "floating" ? 63 : 8}
         position="top-center"
         toastOptions={{
           classNames: {
-            toast: "w-full font-inter font-light text-xs drop-shadow-md",
+            toast: "w-full !font-light text-xs drop-shadow",
             content: "w-full",
-            title: "w-full font-inter font-semibold text-sm",
-            description: "w-full font-inter font-light text-xs !text-black",
+            title: "w-full !font-light text-sm",
+            description: "w-full !font-light text-xs !text-black",
           },
           style: {
             borderRadius: "0px",

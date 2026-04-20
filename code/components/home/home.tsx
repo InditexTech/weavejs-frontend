@@ -2,20 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { motion } from "motion/react";
-import { Logo } from "@/components/utils/logo";
-import LoginForm from "./login-form";
-import { Button } from "../ui/button";
-import { Info, Eye, EyeOff, ExternalLink, X } from "lucide-react";
-import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
-import weavePackage from "../../node_modules/@inditextech/weave-sdk/package.json";
-import weaveReactHelperPackage from "../../node_modules/@inditextech/weave-react/package.json";
-import weaveStorePackage from "../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
 import { createPortal } from "react-dom";
+import { Rooms } from "../room-components/rooms/rooms";
+import { CreateRoomDialog } from "../room-components/overlay/create-room";
+import { useGetSession } from "../room-components/hooks/use-get-session";
+import { ShowcaseDependencies } from "../showcase/showcase.dependencies";
+import { ShowcaseLeftSidebar } from "../showcase/showcase.left-sidebar";
+import { EditRoomDialog } from "../room-components/overlay/edit-room";
+import { DeleteRoomDialog } from "../room-components/overlay/delete-room";
+import { RoomAccessLinkDialog } from "../room-components/overlay/room-acces-link";
+import { JoinRoomDialog } from "../room-components/overlay/join-room";
+import { useGlobalEvents } from "../room-components/hooks/use-global-events";
+import { useHandleGlobalEvents } from "../room-components/hooks/use-handle-global-events";
+import { SessionLogin } from "../session/session.login";
+import { SignOverlay } from "../sign-overlay/sign-overlay";
 
 export const Home = () => {
   return (
@@ -27,122 +29,27 @@ export const Home = () => {
 };
 
 const HomeInternal = () => {
-  const [showDetails, setShowDetails] = React.useState(false);
+  const { session } = useGetSession();
+
+  useGlobalEvents();
+  useHandleGlobalEvents();
 
   return (
     <>
-      <main className="w-full h-full flex justify-center items-center relative">
-        <motion.section
-          initial={{ opacity: 0, y: -100 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative flex h-full w-full flex-col items-center justify-start lg:justify-center overflow-auto"
-        >
-          <div className="max-w-full lg:max-w-[500px] w-[calc(100dvw-24px)] h-dvh lg:h-auto flex flex-col items-center justify-between gap-3 lg:gap-6 m-3">
-            <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-2 lg:left-8 lg:top-8 bg-background p-8 border border-[#c9c9c9]">
-              <Logo kind="landscape" variant="no-text" />
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex flex-col items-end justify-center"
-              >
-                <h1 className="text-3xl font-inter font-light text-muted-foreground uppercase">
-                  SHOWCASE
-                </h1>
-              </motion.div>
-            </div>
-            <div className="w-full h-full lg:h-auto flex flex-col gap-2 items-center justify-center bg-background p-8 border border-[#c9c9c9]">
-              <LoginForm />
-            </div>
-            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 border border-[#c9c9c9]">
-              <div className="flex flex-col lg:flex-row gap-0 lg:gap-2 justify-center-items-center">
-                <Button
-                  variant="link"
-                  onClick={() => {
-                    window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-                  }}
-                  className="cursor-pointer font-inter font-light"
-                >
-                  <ExternalLink strokeWidth={1} /> GITHUB
-                </Button>
-                <Button
-                  variant="link"
-                  onClick={() => {
-                    window.open(
-                      DOCUMENTATION_URL,
-                      "_blank",
-                      "noopener,noreferrer",
-                    );
-                  }}
-                  className="cursor-pointer font-inter font-light"
-                >
-                  <ExternalLink strokeWidth={1} /> DOCUMENTATION
-                </Button>
-                <Button
-                  variant="link"
-                  onClick={() => {
-                    setShowDetails((prev) => !prev);
-                  }}
-                  className="cursor-pointer font-inter font-light"
-                >
-                  {!showDetails ? (
-                    <Eye strokeWidth={1} />
-                  ) : (
-                    <EyeOff strokeWidth={1} />
-                  )}{" "}
-                  DEPENDENCIES
-                </Button>
-              </div>
-            </div>
-            {showDetails && (
-              <div className="w-[calc(100dvw-24px)] lg:w-auto absolute bottom-3 right-3 lg:bottom-8 lg:right-8 flex flex-col items-start justify-center bg-background p-5 pt-3 border border-[#c9c9c9]">
-                <div className="w-full flex gap-2 justify-between items-center mb-5 uppercase">
-                  <div className="flex gap-2 justify-start items-center font-inter font-light text-sm">
-                    <Info strokeWidth={1} size={16} />
-                    Dependencies Used
-                  </div>
-                  <Button
-                    variant="link"
-                    onClick={() => {
-                      setShowDetails(false);
-                    }}
-                    className="cursor-pointer font-inter font-light"
-                  >
-                    <X strokeWidth={1} />
-                  </Button>
-                </div>
-                <div className="w-full grid grid-cols-[1fr_auto] gap-x-5 gap-y-1 justify-center-items-center font-light text-[12px]">
-                  <div className="flex gap-1 justify-start items-center">
-                    <code>@inditextech/weave-sdk</code>
-                  </div>
-                  <div className="flex gap-1 justify-center items-center">
-                    <code className="bg-[#e9e9e9] px-2 py-1">
-                      v{weavePackage.version}
-                    </code>
-                  </div>
-                  <div className="flex gap-1 justify-start items-center">
-                    <code>@inditextech/weave-react</code>
-                  </div>
-                  <div className="flex gap-1 justify-center items-center">
-                    <code className="bg-[#e9e9e9] px-2 py-1">
-                      v{weaveReactHelperPackage.version}
-                    </code>
-                  </div>
-                  <div className="flex gap-1 justify-start items-center">
-                    <code>@inditextech/weave-store-azure-web-pubsub</code>
-                  </div>
-                  <div className="flex gap-1 justify-center items-center">
-                    <code className="bg-[#e9e9e9] px-2 py-1">
-                      v{weaveStorePackage.version}
-                    </code>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.section>
+      <main className="w-full h-full grid grid-cols-[400px_1fr] 2xl:grid-cols-[400px_1fr] flex justify-center items-center relative">
+        <ShowcaseLeftSidebar />
+        <div className="w-full h-dvh flex flex-col items-center justify-center">
+          {!session && <SessionLogin />}
+          {session && <Rooms kind="showcase" />}
+        </div>
+        <ShowcaseDependencies />
       </main>
+      <CreateRoomDialog kind="showcase" />
+      <JoinRoomDialog />
+      <EditRoomDialog />
+      <DeleteRoomDialog />
+      <RoomAccessLinkDialog />
+      <SignOverlay />
     </>
   );
 };
@@ -152,16 +59,15 @@ const Toasts = () => {
     <Toaster
       offset={16}
       mobileOffset={16}
-      position="bottom-center"
+      position="bottom-right"
       toastOptions={{
         classNames: {
-          toast: "w-full font-inter font-light text-xs",
+          toast: "w-full !font-light text-xs",
           content: "w-full",
-          title: "w-full font-inter font-semibold text-sm",
-          description: "w-full font-inter font-light text-xs !text-black",
+          title: "w-full !font-light text-sm",
+          description: "w-full !font-light text-xs !text-black",
         },
         style: {
-          transform: "translateX(calc(-496px + 50%))",
           borderRadius: "0px",
           boxShadow: "none",
         },

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import {
   WeaveMoveToolAction,
   WeaveSelectionToolAction,
@@ -38,6 +36,7 @@ import { FuzzyMaskToolAction } from "../../actions/fuzzy-mask-tool/fuzzy-mask-to
 import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { ThreadEntity } from "../../room-components/hooks/types";
+import { FitToPageToolAction } from "@/components/actions/fit-to-page-tool/fit-to-page-tool";
 
 export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
@@ -96,4 +95,5 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
       },
     },
   }),
+  new FitToPageToolAction(),
 ];

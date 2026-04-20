@@ -6,7 +6,10 @@ export const postImage = async (roomId: string, file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const endpoint = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/images`;
+  const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/images`;
   const response = await fetch(endpoint, {
     method: "POST",
     body: formData,

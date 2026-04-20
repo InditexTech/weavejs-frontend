@@ -14,7 +14,10 @@ export type PostAddTemplateToRoomPayload = {
 export const postAddTemplateToRoom = async (
   payload: PostAddTemplateToRoomPayload,
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/templates/add-template-to-room`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/templates/add-template-to-room`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {

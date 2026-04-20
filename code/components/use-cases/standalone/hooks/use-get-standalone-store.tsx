@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { WeaveUser } from "@inditextech/weave-types";
 import { WeaveStoreStandalone } from "@inditextech/weave-store-standalone/client";
 import React from "react";
@@ -49,7 +47,7 @@ export function useGetStandaloneStore({
           undoManagerOptions: {
             captureTimeout: 500,
           },
-        }
+        },
       );
 
       setStore(store);

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import Emittery from "emittery";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import React from "react";
@@ -11,16 +12,61 @@ import { useCollaborationRoom } from "@/store/store";
 import { eventBus } from "@/components/utils/events-bus";
 import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
 import { postCommBusJoin } from "@/api/post-comm-bus-join";
+import { useGetSession } from "./use-get-session";
+
+type Member = {
+  clientId: string;
+  lastSeen: number;
+};
+
+const emitter = new Emittery();
+
+const HEARTBEAT_TIMEOUT = 4000; // 4 seconds
+
+function cleanupMembers(members: Map<string, Member>) {
+  const now = Date.now();
+
+  for (const [id, member] of members.entries()) {
+    if (now - member.lastSeen > HEARTBEAT_TIMEOUT) {
+      members.delete(id);
+    }
+  }
+}
+
+function electLeader(members: Map<string, Member>) {
+  const alive = [...members.entries()]
+    .filter(([, { lastSeen }]) => Date.now() - lastSeen < HEARTBEAT_TIMEOUT)
+    .map(([id]) => id);
+
+  if (alive.length === 0) return null;
+
+  return alive.sort()[0];
+}
+
+export const getEmmiter = () => {
+  return emitter;
+};
 
 export const useTasksEvents = () => {
-  const toastExportImageRef = React.useRef<string | number | null>(null);
-  const toastExportPdfRef = React.useRef<string | number | null>(null);
+  const intervalIdRef = React.useRef<NodeJS.Timeout | null>(null);
+  const pageMembersRef = React.useRef<Record<string, Map<string, Member>>>({});
+  const toastExportPageToImageRef = React.useRef<string | number | null>(null);
+  const toastExportRoomToPdfRef = React.useRef<string | number | null>(null);
+  const toastExportFramesToPdfRef = React.useRef<string | number | null>(null);
 
   const [initializedCommBus, setInitializedCommBus] =
     React.useState<boolean>(false);
+  const [actualRoomPage, setActualRoomPage] = React.useState<string | null>(
+    null,
+  );
+  const [bus, setBus] = React.useState<ReconnectingWebsocket | null>(null);
+
   const room = useCollaborationRoom((state) => state.room);
-  const user = useCollaborationRoom((state) => state.user);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
   const clientId = useCollaborationRoom((state) => state.clientId);
+  const commBusConnected = useCollaborationRoom(
+    (state) => state.commBus.connected,
+  );
   const setClientId = useCollaborationRoom((state) => state.setClientId);
   const setCommBusConnected = useCollaborationRoom(
     (state) => state.setCommBusConnected,
@@ -31,10 +77,26 @@ export const useTasksEvents = () => {
   const setFramesExporting = useCollaborationRoom(
     (state) => state.setFramesExporting,
   );
+  const setPresentationStatus = useCollaborationRoom(
+    (state) => state.setPresentationStatus,
+  );
+  const setPresentationInstanceId = useCollaborationRoom(
+    (state) => state.setPresentationInstanceId,
+  );
+  const setPresentationPagesStatus = useCollaborationRoom(
+    (state) => state.setPresentationPagesStatus,
+  );
+  const setLeaderId = useCollaborationRoom((state) => state.setLeaderId);
+  const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
+  const roomInfoLoaded = useCollaborationRoom((state) => state.roomInfo.loaded);
+  const roomInfoError = useCollaborationRoom((state) => state.roomInfo.error);
+
+  const { session } = useGetSession();
+
   const queryClient = useQueryClient();
 
   const getCommBusUrl = useMutation({
-    mutationFn: () => getCommBusNegotiate(room ?? "", user?.name ?? ""),
+    mutationFn: () => getCommBusNegotiate(room ?? "", session?.user.id ?? ""),
   });
 
   React.useEffect(() => {
@@ -49,29 +111,58 @@ export const useTasksEvents = () => {
       return;
     }
 
-    if (!room || !user?.name) {
+    if (
+      !pageId ||
+      !session?.user.id ||
+      !roomInfo ||
+      !roomInfoLoaded ||
+      roomInfoError
+    ) {
       return;
     }
 
     async function connectToRoomCoomBus() {
-      if (!room || !user?.name) {
+      if (!pageId || !session?.user.id) {
         return;
       }
 
       const ws = new ReconnectingWebsocket(async () => {
         const { url } = await getCommBusUrl.mutateAsync();
-        console.log("🔌 Connecting comm-bus");
-
+        console.log("🔌 [Comm-Bus] connecting", url);
         return url;
-      });
+      }, "json.webpubsub.azure.v1");
 
-      ws.onclose = () => console.log("🔌 closed");
+      setBus(ws);
+
+      ws.onclose = (e) => {
+        setActualRoomPage(null);
+        console.log(`🚫 [Comm-Bus] closed, code: ${e.code}`);
+      };
 
       ws.onmessage = async (event) => {
-        const message = JSON.parse(event.data);
-        const type = message.type;
-        const messageClientId = message.clientId;
-        const messageUserId = message.userId;
+        const payload = JSON.parse(event.data);
+        const message = payload.data;
+        const type = message?.type ?? "";
+        const messageClientId = message?.clientId ?? "";
+        const messageUserId = message?.userId ?? "";
+
+        if (type.startsWith("client.heartbeat")) {
+          let pageMembers =
+            pageMembersRef.current?.[`${message.roomId}.${message.pageId}`];
+          if (
+            !pageMembersRef.current?.[`${message.roomId}.${message.pageId}`]
+          ) {
+            pageMembersRef.current[`${message.roomId}.${message.pageId}`] =
+              new Map();
+            pageMembers =
+              pageMembersRef.current?.[`${message.roomId}.${message.pageId}`];
+          }
+
+          pageMembers.set(messageClientId, {
+            clientId: messageClientId,
+            lastSeen: Date.now(),
+          });
+        }
 
         if (type.startsWith("comment")) {
           eventBus.emit("onCommentsChanged");
@@ -105,29 +196,55 @@ export const useTasksEvents = () => {
           queryClient.invalidateQueries({ queryKey });
         }
 
+        if (["roomUpdated"].includes(type)) {
+          emitter.emit("roomUpdated", message.payload);
+        }
+
+        if (["roomDeleted"].includes(type)) {
+          emitter.emit("roomDeleted", message.payload);
+        }
+
+        if (["pageCreated"].includes(type)) {
+          emitter.emit("pageCreated", message.payload);
+        }
+
+        if (["pageUpdated"].includes(type)) {
+          emitter.emit("pageUpdated", message.payload);
+        }
+
+        if (["pageThumbnailUpdated"].includes(type)) {
+          emitter.emit("pageThumbnailUpdated", message.payload);
+        }
+
+        if (["pageDeleted"].includes(type)) {
+          emitter.emit("pageDeleted", message.payload);
+        }
+
         if (
-          ["exportImage"].includes(type) &&
+          ["exportPageToImage"].includes(type) &&
           messageClientId === clientId &&
-          messageUserId === user.id
+          messageUserId === session?.user.id
         ) {
           const status = message.status;
 
           switch (status) {
             case "created": {
-              toastExportImageRef.current = toast.loading(
-                "Export to image requested",
+              toastExportPageToImageRef.current = toast.loading(
+                "Export page to image",
                 {
+                  description: "Requested",
                   duration: Infinity,
                 },
               );
               break;
             }
             case "active": {
-              if (toastExportImageRef.current) {
-                toastExportImageRef.current = toast.loading(
-                  "Exporting to image processing",
+              if (toastExportPageToImageRef.current) {
+                toastExportPageToImageRef.current = toast.loading(
+                  "Export page to image",
                   {
-                    id: toastExportImageRef.current,
+                    id: toastExportPageToImageRef.current,
+                    description: "Processing",
                     duration: Infinity,
                   },
                 );
@@ -135,11 +252,141 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastExportImageRef.current) {
-                const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
+              if (toastExportPageToImageRef.current) {
+                toast.loading("Export page to image", {
+                  id: toastExportPageToImageRef.current,
+                  description: "Completed, triggering download",
+                  duration: 4000,
+                });
+
+                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
 
                 const res = await fetch(url);
+
+                if (!res.ok) {
+                  setImageExporting(false);
+                  toast.error("Export page to image", {
+                    id: toastExportPageToImageRef.current,
+                    description: "Failed to download image, try again",
+                    duration: 4000,
+                  });
+                  return;
+                }
+
+                toast.loading("Export page to image", {
+                  id: toastExportPageToImageRef.current,
+                  description: "Downloading image, please wait",
+                  duration: Infinity,
+                });
+
                 const blob = await res.blob();
+
+                toast.dismiss(toastExportPageToImageRef.current);
+
+                const objectUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = objectUrl;
+                if (message.data.responseType === "zip") {
+                  a.download = "export.zip";
+                } else if (message.data.responseType === "blob") {
+                  a.download = `export.${message.data.extension}`;
+                }
+                a.click();
+
+                URL.revokeObjectURL(objectUrl);
+
+                setImageExporting(false);
+              }
+              toastExportPageToImageRef.current = null;
+              break;
+            }
+            case "failed": {
+              if (toastExportPageToImageRef.current) {
+                toast.error("Export page to image", {
+                  id: toastExportPageToImageRef.current,
+                  description: "Failed to export page to image, try again",
+                  duration: 4000,
+                });
+
+                setImageExporting(false);
+              }
+              toastExportPageToImageRef.current = null;
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        if (
+          ["exportRoomToPdf"].includes(type) &&
+          messageClientId === clientId &&
+          messageUserId === session?.user.id
+        ) {
+          const status = message.status;
+
+          switch (status) {
+            case "created": {
+              toastExportRoomToPdfRef.current = toast.loading(
+                "Export room to PDF",
+                {
+                  description: "Requested",
+                  duration: Infinity,
+                },
+              );
+              break;
+            }
+            case "active": {
+              if (toastExportRoomToPdfRef.current) {
+                toastExportRoomToPdfRef.current = toast.loading(
+                  "Export room to PDF",
+                  {
+                    id: toastExportRoomToPdfRef.current,
+                    description: "Processing",
+                    duration: Infinity,
+                  },
+                );
+              }
+              break;
+            }
+            case "completed": {
+              if (toastExportRoomToPdfRef.current) {
+                toast.loading("Export room to PDF", {
+                  id: toastExportRoomToPdfRef.current,
+                  description: "Completed, triggering download",
+                  duration: 4000,
+                });
+
+                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
+
+                const res = await fetch(url);
+
+                if (!res.ok) {
+                  setImageExporting(false);
+                  toast.error("Export room to PDF", {
+                    id: toastExportRoomToPdfRef.current,
+                    description: "Failed to download PDF, try again",
+                    duration: 4000,
+                  });
+                  return;
+                }
+
+                toast.loading("Export room to PDF", {
+                  id: toastExportRoomToPdfRef.current,
+                  description: "Downloading PDF, please wait",
+                  duration: Infinity,
+                });
+
+                const blob = await res.blob();
+
+                toast.dismiss(toastExportRoomToPdfRef.current);
 
                 const objectUrl = URL.createObjectURL(blob);
 
@@ -152,31 +399,24 @@ export const useTasksEvents = () => {
                 }
                 a.click();
 
-                toast.success(
-                  "Export to image completed, triggering download, please wait",
-                  {
-                    id: toastExportImageRef.current,
-                    duration: 4000,
-                  },
-                );
-
                 URL.revokeObjectURL(objectUrl);
 
                 setImageExporting(false);
               }
-              toastExportImageRef.current = null;
+              toastExportRoomToPdfRef.current = null;
               break;
             }
             case "failed": {
-              if (toastExportImageRef.current) {
-                toast.error("Export to image failed, try again", {
-                  id: toastExportImageRef.current,
+              if (toastExportRoomToPdfRef.current) {
+                toast.error("Export room to PDF", {
+                  id: toastExportRoomToPdfRef.current,
+                  description: "Failed to export room to PDF, try again",
                   duration: 4000,
                 });
 
                 setImageExporting(false);
               }
-              toastExportImageRef.current = null;
+              toastExportRoomToPdfRef.current = null;
               break;
             }
             default:
@@ -185,28 +425,30 @@ export const useTasksEvents = () => {
         }
 
         if (
-          ["exportPdf"].includes(type) &&
+          ["exportFramesToPdf"].includes(type) &&
           messageClientId === clientId &&
-          messageUserId === user.id
+          messageUserId === session?.user.id
         ) {
           const status = message.status;
 
           switch (status) {
             case "created": {
-              toastExportPdfRef.current = toast.loading(
-                "Export frames to PDF requested",
+              toastExportFramesToPdfRef.current = toast.loading(
+                "Export frames to PDF",
                 {
+                  description: "Requested",
                   duration: Infinity,
                 },
               );
               break;
             }
             case "active": {
-              if (toastExportPdfRef.current) {
-                toastExportPdfRef.current = toast.loading(
-                  "Exporting frames to PDF processing",
+              if (toastExportFramesToPdfRef.current) {
+                toastExportFramesToPdfRef.current = toast.loading(
+                  "Export frames to PDF",
                   {
-                    id: toastExportPdfRef.current,
+                    description: "Processing",
+                    id: toastExportFramesToPdfRef.current,
                     duration: Infinity,
                   },
                 );
@@ -214,11 +456,33 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastExportPdfRef.current) {
-                const url = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
+              if (toastExportFramesToPdfRef.current) {
+                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
 
                 const res = await fetch(url);
+
+                if (!res.ok) {
+                  setFramesExporting(false);
+                  toast.error("Export frames to PDF", {
+                    id: toastExportFramesToPdfRef.current,
+                    description: "Failed to download PDF, try again",
+                    duration: 4000,
+                  });
+                  return;
+                }
+
+                toast.loading("Export frames to PDF", {
+                  id: toastExportFramesToPdfRef.current,
+                  description: "Downloading PDF, please wait",
+                  duration: Infinity,
+                });
+
                 const blob = await res.blob();
+
+                toast.dismiss(toastExportFramesToPdfRef.current);
 
                 const objectUrl = URL.createObjectURL(blob);
 
@@ -231,31 +495,54 @@ export const useTasksEvents = () => {
                 }
                 a.click();
 
-                toast.success(
-                  "Export frames to PDF completed, triggering download, please wait",
-                  {
-                    id: toastExportPdfRef.current,
-                    duration: 4000,
-                  },
-                );
-
                 URL.revokeObjectURL(objectUrl);
 
                 setFramesExporting(false);
               }
-              toastExportPdfRef.current = null;
+              toastExportFramesToPdfRef.current = null;
               break;
             }
             case "failed": {
-              if (toastExportPdfRef.current) {
-                toast.error("Export frames to PDF failed, try again", {
-                  id: toastExportPdfRef.current,
+              if (toastExportFramesToPdfRef.current) {
+                toast.error("Export frames to PDF", {
+                  id: toastExportFramesToPdfRef.current,
+                  description: "Failed to export frames to PDF, try again",
                   duration: 4000,
                 });
 
                 setFramesExporting(false);
               }
-              toastExportPdfRef.current = null;
+              toastExportFramesToPdfRef.current = null;
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        if (
+          ["presentationMode"].includes(type) &&
+          messageClientId === clientId &&
+          messageUserId === session?.user.id
+        ) {
+          const status = message.status;
+
+          switch (status) {
+            case "created": {
+              break;
+            }
+            case "active": {
+              setPresentationPagesStatus(message.data?.loadedPages ?? 0);
+              break;
+            }
+            case "completed": {
+              const presentationInstance = message.data.presentationModeId;
+              setPresentationInstanceId(presentationInstance);
+              setPresentationStatus("loaded");
+              break;
+            }
+            case "failed": {
+              setPresentationStatus("error");
               break;
             }
             default:
@@ -264,16 +551,18 @@ export const useTasksEvents = () => {
         }
       };
 
-      ws.onerror = (err) => console.error("❌ error", err);
+      ws.onerror = (err) => console.error("❌ [Comm-Bus] error", err);
 
       ws.onopen = async () => {
-        console.log("✅ Connected comm-bus");
+        console.log("✅ [Comm-Bus] connected");
 
-        console.log(`🔌 Join Room ${room}`);
+        console.log(`🔌 [Comm-Bus] join room <${room}>`);
 
-        await postCommBusJoin(room, user?.name ?? "");
+        await postCommBusJoin(room ?? "", session?.user.id ?? "");
 
-        console.log(`✅ Room ${room} joined on comm-bus`);
+        console.log(`✅ [Comm-Bus] room <${room}> joined`);
+
+        setActualRoomPage(`${room}.${pageId}`);
 
         setCommBusConnected(true);
       };
@@ -286,12 +575,76 @@ export const useTasksEvents = () => {
     initializedCommBus,
     getCommBusUrl,
     room,
-    user?.name,
+    roomInfo,
+    roomInfoLoaded,
+    roomInfoError,
+    pageId,
     setCommBusConnected,
     queryClient,
     clientId,
-    user?.id,
+    session,
+    setPresentationPagesStatus,
+    setPresentationInstanceId,
+    setPresentationStatus,
     setFramesExporting,
     setImageExporting,
   ]);
+
+  React.useEffect(() => {
+    let sendIntervalId = undefined;
+    if (commBusConnected) {
+      sendIntervalId = setInterval(() => {
+        bus?.send(
+          JSON.stringify({
+            type: "sendToGroup",
+            group: `${room ?? ""}.commbus`,
+            dataType: "json",
+            noEcho: false,
+            data: {
+              type: "client.heartbeat",
+              roomId: room,
+              pageId: pageId,
+              clientId,
+            },
+          }),
+        );
+      }, 2000);
+    }
+
+    return () => {
+      if (sendIntervalId) {
+        clearInterval(sendIntervalId);
+      }
+    };
+  }, [room, pageId, clientId, bus, commBusConnected]);
+
+  React.useEffect(() => {
+    if (actualRoomPage !== `${room}.${pageId}`) {
+      setLeaderId(null);
+      setActualRoomPage(`${room}.${pageId}`);
+      pageMembersRef.current[`${room}.${pageId}`] = new Map();
+    }
+  }, [room, pageId, actualRoomPage, setLeaderId]);
+
+  React.useEffect(() => {
+    intervalIdRef.current = setInterval(() => {
+      let pageMembers = pageMembersRef.current?.[`${room}.${pageId}`];
+      if (!pageMembersRef.current?.[`${room}.${pageId}`]) {
+        pageMembersRef.current[`${room}.${pageId}`] = new Map();
+        pageMembers = pageMembersRef.current?.[`${room}.${pageId}`];
+      }
+
+      cleanupMembers(pageMembers);
+
+      const newLeader = electLeader(pageMembers);
+
+      setLeaderId(newLeader);
+    }, 3000);
+
+    return () => {
+      if (intervalIdRef.current) {
+        clearInterval(intervalIdRef.current);
+      }
+    };
+  }, [room, pageId, setLeaderId]);
 };

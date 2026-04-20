@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { ToolbarButton } from "@/components/room-components/toolbar/toolbar-button";
 import {
@@ -48,11 +46,14 @@ export function Tools() {
   );
 
   return (
-    <div className="pointer-events-none absolute left-5 right-5 bottom-5 flex flex-col gap-2 justify-center items-center">
-      <Toolbar orientation="horizontal" className="hidden 2xl:flex">
+    <div className="pointer-events-none absolute left-[8px] top-[8px] bottom-[8px] flex flex-col gap-2 justify-center items-center ">
+      <Toolbar
+        orientation="vertical"
+        className="!w-[48px] hidden 2xl:flex drop-shadow"
+      >
         <MoveToolTrigger />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -64,11 +65,12 @@ export function Tools() {
               <p>Selection tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -80,12 +82,13 @@ export function Tools() {
               <p>Eraser tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
-        <ToolbarDivider />
+        <ToolbarDivider orientation="horizontal" />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Square className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -97,11 +100,12 @@ export function Tools() {
               <p>Rectangle tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<PenLine className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -113,11 +117,12 @@ export function Tools() {
               <p>Line tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<MoveUpRight className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -129,11 +134,12 @@ export function Tools() {
               <p>Arrow tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Image className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -145,11 +151,12 @@ export function Tools() {
               <p>Image tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Brush className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -161,11 +168,12 @@ export function Tools() {
               <p>Brush tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Type className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -177,11 +185,12 @@ export function Tools() {
               <p>Text tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<MessageSquare className="px-2" size={40} strokeWidth={1} />}
           disabled={
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -195,11 +204,12 @@ export function Tools() {
               <p>Comment tool</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={
             <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />
           }
@@ -223,10 +233,11 @@ export function Tools() {
           }
           tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
-        <ToolbarDivider />
+        <ToolbarDivider orientation="horizontal" />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Undo className="px-2" size={40} strokeWidth={1} />}
           disabled={
             !canUndo ||
@@ -243,11 +254,12 @@ export function Tools() {
               <p>Undo latest changes</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
         <ToolbarButton
-          className="rounded-full !w-[40px]"
+          className="rounded-none !w-[40px]"
           icon={<Redo className="px-2" size={40} strokeWidth={1} />}
           disabled={
             !canRedo ||
@@ -264,8 +276,9 @@ export function Tools() {
               <p>Redo latest changes</p>
             </div>
           }
-          tooltipSide="top"
+          tooltipSide="right"
           tooltipAlign="center"
+          size="medium"
         />
       </Toolbar>
     </div>

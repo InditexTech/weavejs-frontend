@@ -2,12 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
-import { useInView } from "react-intersection-observer";
+import { useOnInView } from "react-intersection-observer";
 import Masonry from "react-responsive-masonry";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -19,28 +17,24 @@ import {
   Info,
   SquareCheck,
   SquareX,
-  Trash,
   Trash2,
 } from "lucide-react";
 import {
   WeaveStateElement,
   WeaveElementAttributes,
-  WeaveElementInstance,
 } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { SidebarSelector } from "../sidebar-selector";
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WEAVE_IMAGES_TOOL_ACTION_NAME,
   // Weave,
-  WeaveImageNode,
   WeaveImagesToolAction,
   WeaveImageToolAction,
-  downscaleImageFromURL,
   WeaveImagesURL,
 } from "@inditextech/weave-sdk";
 import { getImages } from "@/api/get-images";
@@ -60,27 +54,28 @@ import { ImageEntity } from "./types";
 import { ImagesLibraryActions } from "./images-library.actions";
 import { SidebarHeader } from "../sidebar-header";
 import { useIAChat } from "@/store/ia-chat";
-
-function isRelativeUrl(url: string) {
-  try {
-    new URL(url);
-    return false;
-  } catch {
-    return true;
-  }
-}
+import { useGetSession } from "../hooks/use-get-session";
 
 const IMAGES_LIMIT = 20;
 
 export const ImagesLibrary = () => {
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+
+  const [root, setRoot] = React.useState<Element | null>(null);
+
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const imageStoreRef = React.useRef(new Map<string, any>());
+  const [forceRender, setForceRender] = React.useState(0);
+
   const [selectedImages, setSelectedImages] = React.useState<ImageEntity[]>([]);
-  const [images, setImages] = React.useState<ImageEntity[]>([]);
+  // const [images, setImages] = React.useState<ImageEntity[]>([]);
   const [showSelection, setShowSelection] = React.useState<boolean>(false);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
@@ -89,8 +84,6 @@ export const ImagesLibrary = () => {
   );
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
-
-  // const queryClient = useQueryClient();
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
@@ -133,7 +126,7 @@ export const ImagesLibrary = () => {
   const mutationDelete = useMutation({
     mutationFn: async (imageId: string) => {
       return await delImage(
-        user?.name ?? "",
+        session?.user.id ?? "",
         clientId ?? "",
         room ?? "",
         imageId,
@@ -192,7 +185,7 @@ export const ImagesLibrary = () => {
         const dataBase64 = dataBase64Url.split(",")[1];
 
         mutationUploadV2.mutate({
-          userId: user?.name ?? "",
+          userId: session?.user.id ?? "",
           clientId: clientId ?? "",
           imageId: uuidv4(),
           image: {
@@ -202,7 +195,7 @@ export const ImagesLibrary = () => {
         });
       }
     },
-    [instance, clientId, user, mutationUploadV2],
+    [instance, clientId, session, mutationUploadV2],
   );
 
   const query = useInfiniteQuery({
@@ -217,10 +210,8 @@ export const ImagesLibrary = () => {
       if (workloadsEnabled) {
         return await getImagesV2(room ?? "", pageParam as number, IMAGES_LIMIT);
       }
-      return await getImages(room ?? "", 20, pageParam as string);
+      return await getImages(room ?? "", IMAGES_LIMIT, pageParam as string);
     },
-    select: (newData) => newData, // keep shape stable
-    structuralSharing: true,
     initialPageParam: workloadsEnabled ? 0 : "",
     getNextPageParam: (lastPage, allPages) => {
       if (!workloadsEnabled) {
@@ -235,8 +226,46 @@ export const ImagesLibrary = () => {
       }
       return undefined; // no more pages
     },
+    refetchOnWindowFocus: false,
     enabled: sidebarActive === "images",
   });
+
+  React.useEffect(() => {
+    if (!query.data) return;
+
+    const store = imageStoreRef.current;
+    const nextIds = new Set<string>();
+
+    for (const page of query.data.pages) {
+      for (const img of page.items) {
+        const imageId = img.imageId;
+
+        nextIds.add(imageId);
+
+        const existing = store.get(imageId);
+
+        // ADD
+        if (!existing) {
+          store.set(imageId, img);
+          continue;
+        }
+
+        // UPDATE (only if something changed)
+        if (existing.status !== img.status) {
+          store.set(imageId, img);
+        }
+      }
+    }
+
+    // REMOVE
+    for (const id of store.keys()) {
+      if (!nextIds.has(id)) {
+        store.delete(id);
+      }
+    }
+
+    setForceRender((v) => v + 1);
+  }, [query.data]);
 
   const appImages = React.useMemo(() => {
     function extractImages(
@@ -274,31 +303,54 @@ export const ImagesLibrary = () => {
     return images;
   }, [appState]);
 
-  React.useEffect(() => {
-    if (!query.data) return;
-    setImages((prev: ImageEntity[]) =>
-      (query.data?.pages.flatMap((page) => page.items) ?? []).map(
-        (newItem: ImageEntity) =>
-          prev.find(
-            (oldItem) =>
-              oldItem.imageId === newItem.imageId &&
-              oldItem.updatedAt === newItem.updatedAt,
-          ) || newItem,
-      ),
-    );
-  }, [query.data]);
+  // React.useEffect(() => {
+  //   if (!query.data) return;
+  //   setImages((prev: ImageEntity[]) =>
+  //     (query.data?.pages.flatMap((page) => page.items) ?? []).map(
+  //       (newItem: ImageEntity) =>
+  //         prev.find(
+  //           (oldItem) =>
+  //             oldItem.imageId === newItem.imageId &&
+  //             oldItem.updatedAt === newItem.updatedAt,
+  //         ) || newItem,xw
+  //     ),
+  //   );
+  // }, [query.data]);
 
-  const { ref, inView } = useInView({ threshold: 1 });
+  const imagesToRender = React.useMemo(() => {
+    const unsortedImages = [...Array.from(imageStoreRef.current.values())];
+    const sortedImages = unsortedImages.toSorted((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    return sortedImages;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forceRender]);
 
   React.useEffect(() => {
-    if (inView && query.hasNextPage && !query.isFetchingNextPage) {
-      query.fetchNextPage();
+    if (viewportRef.current && !query.isFetching) {
+      setRoot(viewportRef.current);
     }
-  }, [inView, query]);
+  }, [workloadsEnabled, imagesToRender, query.isFetching]);
+
+  const ref = useOnInView(
+    (inView) => {
+      if (inView) {
+        query.fetchNextPage();
+      }
+    },
+    {
+      threshold: 0.1,
+      rootMargin: "0px",
+      root,
+      skip: !root,
+      trackVisibility: true,
+      delay: 500,
+    },
+  );
 
   const realSelectedImages = React.useMemo(() => {
-    return selectedImages.filter((image) => images.includes(image));
-  }, [selectedImages, images]);
+    return selectedImages.filter((image) => imagesToRender.includes(image));
+  }, [selectedImages, imagesToRender]);
 
   const handleCheckNone = React.useCallback(() => {
     setSelectedImages([]);
@@ -307,7 +359,7 @@ export const ImagesLibrary = () => {
   const handleCheckAll = React.useCallback(() => {
     const newSelectedImages = [];
 
-    for (const image of images) {
+    for (const image of imagesToRender) {
       const appImage = appImages.find(
         (appImage) => appImage.props.imageId === image.imageId,
       );
@@ -322,7 +374,7 @@ export const ImagesLibrary = () => {
     }
 
     setSelectedImages(newSelectedImages);
-  }, [images, appImages]);
+  }, [imagesToRender, appImages]);
 
   const handleCheckboxChange = React.useCallback(
     (checked: boolean, image: ImageEntity) => {
@@ -344,12 +396,19 @@ export const ImagesLibrary = () => {
     return null;
   }
 
-  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
-    return null;
-  }
+  // if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
+  //   return null;
+  // }
 
   return (
-    <div className="w-full h-full">
+    <div
+      className={cn("w-full h-full", {
+        ["hidden pointer-events-none"]:
+          sidebarActive !== SIDEBAR_ELEMENTS.images,
+        ["block pointer-events-auto"]:
+          sidebarActive === SIDEBAR_ELEMENTS.images,
+      })}
+    >
       <SidebarHeader
         actions={
           <div className="flex justify-end items-center gap-4">
@@ -377,130 +436,6 @@ export const ImagesLibrary = () => {
       >
         <SidebarSelector title="Images" />
       </SidebarHeader>
-      {!workloadsEnabled && (
-        <ScrollArea className="w-full h-[calc(100%-95px)] overflow-auto">
-          <div className="flex flex-col gap-2 w-full">
-            <div
-              className="grid grid-cols-2 gap-2 w-full weaveDraggable p-[24px]"
-              onDragStart={(e) => {
-                if (!instance) {
-                  return;
-                }
-
-                if (e.target instanceof HTMLImageElement) {
-                  const imageTool = instance.getActionHandler(
-                    WEAVE_IMAGE_TOOL_ACTION_NAME,
-                  ) as WeaveImageToolAction | undefined;
-
-                  if (!imageTool) {
-                    return;
-                  }
-
-                  if (
-                    !e.target.dataset.imageUrl ||
-                    !e.target.dataset.imageFallback
-                  ) {
-                    return;
-                  }
-
-                  imageTool.setDragAndDropProperties({
-                    imageURL: {
-                      url: e.target.dataset.imageUrl,
-                      fallback: e.target.dataset.imageFallback,
-                      width: e.target.naturalWidth,
-                      height: e.target.naturalHeight,
-                    },
-                    imageId: e.target.dataset.imageId,
-                  });
-                }
-              }}
-            >
-              {appImages.length === 0 && (
-                <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-                  <b className="font-normal text-[18px]">No images</b>
-                  <span className="text-[14px]">
-                    {aiChatEnabled ? (
-                      <>
-                        Add an image to the room, or
-                        <br />
-                        generate one from a prompt.
-                      </>
-                    ) : (
-                      "Add an image to the room."
-                    )}
-                  </span>
-                </div>
-              )}
-              <>
-                {appImages.length > 0 &&
-                  appImages.map((image) => {
-                    const imageId = image.key;
-
-                    let imageUrl = "";
-
-                    if (isRelativeUrl(image.props.imageURL)) {
-                      const baseUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}`;
-                      imageUrl = `${baseUrl}${image.props.imageURL}`;
-                    } else {
-                      imageUrl = image.props.imageURL;
-                    }
-
-                    return (
-                      <div
-                        key={imageId}
-                        className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border-0 border-zinc-200 relative"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          key={imageId}
-                          className="w-full h-full object-cover"
-                          draggable="true"
-                          src={imageUrl}
-                          data-image-id={imageId}
-                          data-image-fallback={downscaleImageFromURL(imageUrl, {
-                            maxWidth: 200,
-                            maxHeight: 200,
-                          })}
-                          alt="An image"
-                        />
-                        <button
-                          className="absolute bottom-[8px] right-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer"
-                          onClick={() => {
-                            if (!instance) {
-                              return;
-                            }
-
-                            const node = instance
-                              .getStage()
-                              .findOne(`#${imageId}`);
-
-                            if (node) {
-                              const nodeHandler =
-                                instance.getNodeHandler<WeaveImageNode>(
-                                  node.getAttrs().nodeType,
-                                );
-                              if (!nodeHandler) {
-                                return;
-                              }
-
-                              instance.removeNode(
-                                nodeHandler.serialize(
-                                  node as WeaveElementInstance,
-                                ),
-                              );
-                            }
-                          }}
-                        >
-                          <Trash size={16} />
-                        </button>
-                      </div>
-                    );
-                  })}
-              </>
-            </div>
-          </div>
-        </ScrollArea>
-      )}
       {showSelection && (
         <div className="w-full h-[40px] p-0 px-6 bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
           <div className="flex gap-1 justify-start items-center font-inter font-light text-xs">
@@ -531,165 +466,147 @@ export const ImagesLibrary = () => {
         </div>
       )}
       {workloadsEnabled && (
-        <ScrollArea
-          className={cn("w-full overflow-auto", {
-            ["h-[calc(100%-73px-40px-40px)]"]: showSelection,
-            ["h-[calc(100%-73px)]"]: !showSelection,
-          })}
-        >
-          <div
-            className="w-full weaveDraggable p-0"
-            onDragStart={async (e) => {
-              if (!instance) {
-                return;
-              }
+        <>
+          {imagesToRender.length === 0 && (
+            <div className="col-span-1 w-full h-[calc(100%-57px)] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
+              <b className="font-normal text-[18px]">No images</b>
+              <span className="text-[14px]">
+                {aiChatEnabled ? (
+                  <>
+                    Add an image to the room, or
+                    <br />
+                    generate one from a prompt.
+                  </>
+                ) : (
+                  "Add an image to the room."
+                )}
+              </span>
+            </div>
+          )}
+          {imagesToRender.length > 0 && (
+            <ScrollArea.Root
+              className={cn("w-full overflow-hidden", {
+                ["h-[calc(100%-57px-40px-40px)]"]: showSelection,
+                ["h-[calc(100%-57px)]"]: !showSelection,
+              })}
+            >
+              <ScrollArea.Viewport className="h-full" ref={viewportRef}>
+                <div
+                  className="w-full weaveDraggable p-0"
+                  onDragStart={async (e) => {
+                    if (!instance) {
+                      return;
+                    }
 
-              if (selectedImages.length > 1) {
-                const imagesTool = instance.getActionHandler(
-                  WEAVE_IMAGES_TOOL_ACTION_NAME,
-                ) as WeaveImagesToolAction | undefined;
+                    if (selectedImages.length > 1) {
+                      const imagesTool = instance.getActionHandler(
+                        WEAVE_IMAGES_TOOL_ACTION_NAME,
+                      ) as WeaveImagesToolAction | undefined;
 
-                if (!imagesTool) {
-                  return;
-                }
+                      if (!imagesTool) {
+                        return;
+                      }
 
-                const images: WeaveImagesURL[] = [];
+                      const images: WeaveImagesURL[] = [];
 
-                for (const image of selectedImages) {
-                  const imageId = uuidv4();
-                  const imageSize = {
-                    width: image.width ?? 0,
-                    height: image.height ?? 0,
-                  };
-                  const imageDom = document.getElementById(image.imageId);
+                      for (const image of selectedImages) {
+                        const imageId = uuidv4();
+                        const imageSize = {
+                          width: image.width ?? 0,
+                          height: image.height ?? 0,
+                        };
+                        const imageDom = document.getElementById(image.imageId);
 
-                  if (!imageDom) {
-                    continue;
-                  }
-
-                  const imageURL = `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/weavejs/rooms/${image.roomId}/images/${image.imageId}`;
-
-                  images.push({
-                    url: imageURL,
-                    fallback: imageDom.dataset.imageFallback ?? "",
-                    width: imageSize.width,
-                    height: imageSize.height,
-                    imageId,
-                  });
-                }
-
-                imagesTool.setDragAndDropProperties({
-                  imagesURL: images,
-                });
-                return;
-              }
-
-              if (e.target instanceof HTMLImageElement) {
-                const imageTool = instance.getActionHandler(
-                  WEAVE_IMAGE_TOOL_ACTION_NAME,
-                ) as WeaveImageToolAction | undefined;
-
-                if (!imageTool) {
-                  return;
-                }
-
-                if (
-                  !e.target.dataset.imageUrl ||
-                  !e.target.dataset.imageFallback
-                ) {
-                  return;
-                }
-
-                imageTool.setDragAndDropProperties({
-                  imageURL: {
-                    url: e.target.dataset.imageUrl,
-                    fallback: e.target.dataset.imageFallback,
-                    width: e.target.naturalWidth,
-                    height: e.target.naturalHeight,
-                  },
-                  imageId: e.target.dataset.imageId,
-                });
-              }
-            }}
-          >
-            {images.length === 0 && (
-              <div className="col-span-1 w-full h-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-                <b className="font-normal text-[18px]">No images</b>
-                <span className="text-[14px]">
-                  {aiChatEnabled ? (
-                    <>
-                      Add an image to the room, or
-                      <br />
-                      generate one from a prompt.
-                    </>
-                  ) : (
-                    "Add an image to the room."
-                  )}
-                </span>
-              </div>
-            )}
-            <Masonry sequential columnsCount={2} gutter="1px">
-              {images.length > 0 &&
-                images.map((image) => {
-                  const appImage = appImages.find(
-                    (appImage) => appImage.props.imageId === image.imageId,
-                  );
-
-                  const isChecked = realSelectedImages.includes(image);
-
-                  let imageComponent = (
-                    <UploadedImage
-                      key={image.imageId}
-                      selected={isChecked}
-                      image={image}
-                    />
-                  );
-
-                  if (
-                    [
-                      "negate-image",
-                      "flip-image",
-                      "grayscale-image",
-                      "background-removal",
-                      "image-generation",
-                      "image-edition",
-                    ].includes(image.operation)
-                  ) {
-                    imageComponent = (
-                      <GeneratedImage
-                        key={image.imageId}
-                        selected={isChecked}
-                        image={image}
-                      />
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={image.imageId}
-                      className="w-full"
-                      onClick={() => {
-                        if (
-                          showSelection &&
-                          !(
-                            ["pending", "working"].includes(image.status) ||
-                            (image.removalJobId !== null &&
-                              image.removalStatus !== null &&
-                              ["pending", "working"].includes(
-                                image.removalStatus,
-                              ))
-                          )
-                        ) {
-                          handleCheckboxChange(!isChecked, image);
+                        if (!imageDom) {
+                          continue;
                         }
-                      }}
-                    >
-                      <ContextMenu>
-                        <ContextMenuTrigger>
-                          <div className="group relative w-full">
-                            {imageComponent}
-                            {showSelection &&
-                              typeof appImage === "undefined" &&
+
+                        const apiEndpoint = import.meta.env
+                          .VITE_API_V2_ENDPOINT;
+
+                        const imageURL = `${apiEndpoint}/weavejs/rooms/${image.roomId}/images/${image.imageId}`;
+
+                        images.push({
+                          url: imageURL,
+                          fallback: imageDom.dataset.imageFallback ?? "",
+                          width: imageSize.width,
+                          height: imageSize.height,
+                          imageId,
+                        });
+                      }
+
+                      imagesTool.setDragAndDropProperties({
+                        imagesURL: images,
+                      });
+                      return;
+                    }
+
+                    if (e.target instanceof HTMLImageElement) {
+                      const imageTool = instance.getActionHandler(
+                        WEAVE_IMAGE_TOOL_ACTION_NAME,
+                      ) as WeaveImageToolAction | undefined;
+
+                      if (!imageTool) {
+                        return;
+                      }
+
+                      if (
+                        !e.target.dataset.imageUrl ||
+                        !e.target.dataset.imageFallback
+                      ) {
+                        return;
+                      }
+
+                      imageTool.setDragAndDropProperties({
+                        imageURL: {
+                          url: e.target.dataset.imageUrl,
+                          fallback: e.target.dataset.imageFallback,
+                          width: e.target.naturalWidth,
+                          height: e.target.naturalHeight,
+                        },
+                        imageId: e.target.dataset.imageId,
+                      });
+                    }
+                  }}
+                >
+                  <Masonry
+                    columnsCount={2}
+                    gutter="1px"
+                    className="w-full min-h-[calc(100%)]"
+                  >
+                    {imagesToRender.map((image) => {
+                      const appImage = appImages.find(
+                        (appImage) => appImage.props.imageId === image.imageId,
+                      );
+
+                      const isChecked = realSelectedImages.includes(image);
+
+                      let imageComponent = (
+                        <UploadedImage selected={isChecked} image={image} />
+                      );
+
+                      if (
+                        [
+                          "negate-image",
+                          "flip-image",
+                          "grayscale-image",
+                          "background-removal",
+                          "image-generation",
+                          "image-edition",
+                        ].includes(image.operation)
+                      ) {
+                        imageComponent = (
+                          <GeneratedImage selected={isChecked} image={image} />
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={`${image.imageId}-${image.status}`}
+                          className="w-full min-h-[200px]"
+                          onClick={() => {
+                            if (
+                              showSelection &&
                               !(
                                 ["pending", "working"].includes(image.status) ||
                                 (image.removalJobId !== null &&
@@ -697,104 +614,141 @@ export const ImagesLibrary = () => {
                                   ["pending", "working"].includes(
                                     image.removalStatus,
                                   ))
-                              ) && (
-                                <div className="absolute top-[8px] right-[8px] z-10">
-                                  <Checkbox
-                                    id="terms"
-                                    className="bg-white rounded-none cursor-pointer"
-                                    value={image.imageId}
-                                    checked={isChecked}
-                                    onCheckedChange={(checked: boolean) => {
-                                      handleCheckboxChange(checked, image);
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            {typeof appImage !== "undefined" && (
-                              <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
-                                <Badge
-                                  className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
-                                  variant="default"
-                                >
-                                  IN USE
-                                </Badge>
+                              )
+                            ) {
+                              handleCheckboxChange(!isChecked, image);
+                            }
+                          }}
+                        >
+                          <ContextMenu>
+                            <ContextMenuTrigger>
+                              <div className="group relative w-full">
+                                {imageComponent}
+                                {showSelection &&
+                                  typeof appImage === "undefined" &&
+                                  !(
+                                    ["pending", "working"].includes(
+                                      image.status,
+                                    ) ||
+                                    (image.removalJobId !== null &&
+                                      image.removalStatus !== null &&
+                                      ["pending", "working"].includes(
+                                        image.removalStatus,
+                                      ))
+                                  ) && (
+                                    <div className="absolute top-[8px] right-[8px] z-10">
+                                      <Checkbox
+                                        id="terms"
+                                        className="bg-white rounded-none cursor-pointer"
+                                        value={image.imageId}
+                                        checked={isChecked}
+                                        onCheckedChange={(checked: boolean) => {
+                                          handleCheckboxChange(checked, image);
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                {typeof appImage !== "undefined" && (
+                                  <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
+                                    <Badge
+                                      className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
+                                      variant="default"
+                                    >
+                                      IN USE
+                                    </Badge>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        </ContextMenuTrigger>
-                        <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
-                          {typeof appImage !== "undefined" && (
-                            <>
-                              <ContextMenuItem
-                                disabled
-                                className="rounded-none uppercase font-inter text-xs"
-                              >
-                                <Info
-                                  strokeWidth={1}
-                                  size={16}
-                                  className="mr-2"
-                                />
-                                In use
-                              </ContextMenuItem>
-                              <ContextMenuSeparator />
-                            </>
-                          )}
-                          {["completed"].includes(image.status) && (
-                            <ContextMenuItem
-                              className="rounded-none uppercase font-inter text-xs"
-                              onClick={() => {
-                                handleRemoveBackground(image);
-                              }}
-                            >
-                              <BrushCleaning
-                                strokeWidth={1}
-                                size={16}
-                                className="mr-2"
-                              />
-                              Remove background
-                            </ContextMenuItem>
-                          )}
-                          {typeof appImage === "undefined" && (
-                            <>
-                              {["completed"].includes(image.status) && (
-                                <ContextMenuSeparator />
+                            </ContextMenuTrigger>
+                            <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
+                              {typeof appImage !== "undefined" && (
+                                <>
+                                  <ContextMenuItem
+                                    disabled
+                                    className="rounded-none uppercase font-inter text-xs"
+                                  >
+                                    <Info
+                                      strokeWidth={1}
+                                      size={16}
+                                      className="mr-2"
+                                    />
+                                    In use
+                                  </ContextMenuItem>
+                                  <ContextMenuSeparator />
+                                </>
                               )}
-                              <ContextMenuItem
-                                className="rounded-none uppercase font-inter text-xs"
-                                disabled={typeof appImage !== "undefined"}
-                                onClick={() => {
-                                  handleDeleteImage(image);
-                                }}
-                              >
-                                <Trash2
-                                  strokeWidth={1}
-                                  size={16}
-                                  className="mr-2"
-                                />
-                                Delete
-                              </ContextMenuItem>
-                            </>
-                          )}
-                        </ContextMenuContent>
-                      </ContextMenu>
-                    </div>
-                  );
-                })}
-            </Masonry>
-            <div ref={ref} className="h-[0px]" />
-            {query.isFetchingNextPage && (
-              <p className="font-inter text-xs uppercase text-center py-4">
-                loading more...
-              </p>
-            )}
-          </div>
-        </ScrollArea>
+                              {["completed"].includes(image.status) && (
+                                <ContextMenuItem
+                                  className="rounded-none uppercase font-inter text-xs"
+                                  onClick={() => {
+                                    handleRemoveBackground(image);
+                                  }}
+                                >
+                                  <BrushCleaning
+                                    strokeWidth={1}
+                                    size={16}
+                                    className="mr-2"
+                                  />
+                                  Remove background
+                                </ContextMenuItem>
+                              )}
+                              {typeof appImage === "undefined" && (
+                                <>
+                                  {["completed"].includes(image.status) && (
+                                    <ContextMenuSeparator />
+                                  )}
+                                  <ContextMenuItem
+                                    className="rounded-none uppercase font-inter text-xs"
+                                    disabled={typeof appImage !== "undefined"}
+                                    onClick={() => {
+                                      handleDeleteImage(image);
+                                    }}
+                                  >
+                                    <Trash2
+                                      strokeWidth={1}
+                                      size={16}
+                                      className="mr-2"
+                                    />
+                                    Delete
+                                  </ContextMenuItem>
+                                </>
+                              )}
+                            </ContextMenuContent>
+                          </ContextMenu>
+                        </div>
+                      );
+                    })}
+                  </Masonry>
+                </div>
+                {!query.isFetching &&
+                  !query.isFetchingNextPage &&
+                  query.hasNextPage && (
+                    <div
+                      ref={(el) => {
+                        ref(el);
+                      }}
+                      className="w-full h-[1px]"
+                    />
+                  )}
+                {query.isFetchingNextPage && (
+                  <p className="font-inter text-xs uppercase text-center py-4">
+                    loading more...
+                  </p>
+                )}
+              </ScrollArea.Viewport>
+
+              <ScrollArea.Scrollbar orientation="vertical" />
+            </ScrollArea.Root>
+          )}
+        </>
       )}
       {showSelection && (
         <ImagesLibraryActions
-          images={images}
+          images={imagesToRender}
           appImages={appImages}
           selectedImages={selectedImages}
+          setShowSelection={setShowSelection}
+          setSelectedImages={setSelectedImages}
         />
       )}
     </div>

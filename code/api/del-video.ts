@@ -6,9 +6,12 @@ export const delVideo = async (
   userId: string,
   clientId: string,
   roomId: string,
-  videoId: string
+  videoId: string,
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/videos/${videoId}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/videos/${videoId}`;
   const response = await fetch(endpoint, {
     method: "DELETE",
     headers: {

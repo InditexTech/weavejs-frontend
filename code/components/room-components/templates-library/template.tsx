@@ -2,15 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable @next/next/no-img-element */
-
-"use client";
-
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { TemplateEntity } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +23,7 @@ export const Template = ({
 }: Readonly<TemplateProps>) => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
-
   if (!instance) {
-    return null;
-  }
-
-  if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
     return null;
   }
 
@@ -48,7 +36,7 @@ export const Template = ({
           ["cursor-pointer"]:
             ["completed"].includes(template.status) &&
             template.removalJobId === null,
-        }
+        },
       )}
     >
       <img

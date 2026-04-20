@@ -13,6 +13,7 @@ export const COLOR_TOKEN_NODE_TYPE = "color-token";
 
 export class ColorTokenNode extends WeaveNode {
   protected nodeType = COLOR_TOKEN_NODE_TYPE;
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes) {
     const { id } = props;
@@ -125,7 +126,7 @@ export class ColorTokenNode extends WeaveNode {
 
   onUpdate(
     nodeInstance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ) {
     const { id, colorToken } = nextProps;
 

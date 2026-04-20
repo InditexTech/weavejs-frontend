@@ -37,6 +37,9 @@ export function UploadImages() {
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads,
   );
+  const setAddingImages = useCollaborationRoom(
+    (state) => state.setAddingImages,
+  );
 
   const queryClient = useQueryClient();
 
@@ -79,8 +82,34 @@ export function UploadImages() {
         const data = await mutationUpload.mutateAsync(file);
         const room = data.image.roomId;
         const imageId = data.image.imageId;
-        return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+
+        const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+
+        return `${apiEndpoint}/weavejs/rooms/${room}/images/${imageId}`;
       };
+
+      const handleOnSelectedPositionImages = () => {
+        instance.removeEventListener(
+          "onSelectedPositionImages",
+          handleOnSelectedPositionImages,
+        );
+        setAddingImages(true);
+      };
+
+      instance.addEventListener(
+        "onSelectedPositionImages",
+        handleOnSelectedPositionImages,
+      );
+
+      const handleOnFinishedImages = () => {
+        instance.removeEventListener(
+          "onFinishedImages",
+          handleOnFinishedImages,
+        );
+        setAddingImages(false);
+      };
+
+      instance.addEventListener("onFinishedImages", handleOnFinishedImages);
 
       const onStartUploading = () => {
         toastId = toast.loading("Uploading images...", {
@@ -111,7 +140,7 @@ export function UploadImages() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
-    [instance, queryClient, room, mutationUpload],
+    [instance, queryClient, room, mutationUpload, setAddingImages],
   );
 
   React.useEffect(() => {

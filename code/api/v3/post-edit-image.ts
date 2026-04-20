@@ -24,10 +24,13 @@ export const postEditImageV2 = async (
     moderation: ImageModeration;
     sampleCount: ImageSampleCount;
     size: ImageSize;
-  }
+  },
 ) => {
   const password = sessionStorage.getItem("weave_ai_chat_password");
-  const endpoint = `${process.env.NEXT_PUBLIC_API_V3_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${params.roomId}/images/edit?password=${password}`;
+  const apiEndpoint = import.meta.env.VITE_API_V3_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${params.roomId}/images/edit?password=${password}`;
 
   const response = await fetch(endpoint, {
     method: "POST",

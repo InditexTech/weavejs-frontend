@@ -15,6 +15,7 @@ export const PANTONE_NODE_TYPE = "pantone";
 
 export class PantoneNode extends WeaveNode {
   protected nodeType = PANTONE_NODE_TYPE;
+  initialize = undefined;
 
   /* istanbul ignore next */
   loadAsyncElement(nodeId: string) {
@@ -178,7 +179,7 @@ export class PantoneNode extends WeaveNode {
 
   onUpdate(
     nodeInstance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ) {
     const { id, pantone, pantoneStroke, pantoneStrokeWidth, dash } = nextProps;
 

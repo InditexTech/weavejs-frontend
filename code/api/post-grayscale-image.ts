@@ -10,9 +10,12 @@ export const postGrayscaleImage = async (
   image: {
     dataBase64: string;
     contentType: string;
-  }
+  },
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${roomId}/images/${imageId}/grayscale`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/images/${imageId}/grayscale`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {

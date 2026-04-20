@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,12 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
 import { X } from "lucide-react";
-import { merge } from "lodash";
+import merge from "lodash/merge";
 import { useWeave } from "@inditextech/weave-react";
 import { useStandaloneUseCase } from "../../store/store";
 import { useMeasuresInfo } from "../../hooks/use-measures-info";
@@ -27,20 +24,18 @@ import { useMeasuresInfo } from "../../hooks/use-measures-info";
 export function ConfigurationDialog() {
   const instance = useWeave((state) => state.instance);
 
-  const [selectedTab, setSelectedTab] = React.useState<string>("measurement");
-
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const measurementUnit = useStandaloneUseCase(
-    (state) => state.measurement.unit
+    (state) => state.measurement.unit,
   );
   const configurationOpen = useStandaloneUseCase(
-    (state) => state.configuration.open
+    (state) => state.configuration.open,
   );
   const setConfigurationOpen = useStandaloneUseCase(
-    (state) => state.setConfigurationOpen
+    (state) => state.setConfigurationOpen,
   );
   const setMeasureUnit = useStandaloneUseCase((state) => state.setMeasureUnit);
 
@@ -77,92 +72,74 @@ export function ConfigurationDialog() {
                 </DialogClose>
               </div>
             </DialogHeader>
-            <Tabs
-              value={selectedTab}
-              onValueChange={setSelectedTab}
-              className="w-full h-full"
-            >
-              <div className="bg-[#c9c9c9] w-full">
-                <TabsList className="bg-transparent p-3 h-10 gap-3">
-                  <TabsTrigger
-                    className="font-inter text-base cursor-pointer rounded-none uppercase"
-                    value="measurement"
-                  >
-                    Measurement
-                  </TabsTrigger>
-                </TabsList>
+            <DialogDescription>
+              Configure the measurement reference for the image. This will allow
+              you to take accurate measurements within the image based on the
+              defined units and scale.
+            </DialogDescription>
+            <div className="grid grid-cols-1 gap-5">
+              <div className="flex flex-col justify-start items-start gap-0">
+                <Label className="mb-2">Units</Label>
+                <Input
+                  type="text"
+                  className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
+                  value={unit}
+                  onChange={(e) => {
+                    setUnit(e.target.value);
+                  }}
+                  onFocus={() => {
+                    window.weaveOnFieldFocus = true;
+                  }}
+                  onBlurCapture={() => {
+                    window.weaveOnFieldFocus = false;
+                  }}
+                />
+                <p className="font-inter text-xs mt-2">
+                  Define the units of thee custom measurement (e.g., cms,
+                  meters, inches).
+                </p>
               </div>
-              <TabsContent value="measurement">
-                <DialogDescription className="font-inter text-sm my-5">
-                  Setup measurement configuration.
-                </DialogDescription>
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="flex flex-col justify-start items-start gap-0">
-                    <Label className="mb-2">Units</Label>
-                    <Input
-                      type="text"
-                      className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
-                      value={unit}
-                      onChange={(e) => {
-                        setUnit(e.target.value);
-                      }}
-                      onFocus={() => {
-                        window.weaveOnFieldFocus = true;
-                      }}
-                      onBlurCapture={() => {
-                        window.weaveOnFieldFocus = false;
-                      }}
-                    />
-                    <p className="font-inter text-xs mt-2">
-                      Define the units of thee custom measurement (e.g., cms,
-                      meters, inches).
-                    </p>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-            <div className="w-full min-h-[1px] h-[1px] bg-[#c9c9c9] my-3"></div>
+            </div>
+            <div className="w-full min-h-[0.5px] h-[0.5px] bg-[#c9c9c9]"></div>
             <DialogFooter>
               <Button
                 type="button"
-                disabled={selectedTab === "measurement" && !(unit.length > 0)}
+                disabled={!(unit.length > 0)}
                 className="cursor-pointer font-inter rounded-none"
                 onClick={() => {
                   if (!instance) {
                     return;
                   }
 
-                  if (selectedTab === "measurement") {
-                    const actualSavedConfig = JSON.parse(
-                      sessionStorage.getItem(
-                        `weave.js_standalone_${instanceId}_${managingImageId}_config`
-                      ) || "{}"
-                    );
-
-                    const updatedConfig = {
-                      measurement: {
-                        unit,
-                      },
-                    };
-
-                    const finalConfiguration = merge(
-                      actualSavedConfig,
-                      updatedConfig
-                    );
-
-                    sessionStorage.setItem(
+                  const actualSavedConfig = JSON.parse(
+                    sessionStorage.getItem(
                       `weave.js_standalone_${instanceId}_${managingImageId}_config`,
-                      JSON.stringify(finalConfiguration)
-                    );
+                    ) || "{}",
+                  );
 
-                    instance.emitEvent("onMeasureReferenceChange", {
-                      unit: finalConfiguration.measurement.unit,
-                      unitPerPixel: scale,
-                    });
+                  const updatedConfig = {
+                    measurement: {
+                      unit,
+                    },
+                  };
 
-                    setMeasureUnit(unit);
-                    setUnit(unit);
-                  }
+                  const finalConfiguration = merge(
+                    actualSavedConfig,
+                    updatedConfig,
+                  );
+
+                  sessionStorage.setItem(
+                    `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+                    JSON.stringify(finalConfiguration),
+                  );
+
+                  instance.emitEvent("onMeasureReferenceChange", {
+                    unit: finalConfiguration.measurement.unit,
+                    unitPerPixel: scale,
+                  });
+
+                  setMeasureUnit(unit);
+                  setUnit(unit);
 
                   setConfigurationOpen(false);
                 }}

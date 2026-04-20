@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 
@@ -32,15 +30,17 @@ export const InputText = ({
         input.blur();
         setEnterPressed(true);
       }
+
+      return;
     },
-    []
+    [],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEditedValue(e.target.value);
     },
-    []
+    [],
   );
 
   React.useEffect(() => {

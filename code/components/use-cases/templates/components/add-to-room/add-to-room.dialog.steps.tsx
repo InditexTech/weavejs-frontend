@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { useAddToRoom } from "../../store/add-to-room";
 import { cn } from "@/lib/utils";
@@ -15,7 +13,7 @@ export function AddToRoomDialogSteps() {
     <div className="flex gap-3 justify-center items-center my-5">
       <div
         className={cn(
-          "font-inter rounded-full bg-black text-white text-xl w-[32px] h-[32px] flex justify-center items-center",
+          "font-inter rounded-full bg-black text-white text-base w-[32px] h-[32px] flex justify-center items-center",
           {
             ["bg-black text-white"]: step === "select-room",
             ["bg-[#c9c9c9] text-black"]: step !== "select-room",
@@ -25,7 +23,7 @@ export function AddToRoomDialogSteps() {
         1
       </div>
       <div
-        className={cn("font-inter text-xl", {
+        className={cn("font-inter text-base", {
           ["text-black"]: step === "select-room",
           ["text-[#c9c9c9]"]: step !== "select-room",
         })}
@@ -35,37 +33,57 @@ export function AddToRoomDialogSteps() {
       <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
       <div
         className={cn(
-          "font-inter rounded-full bg-[#c9c9c9] text-black text-xl w-[32px] h-[32px] flex justify-center items-center",
+          "font-inter rounded-full bg-black text-white text-base w-[32px] h-[32px] flex justify-center items-center",
           {
-            ["bg-black text-white"]: step === "select-template",
-            ["bg-[#c9c9c9] text-black"]: step !== "select-template",
+            ["bg-black text-white"]: step === "select-page",
+            ["bg-[#c9c9c9] text-black"]: step !== "select-page",
           },
         )}
       >
         2
       </div>
       <div
-        className={cn("font-inter text-xl", {
-          ["text-black"]: step === "select-template",
-          ["text-[#c9c9c9]"]: step !== "select-template",
+        className={cn("font-inter text-base", {
+          ["text-black"]: step === "select-page",
+          ["text-[#c9c9c9]"]: step !== "select-page",
         })}
       >
-        SELECT TEMPLATE
+        PAGE
       </div>
       <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
       <div
         className={cn(
-          "font-inter rounded-full bg-[#c9c9c9] text-black text-xl w-[32px] h-[32px] flex justify-center items-center",
+          "font-inter rounded-full bg-[#c9c9c9] text-black text-base w-[32px] h-[32px] flex justify-center items-center",
           {
-            ["bg-black text-white"]: step === "confirm",
-            ["bg-[#c9c9c9] text-black"]: step !== "confirm",
+            ["bg-black text-white"]: step === "select-template",
+            ["bg-[#c9c9c9] text-black"]: step !== "select-template",
           },
         )}
       >
         3
       </div>
       <div
-        className={cn("font-inter text-xl", {
+        className={cn("font-inter text-base", {
+          ["text-black"]: step === "select-template",
+          ["text-[#c9c9c9]"]: step !== "select-template",
+        })}
+      >
+        TEMPLATE
+      </div>
+      <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
+      <div
+        className={cn(
+          "font-inter rounded-full bg-[#c9c9c9] text-black text-base w-[32px] h-[32px] flex justify-center items-center",
+          {
+            ["bg-black text-white"]: step === "confirm",
+            ["bg-[#c9c9c9] text-black"]: step !== "confirm",
+          },
+        )}
+      >
+        4
+      </div>
+      <div
+        className={cn("font-inter text-base", {
           ["text-black"]: step === "confirm",
           ["text-[#c9c9c9]"]: step !== "confirm",
         })}

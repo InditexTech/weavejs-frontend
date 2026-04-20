@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,16 +26,16 @@ export function MeasureDefinitionDialog() {
 
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const managingImageId = useStandaloneUseCase(
-    (state) => state.managing.imageId
+    (state) => state.managing.imageId,
   );
   const measureId = useStandaloneUseCase(
-    (state) => state.measurement.measureId
+    (state) => state.measurement.measureId,
   );
   const measureDefinitionOpen = useStandaloneUseCase(
-    (state) => state.measurement.open
+    (state) => state.measurement.open,
   );
   const setMeasurementDefinitionOpen = useStandaloneUseCase(
-    (state) => state.setMeasurementDefinitionOpen
+    (state) => state.setMeasurementDefinitionOpen,
   );
 
   const { scale } = useMeasuresInfo();
@@ -52,8 +50,8 @@ export function MeasureDefinitionDialog() {
 
     const actualSavedConfig = JSON.parse(
       sessionStorage.getItem(
-        `weave.js_standalone_${instanceId}_${managingImageId}_config`
-      ) || "{}"
+        `weave.js_standalone_${instanceId}_${managingImageId}_config`,
+      ) || "{}",
     );
 
     if (actualSavedConfig.measurement) {

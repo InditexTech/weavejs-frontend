@@ -9,7 +9,11 @@ import {
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
-import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
+import {
+  WeaveElementInstance,
+  WeaveSelection,
+  WEAVE_EXPORT_RETURN_FORMAT,
+} from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
@@ -34,13 +38,13 @@ import {
   PackageOpen,
   Paperclip,
 } from "lucide-react";
-import { useExportToImageServerSide } from "./use-export-to-image-server-side";
-import { getImageBase64 } from "@/components/utils/images";
+import { useExportPageToImageServerSide } from "./use-export-page-to-image-server-side";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { setTemplateOnPosition } from "@/components/utils/templates";
 import { useTemplates } from "@/store/templates";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { useIAChat } from "@/store/ia-chat";
+import Konva from "konva";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -60,7 +64,7 @@ function useContextMenu() {
   );
   const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
   const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible,
+    (state) => state.setExportPageToImageConfigVisible,
   );
 
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
@@ -72,46 +76,9 @@ function useContextMenu() {
     (state) => state.setSaveDialogVisible,
   );
 
-  const { isExporting } = useExportToImageServerSide();
+  const { isExporting } = useExportPageToImageServerSide();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
-
-  // const mutationUpload = useMutation({
-  //   mutationFn: async ({
-  //     imageId,
-  //     image,
-  //   }: {
-  //     imageId: string;
-  //     image: { dataBase64: string; contentType: string };
-  //   }) => {
-  //     return await postRemoveBackground(room ?? "", imageId, image);
-  //   },
-  // });
-
-  // const mutationUploadV2 = useMutation({
-  //   mutationFn: async ({
-  //     userId,
-  //     clientId,
-  //     imageId,
-  //     image,
-  //   }: {
-  //     userId: string;
-  //     clientId: string;
-  //     imageId: string;
-  //     image: {
-  //       dataBase64: string;
-  //       contentType: string;
-  //     };
-  //   }) => {
-  //     return await postRemoveBackgroundV2(
-  //       userId,
-  //       clientId,
-  //       room ?? "",
-  //       imageId,
-  //       image
-  //     );
-  //   },
-  // });
 
   React.useEffect(() => {
     if (!instance) return;
@@ -173,32 +140,20 @@ function useContextMenu() {
 
             const id = toast.loading("Generating attachment...");
 
-            const selectionImage = await getImageBase64({
-              instance,
-              nodes: nodes.map((n) => n.node?.key ?? ""),
-              options: {
+            const selectionImage = (await instance.exportNodes(
+              nodes.map((n) => n.instance),
+              (nodes: Konva.Node[]) => nodes,
+              {
                 format: "image/png",
                 padding: 0,
-                backgroundColor: "transparent",
+                backgroundColor: "#ffffff",
                 pixelRatio: 1,
               },
-            });
+              WEAVE_EXPORT_RETURN_FORMAT.BLOB,
+            )) as Blob;
 
-            const [header, base64] = selectionImage.url.split(",");
-            const mime = header.match(/:(.*?);/)![1];
-
-            const binary = atob(base64);
-            const len = binary.length;
-            const bytes = new Uint8Array(len);
-
-            for (let i = 0; i < len; i++) {
-              bytes[i] = binary.charCodeAt(i);
-            }
-
-            const selectionBlob = new Blob([bytes], { type: mime });
-
-            const file = new File([selectionBlob], "image.png", {
-              type: mime,
+            const file = new File([selectionImage], "image.png", {
+              type: "image/png",
             });
 
             promptInputAttachmentsController.add([file]);
@@ -401,7 +356,7 @@ function useContextMenu() {
 
       if (!singleLocked && nodes.length > 0) {
         options.push({
-          id: "div-templates",
+          id: "div-templates-1",
           type: "divider",
         });
         // SAVE AS TEMPLATE

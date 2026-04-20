@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -34,7 +32,7 @@ export function AddToRoomCreateRoom() {
               className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
               value={roomName}
               onChange={(e) => {
-                setRoom({ id: e.target.value, create: true });
+                setRoom({ id: e.target.value, name: "", create: true });
               }}
               onFocus={() => {
                 window.weaveOnFieldFocus = true;

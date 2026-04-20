@@ -23,6 +23,7 @@ import {
   WeaveCommentNodeOnDragEndEvent,
   WeaveCommentsRendererPlugin,
 } from "@inditextech/weave-sdk";
+import { useGetSession } from "./use-get-session";
 
 export const useCommentsHandler = () => {
   const [comments, setComments] = React.useState<ThreadEntity[]>([]);
@@ -31,19 +32,20 @@ export const useCommentsHandler = () => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const { session } = useGetSession();
+
   const clientId = useCollaborationRoom((state) => state.clientId);
-  const room = useCollaborationRoom((state) => state.room);
+  const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
   const commentsStatus = useCollaborationRoom((state) => state.comments.status);
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["comments", room ?? ""],
+    queryKey: ["comments", pageId ?? ""],
     queryFn: () => {
-      if (!room) {
+      if (!pageId) {
         return Promise.resolve({ items: [], total: 0 });
       }
 
-      return getThreads(room ?? "", commentsStatus, true);
+      return getThreads(pageId ?? "", commentsStatus, true);
     },
     enabled: typeof instance !== "undefined",
   });
@@ -57,15 +59,15 @@ export const useCommentsHandler = () => {
       position: Konva.Vector2d;
       content: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { thread: undefined, answers: [], total: 0 };
       }
 
       return (await postThread({
-        userId: user.name ?? "",
-        userMetadata: user,
+        userId: session?.user.id ?? "",
+        userMetadata: session?.user,
         clientId: clientId ?? "",
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         position,
         content,
       })) as { thread: ThreadEntity; answers: []; total: number };
@@ -98,15 +100,15 @@ export const useCommentsHandler = () => {
       node: WeaveElementInstance;
       threadId: string;
     }) => {
-      if (!user) {
+      if (!session) {
         return { x: undefined, y: undefined };
       }
 
       return await putThread({
-        userId: user.name ?? "",
+        userId: session?.user.id ?? "",
         clientId: clientId ?? "",
         threadId,
-        roomId: room ?? "",
+        roomId: pageId ?? "",
         x: node.x(),
         y: node.y(),
       });
@@ -132,7 +134,7 @@ export const useCommentsHandler = () => {
     if (status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       const commentsRendererPlugin =
         instance.getPlugin<WeaveCommentsRendererPlugin<ThreadEntity>>(
-          "commentsRenderer"
+          "commentsRenderer",
         );
       commentsRendererPlugin?.setComments(comments);
       commentsRendererPlugin?.render();
@@ -169,12 +171,12 @@ export const useCommentsHandler = () => {
 
     instance.addEventListener<WeaveCommentNodeOnCreateCommentEvent>(
       "onCommentCreate",
-      createThreadHandler
+      createThreadHandler,
     );
 
     instance.addEventListener<WeaveCommentNodeOnDragEndEvent>(
       "onCommentDragEnd",
-      moveThreadHandler
+      moveThreadHandler,
     );
 
     return () => {

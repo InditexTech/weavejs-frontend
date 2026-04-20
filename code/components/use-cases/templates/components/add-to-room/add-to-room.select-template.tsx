@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
@@ -92,7 +90,7 @@ export function AddToRoomSelectTemplate() {
         <DialogDescription className="font-inter text-sm my-0">
           Select the template to use.
         </DialogDescription>
-        <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-20px-62px-25px-48px-140px-500px)] border border-[#c9c9c9]">
+        <div className="w-full h-[calc(100dvh-48px-32px-72px-20px-20px-62px-25px-48px-140px-48px)] border border-[#c9c9c9]">
           {templates.length === 0 && (
             <div className="w-full h-full flex justify-center items-center">
               <div className="w-full p-5 flex flex-col gap-2 justify-center items-center">
@@ -106,7 +104,7 @@ export function AddToRoomSelectTemplate() {
           {templates.length > 0 && (
             <ScrollArea className="w-full h-full overflow-auto">
               <div
-                className="w-full grid grid-cols-3 gap-5 p-5"
+                className="w-full grid grid-cols-3 gap-2 p-2"
                 onDragStart={(e) => {
                   if (!instance) {
                     return;

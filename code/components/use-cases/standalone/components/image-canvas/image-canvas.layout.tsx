@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
@@ -12,23 +10,15 @@ import {
   WEAVE_STORE_CONNECTION_STATUS,
 } from "@inditextech/weave-types";
 import { Tools } from "../overlays/tools";
-import { Zoom } from "../overlays/zoom";
 import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
 import { useStandaloneUseCase } from "../../store/store";
-import { Cog, ImageDown, SaveIcon, XIcon } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { putStandaloneInstanceImageData } from "@/api/standalone/put-standalone-instance-image-data";
-import { uint8ToBase64 } from "../../utils/utils";
-import { ScaleLoader } from "react-spinners";
 import { ConfigurationDialog } from "../overlays/configuration";
 import { NodeToolbar } from "../overlays/node-toolbar";
-import { useCollaborationRoom } from "@/store/store";
-import { ExportConfigDialog } from "@/components/room-components/overlay/export-config";
+import { ExportPageToImageConfigDialog } from "@/components/room-components/overlay/export-page-to-image-config";
 import { MeasureDefinitionDialog } from "../overlays/measure-definition";
 import { MeasureNode } from "../../nodes/measure/measure";
 import { useMeasuresInfo } from "../../hooks/use-measures-info";
 import { MEASURE_NODE_TYPE } from "../../nodes/measure/constants";
-import { ExportPDFConfigDialog } from "@/components/room-components/overlay/export-pdf-config";
 
 export const ImageCanvasLayout = () => {
   const instance = useWeave((state) => state.instance);
@@ -36,32 +26,20 @@ export const ImageCanvasLayout = () => {
   const status = useWeave((state) => state.status);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
-  const setExportConfigVisible = useCollaborationRoom(
-    (state) => state.setExportConfigVisible,
-  );
-
   const instanceId = useStandaloneUseCase((state) => state.instanceId);
   const exporting = useStandaloneUseCase((state) => state.actions.exporting);
   const saving = useStandaloneUseCase((state) => state.actions.saving);
   const managingImageId = useStandaloneUseCase(
     (state) => state.managing.imageId,
   );
-  const setManagingImageId = useStandaloneUseCase(
-    (state) => state.setManagingImageId,
-  );
-  const setSaving = useStandaloneUseCase((state) => state.setSaving);
-  const setCommentsShow = useStandaloneUseCase(
-    (state) => state.setCommentsShow,
-  );
-  const setConfigurationOpen = useStandaloneUseCase(
-    (state) => state.setConfigurationOpen,
-  );
   const setExporting = useStandaloneUseCase((state) => state.setExporting);
   const setMeasureUnit = useStandaloneUseCase((state) => state.setMeasureUnit);
   const setMeasureId = useStandaloneUseCase((state) => state.setMeasureId);
   const setMeasurementDefinitionOpen = useStandaloneUseCase(
     (state) => state.setMeasurementDefinitionOpen,
+  );
+  const setSidebarVisible = useStandaloneUseCase(
+    (state) => state.setSidebarVisible,
   );
 
   useWeaveEvents();
@@ -71,26 +49,27 @@ export const ImageCanvasLayout = () => {
   const { scale } = useMeasuresInfo();
 
   React.useEffect(() => {
+    setSidebarVisible(false);
+  }, [managingImageId, setSidebarVisible]);
+
+  React.useEffect(() => {
     if (!instance) return;
 
     if (status !== WEAVE_INSTANCE_STATUS.RUNNING) return;
 
     if (!roomLoaded) return;
 
-    if (status === WEAVE_INSTANCE_STATUS.RUNNING) {
-      instance.triggerAction("fitToScreenTool", {
-        previousAction: "selectionTool",
-        overrideZoom: false,
-      });
+    if (!managingImageId) return;
 
-      const weaveStageZoomPlugin =
+    if (status === WEAVE_INSTANCE_STATUS.RUNNING) {
+      const stageZoomPlugin =
         instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
 
-      if (weaveStageZoomPlugin) {
-        weaveStageZoomPlugin.setZoom(1);
+      if (stageZoomPlugin) {
+        stageZoomPlugin.fitToNodes([managingImageId]);
       }
     }
-  }, [instance, status, roomLoaded]);
+  }, [instance, status, managingImageId, roomLoaded]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -172,29 +151,6 @@ export const ImageCanvasLayout = () => {
     setMeasurementDefinitionOpen,
   ]);
 
-  const mutationSave = useMutation({
-    mutationFn: async (data: string) => {
-      if (!managingImageId) {
-        throw new Error("No managing image id");
-      }
-
-      return await putStandaloneInstanceImageData(
-        instanceId,
-        managingImageId,
-        data,
-      );
-    },
-    onMutate: () => {
-      setSaving(true);
-    },
-    onSettled: () => {
-      setSaving(false);
-    },
-    onError: () => {
-      setSaving(false);
-    },
-  });
-
   return (
     <>
       <div
@@ -214,61 +170,13 @@ export const ImageCanvasLayout = () => {
       >
         <NodeToolbar />
       </div>
+      <div className="absolute top-0 left-0 right-0 bottom-0 shadow-[inset_0_2px_6px_rgba(0,0,0,0.10)] pointer-events-none"></div>
       {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
         <>
-          <div className="absolute top-5 right-5 flex justify-end gap-1">
-            <Zoom />
-          </div>
           <Tools />
-          <div className="absolute top-5 left-5 flex justify-end items-center gap-1">
-            <div className="font-inter text-xs bg-white px-5 py-3">
-              <span className="uppercase">IMAGE:</span> {managingImageId}
-            </div>
-            <button
-              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
-              onClick={() => {
-                setExportNodes([]);
-                setExportConfigVisible(true);
-              }}
-            >
-              <ImageDown strokeWidth={1} size={16} /> EXPORT
-            </button>
-            <button
-              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
-              onClick={() => {
-                setConfigurationOpen(true);
-              }}
-            >
-              <Cog strokeWidth={1} size={16} /> SETUP
-            </button>
-            <button
-              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
-              onClick={() => {
-                if (!instance) return;
-
-                const snapshot: Uint8Array<ArrayBufferLike> = instance
-                  .getStore()
-                  .getStateSnapshot();
-
-                mutationSave.mutate(uint8ToBase64(snapshot));
-              }}
-            >
-              <SaveIcon strokeWidth={1} size={16} /> SAVE
-            </button>
-            <button
-              className="group cursor-pointer bg-white disabled:cursor-default hover:disabled:bg-transparent px-3 h-[40px] hover:text-[#c9c9c9] flex gap-3 justify-center items-center"
-              onClick={() => {
-                setManagingImageId(null);
-                setCommentsShow(false);
-              }}
-            >
-              <XIcon strokeWidth={1} size={16} /> CLOSE
-            </button>
-          </div>
           {exporting && (
             <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
               <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
-                <ScaleLoader />
                 <div className="font-inter text-xl uppercase">exporting</div>
               </div>
             </div>
@@ -276,13 +184,11 @@ export const ImageCanvasLayout = () => {
           {saving && (
             <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
               <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
-                <ScaleLoader />
                 <div className="font-inter text-xl uppercase">saving</div>
               </div>
             </div>
           )}
-          <ExportConfigDialog onIsExportingChange={setExporting} />
-          <ExportPDFConfigDialog onIsExportingChange={setExporting} />
+          <ExportPageToImageConfigDialog onIsExportingChange={setExporting} />
           <ConfigurationDialog />
           <MeasureDefinitionDialog />
         </>

@@ -2,34 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
-import { v4 as uuidv4 } from "uuid";
 import React from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { useWeave } from "@inditextech/weave-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
-import { useKeyDown } from "../hooks/use-key-down";
-import { SYSTEM_OS } from "@/lib/utils";
-import { useGetOs } from "../hooks/use-get-os";
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WEAVE_IMAGES_TOOL_ACTION_NAME,
-  WeaveExportNodesActionParams,
-  WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function useKeyboardHandler() {
-  const os = useGetOs();
-
   const instance = useWeave((state) => state.instance);
   const selectedNodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
-  const showUI = useCollaborationRoom((state) => state.ui.show);
-  const setShowUi = useCollaborationRoom((state) => state.setShowUi);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
   );
@@ -39,9 +28,6 @@ export function useKeyboardHandler() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads,
   );
-
-  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -95,501 +81,326 @@ export function useKeyboardHandler() {
     return false;
   }, [actualAction]);
 
-  /* Keyboard shortcuts toolbar */
-  const keyDownHandler = React.useCallback(
-    async (event: KeyboardEvent) => {
-      if (event.code === "KeyM") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("moveTool");
-      }
+  // TOOLBAR HOTKEYS
 
-      if (event.code === "KeyS") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("selectionTool");
-      }
+  // MOVE, SELECTION AND DELETE TOOLS
 
-      if (event.code === "KeyD") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("eraserTool");
-      }
+  useHotkey({ key: "M", mod: false, shift: false }, () => {
+    triggerTool("moveTool");
+  });
 
-      if (event.code === "KeyF" && !(event.ctrlKey || event.metaKey)) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("frameTool");
-      }
+  useHotkey({ key: "S", mod: false, shift: false }, () => {
+    triggerTool("selectionTool");
+  });
 
-      if (event.code === "KeyR") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("rectangleTool");
-      }
+  useHotkey({ key: "D", mod: false, shift: false }, () => {
+    triggerTool("eraserTool");
+  });
 
-      if (event.code === "KeyE") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("ellipseTool");
-      }
+  // SHAPES TOOLS
 
-      if (event.code === "KeyP") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("regularPolygonTool");
-      }
+  useHotkey({ key: "R", mod: false, shift: false }, () => {
+    triggerTool("rectangleTool");
+  });
 
-      if (event.code === "KeyQ") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("arrowTool");
-      }
+  useHotkey({ key: "E", mod: false, shift: false }, () => {
+    triggerTool("ellipseTool");
+  });
 
-      if (event.code === "KeyL") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("strokeTool");
-      }
+  useHotkey({ key: "P", mod: false, shift: false }, () => {
+    triggerTool("regularPolygonTool");
+  });
 
-      if (event.code === "KeyB") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("brushTool");
-      }
+  useHotkey({ key: "J", mod: false, shift: false }, () => {
+    triggerTool("starTool");
+  });
 
-      if (event.code === "KeyX") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("connectorTool");
-      }
+  useHotkey({ key: "L", mod: false, shift: false }, () => {
+    triggerTool("strokeTool");
+  });
 
-      if (
-        event.code === "KeyT" &&
-        !event.shiftKey &&
-        !event.altKey &&
-        !([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey)
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("textTool");
-      }
+  useHotkey({ key: "B", mod: false, shift: false }, () => {
+    triggerTool("brushTool");
+  });
 
-      if (event.code === "KeyI" && !(event.ctrlKey || event.metaKey)) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
-        setShowSelectFileImage(true);
-      }
+  useHotkey({ key: "Q", mod: false, shift: false }, () => {
+    triggerTool("arrowTool");
+  });
 
-      if (event.code === "KeyO" && !(event.ctrlKey || event.metaKey)) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool(WEAVE_IMAGES_TOOL_ACTION_NAME);
-        setShowSelectFileImage(true);
-      }
+  // MEDIA TOOLS
 
-      if (event.code === "KeyJ") {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("starTool");
-      }
+  useHotkey({ key: "I", mod: false, shift: false }, () => {
+    triggerTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
+    setShowSelectFileImage(true);
+  });
 
-      if (event.code === "KeyK" && !(event.ctrlKey || event.metaKey)) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("colorTokenTool");
-      }
+  useHotkey({ key: "O", mod: false, shift: false }, () => {
+    triggerTool(WEAVE_IMAGES_TOOL_ACTION_NAME);
+    setShowSelectFileImage(true);
+  });
 
-      if (
-        event.code === "KeyZ" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const actualStore = instance.getStore();
-        actualStore.undoStateStep();
-      }
+  // TEXT TOOLS
 
-      if (
-        event.code === "KeyY" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const actualStore = instance.getStore();
-        actualStore.redoStateStep();
-      }
+  useHotkey({ key: "T", mod: false, shift: false }, () => {
+    triggerTool("textTool");
+  });
 
-      /* Keyboard shortcuts visibility */
+  // OTHER TOOLS
 
-      if (
-        event.code === "IntlBackslash" &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        setShowUi(!showUI);
-      }
+  useHotkey({ key: "F", mod: false, shift: false }, () => {
+    triggerTool("frameTool");
+  });
 
-      if (
-        event.code === "KeyU" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const usersPointersPlugin =
-          instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
-        if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
-          usersPointersPlugin.disable();
-        }
-        if (usersPointersPlugin && !usersPointersPlugin.isEnabled()) {
-          usersPointersPlugin.enable();
-        }
-      }
+  useHotkey({ key: "K", mod: false, shift: false }, () => {
+    triggerTool("colorTokenTool");
+  });
 
-      /* Keyboard shortcuts selection */
+  useHotkey({ key: "X", mod: false, shift: false }, () => {
+    triggerTool("connectorTool");
+  });
 
-      if (
-        event.code === "KeyA" &&
-        event.shiftKey &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-        if (selectionPlugin) {
-          selectionPlugin.selectAll();
-        }
-      }
+  useHotkey({ key: "H", mod: false, shift: false }, () => {
+    if (!threadsEnabled) {
+      return;
+    }
 
-      if (event.code === "Escape" && event.shiftKey && instance) {
-        event.stopPropagation();
-        event.preventDefault();
-        const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-        if (selectionPlugin) {
-          selectionPlugin.selectNone();
-        }
-      }
+    triggerTool("commentTool");
+    sidebarToggle(SIDEBAR_ELEMENTS.comments);
+  });
 
-      /* Keyboard shortcuts editing */
+  // UNDO / REDO
 
-      if (
-        event.code === "KeyE" &&
-        event.shiftKey &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        if (instance && selectedNodes.length === 1) {
-          instance.triggerAction<WeaveExportNodesActionParams, void>(
-            "exportNodeTool",
-            {
-              nodes: selectedNodes.map((node) => node.instance),
-              options: {
-                padding: 20,
-                pixelRatio: 2,
-              },
-            },
-          );
-        }
-      }
+  useHotkey({ key: "Z", mod: true, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (
-        event.code === "KeyV" &&
-        event.shiftKey &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const image = await instance.triggerAction<
-          WeaveExportStageActionParams,
-          Promise<HTMLImageElement>
-        >("exportStageTool", {
-          options: {
-            padding: 20,
-            pixelRatio: 2,
-          },
-        });
+    const actualStore = instance.getStore();
+    actualStore.undoStateStep();
+  });
 
-        const link = document.createElement("a");
-        link.href = image.src;
-        link.download = `${uuidv4()}image/png`;
-        link.click();
-      }
+  useHotkey({ key: "Y", mod: true, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
 
-      /* Keyboard shortcuts arrange */
+    const actualStore = instance.getStore();
+    actualStore.redoStateStep();
+  });
 
-      if (
-        event.code === "BracketRight" &&
-        !([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.bringToFront(selectedNodes[0].instance);
-      }
+  // VISIBILITY HOTKEYS
 
-      if (
-        event.code === "BracketRight" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.moveUp(selectedNodes[0].instance);
-      }
+  useHotkey({ key: "U", mod: true, shift: true }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (
-        event.code === "BracketLeft" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.moveDown(selectedNodes[0].instance);
-      }
+    const usersPointersPlugin =
+      instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
 
-      if (
-        event.code === "BracketLeft" &&
-        !([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.sendToBack(selectedNodes[0].instance);
-      }
+    if (!usersPointersPlugin) {
+      return;
+    }
 
-      if (
-        event.code === "KeyG" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length > 1
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.group(
-          selectedNodes
-            .map((n) => n?.node)
-            .filter((node) => typeof node !== "undefined"),
-        );
-      }
+    if (usersPointersPlugin.isEnabled()) {
+      usersPointersPlugin.disable();
+    } else {
+      usersPointersPlugin.enable();
+    }
+  });
 
-      if (
-        event.code === "KeyU" &&
-        ([SYSTEM_OS.MAC as string].includes(os)
-          ? event.metaKey
-          : event.ctrlKey) &&
-        instance &&
-        selectedNodes.length === 1 &&
-        selectedNodes[0].node?.type === "group"
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        instance.unGroup(selectedNodes[0].node);
-      }
+  // SELECTION HOTKEYS
 
-      /* Keyboard shortcuts sidebars */
+  useHotkey({ key: "A", mod: true, shift: true }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (
-        event.code === "KeyI" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.images);
-      }
+    const selectionPlugin =
+      instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 
-      if (
-        event.code === "KeyV" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.videos);
-      }
+    if (!selectionPlugin) {
+      return;
+    }
 
-      if (
-        event.code === "KeyC" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
-      }
+    selectionPlugin.selectAll();
+  });
 
-      if (
-        event.code === "KeyF" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.frames);
-      }
+  useHotkey({ key: "Escape", mod: false, shift: true }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (
-        event.code === "KeyT" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.templates);
-      }
+    const selectionPlugin =
+      instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 
-      if (
-        event.code === "KeyE" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
-      }
+    if (!selectionPlugin) {
+      return;
+    }
 
-      /* Keyboard shortcuts zoom */
+    selectionPlugin.selectNone();
+  });
 
-      if (
-        event.code === "BracketRight" &&
-        isZoomingAllowed &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        handleTriggerAction("zoomInTool", { previousAction: actualAction });
-      }
+  // Z-INDEX HOTKEYS
 
-      if (
-        event.code === "Slash" &&
-        isZoomingAllowed &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        handleTriggerAction("zoomOutTool", { previousAction: actualAction });
-      }
+  useHotkey({ key: "BracketRight", mod: false, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (event.code === "Digit1" && isZoomingAllowed && event.shiftKey) {
-        event.stopPropagation();
-        event.preventDefault();
-        handleTriggerAction("fitToScreenTool", {
-          previousAction: actualAction,
-          overrideZoom: false,
-        });
-      }
+    if (selectedNodes.length !== 1) {
+      return;
+    }
 
-      if (event.code === "Digit2" && isZoomingAllowed && event.shiftKey) {
-        event.stopPropagation();
-        event.preventDefault();
-        handleTriggerAction("fitToSelectionTool", {
-          previousAction: actualAction,
-          overrideZoom: false,
-        });
-      }
+    instance.bringToFront(selectedNodes[0].instance);
+  });
 
-      /* Keyboard shortcuts utility */
+  useHotkey({ key: "BracketRight", mod: false, shift: true }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (
-        event.code === "KeyC" &&
-        event.altKey &&
-        ([SYSTEM_OS.MAC as string].includes(os) ? event.metaKey : event.ctrlKey)
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        handlePrintToConsoleState();
-      }
+    if (selectedNodes.length !== 1) {
+      return;
+    }
 
-      /* Other tools */
+    instance.moveUp(selectedNodes[0].instance);
+  });
 
-      if (event.code === "KeyH" && threadsEnabled) {
-        event.stopPropagation();
-        event.preventDefault();
-        triggerTool("commentTool");
-        sidebarToggle(SIDEBAR_ELEMENTS.comments);
-      }
+  useHotkey({ key: "BracketLeft", mod: false, shift: true }, () => {
+    if (!instance) {
+      return;
+    }
 
-      if (event.code === "KeyN") {
-        event.stopPropagation();
-        event.preventDefault();
-        setShowMinimap(!showMinimap);
-      }
+    if (selectedNodes.length !== 1) {
+      return;
+    }
 
-      if (
-        event.code === "KeyV" &&
-        !(event.ctrlKey || event.metaKey) &&
-        instance
-      ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const { finishUploadCallback } = instance.triggerAction(
-          "videoTool",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ) as any;
+    instance.moveDown(selectedNodes[0].instance);
+  });
 
-        instance.updatePropsAction("videoTool", { videoId: "testJesus" });
+  useHotkey({ key: "BracketLeft", mod: false, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
 
-        const videoURLUploaded =
-          "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Physicsworks.ogv/Physicsworks.ogv.240p.vp9.webm";
-        finishUploadCallback?.(videoURLUploaded);
-      }
-    },
-    [
-      selectedNodes,
-      actualAction,
-      showUI,
-      threadsEnabled,
-      os,
-      instance,
-      isZoomingAllowed,
-      showMinimap,
-      setShowMinimap,
-      setShowUi,
-      sidebarToggle,
-      handleTriggerAction,
-      handlePrintToConsoleState,
-      triggerTool,
-      setShowSelectFileImage,
-    ],
-  );
+    if (selectedNodes.length !== 1) {
+      return;
+    }
 
-  useKeyDown(keyDownHandler);
+    instance.sendToBack(selectedNodes[0].instance);
+  });
+
+  // GROUPING HOTKEYS
+
+  useHotkey({ key: "G", mod: true, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
+
+    if (selectedNodes.length <= 1) {
+      return;
+    }
+
+    instance.group(
+      selectedNodes
+        .map((n) => n?.node)
+        .filter((node) => typeof node !== "undefined"),
+    );
+  });
+
+  useHotkey({ key: "U", mod: true, shift: false }, () => {
+    if (!instance) {
+      return;
+    }
+
+    if (selectedNodes.length !== 1 || selectedNodes[0].node?.type !== "group") {
+      return;
+    }
+
+    instance.unGroup(selectedNodes[0].node);
+  });
+
+  // SIDEBARS HOTKEYS
+
+  useHotkey({ key: "I", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.images);
+  });
+
+  useHotkey({ key: "V", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.videos);
+  });
+
+  useHotkey({ key: "C", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
+  });
+
+  useHotkey({ key: "F", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.frames);
+  });
+
+  useHotkey({ key: "T", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.templates);
+  });
+
+  useHotkey({ key: "E", mod: true, alt: true, shift: false }, () => {
+    sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+  });
+
+  // ZOOM HOTKEYS
+
+  useHotkey({ key: "ArrowDown", mod: false, shift: true }, () => {
+    if (!isZoomingAllowed) {
+      return;
+    }
+
+    handleTriggerAction("zoomInTool", { previousAction: actualAction });
+  });
+
+  useHotkey({ key: "ArrowUp", mod: false, shift: true }, () => {
+    if (!isZoomingAllowed) {
+      return;
+    }
+
+    handleTriggerAction("zoomOutTool", { previousAction: actualAction });
+  });
+
+  useHotkey({ key: "1", mod: false, shift: true }, () => {
+    if (!isZoomingAllowed) {
+      return;
+    }
+
+    handleTriggerAction("fitToScreenTool", {
+      previousAction: actualAction,
+      overrideZoom: false,
+    });
+  });
+
+  useHotkey({ key: "2", mod: false, shift: true }, () => {
+    if (!isZoomingAllowed) {
+      return;
+    }
+
+    handleTriggerAction("fitToSelectionTool", {
+      previousAction: actualAction,
+      overrideZoom: false,
+    });
+  });
+
+  useHotkey({ key: "3", mod: false, shift: true }, () => {
+    if (!isZoomingAllowed) {
+      return;
+    }
+
+    handleTriggerAction("fitToPageTool", {
+      previousAction: actualAction,
+      overrideZoom: false,
+    });
+  });
+
+  // OTHER HOTKEYS
+
+  useHotkey({ key: "L", mod: true, alt: false, shift: true }, () => {
+    handlePrintToConsoleState();
+  });
 }

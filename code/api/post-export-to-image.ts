@@ -8,9 +8,12 @@ export const postExportToImage = async (
   roomData: string,
   nodes: string[],
   options: WeaveExportNodesOptions,
-  responseType: "base64" | "blob" | "zip" = "zip"
+  responseType: "base64" | "blob" | "zip" = "zip",
 ) => {
-  const endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/export`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  const endpoint = `${apiEndpoint}/${hubName}/export`;
 
   const exportPayload = {
     roomData,

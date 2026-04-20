@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import Konva from "konva";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -51,6 +49,7 @@ import {
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
 import {
+  WEAVE_EXPORT_RETURN_FORMAT,
   WeaveElementInstance,
   WeaveFont,
   type WeaveUser,
@@ -62,7 +61,6 @@ import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { getUserShort } from "@/components/utils/users";
 import { ThreadEntity } from "@/components/room-components/hooks/types";
-import { getImageBase64 } from "@/components/utils/images";
 import {
   createCommentDOM,
   viewCommentDOM,
@@ -473,12 +471,18 @@ const PLUGINS = (getUser: () => WeaveUser) => [
     },
     getImageBase64: async (instance, nodes) => {
       try {
-        const res = await getImageBase64({
-          instance: instance,
-          nodes: nodes.map((node) => node.getAttrs().id ?? ""),
-          options: { format: "image/png", padding: 0, pixelRatio: 1 },
-        });
-        return res.url;
+        const url = (await instance.exportNodes(
+          nodes as WeaveElementInstance[],
+          (nodes: Konva.Node[]) => nodes,
+          {
+            format: "image/png",
+            padding: 0,
+            pixelRatio: 1,
+          },
+          WEAVE_EXPORT_RETURN_FORMAT.DATA_URL,
+        )) as string;
+
+        return url;
       } catch (error) {
         console.error("Error getting image base64:", error);
         throw error;

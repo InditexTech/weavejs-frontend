@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";

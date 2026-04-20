@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import Image from "next/image";
+import { Image } from "@unpic/react";
 import logoSrc from "@/assets/images/logo.png";
 import logoOnlySrc from "@/assets/images/logo-only.png";
 import logoLandscapeSrc from "@/assets/images/logo-landscape.png";
@@ -40,9 +40,9 @@ export function Logo({
     <div className="p-0 bg-transparent flex justify-start items-center gap-2">
       <Image
         src={src}
-        width={width}
-        height={height}
-        priority
+        width={width ?? 0}
+        height={height ?? 0}
+        // priority="true"
         className={cn(`object-cover`, {
           ["w-[calc(345px*0.6)] h-[calc(40px*0.6)]"]: kind === "landscape",
           ["w-11 h-11"]: kind === "large",
@@ -50,6 +50,7 @@ export function Logo({
           ["w-[40px] h-[40px]"]: kind === "small",
         })}
         alt="Weave.js logo"
+        layout="fixed"
       />
       {variant === "text" && (
         <div

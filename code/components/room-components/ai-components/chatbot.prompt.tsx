@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import {
   PromptInput,
   PromptInputAttachment,
@@ -38,8 +36,9 @@ import { useIAChat } from "@/store/ia-chat";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { Label } from "@/components/ui/label";
-import { CheckIcon, PanelBottomOpen, PanelTopOpen } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWeave } from "@inditextech/weave-react";
 
 const GEMINI_IMAGE_ASPECT_RATIOS = [
   "1:1",
@@ -78,10 +77,12 @@ const MODELS = [
 
 const ChatBotPrompt = () => {
   const [open, setOpen] = React.useState(false);
-  const [hidden, setHidden] = React.useState(false);
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+  const selectionActive = useWeave((state) => state.selection.active);
+
+  const hidden = useIAChat((state) => state.hidden);
   const imageModel = useIAChat((state) => state.imageOptions.model);
   const imagesSamples = useIAChat((state) => state.imageOptions.samples);
   const imageAspectRatio = useIAChat((state) => state.imageOptions.aspectRatio);
@@ -102,6 +103,9 @@ const ChatBotPrompt = () => {
 
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
+  );
+  const setShowRightSidebarFloating = useCollaborationRoom(
+    (state) => state.setShowRightSidebarFloating,
   );
 
   const handleSubmit = React.useCallback(
@@ -135,6 +139,7 @@ const ChatBotPrompt = () => {
       });
       setAiView("chat");
       setSidebarActive(SIDEBAR_ELEMENTS.aiChat);
+      setShowRightSidebarFloating(true);
     },
     [
       imageModel,
@@ -145,6 +150,7 @@ const ChatBotPrompt = () => {
       sendMessage,
       setAiView,
       setSidebarActive,
+      setShowRightSidebarFloating,
       scrollToBottom,
     ],
   );
@@ -154,30 +160,22 @@ const ChatBotPrompt = () => {
   return (
     <div
       className={cn(
-        "pointer-events-none fixed left-[16px] right-[16px] flex justify-center items-center",
+        "pointer-events-none fixed left-[16px] right-[16px] justify-center items-center",
         {
-          ["bottom-[-134px]"]: hidden,
-          ["bottom-[16px]"]: !hidden,
+          ["hidden"]: hidden,
+          ["flex drop-shadow bottom-[48px]"]: !hidden,
         },
       )}
     >
-      <div className="relative w-[900px] pointer-events-auto border border-[#c9c9c9]">
-        {hidden && (
-          <div className="absolute top-[-40px] left-0 right-0 flex justify-center items-center">
-            <button
-              className={cn(
-                "bg-white rounded-none border border-[#c9c9c9] cursor-pointer",
-                {
-                  ["px-3 py-2"]: hidden,
-                  ["px-5 py-3"]: !hidden,
-                },
-              )}
-              onClick={() => setHidden(false)}
-            >
-              <PanelBottomOpen strokeWidth={1} size={16} />
-            </button>
-          </div>
+      <div
+        className={cn(
+          "relative w-[600px] pointer-events-auto border-[0.5px] border-[#c9c9c9]",
+          {
+            ["pointer-events-none"]: selectionActive,
+            ["pointer-events-auto"]: !selectionActive,
+          },
         )}
+      >
         {attachments.files.length > 0 && (
           <div className="w-full bg-white border-b border-[#c9c9c9] p-3">
             <PromptInputAttachments>
@@ -209,7 +207,7 @@ const ChatBotPrompt = () => {
               <ModelSelector onOpenChange={setOpen} open={open}>
                 <ModelSelectorTrigger asChild>
                   <Button
-                    className="h-[40px] border-[#c9c9c9] rounded-none font-inter text-xs cursor-pointer"
+                    className="w-[140px] h-[40px] px-3 border-[#c9c9c9] rounded-none font-inter text-xs cursor-pointer"
                     variant="outline"
                   >
                     <Label className="font-inter text-xs text-[#c9c9c9]">
@@ -405,12 +403,6 @@ const ChatBotPrompt = () => {
                   </PromptInputSelectContent>
                 </PromptInputSelect>
               )}
-              <button
-                className="bg-white px-5 py-3 border border-[#c9c9c9] cursor-pointer rounded-none"
-                onClick={() => setHidden(true)}
-              >
-                <PanelTopOpen strokeWidth={1} size={16} />
-              </button>
             </PromptInputTools>
             <PromptInputSubmit
               className="cursor-pointer rounded-none"

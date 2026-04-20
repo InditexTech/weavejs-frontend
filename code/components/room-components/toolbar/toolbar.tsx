@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import { cn } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
 import React from "react";
@@ -24,14 +22,15 @@ export const Toolbar = ({
   return (
     <div
       className={cn(
-        "gap-[4px] p-[4px] bg-white border rounded-full border-[#c9c9c9]",
+        "gap-[4px] p-[4px] bg-white border-[0.5px] rounded-none !border-0",
         {
           ["pointer-events-none"]: selectionActive,
           ["pointer-events-auto"]: !selectionActive,
           ["flex flex-row"]: orientation === "horizontal",
-          ["flex flex-col"]: orientation === "vertical",
+          ["flex flex-col justify-center items-center"]:
+            orientation === "vertical",
         },
-        className
+        className,
       )}
     >
       {children}

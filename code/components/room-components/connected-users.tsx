@@ -2,239 +2,193 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
-import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
-import { useCollaborationRoom } from "@/store/store";
-import { EllipsisVertical } from "lucide-react";
+import {
+  Avatar as AvatarUI,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { useWeave } from "@inditextech/weave-react";
 import { getUserShort, stringToColor } from "../utils/users";
 import {
   DropdownMenu,
-  DropdownMenuLabel,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
-import { WeaveUserMutexLock } from "@inditextech/weave-types";
+import {
+  WEAVE_STORE_CONNECTION_STATUS,
+  WeaveUserMutexLock,
+} from "@inditextech/weave-types";
 import { OPERATIONS_MAP } from "../utils/weave/constants";
+import { Divider } from "./overlay/divider";
+import { useGetSession } from "./hooks/use-get-session";
+import { useCollaborationRoom } from "@/store/store";
 
-const SHOW_USERS_LIMIT = 4;
+const SHOW_USERS_LIMIT = 6;
 
 export const ConnectedUsers = () => {
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+  const isRoomSwitching = useWeave((state) => state.room.switching);
   const connectedUsers = useWeave((state) => state.users);
   const usersLocks = useWeave((state) => state.usersLocks);
 
-  const user = useCollaborationRoom((state) => state.user);
+  const clientId = useCollaborationRoom((state) => state.clientId);
+
+  const { session } = useGetSession();
+  const userId = React.useMemo(() => {
+    if (!session?.user) {
+      return `unknown-${clientId}`;
+    }
+
+    return `${session.user.id}-${clientId}`;
+  }, [clientId, session]);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const connectedUserKey = React.useMemo(() => {
-    const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser === user?.name,
-    );
+    const filterOwnUser = Object.keys(connectedUsers).filter((actUserKey) => {
+      const actUser = connectedUsers[actUserKey];
+      return actUser.id === userId;
+    });
     return filterOwnUser?.[0];
-  }, [user, connectedUsers]);
+  }, [userId, connectedUsers]);
 
   const { showUsers, restUsers } = React.useMemo(() => {
-    const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser !== user?.name,
-    );
+    const filterOwnUser = Object.keys(connectedUsers).filter((actUserKey) => {
+      const actUser = connectedUsers[actUserKey];
+      return actUser.id !== userId;
+    });
     return {
       showUsers: filterOwnUser.slice(0, SHOW_USERS_LIMIT - 1),
       restUsers: filterOwnUser.slice(SHOW_USERS_LIMIT - 1),
     };
-  }, [user, connectedUsers]);
+  }, [userId, connectedUsers]);
+
+  if (
+    isRoomSwitching ||
+    weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+  ) {
+    return null;
+  }
 
   if (Object.keys(connectedUsers).length === 0) {
     return null;
   }
 
   return (
-    <div
-      className="min-h-[40px] flex gap-1 justify-between items-center"
-      style={{
-        width:
-          showUsers.length > 0
-            ? `calc(${(showUsers.length - 1) * 16 + 32}px + ${restUsers.length > 0 ? "16px" : "0px"})`
-            : "32px",
-      }}
-    >
-      {/* <div className="flex justify-start items-center gap-1">
-          <div className="w-full flex justify-start gap-2 items-center text-center font-inter font-light text-xs px-2 pl-0">
-            <div>{Object.keys(connectedUsers).length}</div>
-            <div className="text-left">USERS</div>
-          </div>
-        </div> */}
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <div
-            className="relative w-full h-[32px] flex gap-1 justify-start items-center"
-            // style={{
-            //   width: `calc(${connectedUserKey ? "32px" : "0px"} + ${showUsers.length > 0 ? `${(showUsers.length - 1) * 16}px` : "0px"} + ${restUsers.length > 0 ? "16px" : "0px"})`,
-            // }}
-            role="button"
-          >
-            {connectedUserKey && (
-              // <Tooltip>
-              //   <TooltipTrigger asChild>
-              <button className="cursor-pointer rounded-none absolute top-0 left-0">
-                <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
-                  <AvatarFallback className="bg-transparent uppercase">
-                    {getUserShort(user?.name ?? "")}
-                  </AvatarFallback>
-                </AvatarUI>
-              </button>
-              //   </TooltipTrigger>
-              //   <TooltipContent
-              //     sideOffset={8}
-              //     side="bottom"
-              //     className="rounded-none flex gap-2 justify-start items-center"
-              //   >
-              //     <div
-              //       className="w-[16px] h-[16px]"
-              //       style={{ background: stringToColor(user?.name ?? "") }}
-              //     ></div>
-              //     <p className="font-inter text-xs">{user?.name}</p>
-              //   </TooltipContent>
-              // </Tooltip>
-            )}
-            {showUsers.map((user, index) => {
-              const userInfo = connectedUsers[user];
-              return (
-                // <Tooltip key={user}>
-                //   <TooltipTrigger asChild>
-                <button
-                  key={user}
-                  className="cursor-pointer absolute top-0"
-                  style={{ left: `${index * 16}px` }}
-                >
-                  <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
+    <>
+      <Divider className="h-[20px]" />
+      <div className="min-h-[24px] flex gap-1 justify-between items-center">
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <div
+              className="relative w-full h-[24px] flex gap-1 justify-start items-center"
+              role="button"
+            >
+              <AvatarGroup>
+                {connectedUserKey && (
+                  <AvatarUI
+                    size="sm"
+                    className="cursor-pointer bg-muted font-light !text-xs border-[0.5px] border-[#c9c9c9]"
+                  >
+                    <AvatarImage
+                      src={connectedUsers[userId].image}
+                      alt={connectedUsers[userId].name}
+                      referrerPolicy="no-referrer"
+                    />
                     <AvatarFallback className="bg-transparent uppercase">
-                      {getUserShort(userInfo?.name ?? "")}
+                      {getUserShort(session?.user?.name ?? "")}
                     </AvatarFallback>
                   </AvatarUI>
-                </button>
-                //   </TooltipTrigger>
-                //   <TooltipContent
-                //     sideOffset={8}
-                //     side="bottom"
-                //     className="rounded-none flex gap-2 justify-start items-center"
-                //   >
-                //     <div
-                //       className="w-[16px] h-[16px]"
-                //       style={{ background: stringToColor(userInfo?.name ?? "") }}
-                //     ></div>
-                //     <p className="font-inter text-xs">{userInfo.name}</p>
-                //   </TooltipContent>
-                // </Tooltip>
-              );
-            })}
-            {restUsers.length > 0 && (
-              <button
-                className="cursor-pointer absolute top-0"
-                style={{ left: `${showUsers.length * 16}px` }}
-              >
-                <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9]">
-                  <AvatarFallback className="bg-transparent uppercase">
-                    <EllipsisVertical size={20} strokeWidth={1} />
-                  </AvatarFallback>
-                </AvatarUI>
-              </button>
-              // <>
-              //   <Tooltip>
-              //     <TooltipTrigger asChild>
-              //       <DropdownMenu
-              //         onOpenChange={(open: boolean) => setMenuOpen(open)}
-              //       >
-              //         <DropdownMenuTrigger
-              //           className={cn(
-              //             "rounded-full cursor-pointer p-1 !bg-muted hover:bg-accent focus:outline-none",
-              //             {
-              //               ["bg-accent"]: menuOpen,
-              //               ["bg-white"]: !menuOpen,
-              //             }
-              //           )}
-              //         >
-              //           <ChevronDown
-              //             size={24}
-              //             strokeWidth={1}
-              //             className="rounded-none"
-              //           />
-              //         </DropdownMenuTrigger>
-              //         <DropdownMenuContent
-              //           align="end"
-              //           side="bottom"
-              //           alignOffset={0}
-              //           sideOffset={4}
-              //           className="font-inter rounded-none"
-              //         >
-              //           {restUsers.map((user) => {
-              //             const userInfo = connectedUsers[user];
-              //             return (
-              //               <DropdownMenuItem
-              //                 key={user}
-              //                 className="text-foreground focus:bg-white hover:rounded-none"
-              //               >
-              //                 <div
-              //                   className="w-[16px] h-[16px]"
-              //                   style={{
-              //                     background: stringToColor(userInfo?.name ?? ""),
-              //                   }}
-              //                 ></div>
-              //                 <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px]">
-              //                   <AvatarFallback className="bg-transparent uppercase">
-              //                     {getUserShort(userInfo?.name ?? "")}
-              //                   </AvatarFallback>
-              //                 </AvatarUI>
-              //                 {userInfo?.name}
-              //               </DropdownMenuItem>
-              //             );
-              //           })}
-              //         </DropdownMenuContent>
-              //       </DropdownMenu>
-              //     </TooltipTrigger>
-              //     <TooltipContent side="bottom">
-              //       <p className="font-inter text-sm">More users</p>
-              //     </TooltipContent>
-              //   </Tooltip>
-              // </>
-            )}
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side="bottom"
-          align="end"
-          sideOffset={12}
-          className="rounded-none p-0"
-        >
-          <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-inter text-xs">
-            Connected users
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {Object.keys(connectedUsers).map((userKey) => {
-              const userInfo = connectedUsers[userKey];
-              return (
-                <React.Fragment key={userKey}>
-                  <DropdownMenuItem className="text-foreground cursor-default hover:rounded-none w-full text-xs">
-                    <div
-                      className="w-[16px] h-[16px]"
-                      style={{
-                        background: stringToColor(userInfo?.name ?? ""),
-                      }}
-                    ></div>
-                    <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px] border-[0.5px] border-[#c9c9c9] px-3">
+                )}
+                {showUsers.map((user) => {
+                  const userInfo = connectedUsers[user];
+                  return (
+                    <AvatarUI
+                      key={`${userInfo.clientId ?? ""}.${userInfo.email ?? ""}`}
+                      size="sm"
+                      className="cursor-pointer bg-muted font-light !text-xs border-[0.5px] border-[#c9c9c9]"
+                    >
+                      <AvatarImage
+                        src={userInfo.image}
+                        alt={userInfo.name}
+                        referrerPolicy="no-referrer"
+                      />
                       <AvatarFallback className="bg-transparent uppercase">
                         {getUserShort(userInfo?.name ?? "")}
                       </AvatarFallback>
                     </AvatarUI>
-                    <div className="flex flex-col gap-0">
-                      <div className="w-full ">{userInfo?.name}</div>
-                      <div className="w-full font-mono text-[10px] text-[#999999] whitespace-nowrap">
+                  );
+                })}
+              </AvatarGroup>
+              {restUsers.length > 0 && (
+                <Badge
+                  variant="outline"
+                  className="cursor-pointer ml-1 text-xs"
+                >
+                  and {restUsers.length} more
+                </Badge>
+              )}
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="bottom"
+            align="start"
+            sideOffset={12}
+            className="rounded-none p-0 shadow-none drop-shadow"
+          >
+            {/* <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-inter text-xs">
+            Connected users
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator /> */}
+            <DropdownMenuGroup>
+              {Object.keys(connectedUsers).map((userKey) => {
+                const userInfo = connectedUsers[userKey];
+                return (
+                  <React.Fragment key={userKey}>
+                    <DropdownMenuItem className="text-foreground cursor-default hover:!bg-white hover:rounded-none w-full text-xs">
+                      <div
+                        className="w-[16px] h-[16px]"
+                        style={{
+                          background: stringToColor(userInfo?.name ?? ""),
+                        }}
+                      ></div>
+                      <AvatarUI
+                        size="sm"
+                        className="bg-muted font-light !text-[11] border-[0.5px] border-[#c9c9c9]"
+                      >
+                        <AvatarImage
+                          src={userInfo?.image}
+                          alt={userInfo?.name}
+                          referrerPolicy="no-referrer"
+                        />
+                        <AvatarFallback className="bg-transparent uppercase">
+                          {getUserShort(userInfo?.name ?? "")}
+                        </AvatarFallback>
+                      </AvatarUI>
+                      <div className="flex flex-col gap-0 leading-tight">
+                        <div className="w-full text-sm">{userInfo?.name}</div>
+                        <div className="w-full font-mono text-xs text-[#757575]">
+                          {userInfo?.email}
+                        </div>
+                        {/* <div className="w-full font-mono mt-1 text-xs text-[#999999] whitespace-nowrap">
+                          {typeof usersLocks[userInfo.id] !== "undefined"
+                            ? OPERATIONS_MAP[
+                                (
+                                  usersLocks[
+                                    userInfo.id
+                                  ] as WeaveUserMutexLock<unknown>
+                                ).operation
+                              ]
+                            : "idle"}
+                        </div> */}
+                      </div>
+                      <Divider className="h-[32px]" />
+                      <Badge className="mt-2">
                         {typeof usersLocks[userInfo.id] !== "undefined"
                           ? OPERATIONS_MAP[
                               (
@@ -244,15 +198,15 @@ export const ConnectedUsers = () => {
                               ).operation
                             ]
                           : "idle"}
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                </React.Fragment>
-              );
-            })}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+                      </Badge>
+                    </DropdownMenuItem>
+                  </React.Fragment>
+                );
+              })}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </>
   );
 };

@@ -6,7 +6,10 @@ export const getRooms = async (
   pageSize: number,
   continuationToken: string | undefined,
 ) => {
-  let endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms?pageSize=${pageSize}`;
+  const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+  let endpoint = `${apiEndpoint}/${hubName}/rooms?pageSize=${pageSize}`;
 
   if (continuationToken) {
     endpoint = `${endpoint}&continuationToken=${continuationToken}`;

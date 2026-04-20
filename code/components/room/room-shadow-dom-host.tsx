@@ -2,16 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { RoomShadowDom } from "@/components/room/room-shadow-dom";
 import { mountToShadowDom } from "../utils/mount-to-shadow-dom";
 import useHandleRouteParams from "../room-components/hooks/use-handle-route-params";
 
 export function RoomShadowDomHost() {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const { loadedParams } = useHandleRouteParams();
 
@@ -28,7 +26,7 @@ export function RoomShadowDomHost() {
     return () => {
       window.removeEventListener("nextRouter", handleRoute);
     };
-  }, [router, loadedParams]);
+  }, [navigate, loadedParams]);
 
   return <div id="shadow-host" className="w-full h-full" />;
 }

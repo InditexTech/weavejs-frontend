@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
-
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -34,9 +32,6 @@ export function useOnPasteExternalImage() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
-  const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage,
-  );
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads,
   );
@@ -58,8 +53,6 @@ export function useOnPasteExternalImage() {
 
   React.useEffect(() => {
     const onAddedImageHandler = ({ nodeId }: { nodeId: string }) => {
-      setUploadingImage(false);
-
       if (!addImageRef.current) {
         return;
       }
@@ -109,7 +102,7 @@ export function useOnPasteExternalImage() {
     return () => {
       instance?.removeEventListener("onAddedImage", onAddedImageHandler);
     };
-  }, [instance, setUploadingImage]);
+  }, [instance]);
 
   React.useEffect(() => {
     const onPasteExternalImage = async ({
@@ -212,7 +205,9 @@ export function useOnPasteExternalImage() {
           const queryKey = ["getImages", room];
           queryClient.invalidateQueries({ queryKey });
 
-          return `${process.env.NEXT_PUBLIC_API_V2_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`;
+          const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+
+          return `${apiEndpoint}/weavejs/rooms/${room}/images/${imageId}`;
         };
 
         instance.triggerAction<
@@ -241,11 +236,5 @@ export function useOnPasteExternalImage() {
         instance.removeEventListener("onPasteExternal", onPasteExternalImage);
       }
     };
-  }, [
-    instance,
-    queryClient,
-    mutationUpload,
-    setShowSelectFileImage,
-    setUploadingImage,
-  ]);
+  }, [instance, queryClient, mutationUpload, setShowSelectFileImage]);
 }
