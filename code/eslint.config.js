@@ -48,19 +48,6 @@ export default [
     },
   },
 
-  // ✅ Server (Nitro / API routes)
-  {
-    files: ["server/**/*.ts"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      "no-undef": "off", // Nitro injects stuff
-    },
-  },
-
   // ✅ Config files (vite, nitro, etc.)
   {
     files: ["*.config.js", "*.config.ts"],
