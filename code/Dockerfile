@@ -39,6 +39,6 @@ RUN chown tts:nodejs .output
 COPY --from=builder --chown=nextjs:nodejs /app/.env.production ./.env.production
 COPY --from=builder --chown=nextjs:nodejs /app/.output ./.output
 USER tts
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 8080
+ENV PORT=8080
 CMD ["node", "--env-file=/app/.env.production", ".output/server/index.mjs"]
