@@ -14,6 +14,11 @@ path = [
     "**/.gitignore",
 
     # code/ directory licensing
+    "code/eslint.config.js",
+    "code/nitro.config.ts",
+    "code/src/routeTree.gen.ts",
+    "code/vite-env.d.ts",
+    "code/vite.config.ts",
     "code/public/**",
     "code/.dockerignore",
     "code/.prettierignore",
