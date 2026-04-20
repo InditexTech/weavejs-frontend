@@ -16,7 +16,9 @@ import { Divider } from "../room-components/overlay/divider";
 import { useGetSession } from "../room-components/hooks/use-get-session";
 import { authClient } from "@/lib/auth.client";
 import { useCollaborationRoom } from "@/store/store";
+import packageJson from "@/../package.json";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Badge } from "../ui/badge";
 
 export const ShowcaseLeftSidebar = () => {
   const navigate = useNavigate();
@@ -150,6 +152,12 @@ export const ShowcaseLeftSidebar = () => {
           )}{" "}
           DEPENDENCIES
         </Button>
+        <Divider className="h-[1px] w-full my-3" />
+        <div className="w-full flex justify-start items-center gap-1 text-muted-foreground">
+          <Badge variant="outline" className="text-xs font-mono">
+            v{packageJson.version}
+          </Badge>
+        </div>
       </div>
     </div>
   );
