@@ -97,10 +97,13 @@ jobs:
           username: ${{ env.AZURE_ACR_USERNAME }}
           password: ${{ env.AZURE_ACR_PASSWORD }}
 
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
         env:
-          GITHUB_BUILD: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          GITHUB_BUILD: ${{ env.SHORT_SHA }}-${{ github.run_id }}-${{ github.run_attempt }}
         with:
           push: true
           platforms: linux/amd64
@@ -116,7 +119,7 @@ jobs:
       - name: Deploy
         uses: azure/cli@v2
         env:
-          GITHUB_BUILD: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          GITHUB_BUILD: ${{ env.SHORT_SHA }}-${{ github.run_id }}-${{ github.run_attempt }}
         with:
           azcliversion: latest
           inlineScript: |
