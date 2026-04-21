@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-ARG GITHUB_SHA
-
 FROM node:24 AS base
 
 # Install dependencies step
@@ -20,6 +18,8 @@ RUN npm ci
 
 # Build step
 FROM base AS builder
+
+ARG GITHUB_SHA
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
