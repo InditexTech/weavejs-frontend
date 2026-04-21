@@ -126,6 +126,6 @@ jobs:
             az containerapp update \
             --name $AZURE_CONTAINER_NAME \
             --resource-group $AZURE_RESOURCE_GROUP \
-            --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:$GITHUB_SHA \
+            --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:$GITHUB_BUILD \
             --revision-suffix $GITHUB_BUILD \
             --query properties.configuration.ingress.fqdn
