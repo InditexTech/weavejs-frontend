@@ -120,7 +120,7 @@ export const Rooms = ({ kind }: Readonly<RoomsProps>) => {
     const nextIds = new Set<string>();
 
     for (const page of query.data.pages) {
-      for (const room of page.items) {
+      for (const room of page?.items ?? []) {
         const roomId = room.roomId;
 
         nextIds.add(roomId);

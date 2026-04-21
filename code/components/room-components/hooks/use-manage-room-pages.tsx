@@ -29,6 +29,7 @@ export const useManageRoomPages = (roomId: string | undefined) => {
       return getPages(roomId ?? "", "active", 0, 10);
     },
     initialData: undefined,
+    refetchOnWindowFocus: false,
     staleTime: 0,
     retry: false,
     enabled: !!roomId,
