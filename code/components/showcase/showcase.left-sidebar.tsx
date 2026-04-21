@@ -16,7 +16,7 @@ import { Divider } from "../room-components/overlay/divider";
 import { useGetSession } from "../room-components/hooks/use-get-session";
 import { authClient } from "@/lib/auth.client";
 import { useCollaborationRoom } from "@/store/store";
-import packageJson from "@/../package.json";
+import packageJson from "@/package.json";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
 
