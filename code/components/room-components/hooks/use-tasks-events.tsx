@@ -48,6 +48,7 @@ export const getEmmiter = () => {
 };
 
 export const useTasksEvents = () => {
+  const websocketRef = React.useRef<ReconnectingWebsocket | null>(null);
   const intervalIdRef = React.useRef<NodeJS.Timeout | null>(null);
   const pageMembersRef = React.useRef<Record<string, Map<string, Member>>>({});
   const toastExportPageToImageRef = React.useRef<string | number | null>(null);
@@ -567,6 +568,8 @@ export const useTasksEvents = () => {
         setCommBusConnected(true);
       };
 
+      websocketRef.current = ws;
+
       setInitializedCommBus(true);
     }
 
@@ -589,6 +592,15 @@ export const useTasksEvents = () => {
     setFramesExporting,
     setImageExporting,
   ]);
+
+  React.useEffect(() => {
+    return () => {
+      if (websocketRef.current) {
+        console.log("🚫 [Comm-Bus] disconnecting");
+        websocketRef.current.close();
+      }
+    };
+  }, []);
 
   React.useEffect(() => {
     let sendIntervalId = undefined;
