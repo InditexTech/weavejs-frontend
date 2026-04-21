@@ -226,7 +226,7 @@ export const Rooms = ({ kind }: Readonly<RoomsProps>) => {
                 CREATE A ROOM
               </Button>
             </div>
-            <Divider className="h-[1px] w-full" />
+            <Divider className="h-[0.5px] w-full" />
             <div className="w-full flex flex-col gap-5 justify-center items-center">
               <UserPlus size={48} strokeWidth={1} />
               <b className="font-normal text-base text-[#757575]">
@@ -350,7 +350,7 @@ export const Rooms = ({ kind }: Readonly<RoomsProps>) => {
                   NO ROOMS CREATED
                 </p>
               </div>
-              <Divider className="h-[1px] w-[320px]" />
+              <Divider className="h-[0.5px] w-[320px]" />
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   <Button

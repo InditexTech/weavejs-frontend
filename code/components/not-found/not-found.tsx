@@ -19,7 +19,7 @@ export const NotFound = () => {
           </div>
         </div>
         <h1 className="font-light text-xl2">Oops we couldn't find this page</h1>
-        <Divider className="h-[1px] w-full" />
+        <Divider className="h-[0.5px] w-full" />
         <div className="flex justify-center items-center">
           <Button
             className="cursor-pointer font-inter font-light rounded-none"

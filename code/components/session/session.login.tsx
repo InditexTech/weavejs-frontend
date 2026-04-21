@@ -38,7 +38,7 @@ export const SessionLogin = ({
               To get started, sign in with one of our social logins
             </p>
           </div>
-          <Divider className="h-[1px] w-full" />
+          <Divider className="h-[0.5px] w-full" />
         </>
       )}
       <div className="flex flex-col gap-1">

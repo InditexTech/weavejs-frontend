@@ -5,6 +5,12 @@
 import React from "react";
 import { Logo } from "@/components/utils/logo";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Avatar as AvatarUI,
   AvatarImage,
   AvatarFallback,
@@ -52,7 +58,7 @@ export const ShowcaseLeftSidebar = () => {
           {isTemplates && <span>TEMPLATES</span>}
         </h1>
         <div className="w-full mt-5 flex flex-col justify-start items-start">
-          <Divider className="h-[1px] w-full mb-6" />
+          <Divider className="h-[0.5px] w-full mb-6" />
           <Button
             variant="link"
             disabled={isShowcase}
@@ -107,7 +113,7 @@ export const ShowcaseLeftSidebar = () => {
                 <b className="text-sm">{session.user.email}</b>
               </div>
             </div>
-            <Divider className="h-[1px] w-full" />
+            <Divider className="h-[0.5px] w-full" />
             <Button
               variant="link"
               className="cursor-pointer font-inter font-light !px-0 !py-0 !h-auto"
@@ -117,7 +123,7 @@ export const ShowcaseLeftSidebar = () => {
             >
               <LogOut strokeWidth={1} /> SIGN OUT
             </Button>
-            <Divider className="h-[1px] w-full" />
+            <Divider className="h-[0.5px] w-full" />
           </>
         )}
         <Button
@@ -152,11 +158,32 @@ export const ShowcaseLeftSidebar = () => {
           )}{" "}
           DEPENDENCIES
         </Button>
-        <Divider className="h-[1px] w-full my-3" />
+        <Divider className="h-[0.5px] w-full my-2" />
         <div className="w-full flex justify-start items-center gap-1 text-muted-foreground">
-          <Badge variant="outline" className="text-xs font-mono">
+          <Badge variant="outline" className="text-xs font-mono cursor-default">
             v{packageJson.version}
           </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="secondary"
+                  className="text-xs font-mono cursor-default"
+                >
+                  sha:{(import.meta.env.VITE_GITHUB_SHA ?? "").slice(0, 7)}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent
+                align="start"
+                side="top"
+                sideOffset={4}
+                className="rounded-none"
+              >
+                <p>BUILD GITHUB SHA</p>
+                <p>{import.meta.env.VITE_GITHUB_SHA}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>

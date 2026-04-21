@@ -106,6 +106,8 @@ jobs:
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{
             github.sha }}
           file: code/Dockerfile
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}
 
       - name: Deploy
         uses: azure/cli@v2

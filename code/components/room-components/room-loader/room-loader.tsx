@@ -93,7 +93,7 @@ export function RoomLoader() {
                 )}
                 {roomInfoError && roomInfoError.cause === 404 && (
                   <>
-                    <Divider className="h-[1px] w-full" />
+                    <Divider className="h-[0.5px] w-full" />
                     <Ban size={48} strokeWidth={1} />
                     <div className="text-center text-base text-[#757575]">
                       <p>
@@ -102,7 +102,7 @@ export function RoomLoader() {
                         It may have been deleted or the URL may be incorrect.
                       </p>
                     </div>
-                    <Divider className="h-[1px] w-full" />
+                    <Divider className="h-[0.5px] w-full" />
                     <Button
                       className="cursor-pointer font-inter font-light rounded-none"
                       onClick={async () => {
@@ -115,7 +115,7 @@ export function RoomLoader() {
                 )}
                 {roomInfoError && roomInfoError.cause === 403 && (
                   <>
-                    <Divider className="h-[1px] w-full" />
+                    <Divider className="h-[0.5px] w-full" />
                     <Ban size={48} strokeWidth={1} />
                     <div className="text-center text-base text-[#757575]">
                       <p>
@@ -124,7 +124,7 @@ export function RoomLoader() {
                         ask the room owner or any participant for an invite.
                       </p>
                     </div>
-                    <Divider className="h-[1px] w-full" />
+                    <Divider className="h-[0.5px] w-full" />
                     <Button
                       className="cursor-pointer font-inter font-light rounded-none"
                       onClick={async () => {
@@ -138,7 +138,7 @@ export function RoomLoader() {
                 {!session && <SessionLogin hideTitle />}
                 {!session && roomInfoLoaded && (
                   <>
-                    <Divider className="h-[1px] w-full" />
+                    <Divider className="h-[0.5px] w-full" />
                     <Button
                       className="cursor-pointer font-inter font-light rounded-none"
                       onClick={async () => {

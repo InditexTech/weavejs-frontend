@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+ARG GITHUB_SHA
+
 FROM node:24 AS base
 
 # Install dependencies step
@@ -22,6 +24,7 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV GITHUB_SHA=$GITHUB_SHA
 RUN npm run build:img
 
 # Runtime image step

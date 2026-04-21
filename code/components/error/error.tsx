@@ -40,7 +40,7 @@ export const Error = () => {
               <p>{description}</p>
             </div>
           </div>
-          <Divider className="h-[1px] w-full" />
+          <Divider className="h-[0.5px] w-full" />
           <Button
             className="cursor-pointer font-inter font-light rounded-none uppercase"
             onClick={async () => {

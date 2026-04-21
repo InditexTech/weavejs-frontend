@@ -167,7 +167,7 @@ export const RoomAccessLink = () => {
             </div>
             {!session && (
               <>
-                <Divider className="h-[1px] w-full" />
+                <Divider className="h-[0.5px] w-full" />
                 <div className="flex flex-col gap-1">
                   <Button
                     variant="outline"

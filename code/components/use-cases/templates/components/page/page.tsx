@@ -120,7 +120,7 @@ export const TemplatesPage = () => {
           <div className="w-full flex flex-col justify-center items-center text-black gap-8 mt-8">
             {roomInfoError && roomInfoError.cause === 404 && (
               <>
-                <Divider className="h-[1px] w-full" />
+                <Divider className="h-[0.5px] w-full" />
                 <Ban size={48} strokeWidth={1} />
                 <div className="text-center text-base text-[#757575]">
                   <p>
@@ -133,7 +133,7 @@ export const TemplatesPage = () => {
             )}
             {roomInfoError && roomInfoError.cause === 403 && (
               <>
-                <Divider className="h-[1px] w-full" />
+                <Divider className="h-[0.5px] w-full" />
                 <Ban size={48} strokeWidth={1} />
                 <div className="text-center text-base text-[#757575]">
                   <p>
@@ -144,7 +144,7 @@ export const TemplatesPage = () => {
                 </div>
               </>
             )}
-            <Divider className="h-[1px] w-full" />
+            <Divider className="h-[0.5px] w-full" />
             <Button
               className="cursor-pointer font-inter font-light rounded-none"
               onClick={async () => {
