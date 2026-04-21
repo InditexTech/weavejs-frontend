@@ -107,7 +107,9 @@ export function RoomHeader() {
   const setRoomsPageEditVisible = useCollaborationRoom(
     (state) => state.setRoomsPageEditVisible,
   );
-
+  const setRoomsAccessVisible = useCollaborationRoom(
+    (state) => state.setRoomsAccessVisible,
+  );
   const setRoomsEditVisible = useCollaborationRoom(
     (state) => state.setRoomsEditVisible,
   );
@@ -351,6 +353,12 @@ export function RoomHeader() {
     setRoomsRoomId(room ?? "");
     setRoomsEditVisible(true);
   }, [room, setRoomsRoomId, setRoomsEditVisible]);
+
+  const handleAccessLinkRoom = React.useCallback(async () => {
+    setMenuOpen(false);
+    setRoomsRoomId(room ?? "");
+    setRoomsAccessVisible(true);
+  }, [room, setRoomsRoomId, setRoomsAccessVisible]);
 
   const handleArchiveRoom = React.useCallback(async () => {
     setMenuOpen(false);
@@ -653,6 +661,13 @@ export function RoomHeader() {
                   Configuration
                 </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={!isRoomReady}
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onPointerDown={handleAccessLinkRoom}
+                >
+                  Access link
+                </DropdownMenuItem>
                 {roomInfo?.roomUser?.role === "owner" &&
                   roomInfo?.room.status !== "archived" && (
                     <>

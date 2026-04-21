@@ -41,6 +41,7 @@ import { Logo } from "../utils/logo";
 import { useLoadRoom } from "../room-components/hooks/use-load-room";
 import { SignOverlay } from "../sign-overlay/sign-overlay";
 import { useQueryClient } from "@tanstack/react-query";
+import { RoomAccessLinkDialog } from "../room-components/overlay/room-acces-link";
 
 export const Room = () => {
   return (
@@ -325,10 +326,6 @@ const RoomInternal = () => {
               <UploadVideo />
               <RoomLayout inShadowDom={false} />
               <HelpDrawer />
-              <EditRoomDialog />
-              <DeleteRoomDialog />
-              <EditRoomPageDialog />
-              <DeleteRoomPageDialog />
             </WeaveProvider>
           </ChatBotPromptProvider>
         )}
@@ -337,6 +334,11 @@ const RoomInternal = () => {
           <RoomLoader />
         </main>
       )}
+      <EditRoomDialog />
+      <DeleteRoomDialog />
+      <RoomAccessLinkDialog />
+      <EditRoomPageDialog />
+      <DeleteRoomPageDialog />
       <SignOverlay />
     </>
   );
