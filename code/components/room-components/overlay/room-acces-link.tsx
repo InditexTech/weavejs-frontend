@@ -346,8 +346,9 @@ export function RoomAccessLinkDialog() {
                 <Button
                   className="cursor-pointer rounded-none"
                   onClick={async () => {
+                    const origin = window.location.origin;
                     await navigator.clipboard.writeText(
-                      `https://localhost:3000/rooms/access-link?p=${accessCode}`,
+                      `${origin}/rooms/access-link?p=${accessCode}`,
                     );
                   }}
                 >
