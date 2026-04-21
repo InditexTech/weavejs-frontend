@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM node:20 AS base
+FROM node:24 AS base
 
 # Install dependencies step
 FROM base AS deps
