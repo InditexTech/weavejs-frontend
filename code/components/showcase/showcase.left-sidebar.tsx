@@ -159,9 +159,9 @@ export const ShowcaseLeftSidebar = () => {
           DEPENDENCIES
         </Button>
         <Divider className="h-[0.5px] w-full my-2" />
-        <div className="w-full flex justify-start items-center gap-1 text-muted-foreground">
+        <div className="w-full flex flex-col justify-start items-start gap-1 text-muted-foreground">
           <Badge variant="outline" className="text-xs font-mono cursor-default">
-            v{packageJson.version}
+            version:{packageJson.version}
           </Badge>
           <TooltipProvider>
             <Tooltip>
@@ -170,7 +170,8 @@ export const ShowcaseLeftSidebar = () => {
                   variant="secondary"
                   className="text-xs font-mono cursor-default"
                 >
-                  sha:{(__GIT_SHA__ ?? "").slice(0, 7)}
+                  build:{(__GIT_SHA__ ?? "").slice(0, 7)}.{__GIT_RUN_ID__}.
+                  {__GIT_RUN_ATTEMPT__}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent
@@ -179,7 +180,9 @@ export const ShowcaseLeftSidebar = () => {
                 sideOffset={4}
                 className="rounded-none"
               >
-                <p>BUILD GITHUB SHA</p>
+                <p>
+                  <b>Github full SHA</b>
+                </p>
                 <p>{__GIT_SHA__}</p>
               </TooltipContent>
             </Tooltip>

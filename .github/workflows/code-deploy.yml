@@ -99,20 +99,24 @@ jobs:
 
       - name: Build image and push it to ACR
         uses: docker/build-push-action@v6
+        env:
+          GITHUB_BUILD: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
         with:
           push: true
           platforms: linux/amd64
           context: code
           tags: ${{ env.AZURE_ACR_NAME }}.azurecr.io/${{ env.AZURE_CONTAINER_NAME }}:${{
-            github.sha }}
+            env.GITHUB_BUILD }}
           file: code/Dockerfile
           build-args: |
             GITHUB_SHA=${{ github.sha }}
+            GITHUB_RUN_ID=${{ github.run_id }}
+            GITHUB_RUN_ATTEMPT=${{ github.run_attempt }}
 
       - name: Deploy
         uses: azure/cli@v2
         env:
-          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_BUILD: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
         with:
           azcliversion: latest
           inlineScript: |
@@ -120,5 +124,5 @@ jobs:
             --name $AZURE_CONTAINER_NAME \
             --resource-group $AZURE_RESOURCE_GROUP \
             --image $AZURE_ACR_NAME.azurecr.io/$AZURE_CONTAINER_NAME:$GITHUB_SHA \
-            --revision-suffix $GITHUB_SHA \
+            --revision-suffix $GITHUB_BUILD \
             --query properties.configuration.ingress.fqdn

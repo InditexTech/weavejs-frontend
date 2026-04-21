@@ -20,11 +20,15 @@ RUN npm ci
 FROM base AS builder
 
 ARG GITHUB_SHA
+ARG GITHUB_RUN_ID
+ARG GITHUB_RUN_ATTEMPT
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV VITE_GITHUB_SHA=$GITHUB_SHA
+ENV VITE_GITHUB_RUN_ID=$GITHUB_RUN_ID
+ENV VITE_GITHUB_RUN_ATTEMPT=$GITHUB_RUN_ATTEMPT
 RUN npm run build:img
 
 # Runtime image step

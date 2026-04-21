@@ -61,6 +61,8 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __GIT_SHA__: JSON.stringify(process.env.VITE_GITHUB_SHA),
+      __GIT_RUN_ID__: JSON.stringify(process.env.VITE_GITHUB_RUN_ID),
+      __GIT_RUN_ATTEMPT__: JSON.stringify(process.env.VITE_GITHUB_RUN_ATTEMPT),
     },
     worker: {
       format: "es",
