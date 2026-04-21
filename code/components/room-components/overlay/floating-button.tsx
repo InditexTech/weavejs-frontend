@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { LongPressEventType, useLongPress } from "use-long-press";
+// import { LongPressEventType, useLongPress } from "use-long-press";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -51,14 +51,14 @@ export const FloatingButton = React.forwardRef<
 
     const isTouchDevice = useIsTouchDevice();
 
-    const bind = useLongPress(
-      () => {
-        alert("Long pressed!");
-      },
-      {
-        detect: "pointer" as LongPressEventType,
-      },
-    );
+    // const bind = useLongPress(
+    //   () => {
+    //     alert("Long pressed!");
+    //   },
+    //   {
+    //     detect: "pointer" as LongPressEventType,
+    //   },
+    // );
 
     const ButtonElement = React.useMemo(() => {
       return (
@@ -80,7 +80,7 @@ export const FloatingButton = React.forwardRef<
           disabled={disabled}
           onMouseOver={(e) => e.preventDefault()}
           onClick={(e) => onClick(e)}
-          {...bind()}
+          // {...bind()}
         >
           {icon}
         </button>
@@ -93,7 +93,7 @@ export const FloatingButton = React.forwardRef<
       className,
       icon,
       onClick,
-      bind,
+      // bind,
       selectionActive,
     ]);
 

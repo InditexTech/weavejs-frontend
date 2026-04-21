@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { LongPressEventType, useLongPress } from "use-long-press";
+// import { LongPressEventType, useLongPress } from "use-long-press";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -54,14 +54,14 @@ export const ToolbarButton = React.forwardRef<
 
     const isTouchDevice = useIsTouchDevice();
 
-    const bind = useLongPress(
-      () => {
-        alert("Long pressed!");
-      },
-      {
-        detect: "pointer" as LongPressEventType,
-      },
-    );
+    // const bind = useLongPress(
+    //   () => {
+    //     alert("Long pressed!");
+    //   },
+    //   {
+    //     detect: "pointer" as LongPressEventType,
+    //   },
+    // );
 
     const ButtonElement = React.useMemo(() => {
       return (
@@ -85,7 +85,7 @@ export const ToolbarButton = React.forwardRef<
           disabled={disabled}
           onMouseOver={(e) => e.preventDefault()}
           onClick={(e) => onClick(e)}
-          {...bind()}
+          // {...bind()}
         >
           {icon &&
             React.cloneElement(icon as React.ReactElement, {
@@ -101,7 +101,7 @@ export const ToolbarButton = React.forwardRef<
       className,
       icon,
       onClick,
-      bind,
+      // bind,
       size,
       selectionActive,
     ]);

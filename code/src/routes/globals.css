@@ -4,60 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap");
+
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
-/* @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  display: swap;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  display: swap;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  display: swap;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-italic-bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: italic;
-  display: swap;
-}
-
-@font-face {
-  font-family: "Sansita";
-  src: url("/fonts/sansita-regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Sansita";
-  src: url("/fonts/sansita-bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-} */
-
 @theme {
-  --inter: var(--inter);
+  --font-sans: "Inter", ui-sans-serif, system-ui;
+  --font-mono: "Noto Sans Mono", ui-monospace, monospace;
 }
 
 .custom-scrollbar {
