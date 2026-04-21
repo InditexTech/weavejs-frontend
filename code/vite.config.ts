@@ -59,6 +59,9 @@ export default defineConfig(({ mode }) => {
         external: ["skia-canvas"],
       },
     },
+    define: {
+      __GIT_SHA__: JSON.stringify(process.env.VITE_GITHUB_SHA),
+    },
     worker: {
       format: "es",
     },

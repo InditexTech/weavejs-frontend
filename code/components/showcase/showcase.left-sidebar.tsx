@@ -170,7 +170,7 @@ export const ShowcaseLeftSidebar = () => {
                   variant="secondary"
                   className="text-xs font-mono cursor-default"
                 >
-                  sha:{(import.meta.env.VITE_GITHUB_SHA ?? "").slice(0, 7)}
+                  sha:{(__GIT_SHA__ ?? "").slice(0, 7)}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent
@@ -180,7 +180,7 @@ export const ShowcaseLeftSidebar = () => {
                 className="rounded-none"
               >
                 <p>BUILD GITHUB SHA</p>
-                <p>{import.meta.env.VITE_GITHUB_SHA}</p>
+                <p>{__GIT_SHA__}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
