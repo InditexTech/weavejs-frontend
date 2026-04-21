@@ -4,8 +4,6 @@
 
 import { createAuthClient } from "better-auth/react";
 
-console.log("Auth server", import.meta.env.VITE_APP_HOST);
-
 export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_APP_HOST,
   basePath: "/weavebff/api/auth",
