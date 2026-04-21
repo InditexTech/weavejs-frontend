@@ -24,7 +24,7 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV GITHUB_SHA=$GITHUB_SHA
+ENV VITE_GITHUB_SHA=$GITHUB_SHA
 RUN npm run build:img
 
 # Runtime image step
