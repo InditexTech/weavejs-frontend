@@ -79,7 +79,6 @@ export function AddToRoomSelectPage() {
           <ScrollArea className="w-full h-full">
             {pages.length > 0 &&
               pages.map((pageInfo, index) => {
-                console.log({ pageInfo, page });
                 return (
                   <div
                     key={pageInfo.pageId}

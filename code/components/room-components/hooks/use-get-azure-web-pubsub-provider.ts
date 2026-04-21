@@ -46,7 +46,14 @@ function useGetAzureWebPubsubProvider({
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    if (loadedParams && pageDataIsFetched && room && session && !wsProvider) {
+    if (
+      loadedParams &&
+      pageDataIsFetched &&
+      room &&
+      pageId &&
+      session &&
+      !wsProvider
+    ) {
       const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
       const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 

@@ -40,6 +40,7 @@ import { DeleteRoomPageDialog } from "../room-components/overlay/delete-room-pag
 import { Logo } from "../utils/logo";
 import { useLoadRoom } from "../room-components/hooks/use-load-room";
 import { SignOverlay } from "../sign-overlay/sign-overlay";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Room = () => {
   return (
@@ -145,6 +146,13 @@ const RoomInternal = () => {
   }, [upscaleConfiguration]);
 
   const breakpoint = useBreakpoint();
+
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    const queryKey = ["roomData"];
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient]);
 
   React.useEffect(() => {
     if (["2xl"].includes(breakpoint)) {

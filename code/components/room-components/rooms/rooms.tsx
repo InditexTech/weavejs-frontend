@@ -195,9 +195,27 @@ export const Rooms = ({ kind }: Readonly<RoomsProps>) => {
             <div className="w-full flex flex-col gap-5 justify-center items-center">
               <FilePlus size={48} strokeWidth={1} />
               <b className="font-normal text-base text-[#757575]">
-                The easiest way to start is by <b>creating a room</b>, just
-                define a name for it and create it. Then you can share the room
-                with your colleagues and start collaborating.
+                {kind === "showcase" && (
+                  <>
+                    The easiest way to start the <b>showcase</b> example
+                    <br />
+                    is by <u>creating a room</u>, just define a name for it.
+                  </>
+                )}
+                {kind === "standalone" && (
+                  <>
+                    The easiest way to start the <b>standalone</b> example
+                    <br />
+                    is by <u>creating a room</u>, just define a name for it.
+                  </>
+                )}
+                {kind === "templates" && (
+                  <>
+                    The easiest way to start the <b>templates</b> example
+                    <br />
+                    is by <u>creating a room</u>, just define a name for it.
+                  </>
+                )}
               </b>
               <Button
                 className="cursor-pointer font-inter font-light rounded-none"
@@ -212,10 +230,33 @@ export const Rooms = ({ kind }: Readonly<RoomsProps>) => {
             <div className="w-full flex flex-col gap-5 justify-center items-center">
               <UserPlus size={48} strokeWidth={1} />
               <b className="font-normal text-base text-[#757575]">
-                Or <b>join an already created room</b>, the owner or any
-                participant of the room can share a code with you that allows
-                you to join the room and start collaborating with the rest of
-                the participants that are already in.
+                {kind === "showcase" && (
+                  <>
+                    Enter to another user <b>showcase</b> example
+                    <br />
+                    by <u>joining a room</u>, the owner or any participant of
+                    the room must share a code with you that will allow you to
+                    join it.
+                  </>
+                )}
+                {kind === "standalone" && (
+                  <>
+                    Enter to another user <b>standalone</b> example
+                    <br />
+                    by <u>joining a room</u>, the owner or any participant of
+                    the room must share a code with you that will allow you to
+                    join it.
+                  </>
+                )}
+                {kind === "templates" && (
+                  <>
+                    Enter to another user <b>templates</b> example
+                    <br />
+                    by <u>joining a room</u>, the owner or any participant of
+                    the room must share a code with you that will allow you to
+                    join it.
+                  </>
+                )}
               </b>
               <Button
                 className="cursor-pointer font-inter font-light rounded-none"

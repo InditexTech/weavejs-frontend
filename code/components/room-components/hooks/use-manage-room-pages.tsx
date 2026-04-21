@@ -3,17 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from "uuid";
-import { getRoom } from "@/api/get-room";
 import { getPages } from "@/api/pages/get-pages";
 import { postPage } from "@/api/pages/post-page";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 
 export const useManageRoomPages = (roomId: string | undefined) => {
   const [status, setStatus] = React.useState<
-    "loading" | "loaded" | "creating" | "managed" | "error"
-  >("loading");
+    "idle" | "loading" | "loaded" | "creating" | "managed" | "error"
+  >("idle");
 
   const setActualPage = useCollaborationRoom(
     (state) => state.setPagesActualPage,
@@ -23,27 +22,10 @@ export const useManageRoomPages = (roomId: string | undefined) => {
   );
   const setRoomStatus = useCollaborationRoom((state) => state.setRoomStatus);
 
-  const {
-    data: roomData,
-    fetchStatus: roomDataStatus,
-    isFetched: roomDataIsFetched,
-  } = useQuery({
-    queryKey: ["roomData", roomId ?? ""],
-    queryFn: () => {
-      return getRoom(roomId ?? "");
-    },
-    initialData: undefined,
-    staleTime: 0,
-    gcTime: 0,
-    retry: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    enabled: !!roomId,
-  });
-
   const { data: roomPages, isFetched: pagesIsFetched } = useQuery({
-    queryKey: ["getPages", roomId ?? ""],
+    queryKey: ["getPagesInit", roomId ?? ""],
     queryFn: () => {
+      setStatus("loading");
       return getPages(roomId ?? "", "active", 0, 10);
     },
     initialData: undefined,
@@ -75,32 +57,49 @@ export const useManageRoomPages = (roomId: string | undefined) => {
     },
   });
 
-  React.useEffect(() => {
-    if (roomDataStatus === "fetching" && !roomDataIsFetched) {
-      setRoomStatus("loading");
-    } else if (roomDataStatus === "idle" && roomDataIsFetched && roomData) {
-      setRoomStatus("loaded");
-    }
-  }, [status, roomDataStatus, roomDataIsFetched, roomData, setRoomStatus]);
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    if (roomDataIsFetched && pagesIsFetched) {
-      setStatus("loaded");
+    const queryKey = ["getPagesInit"];
+    queryClient.invalidateQueries({ queryKey });
+    setActualPage(0);
+    setActualPageId(null);
+    setStatus("idle");
+  }, [roomId, setActualPage, setActualPageId, queryClient]);
+
+  React.useEffect(() => {
+    if (!pagesIsFetched) {
+      setStatus("loading");
+      setRoomStatus("loading");
     }
-  }, [roomDataIsFetched, pagesIsFetched]);
+    if (pagesIsFetched) {
+      setStatus("loaded");
+      setRoomStatus("loaded");
+    }
+  }, [pagesIsFetched, setRoomStatus]);
+
+  const pages = React.useMemo(() => {
+    if (roomPages && pagesIsFetched) {
+      return roomPages.items;
+    }
+    return [];
+  }, [roomPages, pagesIsFetched]);
 
   React.useEffect(() => {
     if (!roomId) {
       return;
     }
 
-    if (roomPages?.items?.length > 0) {
-      setRoomStatus("loaded");
+    if (status === "idle") {
+      return;
+    }
+
+    if (pages.length > 0 && status === "loaded") {
       setActualPage(1);
-      setActualPageId(roomPages.items[0].pageId);
+      setActualPageId(pages[0].pageId);
       setStatus("managed");
     }
-    if (roomData && roomPages?.items?.length === 0 && status === "loaded") {
+    if (pages.length === 0 && status === "loaded") {
       createPage.mutate({
         pageId: uuidv4(),
         name: "New page",
@@ -108,20 +107,11 @@ export const useManageRoomPages = (roomId: string | undefined) => {
       });
       setStatus("creating");
     }
-    if (!roomData && roomPages?.items?.length === 0 && status === "loaded") {
-      createPage.mutate({
-        pageId: uuidv4(),
-        name: "New page",
-        thumbnail: "",
-      });
-      setStatus("creating");
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     status,
-    roomData,
-    roomPages,
+    pages,
     createPage,
-    roomId,
     setActualPage,
     setActualPageId,
     setRoomStatus,
