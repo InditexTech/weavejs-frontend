@@ -38,11 +38,11 @@ function InputFontFamily({
   }, [value]);
 
   React.useEffect(() => {
-    if (onChange && selectedFont !== lastSelectedFontFamily.current) {
+    if (selectedFont !== lastSelectedFontFamily.current) {
       lastSelectedFontFamily.current = selectedFont;
-      onChange(selectedFont);
+      setSelectedFont(selectedFont);
     }
-  }, [selectedFont, onChange]);
+  }, [selectedFont]);
 
   return (
     <div className="flex flex-col items-start justify-start relative">
@@ -94,6 +94,8 @@ function InputFontFamily({
                     value={font.name}
                     onSelect={() => {
                       setSelectedFont(font.name);
+                      lastSelectedFontFamily.current = font.name;
+                      onChange(font.name);
                       setOpen(false);
                     }}
                     className="flex items-center"

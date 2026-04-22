@@ -108,6 +108,7 @@ export function TextProperties() {
           <InputFontFamily
             value={`${actualNode.props.fontFamily ?? null}`}
             onChange={(value) => {
+              console.log("Selected font family:", value);
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {

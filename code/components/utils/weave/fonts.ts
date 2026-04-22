@@ -39,7 +39,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "Arial",
     name: "Arial, sans-serif",
-    offsetY: -1.6,
+    offsetY: 0,
     supportedStyles: ["normal", "italic", "bold"],
   });
 
@@ -64,7 +64,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "FuzzyBubbles",
     name: "Fuzzy Bubbles, cursive",
-    offsetY: -0.6,
+    offsetY: 0,
     supportedStyles: ["normal", "bold"],
   });
 
@@ -101,7 +101,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "Inter",
     name: `Inter, sans-serif`,
-    offsetY: -1.4,
+    offsetY: 0,
     supportedStyles: ["normal", "italic", "bold"],
   });
 
@@ -126,7 +126,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "Noto Sans Mono",
     name: "Noto Sans Mono, monospace",
-    offsetY: -0.6,
+    offsetY: 0,
     supportedStyles: ["normal", "bold"],
   });
 
@@ -167,7 +167,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "RobotoMono",
     name: "Roboto Mono, monospace",
-    offsetY: -0.6,
+    offsetY: 0,
     supportedStyles: ["normal", "italic", "bold"],
   });
 
@@ -191,7 +191,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "Sansita",
     name: `Sansita, sans-serif`,
-    offsetY: -1.6,
+    offsetY: 0,
     supportedStyles: ["normal", "bold"],
   });
 
@@ -208,7 +208,7 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   fonts.push({
     id: "SpecialGothicCondensedOne",
     name: "Special Gothic Condensed One, sans-serif",
-    offsetY: -0.6,
+    offsetY: 0,
     supportedStyles: ["normal"],
   });
 

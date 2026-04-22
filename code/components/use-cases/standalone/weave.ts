@@ -125,32 +125,32 @@ const FONTS = async (): Promise<WeaveFont[]> => {
     {
       id: "Inter",
       name: `Inter, sans-serif`,
-      offsetY: -1.4,
+      offsetY: 0,
     },
     {
       id: "Sansita",
       name: `Sansita, sans-serif`,
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "Arial",
       name: "Arial",
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "Helvetica",
       name: "Helvetica, sans-serif",
-      offsetY: -1,
+      offsetY: 0,
     },
     {
       id: "TimesNewRoman",
       name: '"Times New Roman", serif',
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "Times",
       name: "Times, serif",
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "CourierNew",
@@ -159,57 +159,57 @@ const FONTS = async (): Promise<WeaveFont[]> => {
     {
       id: "Courier",
       name: "Courier, monospace",
-      offsetY: -1.2,
+      offsetY: 0,
     },
     {
       id: "Verdana",
       name: "Verdana, sans-serif",
-      offsetY: -2.2,
+      offsetY: 0,
     },
     {
       id: "Georgia",
       name: "Georgia, serif",
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "Palatino",
       name: "Palatino, serif",
-      offsetY: -0.8,
+      offsetY: 0,
     },
     {
       id: "Garamond",
       name: "Garamond, serif",
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "Bookman",
       name: "Bookman, serif",
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "ComicSansMS",
       name: '"Comic Sans MS", cursive',
-      offsetY: -3.6,
+      offsetY: 0,
     },
     {
       id: "TrebuchetMS",
       name: '"Trebuchet MS", sans-serif',
-      offsetY: -1.6,
+      offsetY: 0,
     },
     {
       id: "ArialBlack",
       name: '"Arial Black", sans-serif',
-      offsetY: -2.4,
+      offsetY: 0,
     },
     {
       id: "Impact",
       name: "Impact, sans-serif",
-      offsetY: -0.6,
+      offsetY: 0,
     },
     {
       id: "NotoSansMono",
       name: "NotoSansMono, monospace",
-      offsetY: -0.6,
+      offsetY: 0,
     },
   ];
 };
