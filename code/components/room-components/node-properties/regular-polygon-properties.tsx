@@ -50,6 +50,8 @@ export function RegularPolygonProperties() {
     [instance, actualAction, nodePropertiesAction],
   );
 
+  // console.log("actualNode", actualAction, actualNode);
+
   if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
   }

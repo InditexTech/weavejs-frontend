@@ -16,8 +16,7 @@ import {
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveContextMenuPlugin,
-  WeaveNodesEdgeSnappingPlugin,
-  // WeaveNodesDistanceSnappingPlugin,
+  WeaveNodesSnappingPlugin,
   WeaveCommentsRendererPlugin,
   // WeaveStageMinimapPlugin,
   WeaveNodesMultiSelectionFeedbackPlugin,
@@ -25,6 +24,9 @@ import {
   WEAVE_FRAME_NODE_TYPE,
   WEAVE_IMAGE_NODE_TYPE,
   WEAVE_STROKE_SINGLE_NODE_TYPE,
+  Weave,
+  GUIDE_KIND,
+  GUIDE_ORIENTATION,
 } from "@inditextech/weave-sdk";
 import {
   WEAVE_EXPORT_RETURN_FORMAT,
@@ -37,6 +39,7 @@ import { COLOR_TOKEN_ACTION_NAME } from "../../actions/color-token-tool/constant
 import { OPERATIONS_MAP } from "./constants";
 import { ExportAreaReferencePlugin } from "@/components/plugins/export-area-reference/export-area-reference";
 import { EXPORT_AREA_SIZES } from "@/components/room-components/reference-area-size-selector";
+import { EXPORT_AREA_REFERENCE_PLUGIN_KEY } from "@/components/plugins/export-area-reference/constants";
 
 export const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageGridPlugin({
@@ -63,13 +66,13 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveNodesSelectionPlugin({
     config: {
       selection: {
-        ignoreStroke: true,
+        ignoreStroke: false,
         padding: 0,
         borderStrokeWidth: 2,
         borderStroke: "#1a1aff",
       },
       hover: {
-        ignoreStroke: true,
+        ignoreStroke: false,
         padding: 0,
         borderStrokeWidth: 2,
         borderStroke: "#1a1aff",
@@ -157,17 +160,93 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  new WeaveNodesEdgeSnappingPlugin(),
-  // new WeaveNodesDistanceSnappingPlugin({
-  //   config: {
-  //     ui: {
-  //       label: {
-  //         fontSize: 12,
-  //         fontFamily: "'Inter', sans-serif",
-  //       },
-  //     },
-  //   },
-  // }),
+  new WeaveNodesSnappingPlugin({
+    config: {
+      getStaticGuides: ({
+        instance,
+        containerId,
+      }: {
+        instance: Weave;
+        containerId: string;
+      }) => {
+        if (!instance) {
+          return [];
+        }
+
+        if (containerId === instance.getMainLayer()?.id()) {
+          const stage = instance.getStage();
+          const exportAreaReferencePlugin = instance.getPlugin(
+            EXPORT_AREA_REFERENCE_PLUGIN_KEY,
+          ) as ExportAreaReferencePlugin;
+
+          if (exportAreaReferencePlugin) {
+            return exportAreaReferencePlugin.getExportAreaGuides(stage);
+          }
+        }
+
+        if (containerId !== instance.getMainLayer()?.id()) {
+          const stage = instance.getStage();
+          const node = stage.findOne(`#${containerId}`);
+
+          if (node && node.getAttrs().containerId) {
+            const rectStage = node.getClientRect({
+              relativeTo: stage,
+            });
+
+            return [
+              {
+                orientation: GUIDE_ORIENTATION.VERTICAL,
+                value: 0,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-vertical-start`,
+                containerId: node.id(),
+              },
+              {
+                orientation: GUIDE_ORIENTATION.VERTICAL,
+                value: rectStage.width / 2,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-vertical-middle`,
+                containerId: node.id(),
+              },
+              {
+                orientation: GUIDE_ORIENTATION.VERTICAL,
+                value: rectStage.width,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-vertical-end`,
+                containerId: node.id(),
+              },
+              {
+                orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                value: 0,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-horizontal-start`,
+                containerId: node.id(),
+              },
+              {
+                orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                value: rectStage.height / 2,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-horizontal-middle`,
+                containerId: node.id(),
+              },
+              {
+                orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                value: rectStage.height,
+                kind: GUIDE_KIND.STATIC,
+                guideId: `frame-${node.id()}-horizontal-end`,
+                containerId: node.id(),
+              },
+            ];
+          }
+        }
+
+        return [];
+      },
+      persistence: {
+        enabled: true,
+      },
+    },
+  }),
   new WeaveStageDropAreaPlugin(),
   new WeaveCopyPasteNodesPlugin({
     config: {
@@ -265,7 +344,8 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
   // }),
   new WeaveStageKeyboardMovePlugin({
     config: {
-      movementDelta: 5,
+      movementDelta: 0.5,
+      shiftMovementDelta: 10,
     },
   }),
   new ExportAreaReferencePlugin({

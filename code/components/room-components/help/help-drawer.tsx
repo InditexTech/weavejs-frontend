@@ -15,10 +15,8 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { XIcon } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpTools } from "./help-tools";
 import React from "react";
-import { useGetOs } from "../hooks/use-get-os";
 import { HelpZoom } from "./help-zoom";
 import { HelpView } from "./help-view";
 import { HelpSelection } from "./help-selection";
@@ -26,6 +24,7 @@ import { HelpEdit } from "./help-edit";
 import { HelpArrange } from "./help-arrange";
 import { useCollaborationRoom } from "@/store/store";
 import { DRAWER_ELEMENTS } from "@/lib/constants";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 type HelpDrawerTriggerProps = {
   onClick?: () => void;
@@ -34,10 +33,8 @@ type HelpDrawerTriggerProps = {
 export const HelpDrawerTrigger = ({
   onClick = () => {},
 }: Readonly<HelpDrawerTriggerProps>) => {
-  const os = useGetOs();
-
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 
@@ -46,23 +43,22 @@ export const HelpDrawerTrigger = ({
       onPointerDown={() => {
         setShowDrawer(
           DRAWER_ELEMENTS.keyboardShortcuts,
-          !keyboardShortcutsVisible
+          !keyboardShortcutsVisible,
         );
         onClick?.();
       }}
       onClick={() => {
         setShowDrawer(
           DRAWER_ELEMENTS.keyboardShortcuts,
-          !keyboardShortcutsVisible
+          !keyboardShortcutsVisible,
         );
         onClick?.();
       }}
-      className="w-full text-foreground cursor-pointer hover:rounded-none"
+      className="w-full text-xs cursor-pointer hover:rounded-none"
     >
       <div className="w-[16px] h-[16px]" /> Keyboard shortcuts
       <DropdownMenuShortcut>
-        {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
-        {[SYSTEM_OS.WINDOWS as string].includes(os) && "Alt Ctrl C"}
+        {formatForDisplay("Alt+Mod+C")}
       </DropdownMenuShortcut>
     </DropdownMenuItem>
   );
@@ -70,7 +66,7 @@ export const HelpDrawerTrigger = ({
 
 export const HelpDrawer = () => {
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 
@@ -86,7 +82,7 @@ export const HelpDrawer = () => {
     >
       <DrawerContent className="p-0 !rounded-none bg-black flex flex-col justify-start items-center min-h-[330px]">
         <DrawerHeader className="w-[1024px] flex flex-row justify-between items-centers p-0 py-3">
-          <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-inter">
+          <DrawerTitle className="flex flex-row justify-start items-center text-center text-xs text-white font-light">
             Keyboard shortcuts
           </DrawerTitle>
           <DrawerClose>

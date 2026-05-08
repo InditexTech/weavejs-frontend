@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useWeave } from "@inditextech/weave-react";
 import {
@@ -17,12 +17,11 @@ import {
 import { Logo } from "@/components/utils/logo";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { useGetOs } from "@/components/room-components/hooks/use-get-os";
 import { useStandaloneUseCase } from "../../store/store";
 import { useCollaborationRoom } from "@/store/store";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export function Menu() {
-  const os = useGetOs();
   const navigate = useNavigate();
 
   const instance = useWeave((state) => state.instance);
@@ -133,8 +132,7 @@ export function Menu() {
           >
             Print state to console
             <DropdownMenuShortcut>
-              {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
-              {[SYSTEM_OS.WINDOWS as string].includes(os) && "Alt Ctrl C"}
+              {formatForDisplay("Alt+Mod+C")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

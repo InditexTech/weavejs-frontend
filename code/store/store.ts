@@ -15,6 +15,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 import merge from "lodash/merge";
+import { Guide } from "@/components/plugins/snapping-manager/types";
 
 type PresentationModeState = "idle" | "loading" | "loaded" | "error";
 
@@ -92,6 +93,9 @@ interface CollaborationRoomState {
   fetchConnectionUrl: {
     loading: boolean;
     error: Error | null;
+  };
+  guides: {
+    selected: Guide | null;
   };
   pages: {
     listVisible: boolean;
@@ -360,6 +364,7 @@ interface CollaborationRoomState {
   setUIUsersPointersVisible: (newVisible: boolean) => void;
   setUICommentsVisible: (newVisible: boolean) => void;
   setUIReferenceAreaVisible: (newVisible: boolean) => void;
+  setSelectedGuide: (newSelectedGuide: Guide | null) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -419,6 +424,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       tests: {
         show: false,
       },
+    },
+    guides: {
+      selected: null,
     },
     ui: {
       usersPointers: {
@@ -1283,6 +1291,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           referenceArea: {
             visible: newVisible,
           },
+        },
+      })),
+    setSelectedGuide: (newSelectedGuide) =>
+      set((state) => ({
+        ...state,
+        guides: {
+          ...state.guides,
+          selected: newSelectedGuide,
         },
       })),
   };

@@ -12,7 +12,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   SwatchBook,
   Projector,
@@ -29,6 +29,7 @@ import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useWeave } from "@inditextech/weave-react";
 import { useIAChat } from "@/store/ia-chat";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 const TITLE_MAP: Record<string, string> = {
   [SIDEBAR_ELEMENTS.nodeProperties]: "Selection",
@@ -122,7 +123,7 @@ export const SidebarSelectorFooter = () => {
           >
             <Images strokeWidth={1} /> Images
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
+              {formatForDisplay("Alt+Mod+I")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -135,7 +136,7 @@ export const SidebarSelectorFooter = () => {
           >
             <Video strokeWidth={1} /> Videos
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl V"}
+              {formatForDisplay("Alt+Mod+V")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -148,7 +149,7 @@ export const SidebarSelectorFooter = () => {
           >
             <Projector strokeWidth={1} /> Frames
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
+              {formatForDisplay("Alt+Mod+F")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -161,7 +162,7 @@ export const SidebarSelectorFooter = () => {
           >
             <LayoutPanelTop strokeWidth={1} /> Templates
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
+              {formatForDisplay("Alt+Mod+T")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -174,7 +175,7 @@ export const SidebarSelectorFooter = () => {
           >
             <SwatchBook strokeWidth={1} /> Color tokens
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ C" : "Alt Ctrl C"}
+              {formatForDisplay("Alt+Mod+C")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           {threadsEnabled && (
@@ -188,7 +189,7 @@ export const SidebarSelectorFooter = () => {
             >
               <MessageCircle strokeWidth={1} /> Comments
               <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                {formatForDisplay("Alt+Mod+O")}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}

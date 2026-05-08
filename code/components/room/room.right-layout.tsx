@@ -19,6 +19,7 @@ import { ChatBot } from "../room-components/ai-components/chatbot";
 import { useIAChat } from "@/store/ia-chat";
 import { useWeave } from "@inditextech/weave-react";
 import { RoomUser } from "./room.user";
+import { GuidesLibrary } from "../room-components/guides-library/guides-library";
 
 export const RoomRightSidebar = () => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -91,6 +92,7 @@ export const RoomRightSidebar = () => {
                   <>
                     <NodeProperties />
                     <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+                    <GuidesLibrary key={SIDEBAR_ELEMENTS.guides} />
                     <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
                     <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
                     <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />

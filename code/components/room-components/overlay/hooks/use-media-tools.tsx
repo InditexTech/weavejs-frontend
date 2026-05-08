@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { ShortcutElement } from "../../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
 import { Image, Images, Video } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -12,6 +10,7 @@ import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WEAVE_IMAGES_TOOL_ACTION_NAME,
 } from "@inditextech/weave-sdk";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const useMediaTools = () => {
   const instance = useWeave((state) => state.instance);
@@ -55,12 +54,7 @@ export const useMediaTools = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Image tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "I",
-                [SYSTEM_OS.OTHER]: "I",
-              }}
-            />
+            {formatForDisplay("I")}
           </div>
         ),
         onClick: () => {
@@ -73,12 +67,7 @@ export const useMediaTools = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Images tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "O",
-                [SYSTEM_OS.OTHER]: "O",
-              }}
-            />
+            {formatForDisplay("O")}
           </div>
         ),
         onClick: () => {

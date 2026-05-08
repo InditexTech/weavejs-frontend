@@ -25,6 +25,7 @@ export function ToolsNodeOverlay() {
   const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
+  const selectedGuide = useCollaborationRoom((state) => state.guides.selected);
   const imageCroppingEnabled = useCollaborationRoom(
     (state) => state.images.cropping.enabled,
   );
@@ -68,7 +69,7 @@ export function ToolsNodeOverlay() {
       return;
     }
 
-    if ((!actualAction || !node) && nodes.length === 0) {
+    if ((!actualAction || !node) && nodes.length === 0 && !selectedGuide) {
       setNodePropertiesAction(undefined);
       setSidebarActive(
         aiChatEnabled ? SIDEBAR_ELEMENTS.aiChat : SIDEBAR_ELEMENTS.images,
@@ -83,6 +84,7 @@ export function ToolsNodeOverlay() {
   }, [
     aiChatEnabled,
     actualAction,
+    selectedGuide,
     node,
     nodes,
     setSidebarActive,

@@ -101,6 +101,10 @@ export function ExportPageToImageConfigDialog({
       relativeTo: stage,
     });
 
+    if (!exportRect) {
+      return;
+    }
+
     handleExportPageToImageServerSide({
       type: "area",
       area: exportRect,

@@ -6,9 +6,8 @@ import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ToolbarButton } from "../../toolbar/toolbar-button";
 import { Hand } from "lucide-react";
-import { ShortcutElement } from "../../help/shortcut-element";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
-import { SYSTEM_OS } from "@/lib/utils";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 type MoveToolTriggerProps = {
   tooltipSide?: "top" | "bottom" | "left" | "right";
@@ -52,12 +51,7 @@ export const MoveToolTrigger = ({
       label={
         <div className="flex gap-3 justify-start items-center">
           <p>Move tool</p>
-          <ShortcutElement
-            shortcuts={{
-              [SYSTEM_OS.MAC]: "M",
-              [SYSTEM_OS.OTHER]: "M",
-            }}
-          />
+          {formatForDisplay("M")}
         </div>
       }
       tooltipSide={tooltipSide}

@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { ShortcutElement } from "./shortcut-element";
 
 type HelpShortcutElement = {
   icon: React.ReactElement;
   label: string;
-  shortcuts: Record<string, string>;
+  shortcuts: string;
 };
 
 export const HelpShortcutElement = ({
@@ -22,7 +21,7 @@ export const HelpShortcutElement = ({
         {React.cloneElement(icon, { size: 20 })}
         <div className="text-white font-inter text-sm">{label}</div>
       </div>
-      <ShortcutElement shortcuts={shortcuts} />
+      {shortcuts}
     </div>
   );
 };

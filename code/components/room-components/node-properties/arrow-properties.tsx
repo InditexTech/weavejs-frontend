@@ -188,6 +188,7 @@ export function ArrowProperties() {
               hideSearch
               label="Line width"
               options={[
+                { label: "None", value: "0" },
                 { label: "Small", value: "1" },
                 { label: "Medium", value: "3" },
                 { label: "Large", value: "5" },
@@ -262,7 +263,9 @@ export function ArrowProperties() {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      dash: value.split(",").map((v) => parseInt(v)),
+                      dash: value
+                        ? value.split(",").map((v) => parseInt(v))
+                        : [],
                     },
                   };
                   updateElement(updatedNode);

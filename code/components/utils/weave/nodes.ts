@@ -117,6 +117,7 @@ export const NODES = () => [
       fontFamily: "'Inter', sans-serif",
       fontStyle: "normal",
       fontSize: 14,
+      borderWidth: 1,
       borderColor: "#757575",
       fontColor: "#757575",
       titleMargin: 5,

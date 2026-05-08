@@ -72,12 +72,6 @@ export const NodeProperties = () => {
       return;
     }
 
-    if ((!actualAction || !node) && nodes.length === 0) {
-      setNodePropertiesAction(undefined);
-      setSidebarActive(SIDEBAR_ELEMENTS.images);
-      return;
-    }
-
     if (node) {
       setNodePropertiesAction("update");
       setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);

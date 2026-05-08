@@ -335,9 +335,6 @@ export const ElementsTree = () => {
       if (nodes.length > 1) {
         setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
       }
-      if (nodes.length === 0) {
-        setSidebarActive(SIDEBAR_ELEMENTS.images);
-      }
 
       setSelectedNodes(
         nodes

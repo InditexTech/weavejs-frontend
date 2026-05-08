@@ -4,6 +4,7 @@
 
 import { toast } from "sonner";
 import {
+  containerOverCursor,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
@@ -18,8 +19,6 @@ import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
-import { ShortcutElement } from "../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import {
   ClipboardCopy,
   ClipboardPaste,
@@ -37,6 +36,7 @@ import {
   PackagePlus,
   PackageOpen,
   Paperclip,
+  PanelLeftRightDashed,
 } from "lucide-react";
 import { useExportPageToImageServerSide } from "./use-export-page-to-image-server-side";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
@@ -45,6 +45,8 @@ import { useTemplates } from "@/store/templates";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { useIAChat } from "@/store/ia-chat";
 import Konva from "konva";
+import { useCopyPasteGuides } from "./use-copy-paste-guides";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -79,6 +81,9 @@ function useContextMenu() {
   const { isExporting } = useExportPageToImageServerSide();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
+
+  const { copyGuides, pasteGuides, toggleContainerGuides } =
+    useCopyPasteGuides();
 
   React.useEffect(() => {
     if (!instance) return;
@@ -228,12 +233,7 @@ function useContextMenu() {
             label: (
               <div className="w-full flex justify-between items-center">
                 <div>Export as image</div>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⇧ ⌘ E",
-                    [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
-                  }}
-                />
+                {formatForDisplay("Shift+Mod+E")}
               </div>
             ),
             icon: <ImageDown size={16} />,
@@ -287,12 +287,7 @@ function useContextMenu() {
             label: (
               <div className="w-full flex justify-between items-center">
                 <div>Copy</div>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⌘ C",
-                    [SYSTEM_OS.OTHER]: "Ctrl C",
-                  }}
-                />
+                {formatForDisplay("Mod+C")}
               </div>
             ),
             icon: <ClipboardCopy size={16} />,
@@ -334,12 +329,7 @@ function useContextMenu() {
         label: (
           <div className="w-full flex justify-between items-center">
             <div>Paste here</div>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "⌘ P",
-                [SYSTEM_OS.OTHER]: "Ctrl P",
-              }}
-            />
+            {formatForDisplay("Mod+P")}
           </div>
         ),
         icon: <ClipboardPaste size={16} />,
@@ -353,6 +343,117 @@ function useContextMenu() {
           }
         },
       });
+
+      if (
+        nodes.length === 0 ||
+        (nodes.length === 1 &&
+          nodes[0].instance.getAttrs().nodeType === "frame")
+      ) {
+        options.push({
+          id: "div-guides-1",
+          type: "divider",
+        });
+
+        options.push({
+          id: "toggle-guides",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Toggle container guides</div>
+              {formatForDisplay("G")} {formatForDisplay("T")}
+            </div>
+          ),
+          icon: <PanelLeftRightDashed size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            if (!instance) return;
+
+            const node = containerOverCursor(instance, [], stageClickPoint);
+
+            let selectedContainerId: string =
+              instance.getMainLayer()?.id() ?? "";
+            if (node) {
+              selectedContainerId = node.id();
+            }
+
+            toggleContainerGuides(selectedContainerId);
+          },
+        });
+
+        options.push({
+          id: "copy-guides",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Copy guides to clipboard</div>
+              {formatForDisplay("G")} {formatForDisplay("Mod+C")}
+            </div>
+          ),
+          icon: <ClipboardCopy size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            if (!instance) return;
+
+            let selectedContainerId: string =
+              instance.getMainLayer()?.id() ?? "";
+
+            if (
+              nodes.length === 1 &&
+              nodes[0].instance.getAttrs().nodeType === "frame"
+            ) {
+              selectedContainerId = nodes[0].instance.id();
+            }
+            if (nodes.length === 0) {
+              const node = containerOverCursor(instance, [], stageClickPoint);
+              if (node) {
+                selectedContainerId = node.id();
+              }
+            }
+
+            await copyGuides(selectedContainerId);
+          },
+        });
+
+        options.push({
+          id: "paste-guides",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Paste guides from clipboard</div>
+              {formatForDisplay("G")} {formatForDisplay("Mod+P")}
+            </div>
+          ),
+          icon: <ClipboardPaste size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            if (!instance) return;
+
+            let selectedContainerId: string =
+              instance.getMainLayer()?.id() ?? "";
+
+            if (
+              nodes.length === 1 &&
+              nodes[0].instance.getAttrs().nodeType === "frame"
+            ) {
+              selectedContainerId = nodes[0].instance.id();
+            }
+            if (nodes.length === 0) {
+              const node = containerOverCursor(instance, [], stageClickPoint);
+              if (node) {
+                selectedContainerId = node.id();
+              }
+            }
+
+            await pasteGuides(selectedContainerId);
+          },
+        });
+      }
 
       if (!singleLocked && nodes.length > 0) {
         options.push({
@@ -392,12 +493,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Bring to front</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "]",
-                  [SYSTEM_OS.OTHER]: "]",
-                }}
-              />
+              {formatForDisplay("]")}
             </div>
           ),
           icon: <BringToFront size={16} />,
@@ -413,12 +509,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move up</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ ]",
-                  [SYSTEM_OS.OTHER]: "Ctrl ]",
-                }}
-              />
+              {formatForDisplay("Mod+]")}
             </div>
           ),
           icon: <ArrowUp size={16} />,
@@ -435,12 +526,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move down</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ [",
-                  [SYSTEM_OS.OTHER]: "Ctrl [",
-                }}
-              />
+              {formatForDisplay("Mod+[")}
             </div>
           ),
           icon: <ArrowDown size={16} />,
@@ -457,12 +543,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Send to back</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "[",
-                  [SYSTEM_OS.OTHER]: "[",
-                }}
-              />
+              {formatForDisplay("[")}
             </div>
           ),
           icon: <SendToBack size={16} />,
@@ -486,12 +567,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Group</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ G",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
-                }}
-              />
+              {formatForDisplay("Shift+Mod+G")}
             </div>
           ),
           icon: <Group size={16} />,
@@ -512,12 +588,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Un-group</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ U",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
-                }}
-              />
+              {formatForDisplay("Shift+Mod+U")}
             </div>
           ),
           icon: <Ungroup size={16} />,
@@ -606,12 +677,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Delete</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "Del",
-                  [SYSTEM_OS.OTHER]: "Del",
-                }}
-              />
+              {formatForDisplay("Del")}
             </div>
           ),
           icon: <Trash size={16} />,

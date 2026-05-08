@@ -11,11 +11,11 @@ import {
   MessageSquare,
   RulerDimensionLine,
   Tag,
+  Video,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { ShortcutElement } from "../../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const useOtherTools = () => {
   const instance = useWeave((state) => state.instance);
@@ -32,6 +32,9 @@ export const useOtherTools = () => {
   );
   const measurementReferenceMeasurePixels = useCollaborationRoom(
     (state) => state.measurement.referenceMeasurePixels,
+  );
+  const setShowSelectFileVideo = useCollaborationRoom(
+    (state) => state.setShowSelectFileVideo,
   );
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
@@ -78,6 +81,19 @@ export const useOtherTools = () => {
           triggerTool("frameTool", nodeCreateProps);
         },
         active: () => actualAction === "frameTool",
+      },
+      videoTool: {
+        icon: <Video className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Video tool</p>
+          </div>
+        ),
+        onClick: () => {
+          triggerTool("videoTool", nodeCreateProps);
+          setShowSelectFileVideo(true);
+        },
+        active: () => actualAction === "videoTool",
       },
       commentTool: {
         icon: <MessageSquare className="px-2" size={40} strokeWidth={1} />,
@@ -151,12 +167,7 @@ export const useOtherTools = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Color Token Reference tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "K",
-                [SYSTEM_OS.OTHER]: "K",
-              }}
-            />
+            {formatForDisplay("K")}
           </div>
         ),
         onClick: () => triggerTool("colorTokenTool"),

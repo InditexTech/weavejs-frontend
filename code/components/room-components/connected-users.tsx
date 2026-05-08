@@ -138,8 +138,8 @@ export const ConnectedUsers = () => {
           <DropdownMenuContent
             side="bottom"
             align="start"
-            sideOffset={12}
-            className="rounded-none p-0 shadow-none drop-shadow"
+            sideOffset={14}
+            className="rounded-none p-0 shadow-none drop-shadow border-0"
           >
             {/* <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-inter text-xs">
             Connected users
@@ -150,32 +150,34 @@ export const ConnectedUsers = () => {
                 const userInfo = connectedUsers[userKey];
                 return (
                   <React.Fragment key={userKey}>
-                    <DropdownMenuItem className="text-foreground cursor-default hover:!bg-white hover:rounded-none w-full text-xs">
+                    <DropdownMenuItem className="text-foreground p-0 !border-0 cursor-default hover:!bg-white hover:rounded-none w-full text-xs gap-0">
                       <div
-                        className="w-[16px] h-[16px]"
+                        className="w-[32px] h-[60px]"
                         style={{
                           background: stringToColor(userInfo?.name ?? ""),
                         }}
                       ></div>
-                      <AvatarUI
-                        size="sm"
-                        className="bg-muted font-light !text-[11] border-[0.5px] border-[#c9c9c9]"
-                      >
-                        <AvatarImage
-                          src={userInfo?.image}
-                          alt={userInfo?.name}
-                          referrerPolicy="no-referrer"
-                        />
-                        <AvatarFallback className="bg-transparent uppercase">
-                          {getUserShort(userInfo?.name ?? "")}
-                        </AvatarFallback>
-                      </AvatarUI>
-                      <div className="flex flex-col gap-0 leading-tight">
-                        <div className="w-full text-sm">{userInfo?.name}</div>
-                        <div className="w-full font-mono text-xs text-[#757575]">
-                          {userInfo?.email}
-                        </div>
-                        {/* <div className="w-full font-mono mt-1 text-xs text-[#999999] whitespace-nowrap">
+                      <div className="flex flex-row items-center gap-2 w-full p-3">
+                        <AvatarUI
+                          size="sm"
+                          className="bg-muted !w-[32px] !h-[32px] font-light !text-[11] border-[0.5px] border-[#c9c9c9]"
+                        >
+                          <AvatarImage
+                            src={userInfo?.image}
+                            alt={userInfo?.name}
+                            referrerPolicy="no-referrer"
+                            className="w-[32px] h-[32px]"
+                          />
+                          <AvatarFallback className="bg-transparent uppercase">
+                            {getUserShort(userInfo?.name ?? "")}
+                          </AvatarFallback>
+                        </AvatarUI>
+                        <div className="flex flex-col gap-0 leading-tight">
+                          <div className="w-full text-sm">{userInfo?.name}</div>
+                          <div className="w-full font-mono text-xs text-[#757575]">
+                            {userInfo?.email}
+                          </div>
+                          {/* <div className="w-full font-mono mt-1 text-xs text-[#999999] whitespace-nowrap">
                           {typeof usersLocks[userInfo.id] !== "undefined"
                             ? OPERATIONS_MAP[
                                 (
@@ -186,19 +188,20 @@ export const ConnectedUsers = () => {
                               ]
                             : "idle"}
                         </div> */}
+                        </div>
+                        <Divider className="h-[32px]" />
+                        <Badge>
+                          {typeof usersLocks[userInfo.id] !== "undefined"
+                            ? OPERATIONS_MAP[
+                                (
+                                  usersLocks[
+                                    userInfo.id
+                                  ] as WeaveUserMutexLock<unknown>
+                                ).operation
+                              ]
+                            : "idle"}
+                        </Badge>
                       </div>
-                      <Divider className="h-[32px]" />
-                      <Badge className="mt-2">
-                        {typeof usersLocks[userInfo.id] !== "undefined"
-                          ? OPERATIONS_MAP[
-                              (
-                                usersLocks[
-                                  userInfo.id
-                                ] as WeaveUserMutexLock<unknown>
-                              ).operation
-                            ]
-                          : "idle"}
-                      </Badge>
                     </DropdownMenuItem>
                   </React.Fragment>
                 );
