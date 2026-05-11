@@ -33,7 +33,7 @@ function useCopyPaste() {
         copyingToastIdRef.current = null;
       }
     },
-    []
+    [],
   );
 
   const onPasteHandler = React.useCallback(
@@ -41,8 +41,10 @@ function useCopyPaste() {
       const { error } = pasteInfo;
 
       if (error) {
-        if (error.message === "Invalid elements to paste") {
-          toast.warning("Elements in clipboard cannot be pasted here");
+        if (error.cause === "InvalidPasteTarget") {
+          toast.warning(
+            "Copied elements cannot be pasted on the selected target",
+          );
         } else {
           console.error("onPaste", error);
           toast.error("An error occurred when reading from the clipboard");
@@ -51,7 +53,7 @@ function useCopyPaste() {
         toast.success("Paste successful");
       }
     },
-    []
+    [],
   );
 
   React.useEffect(() => {

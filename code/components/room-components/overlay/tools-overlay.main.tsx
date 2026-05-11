@@ -487,8 +487,8 @@ export function ToolsOverlayMain() {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
                   setOtherToolsMenuOpen(false);
-                  setActualOtherTool("videoTool");
-                  OTHER_TOOLS["videoTool"].onClick();
+                  setActualMediaTool("videoTool");
+                  MEDIA_TOOLS["videoTool"].onClick();
                 }}
               >
                 <Video size={20} strokeWidth={1} /> Video tool
@@ -586,8 +586,8 @@ export function ToolsOverlayMain() {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
                     setOtherToolsMenuOpen(false);
-                    setActualOtherTool("videoTool");
-                    OTHER_TOOLS["videoTool"].onClick();
+                    setActualMediaTool("videoTool");
+                    MEDIA_TOOLS["videoTool"].onClick();
                   }}
                 >
                   <Video size={20} strokeWidth={1} /> Video tool

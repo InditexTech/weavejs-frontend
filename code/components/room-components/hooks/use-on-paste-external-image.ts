@@ -62,6 +62,8 @@ export function useOnPasteExternalImage() {
         pastingToastIdRef.current = null;
       }
 
+      console.log("onAddedImageHandler");
+
       toast.success("Paste successful");
 
       const node = instance?.getStage().findOne(`#${nodeId}`);

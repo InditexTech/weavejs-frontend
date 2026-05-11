@@ -14,7 +14,6 @@ import Konva from "konva";
 import {
   getDownscaleRatio,
   getImageSizeFromFile,
-  getPositionRelativeToContainerOnPosition,
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
   WeaveImageToolActionTriggerParams,
@@ -123,8 +122,9 @@ export function UploadImage() {
       }
 
       instance.getStage().setPointersPositions(e);
-      const position: Konva.Vector2d | null | undefined =
-        getPositionRelativeToContainerOnPosition(instance);
+      const position: Konva.Vector2d | null | undefined = instance
+        .getStage()
+        .getRelativePointerPosition();
 
       if (!position) {
         return;
