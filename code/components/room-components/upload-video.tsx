@@ -9,7 +9,6 @@ import { postVideo } from "@/api/post-video";
 import { useWeave } from "@inditextech/weave-react";
 import { toast } from "sonner";
 import Konva from "konva";
-import { getPositionRelativeToContainerOnPosition } from "@inditextech/weave-sdk";
 
 export function UploadVideo() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,8 +114,9 @@ export function UploadVideo() {
       }
 
       instance.getStage().setPointersPositions(e);
-      const position: Konva.Vector2d | null | undefined =
-        getPositionRelativeToContainerOnPosition(instance);
+      const position: Konva.Vector2d | null | undefined = instance
+        .getStage()
+        .getRelativePointerPosition();
 
       if (!position) {
         return;

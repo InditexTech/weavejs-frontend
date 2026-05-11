@@ -13,7 +13,6 @@ import { useWeave } from "@inditextech/weave-react";
 import {
   getDownscaleRatio,
   getImageSizeFromFile,
-  getPositionRelativeToContainerOnPosition,
   WEAVE_IMAGES_TOOL_ACTION_NAME,
   WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
   WeaveImagesFile,
@@ -154,8 +153,9 @@ export function UploadImages() {
       }
 
       instance.getStage().setPointersPositions(e);
-      const position: Konva.Vector2d | null | undefined =
-        getPositionRelativeToContainerOnPosition(instance);
+      const position: Konva.Vector2d | null | undefined = instance
+        .getStage()
+        .getRelativePointerPosition();
 
       if (!position) {
         return;

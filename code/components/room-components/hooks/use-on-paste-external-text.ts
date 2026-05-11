@@ -37,9 +37,8 @@ export function useOnPasteExternalText() {
       if (pastingToastIdRef.current) {
         toast.dismiss(pastingToastIdRef.current);
         pastingToastIdRef.current = null;
+        toast.success("Paste successful");
       }
-
-      toast.success("Paste successful");
 
       if (!positionCalculatedRef.current) {
         return;

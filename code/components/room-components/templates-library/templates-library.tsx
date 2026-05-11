@@ -107,7 +107,6 @@ export const TemplatesLibrary = () => {
         const position: Konva.Vector2d | null | undefined = instance
           .getStage()
           .getPointerPosition();
-        // getPositionRelativeToContainerOnPosition(instance);
 
         if (!position) {
           return;

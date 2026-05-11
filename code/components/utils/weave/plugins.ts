@@ -16,7 +16,7 @@ import {
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveContextMenuPlugin,
-  WeaveNodesEdgeSnappingPlugin,
+  // WeaveNodesEdgeSnappingPlugin,
   // WeaveNodesDistanceSnappingPlugin,
   WeaveCommentsRendererPlugin,
   // WeaveStageMinimapPlugin,
@@ -29,6 +29,7 @@ import {
 import {
   WEAVE_EXPORT_RETURN_FORMAT,
   WeaveElementInstance,
+  // WeaveStateElement,
   type WeaveUser,
 } from "@inditextech/weave-types";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
@@ -157,7 +158,7 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
       },
     },
   }),
-  new WeaveNodesEdgeSnappingPlugin(),
+  // new WeaveNodesEdgeSnappingPlugin(),
   // new WeaveNodesDistanceSnappingPlugin({
   //   config: {
   //     ui: {
