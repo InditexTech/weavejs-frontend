@@ -338,7 +338,7 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
   //       return document?.getElementById("minimap") as HTMLElement;
   //     },
   //     id: "weave_stage_minimap",
-  //     width: window.innerWidth * 0.2,
+  //     width: 300,
   //     fitToContentPadding: 5,
   //   },
   // }),
