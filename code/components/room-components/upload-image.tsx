@@ -104,7 +104,6 @@ export function UploadImage() {
         },
         uploadImageFunction,
         imageId: resourceId,
-        forceMainContainer: false,
         ...(position && { position }),
       });
     },

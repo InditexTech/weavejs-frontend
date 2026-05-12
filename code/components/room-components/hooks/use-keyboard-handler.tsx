@@ -15,6 +15,8 @@ import {
   WeaveUsersPointersPlugin,
   WeaveNodesSnappingPlugin,
   GUIDE_ORIENTATION,
+  WEAVE_IMAGE_NODE_TYPE,
+  WEAVE_RECTANGLE_NODE_TYPE,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useCopyPasteGuides } from "./use-copy-paste-guides";
@@ -807,6 +809,38 @@ export function useKeyboardHandler() {
     { key: "L", mod: true, alt: false, shift: true },
     () => {
       handlePrintToConsoleState();
+    },
+    {
+      enabled: keysEnabled,
+    },
+  );
+
+  useHotkey(
+    { key: "7", mod: true, alt: false, shift: false },
+    () => {
+      if (!instance) {
+        return;
+      }
+
+      if (selectedNodes.length === 2) {
+        const image = selectedNodes.find(
+          (n) => n.node?.type === WEAVE_IMAGE_NODE_TYPE,
+        );
+        const rectangle = selectedNodes.find(
+          (n) => n.node?.type === WEAVE_RECTANGLE_NODE_TYPE,
+        );
+
+        if (image && rectangle) {
+          const imageHandler = instance.getNodeHandler(WEAVE_IMAGE_NODE_TYPE);
+
+          if (imageHandler) {
+            imageHandler.useRectAsCropReference(
+              rectangle.instance,
+              image.instance,
+            );
+          }
+        }
+      }
     },
     {
       enabled: keysEnabled,

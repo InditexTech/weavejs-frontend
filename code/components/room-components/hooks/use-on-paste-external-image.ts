@@ -223,7 +223,6 @@ export function useOnPasteExternalImage() {
           },
           uploadImageFunction,
           imageId: resourceId,
-          forceMainContainer: false,
           ...(position && { position }),
         });
       }
