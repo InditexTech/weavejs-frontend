@@ -367,6 +367,7 @@ export function RoomHeader() {
   }, [room, setRoomsRoomId, setRoomsDeleteVisible]);
 
   const handleExitRoom = React.useCallback(async () => {
+    console.log("exit???");
     sessionStorage.removeItem(`weave.js_${room}`);
     await instance?.getStore().disconnect();
     setMenuOpen(false);

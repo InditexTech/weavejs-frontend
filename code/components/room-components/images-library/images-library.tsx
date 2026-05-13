@@ -603,7 +603,7 @@ export const ImagesLibrary = () => {
                       return (
                         <div
                           key={`${image.imageId}-${image.status}`}
-                          className="w-full min-h-[200px]"
+                          className="w-full"
                           onClick={() => {
                             if (
                               showSelection &&
