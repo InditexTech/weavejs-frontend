@@ -7,7 +7,7 @@ import { useWeave } from "@inditextech/weave-react";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 
 const USER_IDLE_DETECTION_INTERVAL = 3600000; // 1 hour
-// const USER_IDLE_DETECTION_INTERVAL = 20000;
+// const USER_IDLE_DETECTION_INTERVAL = 10000; // 10 seconds for testing
 
 export const useIdleDetectionUser = () => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -21,7 +21,7 @@ export const useIdleDetectionUser = () => {
     setInactive(false);
     inactivityDetectionTimer.current = setTimeout(
       () => setInactive(true),
-      USER_IDLE_DETECTION_INTERVAL
+      USER_IDLE_DETECTION_INTERVAL,
     );
   };
 
@@ -34,13 +34,13 @@ export const useIdleDetectionUser = () => {
     const events = ["mousemove", "keydown", "scroll", "touchstart", "click"];
 
     events.forEach((ev) =>
-      window.addEventListener(ev, resetInactivityDetectionTimer)
+      window.addEventListener(ev, resetInactivityDetectionTimer),
     );
     resetInactivityDetectionTimer(); // start timer
 
     return () => {
       events.forEach((ev) =>
-        window.removeEventListener(ev, resetInactivityDetectionTimer)
+        window.removeEventListener(ev, resetInactivityDetectionTimer),
       );
       clearTimeout(inactivityDetectionTimer.current);
     };
