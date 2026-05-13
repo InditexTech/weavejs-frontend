@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
+import { toast } from "sonner";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useWeave } from "@inditextech/weave-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
@@ -16,7 +17,6 @@ import {
   WeaveNodesSnappingPlugin,
   GUIDE_ORIENTATION,
   WEAVE_IMAGE_NODE_TYPE,
-  WEAVE_RECTANGLE_NODE_TYPE,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useCopyPasteGuides } from "./use-copy-paste-guides";
@@ -53,6 +53,10 @@ export function useKeyboardHandler() {
     },
     [instance, actualAction],
   );
+
+  const keysEnabled = React.useMemo(() => {
+    return actualAction !== undefined && actualAction === "selectionTool";
+  }, [actualAction]);
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
@@ -826,20 +830,41 @@ export function useKeyboardHandler() {
         const image = selectedNodes.find(
           (n) => n.node?.type === WEAVE_IMAGE_NODE_TYPE,
         );
-        const rectangle = selectedNodes.find(
-          (n) => n.node?.type === WEAVE_RECTANGLE_NODE_TYPE,
+        const reference = selectedNodes.find(
+          (n) => n.node?.type !== WEAVE_IMAGE_NODE_TYPE,
         );
 
-        if (image && rectangle) {
+        if (image && reference) {
           const imageHandler = instance.getNodeHandler(WEAVE_IMAGE_NODE_TYPE);
 
           if (imageHandler) {
-            imageHandler.useRectAsCropReference(
-              rectangle.instance,
-              image.instance,
-            );
+            try {
+              imageHandler.cropImageWithReference(
+                image.instance,
+                reference.instance,
+              );
+            } catch (e) {
+              if (e instanceof Error && e.cause === "RotationNotAligned") {
+                toast.error(
+                  "The selected image cannot be cropped. Check that both elements, image and reference, have the same rotation angle and try again.",
+                );
+              }
+              if (e instanceof Error && e.cause === "InvalidImageNode") {
+                toast.error(
+                  "The provided element defined as an Image is not valid.",
+                );
+              }
+            }
           }
+        } else {
+          toast.error(
+            "To crop an image with reference to another element, select both the image and the reference element and try again.",
+          );
         }
+      } else {
+        toast.error(
+          "To crop an image with reference to another element, select both the image and the reference element and try again.",
+        );
       }
     },
     {
