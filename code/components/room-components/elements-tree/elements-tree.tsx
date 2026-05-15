@@ -188,8 +188,7 @@ function mapElementsToTree(
             const nodesSelectionPlugin =
               instance?.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
             if (instance && nodesSelectionPlugin) {
-              instance.selectNodesByKey([element.key]);
-              nodesSelectionPlugin.removeSelectedNodes();
+              nodesSelectionPlugin.removeElement(element);
             }
           }}
         >

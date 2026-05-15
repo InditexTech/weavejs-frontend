@@ -108,8 +108,6 @@ export const useHandleRoomEvents = () => {
   React.useEffect(() => {
     const handleRoomDeleted = async (payload: { roomId: string }) => {
       refreshRoomData(payload.roomId);
-
-      console.log("Room deleted disconnect");
       sessionStorage.removeItem(`weave.js_${payload.roomId}`);
       await instance?.getStore().disconnect();
       navigate({ to: "/" });

@@ -8,11 +8,13 @@ import React from "react";
 import {
   WEAVE_NODES_SELECTION_KEY,
   WeaveNodesSelectionPlugin,
+  WEAVE_NODES_SNAPPING_PLUGIN_KEY,
+  WeaveNodesSnappingPlugin,
 } from "@inditextech/weave-sdk";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
-export const useCopyPasteGuides = () => {
+export const useHandleGuides = () => {
   const instance = useWeave((state) => state.instance);
 
   const viewType = useCollaborationRoom((state) => state.viewType);
@@ -49,8 +51,8 @@ export const useCopyPasteGuides = () => {
       }
 
       const snappingManagerPlugin =
-        instance.getPlugin<WeaveNodesSelectionPlugin>(
-          WEAVE_NODES_SELECTION_KEY,
+        instance.getPlugin<WeaveNodesSnappingPlugin>(
+          WEAVE_NODES_SNAPPING_PLUGIN_KEY,
         );
 
       if (!snappingManagerPlugin) {
@@ -134,8 +136,8 @@ export const useCopyPasteGuides = () => {
       }
 
       const snappingManagerPlugin =
-        instance.getPlugin<WeaveNodesSelectionPlugin>(
-          WEAVE_NODES_SELECTION_KEY,
+        instance.getPlugin<WeaveNodesSnappingPlugin>(
+          WEAVE_NODES_SNAPPING_PLUGIN_KEY,
         );
 
       if (!snappingManagerPlugin) {
@@ -234,8 +236,8 @@ export const useCopyPasteGuides = () => {
       }
 
       const snappingManagerPlugin =
-        instance.getPlugin<WeaveNodesSelectionPlugin>(
-          WEAVE_NODES_SELECTION_KEY,
+        instance.getPlugin<WeaveNodesSnappingPlugin>(
+          WEAVE_NODES_SNAPPING_PLUGIN_KEY,
         );
 
       if (!snappingManagerPlugin) {
@@ -258,6 +260,7 @@ export const useCopyPasteGuides = () => {
       }
 
       snappingManagerPlugin.getGuidesManager().toggleCustomGuides(containerId);
+      sidebarToggle(SIDEBAR_ELEMENTS.guides);
     },
     [instance],
   );

@@ -25,6 +25,7 @@ import { useCollaborationRoom } from "@/store/store";
 import packageJson from "@/package.json";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
+import { cn } from "@/lib/utils";
 
 export const ShowcaseLeftSidebar = () => {
   const navigate = useNavigate();
@@ -62,7 +63,12 @@ export const ShowcaseLeftSidebar = () => {
           <Button
             variant="link"
             disabled={isShowcase}
-            className="cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto"
+            className={cn(
+              "cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto",
+              {
+                ["!text-red-300"]: isShowcase,
+              },
+            )}
             onClick={async () => {
               navigate({ to: `/` });
             }}
@@ -75,22 +81,17 @@ export const ShowcaseLeftSidebar = () => {
           <Button
             variant="link"
             disabled={isStandalone}
-            className="cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto"
+            className={cn(
+              "cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto",
+              {
+                ["!text-red-300"]: isStandalone,
+              },
+            )}
             onClick={async () => {
               navigate({ to: `/use-cases/standalone` });
             }}
           >
             STANDALONE
-          </Button>
-          <Button
-            variant="link"
-            disabled={isTemplates}
-            className="cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto"
-            onClick={async () => {
-              navigate({ to: `/use-cases/templates` });
-            }}
-          >
-            TEMPLATES
           </Button>
         </div>
       </div>

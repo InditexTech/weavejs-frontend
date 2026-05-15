@@ -11,15 +11,13 @@ import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
   WEAVE_IMAGES_TOOL_ACTION_NAME,
   WEAVE_NODES_SELECTION_KEY,
-  WEAVE_NODES_SNAPPING_PLUGIN_KEY,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
-  WeaveNodesSnappingPlugin,
   GUIDE_ORIENTATION,
   WEAVE_IMAGE_NODE_TYPE,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { useCopyPasteGuides } from "./use-copy-paste-guides";
+import { useHandleGuides } from "./use-handle-guides";
 
 export function useKeyboardHandler() {
   const instance = useWeave((state) => state.instance);
@@ -101,11 +99,7 @@ export function useKeyboardHandler() {
     return false;
   }, [actualAction]);
 
-  const keysEnabled = React.useMemo(() => {
-    return actualAction !== undefined && actualAction === "selectionTool";
-  }, [actualAction]);
-
-  const { copyGuides, pasteGuides } = useCopyPasteGuides();
+  const { copyGuides, pasteGuides, toggleContainerGuides } = useHandleGuides();
 
   // GUIDES HOTKEYS
 
@@ -178,11 +172,7 @@ export function useKeyboardHandler() {
       WEAVE_NODES_SELECTION_KEY,
     );
 
-    const snappingManagerPlugin = instance?.getPlugin<WeaveNodesSnappingPlugin>(
-      WEAVE_NODES_SNAPPING_PLUGIN_KEY,
-    );
-
-    if (snappingManagerPlugin && nodesSelectionPlugin) {
+    if (nodesSelectionPlugin) {
       const mainLayer = instance.getMainLayer();
       let containerId = mainLayer?.id() ?? "";
       let performToggle = true;
@@ -202,10 +192,7 @@ export function useKeyboardHandler() {
       }
 
       if (performToggle) {
-        snappingManagerPlugin
-          .getGuidesManager()
-          .toggleCustomGuides(containerId);
-        sidebarToggle(SIDEBAR_ELEMENTS.guides);
+        toggleContainerGuides(containerId);
       }
     }
 

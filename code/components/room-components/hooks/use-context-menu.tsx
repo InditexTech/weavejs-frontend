@@ -33,7 +33,7 @@ import {
   Lock,
   EyeOff,
   Link,
-  PackagePlus,
+  // PackagePlus,
   PackageOpen,
   Paperclip,
   PanelLeftRightDashed,
@@ -45,8 +45,9 @@ import { useTemplates } from "@/store/templates";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { useIAChat } from "@/store/ia-chat";
 import Konva from "konva";
-import { useCopyPasteGuides } from "./use-copy-paste-guides";
+import { useHandleGuides } from "./use-handle-guides";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+// import { useJsonTemplate } from "./use-json-template";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -79,11 +80,11 @@ function useContextMenu() {
   );
 
   const { isExporting } = useExportPageToImageServerSide();
+  // const { generateJsonTemplate } = useJsonTemplate();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
 
-  const { copyGuides, pasteGuides, toggleContainerGuides } =
-    useCopyPasteGuides();
+  const { copyGuides, pasteGuides, toggleContainerGuides } = useHandleGuides();
 
   React.useEffect(() => {
     if (!instance) return;
@@ -372,13 +373,12 @@ function useContextMenu() {
 
             const node = containerOverCursor(instance, [], stageClickPoint);
 
-            let selectedContainerId: string =
-              instance.getMainLayer()?.id() ?? "";
+            let containerId: string = instance.getMainLayer()?.id() ?? "";
             if (node) {
-              selectedContainerId = node.id();
+              containerId = node.id();
             }
 
-            toggleContainerGuides(selectedContainerId);
+            toggleContainerGuides(containerId);
           },
         });
 
@@ -455,28 +455,57 @@ function useContextMenu() {
         });
       }
 
-      if (!singleLocked && nodes.length > 0) {
-        options.push({
-          id: "div-templates-1",
-          type: "divider",
-        });
-        // SAVE AS TEMPLATE
-        options.push({
-          id: "save-as-template",
-          type: "button",
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Save as template</div>
-            </div>
-          ),
-          icon: <PackagePlus size={16} />,
-          disabled: !["selectionTool"].includes(actActionActive ?? ""),
-          onClick: () => {
-            setSaveDialogVisible(true);
-            setContextMenuShow(false);
-          },
-        });
-      }
+      // if (!singleLocked && nodes.length > 0) {
+      //   options.push({
+      //     id: "div-templates-1",
+      //     type: "divider",
+      //   });
+      //   // SAVE AS TEMPLATE
+      //   options.push({
+      //     id: "save-as-template",
+      //     type: "button",
+      //     label: (
+      //       <div className="w-full flex justify-between items-center">
+      //         <div>Save as template</div>
+      //       </div>
+      //     ),
+      //     icon: <PackagePlus size={16} />,
+      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
+      //     onClick: () => {
+      //       setSaveDialogVisible(true);
+      //       setContextMenuShow(false);
+      //     },
+      //   });
+      //   // SAVE AS TEMPLATE
+      //   options.push({
+      //     id: "save-as-json-template",
+      //     type: "button",
+      //     label: (
+      //       <div className="w-full flex justify-between items-center">
+      //         <div>Save as JSON template</div>
+      //       </div>
+      //     ),
+      //     icon: <PackagePlus size={16} />,
+      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
+      //     onClick: async () => {
+      //       try {
+      //         const template = generateJsonTemplate(nodes);
+      //         await navigator.clipboard.writeText(JSON.stringify(template));
+      //         toast.success("JSON template copied to clipboard.");
+      //       } catch (error) {
+      //         console.error(error);
+      //         if (error instanceof Error && error.cause === "NoInstance") {
+      //           toast.error("Weave instance is not available.");
+      //         }
+      //         if (error instanceof Error && error.cause === "NoNodesSelected") {
+      //           toast.error("No nodes selected to generate JSON template.");
+      //         }
+      //       }
+
+      //       setContextMenuShow(false);
+      //     },
+      //   });
+      // }
 
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR

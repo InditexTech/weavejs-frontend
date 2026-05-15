@@ -189,54 +189,57 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
           const node = stage.findOne(`#${containerId}`);
 
           if (node && node.getAttrs().containerId) {
-            const rectStage = node.getClientRect({
+            const rectStage = node?.getClientRect({
               relativeTo: stage,
+              skipStroke: true,
             });
 
-            return [
-              {
-                orientation: GUIDE_ORIENTATION.VERTICAL,
-                value: 0,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-vertical-start`,
-                containerId: node.id(),
-              },
-              {
-                orientation: GUIDE_ORIENTATION.VERTICAL,
-                value: rectStage.width / 2,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-vertical-middle`,
-                containerId: node.id(),
-              },
-              {
-                orientation: GUIDE_ORIENTATION.VERTICAL,
-                value: rectStage.width,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-vertical-end`,
-                containerId: node.id(),
-              },
-              {
-                orientation: GUIDE_ORIENTATION.HORIZONTAL,
-                value: 0,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-horizontal-start`,
-                containerId: node.id(),
-              },
-              {
-                orientation: GUIDE_ORIENTATION.HORIZONTAL,
-                value: rectStage.height / 2,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-horizontal-middle`,
-                containerId: node.id(),
-              },
-              {
-                orientation: GUIDE_ORIENTATION.HORIZONTAL,
-                value: rectStage.height,
-                kind: GUIDE_KIND.STATIC,
-                guideId: `frame-${node.id()}-horizontal-end`,
-                containerId: node.id(),
-              },
-            ];
+            if (rectStage) {
+              return [
+                {
+                  orientation: GUIDE_ORIENTATION.VERTICAL,
+                  value: 0,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-vertical-start`,
+                  containerId: node.id(),
+                },
+                {
+                  orientation: GUIDE_ORIENTATION.VERTICAL,
+                  value: rectStage.width / 2,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-vertical-middle`,
+                  containerId: node.id(),
+                },
+                {
+                  orientation: GUIDE_ORIENTATION.VERTICAL,
+                  value: rectStage.width,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-vertical-end`,
+                  containerId: node.id(),
+                },
+                {
+                  orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                  value: 0,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-horizontal-start`,
+                  containerId: node.id(),
+                },
+                {
+                  orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                  value: rectStage.height / 2,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-horizontal-middle`,
+                  containerId: node.id(),
+                },
+                {
+                  orientation: GUIDE_ORIENTATION.HORIZONTAL,
+                  value: rectStage.height,
+                  kind: GUIDE_KIND.STATIC,
+                  guideId: `frame-${node.id()}-horizontal-end`,
+                  containerId: node.id(),
+                },
+              ];
+            }
           }
         }
 

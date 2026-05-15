@@ -143,7 +143,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               {formatForDisplay("Shift+G")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
@@ -155,7 +155,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+T")}
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
