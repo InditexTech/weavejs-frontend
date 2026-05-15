@@ -19,6 +19,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useHandleGuides } from "./use-handle-guides";
+import Konva from "konva";
 
 export function useKeyboardHandler() {
   const instance = useWeave((state) => state.instance);
