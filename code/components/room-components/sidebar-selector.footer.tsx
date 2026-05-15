@@ -20,7 +20,7 @@ import {
   ChevronDown,
   ChevronUp,
   MessageCircle,
-  LayoutPanelTop,
+  // LayoutPanelTop,
   SquareMousePointer,
   Video,
   BotMessageSquare,
@@ -36,7 +36,7 @@ const TITLE_MAP: Record<string, string> = {
   [SIDEBAR_ELEMENTS.images]: "Images",
   [SIDEBAR_ELEMENTS.videos]: "Videos",
   [SIDEBAR_ELEMENTS.frames]: "Frames",
-  [SIDEBAR_ELEMENTS.templates]: "Templates",
+  // [SIDEBAR_ELEMENTS.templates]: "Templates",
   [SIDEBAR_ELEMENTS.colorTokens]: "Color tokens",
   [SIDEBAR_ELEMENTS.comments]: "Comments",
   [SIDEBAR_ELEMENTS.aiChat]: "AI Assistant",
@@ -152,7 +152,7 @@ export const SidebarSelectorFooter = () => {
               {formatForDisplay("Alt+Mod+F")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
@@ -164,7 +164,7 @@ export const SidebarSelectorFooter = () => {
             <DropdownMenuShortcut>
               {formatForDisplay("Alt+Mod+T")}
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {

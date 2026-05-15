@@ -14,7 +14,7 @@ import { NodeProperties } from "../room-components/overlay/node-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { Comments } from "../room-components/comment/comments";
 import { VideosLibrary } from "../room-components/videos-library/videos-library";
-import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
+// import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
 import { ChatBot } from "../room-components/ai-components/chatbot";
 import { useIAChat } from "@/store/ia-chat";
 import { useWeave } from "@inditextech/weave-react";
@@ -93,7 +93,7 @@ export const RoomRightSidebar = () => {
                     <NodeProperties />
                     <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
                     <GuidesLibrary key={SIDEBAR_ELEMENTS.guides} />
-                    <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
+                    {/* <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} /> */}
                     <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
                     <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
                     <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />

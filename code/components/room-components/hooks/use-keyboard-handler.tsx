@@ -15,6 +15,7 @@ import {
   WeaveUsersPointersPlugin,
   GUIDE_ORIENTATION,
   WEAVE_IMAGE_NODE_TYPE,
+  WeaveImageNode,
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useHandleGuides } from "./use-handle-guides";
@@ -672,15 +673,15 @@ export function useKeyboardHandler() {
     },
   );
 
-  useHotkey(
-    { key: "T", mod: false, alt: false, shift: true },
-    () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.templates);
-    },
-    {
-      enabled: keysEnabled,
-    },
-  );
+  // useHotkey(
+  //   { key: "T", mod: false, alt: false, shift: true },
+  //   () => {
+  //     sidebarToggle(SIDEBAR_ELEMENTS.templates);
+  //   },
+  //   {
+  //     enabled: keysEnabled,
+  //   },
+  // );
 
   useHotkey(
     { key: "O", mod: false, alt: false, shift: true },
@@ -822,12 +823,14 @@ export function useKeyboardHandler() {
         );
 
         if (image && reference) {
-          const imageHandler = instance.getNodeHandler(WEAVE_IMAGE_NODE_TYPE);
+          const imageHandler = instance.getNodeHandler<WeaveImageNode>(
+            WEAVE_IMAGE_NODE_TYPE,
+          );
 
           if (imageHandler) {
             try {
               imageHandler.cropImageWithReference(
-                image.instance,
+                image.instance as Konva.Group,
                 reference.instance,
               );
             } catch (e) {

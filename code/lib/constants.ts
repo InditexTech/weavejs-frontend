@@ -9,7 +9,7 @@ export const SIDEBAR_ELEMENTS = {
   images: "images",
   videos: "videos",
   frames: "frames",
-  // templates: "templates",
+  templates: "templates",
   colorTokens: "colorTokens",
   comments: "comments",
   guides: "guides",

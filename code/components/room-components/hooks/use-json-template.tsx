@@ -74,7 +74,8 @@ const mapNode = (
   node: Konva.Node,
   topLeft: Konva.Vector2d,
   relativeTo: Konva.Container,
-) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any => {
   const nodeType = node.getAttrs().nodeType;
 
   const boundigBox: BoundingBox = node.getClientRect({
@@ -106,7 +107,8 @@ const mapNode = (
           node.getAttrs().strokeWidth * 2,
         kind: "frame",
         children: nodes.map((childNode) =>
-          mapNode(instance, childNode, { x: 0, y: 0 }, frameContainer),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          mapNode(instance, childNode, { x: 0, y: 0 }, frameContainer as any),
         ),
         editable: true,
         optional: true,

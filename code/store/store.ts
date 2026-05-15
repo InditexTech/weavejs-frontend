@@ -12,10 +12,10 @@ import {
   WeaveStageGridType,
   WEAVE_GRID_DOT_TYPES,
   WeaveStageGridDotType,
+  Guide,
 } from "@inditextech/weave-sdk";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 import merge from "lodash/merge";
-import { Guide } from "@/components/plugins/snapping-manager/types";
 
 type PresentationModeState = "idle" | "loading" | "loaded" | "error";
 
