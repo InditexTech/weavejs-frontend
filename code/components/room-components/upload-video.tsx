@@ -65,7 +65,6 @@ export function UploadVideo() {
                   height: data.video.height,
                 },
                 position,
-                forceMainContainer: true,
               },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ) as any;

@@ -12,6 +12,7 @@ export const SIDEBAR_ELEMENTS = {
   templates: "templates",
   colorTokens: "colorTokens",
   comments: "comments",
+  guides: "guides",
   nodesTree: "nodesTree",
   aiChat: "aiChat",
   nodeProperties: "nodeProperties",

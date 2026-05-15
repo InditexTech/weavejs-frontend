@@ -19,8 +19,6 @@ import {
   Star,
   Hexagon,
   MessageSquare,
-  ChevronsLeftRightEllipsis,
-  LayoutPanelTop,
   Video,
   PenLine,
   RulerDimensionLine,
@@ -55,6 +53,7 @@ import {
 import { useOtherTools } from "./hooks/use-other-tools";
 import { useBreakpoint } from "./hooks/use-breakpoint";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export function ToolsOverlayMain() {
   const [barOrientation, setBarOrientation] = React.useState<
@@ -153,7 +152,7 @@ export function ToolsOverlayMain() {
   return (
     <div
       className={cn(
-        "absolute flex gap-2 justify-center items-center top-[81px] bottom-[48px] xl:top-[16px]] 2xl:left-[16px] 2xl:bottom-[56px] 2xl:right-auto border-r-[#c9c9c9]",
+        "absolute flex gap-2 justify-center items-center top-[81px] bottom-[48px] xl:top-[16px]] 2xl:left-[16px] 2xl:bottom-[56px] 2xl:right-auto border-r-[#c9c9c9] pointer-events-none",
         {
           ["left-[408px] 2xl:left-[408px] drop-shadow"]: viewType === "fixed",
           ["!left-[8px] bg-transparent !top-[0px] !bottom-[0px] z-1"]:
@@ -284,7 +283,7 @@ export function ToolsOverlayMain() {
                 Shapes
               </DropdownMenuLabel>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -296,7 +295,7 @@ export function ToolsOverlayMain() {
                 <Square size={20} strokeWidth={1} /> Rectangle tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -308,7 +307,7 @@ export function ToolsOverlayMain() {
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -320,7 +319,7 @@ export function ToolsOverlayMain() {
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -336,7 +335,7 @@ export function ToolsOverlayMain() {
                 Lines
               </DropdownMenuLabel>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
                   if (!instance) {
                     return;
@@ -351,7 +350,7 @@ export function ToolsOverlayMain() {
                 <PenLine size={20} strokeWidth={1} /> Line tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onClick={() => {
                   if (!instance) {
                     return;
@@ -366,7 +365,7 @@ export function ToolsOverlayMain() {
                 <MoveUpRight size={20} strokeWidth={1} /> Arrow tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -455,7 +454,7 @@ export function ToolsOverlayMain() {
                 Static media
               </DropdownMenuLabel>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -467,7 +466,7 @@ export function ToolsOverlayMain() {
                 <Image size={20} strokeWidth={1} /> Image tool
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -483,7 +482,7 @@ export function ToolsOverlayMain() {
                 Dynamic media
               </DropdownMenuLabel>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
                   setMediaMenuOpen(false);
@@ -505,6 +504,7 @@ export function ToolsOverlayMain() {
             label={
               <div className="flex gap-3 justify-start items-center">
                 <p>Text tool</p>
+                {formatForDisplay("T")}
               </div>
             }
             tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
@@ -581,7 +581,7 @@ export function ToolsOverlayMain() {
                   Elements
                 </DropdownMenuLabel>
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -593,7 +593,7 @@ export function ToolsOverlayMain() {
                   <Video size={20} strokeWidth={1} /> Video tool
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -609,7 +609,7 @@ export function ToolsOverlayMain() {
                   Layout
                 </DropdownMenuLabel>
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -627,7 +627,7 @@ export function ToolsOverlayMain() {
                       Collaboration
                     </DropdownMenuLabel>
                     <DropdownMenuItem
-                      className="text-foreground cursor-pointer hover:rounded-none w-full"
+                      className="text-xs cursor-pointer hover:rounded-none w-full"
                       onPointerDown={() => {
                         setShapesMenuOpen(false);
                         setMediaMenuOpen(false);
@@ -644,8 +644,8 @@ export function ToolsOverlayMain() {
                 <DropdownMenuLabel className="font-light text-xs">
                   Other
                 </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                {/* <DropdownMenuItem
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -658,7 +658,7 @@ export function ToolsOverlayMain() {
                   Connector tool
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -669,9 +669,9 @@ export function ToolsOverlayMain() {
                 >
                   <LayoutPanelTop size={20} strokeWidth={1} /> Image Template
                   tool
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
                   onPointerDown={() => {
                     setShapesMenuOpen(false);
                     setMediaMenuOpen(false);
@@ -722,6 +722,7 @@ export function ToolsOverlayMain() {
             label={
               <div className="flex gap-3 justify-start items-center">
                 <p>Undo latest changes</p>
+                {formatForDisplay("Mod+Z")}
               </div>
             }
             tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
@@ -741,6 +742,7 @@ export function ToolsOverlayMain() {
             label={
               <div className="flex gap-3 justify-start items-center">
                 <p>Redo latest changes</p>
+                {formatForDisplay("Mod+Y")}
               </div>
             }
             tooltipSide={barOrientation === "horizontal" ? "top" : "right"}

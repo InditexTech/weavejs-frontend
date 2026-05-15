@@ -10,8 +10,8 @@ import {
   Group,
   Ungroup,
 } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const HelpArrange = () => {
   return (
@@ -20,52 +20,34 @@ export const HelpArrange = () => {
         <HelpShortcutElement
           icon={<BringToFront />}
           label="Bring to front"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "]",
-            [SYSTEM_OS.OTHER]: "]",
-          }}
+          shortcuts={formatForDisplay("]")}
         />
         <HelpShortcutElement
           icon={<ArrowUp />}
           label="Move up"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ ]",
-            [SYSTEM_OS.OTHER]: "Ctrl ]",
-          }}
+          shortcuts={formatForDisplay("Mod+]")}
         />
         <HelpShortcutElement
           icon={<ArrowDown />}
           label="Move down"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ [",
-            [SYSTEM_OS.OTHER]: "Ctrl [",
-          }}
+          shortcuts={formatForDisplay("Mod+[")}
         />
         <HelpShortcutElement
           icon={<SendToBack />}
           label="Send to back"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "[",
-            [SYSTEM_OS.OTHER]: "[",
-          }}
+          shortcuts={formatForDisplay("[")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<Group />}
           label="Group selected elements"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ G",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+G]")}
         />
         <HelpShortcutElement
           icon={<Ungroup />}
           label="Un-group selected elements"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ U",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+U]")}
         />
       </div>
     </div>

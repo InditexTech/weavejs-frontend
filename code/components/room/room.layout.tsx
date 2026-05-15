@@ -155,6 +155,9 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <AppConfigurationDialog />
           </>
         )}
+        {/* <div className="absolute right-[420px] bottom-[60px] z-[100] bg-white border-[0.5px] border-[#c9c9c9]">
+          <div id="weave_stage_minimap" className="w-full h-full"></div>
+        </div> */}
         <RoomLeftSidebar inShadowDom={inShadowDom} />
         <RoomRightSidebar />
         <RoomFooter />

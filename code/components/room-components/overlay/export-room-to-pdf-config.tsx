@@ -110,6 +110,10 @@ export function ExportRoomToPdfConfigDialog({
       relativeTo: stage,
     });
 
+    if (!exportRect) {
+      return;
+    }
+
     handleExportRoomToPDFServerSide({
       type: "area",
       area: exportRect,

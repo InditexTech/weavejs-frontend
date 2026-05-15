@@ -69,6 +69,10 @@ export class FitToPageToolAction extends WeaveAction {
 
     const renderRect = exportAreaReferencePlugin.getRenderRect();
 
+    if (!renderRect) {
+      this.cancelAction();
+    }
+
     stageZoomPlugin.fitToArea(renderRect, {
       overrideZoom: params?.overrideZoom ?? false,
     });

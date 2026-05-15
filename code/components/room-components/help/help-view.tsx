@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Eye, MapPinned, MousePointer } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const HelpView = () => {
   return (
@@ -13,28 +13,19 @@ export const HelpView = () => {
         <HelpShortcutElement
           icon={<Eye />}
           label="Show/Hide UI / Zen mode"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ \\",
-            [SYSTEM_OS.OTHER]: "Ctrl \\",
-          }}
+          shortcuts={formatForDisplay("Mod+\\")}
         />
         <HelpShortcutElement
           icon={<MapPinned />}
           label="Show/Hide Minimap"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "N",
-            [SYSTEM_OS.OTHER]: "N",
-          }}
+          shortcuts={formatForDisplay("N")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<MousePointer />}
           label="Users cursors"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌥ ⌘ U",
-            [SYSTEM_OS.OTHER]: "Alt Ctrl U",
-          }}
+          shortcuts={formatForDisplay("Alt+Mod+U")}
         />
       </div>
     </div>

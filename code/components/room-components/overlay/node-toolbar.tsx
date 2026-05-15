@@ -60,8 +60,7 @@ import {
   Ruler,
   Settings,
 } from "lucide-react";
-import { ShortcutElement } from "../help/shortcut-element";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   WEAVE_IMAGE_CROP_END_TYPE,
   WeaveCopyPasteNodesPlugin,
@@ -84,6 +83,7 @@ import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input
 import { useIAChat } from "@/store/ia-chat";
 import { useBreakpoint } from "./hooks/use-breakpoint";
 import { useGetSession } from "../hooks/use-get-session";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const NodeToolbar = () => {
   const actualNodeRef = React.useRef<WeaveStateElement | undefined>(undefined);
@@ -2286,12 +2286,7 @@ export const NodeToolbar = () => {
                       label={
                         <div className="flex gap-3 justify-start items-center">
                           <p>Bring to front</p>
-                          <ShortcutElement
-                            shortcuts={{
-                              [SYSTEM_OS.MAC]: "]",
-                              [SYSTEM_OS.OTHER]: "]",
-                            }}
-                          />
+                          {formatForDisplay("]")}
                         </div>
                       }
                       tooltipSide="bottom"
@@ -2326,12 +2321,7 @@ export const NodeToolbar = () => {
                       label={
                         <div className="flex gap-3 justify-start items-center">
                           <p>Move up</p>
-                          <ShortcutElement
-                            shortcuts={{
-                              [SYSTEM_OS.MAC]: "⌘ ]",
-                              [SYSTEM_OS.OTHER]: "Ctrl ]",
-                            }}
-                          />
+                          {formatForDisplay("Mod+]")}
                         </div>
                       }
                       tooltipSide="bottom"
@@ -2366,12 +2356,7 @@ export const NodeToolbar = () => {
                       label={
                         <div className="flex gap-3 justify-start items-center">
                           <p>Move down</p>
-                          <ShortcutElement
-                            shortcuts={{
-                              [SYSTEM_OS.MAC]: "⌘ [",
-                              [SYSTEM_OS.OTHER]: "Ctrl [",
-                            }}
-                          />
+                          {formatForDisplay("Mod+[")}
                         </div>
                       }
                       tooltipSide="bottom"
@@ -2412,12 +2397,7 @@ export const NodeToolbar = () => {
                       label={
                         <div className="flex gap-3 justify-start items-center">
                           <p>Move down</p>
-                          <ShortcutElement
-                            shortcuts={{
-                              [SYSTEM_OS.MAC]: "[",
-                              [SYSTEM_OS.OTHER]: "[",
-                            }}
-                          />
+                          {formatForDisplay("[")}
                         </div>
                       }
                       tooltipSide="bottom"
@@ -2450,12 +2430,7 @@ export const NodeToolbar = () => {
                 label={
                   <div className="flex gap-3 justify-start items-center">
                     <p>Group</p>
-                    <ShortcutElement
-                      shortcuts={{
-                        [SYSTEM_OS.MAC]: "⇧ ⌘ G",
-                        [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
-                      }}
-                    />
+                    {formatForDisplay("Shift+Mod+G")}
                   </div>
                 }
                 tooltipSide="bottom"
@@ -2482,12 +2457,7 @@ export const NodeToolbar = () => {
                 label={
                   <div className="flex gap-3 justify-start items-center">
                     <p>Un-group</p>
-                    <ShortcutElement
-                      shortcuts={{
-                        [SYSTEM_OS.MAC]: "⇧ ⌘ U",
-                        [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
-                      }}
-                    />
+                    {formatForDisplay("Shift+Mod+U")}
                   </div>
                 }
                 tooltipSide="bottom"
@@ -2613,12 +2583,7 @@ export const NodeToolbar = () => {
               label={
                 <div className="flex gap-3 justify-start items-center">
                   <p>Copy</p>
-                  <ShortcutElement
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌘ C",
-                      [SYSTEM_OS.OTHER]: "Ctrl C",
-                    }}
-                  />
+                  {formatForDisplay("Mod+C")}
                 </div>
               }
               tooltipSide="bottom"
@@ -2654,12 +2619,7 @@ export const NodeToolbar = () => {
               label={
                 <div className="flex gap-3 justify-start items-center">
                   <p>Remove</p>
-                  <ShortcutElement
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: "Del",
-                      [SYSTEM_OS.OTHER]: "Del",
-                    }}
-                  />
+                  {formatForDisplay("Del")}
                 </div>
               }
               tooltipSide="bottom"

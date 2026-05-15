@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useWeave } from "@inditextech/weave-react";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,6 @@ import {
   setSessionConfig,
 } from "@/components/utils/session-config";
 import { useIAChat } from "@/store/ia-chat";
-import { useGetOs } from "../room-components/hooks/use-get-os";
 import { useExportPageToImageServerSide } from "../room-components/hooks/use-export-page-to-image-server-side";
 import { HelpDrawerTrigger } from "../room-components/help/help-drawer";
 import { EXPORT_AREA_REFERENCE_PLUGIN_KEY } from "../plugins/export-area-reference/constants";
@@ -58,9 +57,9 @@ import { ToolbarButton } from "../room-components/toolbar/toolbar-button";
 import { RoomUser } from "./room.user";
 import { useLoadRoomUserConfig } from "../room-components/hooks/use-load-room-user-config";
 import { useIsRoomReady } from "../room-components/hooks/use-is-room-ready";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export function RoomHeader() {
-  const os = useGetOs();
   const navigate = useNavigate();
 
   const instance = useWeave((state) => state.instance);
@@ -367,7 +366,6 @@ export function RoomHeader() {
   }, [room, setRoomsRoomId, setRoomsDeleteVisible]);
 
   const handleExitRoom = React.useCallback(async () => {
-    console.log("exit???");
     sessionStorage.removeItem(`weave.js_${room}`);
     await instance?.getStore().disconnect();
     setMenuOpen(false);
@@ -445,19 +443,19 @@ export function RoomHeader() {
                   {roomInfo?.roomUser?.role === "owner" && (
                     <DropdownMenuItem
                       disabled={!isRoomReady}
-                      className="text-foreground cursor-pointer hover:rounded-none"
+                      className="text-xs cursor-pointer hover:rounded-none"
                       onPointerDown={handleEditRoom}
                     >
                       Edit
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuSubTrigger className="rounded-none">
+                  <DropdownMenuSubTrigger className="text-xs rounded-none">
                     View
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="rounded-none">
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer rounded-none hover:rounded-none"
+                        className="text-xs cursor-pointer rounded-none hover:rounded-none"
                         disabled={!isRoomReady}
                         onPointerDown={handleToggleUsersPointers}
                       >
@@ -469,7 +467,7 @@ export function RoomHeader() {
                         Users pointers
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         disabled={!isRoomReady}
                         onPointerDown={handleToggleComments}
                       >
@@ -481,7 +479,7 @@ export function RoomHeader() {
                         Comments
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         disabled={!isRoomReady}
                         onPointerDown={handleTogglePageAreaReference}
                       >
@@ -493,11 +491,11 @@ export function RoomHeader() {
                         Page area reference
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-light text-xs">
                         Reference grid
                       </DropdownMenuLabel>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         disabled={!isRoomReady}
                         onPointerDown={handleToggleGrid}
                       >
@@ -508,7 +506,7 @@ export function RoomHeader() {
                         )}
                         Enabled
                       </DropdownMenuItem>
-                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-light text-xs">
                         Type
                       </DropdownMenuLabel>
                       <DropdownMenuItem
@@ -517,7 +515,7 @@ export function RoomHeader() {
                           (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS) ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetGridType(WEAVE_GRID_TYPES.DOTS);
                           setMenuOpen(false);
@@ -537,7 +535,7 @@ export function RoomHeader() {
                             gridType === WEAVE_GRID_TYPES.LINES) ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetGridType(WEAVE_GRID_TYPES.LINES);
                           setMenuOpen(false);
@@ -550,7 +548,7 @@ export function RoomHeader() {
                         )}
                         Lines
                       </DropdownMenuItem>
-                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-light text-xs">
                         Dots Kind
                       </DropdownMenuLabel>
                       <DropdownMenuItem
@@ -560,7 +558,7 @@ export function RoomHeader() {
                             gridType === WEAVE_GRID_TYPES.LINES) ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetGridDotsKind(WEAVE_GRID_DOT_TYPES.CIRCLE);
                           setMenuOpen(false);
@@ -580,7 +578,7 @@ export function RoomHeader() {
                             gridType === WEAVE_GRID_TYPES.LINES) ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetGridDotsKind(WEAVE_GRID_DOT_TYPES.SQUARE);
                           setMenuOpen(false);
@@ -594,7 +592,7 @@ export function RoomHeader() {
                         Square
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                      <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 font-light text-xs">
                         Background color
                       </DropdownMenuLabel>
                       <DropdownMenuItem
@@ -602,7 +600,7 @@ export function RoomHeader() {
                           backgroundColor === BACKGROUND_COLOR.WHITE ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetBackgroundColor(BACKGROUND_COLOR.WHITE);
                           setMenuOpen(false);
@@ -626,7 +624,7 @@ export function RoomHeader() {
                           backgroundColor === BACKGROUND_COLOR.GRAY ||
                           !isRoomReady
                         }
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           handleSetBackgroundColor(BACKGROUND_COLOR.GRAY);
                           setMenuOpen(false);
@@ -649,7 +647,7 @@ export function RoomHeader() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 {/* <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
+                  className="text-xs cursor-pointer hover:rounded-none"
                   disabled={
                     weaveConnectionStatus !==
                     WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -664,7 +662,7 @@ export function RoomHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   disabled={!isRoomReady}
-                  className="text-foreground cursor-pointer hover:rounded-none"
+                  className="text-xs cursor-pointer hover:rounded-none"
                   onPointerDown={handleAccessLinkRoom}
                 >
                   Access link
@@ -674,7 +672,7 @@ export function RoomHeader() {
                     <>
                       <DropdownMenuItem
                         disabled={!isRoomReady}
-                        className="text-foreground cursor-pointer text-[#ff2c2c] hover:rounded-none"
+                        className="text-xs cursor-pointer text-[#ff2c2c] hover:rounded-none"
                         onPointerDown={handleArchiveRoom}
                       >
                         Archive
@@ -683,7 +681,7 @@ export function RoomHeader() {
                     </>
                   )}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="rounded-none">
+                  <DropdownMenuSubTrigger className="text-xs rounded-none">
                     Help
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
@@ -694,7 +692,7 @@ export function RoomHeader() {
                         }}
                       />
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           window.open(
                             GITHUB_URL,
@@ -706,7 +704,7 @@ export function RoomHeader() {
                         <ExternalLink size={16} strokeWidth={1} /> GitHub
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           window.open(
                             DOCUMENTATION_URL,
@@ -721,13 +719,13 @@ export function RoomHeader() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="rounded-none">
+                  <DropdownMenuSubTrigger className="text-xs rounded-none">
                     Extra
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="rounded-none">
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         onPointerDown={() => {
                           setConnectionTestsShow(!connectionTestsShow);
                           setMenuOpen(false);
@@ -741,7 +739,7 @@ export function RoomHeader() {
                         Connection testing
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none"
+                        className="text-xs cursor-pointer hover:rounded-none"
                         disabled={
                           !isRoomReady || (isRoomReady && aiChatEnabled)
                         }
@@ -758,20 +756,18 @@ export function RoomHeader() {
                         IA Capabilities
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        className="text-xs cursor-pointer hover:rounded-none w-full"
                         disabled={!isRoomReady}
                         onPointerDown={handlePrintToConsoleState}
                       >
                         <div className="w-[16px] h-[16px]" /> Print state to
                         console
                         <DropdownMenuShortcut>
-                          {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
-                          {[SYSTEM_OS.WINDOWS as string].includes(os) &&
-                            "Alt Ctrl C"}
+                          {formatForDisplay("Alt+Mod+C")}
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-foreground cursor-pointer hover:rounded-none w-full"
+                        className="text-xs cursor-pointer hover:rounded-none w-full"
                         disabled={!isRoomReady}
                         onPointerDown={() => {
                           handlePrintStateSnapshotToClipboard();
@@ -781,9 +777,7 @@ export function RoomHeader() {
                         <div className="w-[16px] h-[16px]" /> Set state snapshot
                         to clipboard
                         <DropdownMenuShortcut>
-                          {[SYSTEM_OS.MAC as string].includes(os) && "⌘ S"}
-                          {[SYSTEM_OS.WINDOWS as string].includes(os) &&
-                            "Ctrl S"}
+                          {formatForDisplay("Mod+S")}
                         </DropdownMenuShortcut>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -791,7 +785,7 @@ export function RoomHeader() {
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-foreground cursor-pointer hover:rounded-none"
+                  className="text-xs cursor-pointer hover:rounded-none"
                   onPointerDown={handleExitRoom}
                 >
                   Exit

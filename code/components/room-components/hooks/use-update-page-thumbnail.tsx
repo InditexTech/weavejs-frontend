@@ -134,6 +134,10 @@ export const useUpdatePageThumbnail = () => {
 
       const exportRect = exportAreaReferencePlugin.getExportRect();
 
+      if (!exportRect) {
+        return;
+      }
+
       clonedStage.toBlob({
         x: exportRect.x,
         y: exportRect.y,

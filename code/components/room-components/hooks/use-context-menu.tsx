@@ -4,6 +4,7 @@
 
 import { toast } from "sonner";
 import {
+  containerOverCursor,
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
@@ -18,8 +19,6 @@ import { useCollaborationRoom } from "@/store/store";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { ContextMenuOption } from "../context-menu";
-import { ShortcutElement } from "../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import {
   ClipboardCopy,
   ClipboardPaste,
@@ -34,9 +33,10 @@ import {
   Lock,
   EyeOff,
   Link,
-  PackagePlus,
+  // PackagePlus,
   PackageOpen,
   Paperclip,
+  PanelLeftRightDashed,
 } from "lucide-react";
 import { useExportPageToImageServerSide } from "./use-export-page-to-image-server-side";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
@@ -45,6 +45,9 @@ import { useTemplates } from "@/store/templates";
 import { usePromptInputAttachments } from "@/components/ai-elements/prompt-input";
 import { useIAChat } from "@/store/ia-chat";
 import Konva from "konva";
+import { useHandleGuides } from "./use-handle-guides";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+// import { useJsonTemplate } from "./use-json-template";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -77,8 +80,11 @@ function useContextMenu() {
   );
 
   const { isExporting } = useExportPageToImageServerSide();
+  // const { generateJsonTemplate } = useJsonTemplate();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
+
+  const { copyGuides, pasteGuides, toggleContainerGuides } = useHandleGuides();
 
   React.useEffect(() => {
     if (!instance) return;
@@ -228,12 +234,7 @@ function useContextMenu() {
             label: (
               <div className="w-full flex justify-between items-center">
                 <div>Export as image</div>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⇧ ⌘ E",
-                    [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
-                  }}
-                />
+                {formatForDisplay("Shift+Mod+E")}
               </div>
             ),
             icon: <ImageDown size={16} />,
@@ -287,12 +288,7 @@ function useContextMenu() {
             label: (
               <div className="w-full flex justify-between items-center">
                 <div>Copy</div>
-                <ShortcutElement
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: "⌘ C",
-                    [SYSTEM_OS.OTHER]: "Ctrl C",
-                  }}
-                />
+                {formatForDisplay("Mod+C")}
               </div>
             ),
             icon: <ClipboardCopy size={16} />,
@@ -334,12 +330,7 @@ function useContextMenu() {
         label: (
           <div className="w-full flex justify-between items-center">
             <div>Paste here</div>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "⌘ P",
-                [SYSTEM_OS.OTHER]: "Ctrl P",
-              }}
-            />
+            {formatForDisplay("Mod+P")}
           </div>
         ),
         icon: <ClipboardPaste size={16} />,
@@ -354,28 +345,167 @@ function useContextMenu() {
         },
       });
 
-      if (!singleLocked && nodes.length > 0) {
+      if (
+        nodes.length === 0 ||
+        (nodes.length === 1 &&
+          nodes[0].instance.getAttrs().nodeType === "frame")
+      ) {
         options.push({
-          id: "div-templates-1",
+          id: "div-guides-1",
           type: "divider",
         });
-        // SAVE AS TEMPLATE
+
         options.push({
-          id: "save-as-template",
+          id: "toggle-guides",
           type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
-              <div>Save as template</div>
+              <div>Toggle container guides</div>
+              {formatForDisplay("G")} {formatForDisplay("T")}
             </div>
           ),
-          icon: <PackagePlus size={16} />,
+          icon: <PanelLeftRightDashed size={16} />,
           disabled: !["selectionTool"].includes(actActionActive ?? ""),
-          onClick: () => {
-            setSaveDialogVisible(true);
+          onClick: async () => {
             setContextMenuShow(false);
+
+            if (!instance) return;
+
+            const node = containerOverCursor(instance, [], stageClickPoint);
+
+            let containerId: string = instance.getMainLayer()?.id() ?? "";
+            if (node) {
+              containerId = node.id();
+            }
+
+            toggleContainerGuides(containerId);
+          },
+        });
+
+        options.push({
+          id: "copy-guides",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Copy guides to clipboard</div>
+              {formatForDisplay("G")} {formatForDisplay("Mod+C")}
+            </div>
+          ),
+          icon: <ClipboardCopy size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            if (!instance) return;
+
+            let selectedContainerId: string =
+              instance.getMainLayer()?.id() ?? "";
+
+            if (
+              nodes.length === 1 &&
+              nodes[0].instance.getAttrs().nodeType === "frame"
+            ) {
+              selectedContainerId = nodes[0].instance.id();
+            }
+            if (nodes.length === 0) {
+              const node = containerOverCursor(instance, [], stageClickPoint);
+              if (node) {
+                selectedContainerId = node.id();
+              }
+            }
+
+            await copyGuides(selectedContainerId);
+          },
+        });
+
+        options.push({
+          id: "paste-guides",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Paste guides from clipboard</div>
+              {formatForDisplay("G")} {formatForDisplay("Mod+P")}
+            </div>
+          ),
+          icon: <ClipboardPaste size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            if (!instance) return;
+
+            let selectedContainerId: string =
+              instance.getMainLayer()?.id() ?? "";
+
+            if (
+              nodes.length === 1 &&
+              nodes[0].instance.getAttrs().nodeType === "frame"
+            ) {
+              selectedContainerId = nodes[0].instance.id();
+            }
+            if (nodes.length === 0) {
+              const node = containerOverCursor(instance, [], stageClickPoint);
+              if (node) {
+                selectedContainerId = node.id();
+              }
+            }
+
+            await pasteGuides(selectedContainerId);
           },
         });
       }
+
+      // if (!singleLocked && nodes.length > 0) {
+      //   options.push({
+      //     id: "div-templates-1",
+      //     type: "divider",
+      //   });
+      //   // SAVE AS TEMPLATE
+      //   options.push({
+      //     id: "save-as-template",
+      //     type: "button",
+      //     label: (
+      //       <div className="w-full flex justify-between items-center">
+      //         <div>Save as template</div>
+      //       </div>
+      //     ),
+      //     icon: <PackagePlus size={16} />,
+      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
+      //     onClick: () => {
+      //       setSaveDialogVisible(true);
+      //       setContextMenuShow(false);
+      //     },
+      //   });
+      //   // SAVE AS TEMPLATE
+      //   options.push({
+      //     id: "save-as-json-template",
+      //     type: "button",
+      //     label: (
+      //       <div className="w-full flex justify-between items-center">
+      //         <div>Save as JSON template</div>
+      //       </div>
+      //     ),
+      //     icon: <PackagePlus size={16} />,
+      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
+      //     onClick: async () => {
+      //       try {
+      //         const template = generateJsonTemplate(nodes);
+      //         await navigator.clipboard.writeText(JSON.stringify(template));
+      //         toast.success("JSON template copied to clipboard.");
+      //       } catch (error) {
+      //         console.error(error);
+      //         if (error instanceof Error && error.cause === "NoInstance") {
+      //           toast.error("Weave instance is not available.");
+      //         }
+      //         if (error instanceof Error && error.cause === "NoNodesSelected") {
+      //           toast.error("No nodes selected to generate JSON template.");
+      //         }
+      //       }
+
+      //       setContextMenuShow(false);
+      //     },
+      //   });
+      // }
 
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
@@ -392,12 +522,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Bring to front</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "]",
-                  [SYSTEM_OS.OTHER]: "]",
-                }}
-              />
+              {formatForDisplay("]")}
             </div>
           ),
           icon: <BringToFront size={16} />,
@@ -413,12 +538,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move up</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ ]",
-                  [SYSTEM_OS.OTHER]: "Ctrl ]",
-                }}
-              />
+              {formatForDisplay("Mod+]")}
             </div>
           ),
           icon: <ArrowUp size={16} />,
@@ -435,12 +555,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move down</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⌘ [",
-                  [SYSTEM_OS.OTHER]: "Ctrl [",
-                }}
-              />
+              {formatForDisplay("Mod+[")}
             </div>
           ),
           icon: <ArrowDown size={16} />,
@@ -457,12 +572,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Send to back</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "[",
-                  [SYSTEM_OS.OTHER]: "[",
-                }}
-              />
+              {formatForDisplay("[")}
             </div>
           ),
           icon: <SendToBack size={16} />,
@@ -486,12 +596,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Group</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ G",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
-                }}
-              />
+              {formatForDisplay("Shift+Mod+G")}
             </div>
           ),
           icon: <Group size={16} />,
@@ -512,12 +617,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Un-group</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ U",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
-                }}
-              />
+              {formatForDisplay("Shift+Mod+U")}
             </div>
           ),
           icon: <Ungroup size={16} />,
@@ -606,12 +706,7 @@ function useContextMenu() {
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Delete</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: "Del",
-                  [SYSTEM_OS.OTHER]: "Del",
-                }}
-              />
+              {formatForDisplay("Del")}
             </div>
           ),
           icon: <Trash size={16} />,

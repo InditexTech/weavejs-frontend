@@ -66,37 +66,67 @@ export const PresentationMode = () => {
     (state) => state.setPresentationVisible,
   );
 
-  useHotkey({ key: "Esc", mod: false, shift: false }, () => {
-    if (presentationModeVisible) {
-      setPresentationMode(false);
-    }
-  });
+  useHotkey(
+    { key: "Escape", mod: false, shift: false },
+    () => {
+      if (presentationModeVisible) {
+        setPresentationMode(false);
+      }
+    },
+    {
+      enabled: presentationModeVisible,
+    },
+  );
 
-  useHotkey({ key: "ArrowLeft", mod: false, shift: false }, () => {
-    if (presentationModeVisible && presentationModeStatus === "loaded") {
-      setActualPage((prev) => (prev - 1 < 0 ? 0 : prev - 1));
-    }
-  });
+  useHotkey(
+    { key: "ArrowLeft", mod: false, shift: false },
+    () => {
+      if (presentationModeVisible && presentationModeStatus === "loaded") {
+        setActualPage((prev) => (prev - 1 < 0 ? 0 : prev - 1));
+      }
+    },
+    {
+      enabled: presentationModeVisible,
+    },
+  );
 
-  useHotkey({ key: "ArrowRight", mod: false, shift: false }, () => {
-    if (presentationModeVisible && presentationModeStatus === "loaded") {
-      setActualPage((prev) =>
-        prev + 1 >= totalPages ? totalPages - 1 : prev + 1,
-      );
-    }
-  });
+  useHotkey(
+    { key: "ArrowRight", mod: false, shift: false },
+    () => {
+      if (presentationModeVisible && presentationModeStatus === "loaded") {
+        setActualPage((prev) =>
+          prev + 1 >= totalPages ? totalPages - 1 : prev + 1,
+        );
+      }
+    },
+    {
+      enabled: presentationModeVisible,
+    },
+  );
 
-  useHotkey({ key: "ArrowLeft", mod: false, shift: true }, () => {
-    if (presentationModeVisible && presentationModeStatus === "loaded") {
-      setActualPage(0);
-    }
-  });
+  useHotkey(
+    { key: "ArrowLeft", mod: false, shift: true },
+    () => {
+      if (presentationModeVisible && presentationModeStatus === "loaded") {
+        setActualPage(0);
+      }
+    },
+    {
+      enabled: presentationModeVisible,
+    },
+  );
 
-  useHotkey({ key: "ArrowRight", mod: false, shift: true }, () => {
-    if (presentationModeVisible && presentationModeStatus === "loaded") {
-      setActualPage(totalPages - 1);
-    }
-  });
+  useHotkey(
+    { key: "ArrowRight", mod: false, shift: true },
+    () => {
+      if (presentationModeVisible && presentationModeStatus === "loaded") {
+        setActualPage(totalPages - 1);
+      }
+    },
+    {
+      enabled: presentationModeVisible,
+    },
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["getAllPages", pageInfo?.roomId ?? ""],
@@ -208,6 +238,10 @@ export const PresentationMode = () => {
       const exportRect = exportAreaReferencePlugin.getExportRect({
         relativeTo: stage,
       });
+
+      if (!exportRect) {
+        return;
+      }
 
       mutateGenerateImages.mutate({
         type: "area",

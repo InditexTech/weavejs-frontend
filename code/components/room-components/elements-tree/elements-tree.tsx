@@ -188,8 +188,7 @@ function mapElementsToTree(
             const nodesSelectionPlugin =
               instance?.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
             if (instance && nodesSelectionPlugin) {
-              instance.selectNodesByKey([element.key]);
-              nodesSelectionPlugin.removeSelectedNodes();
+              nodesSelectionPlugin.removeElement(element);
             }
           }}
         >
@@ -334,9 +333,6 @@ export const ElementsTree = () => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
       if (nodes.length > 1) {
         setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
-      }
-      if (nodes.length === 0) {
-        setSidebarActive(SIDEBAR_ELEMENTS.images);
       }
 
       setSelectedNodes(

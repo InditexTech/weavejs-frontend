@@ -4,7 +4,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
-import { cn, SYSTEM_OS } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
@@ -52,14 +52,12 @@ import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { AppConfigurationDialog } from "./app-configuration";
 import { LlmSetupDialog } from "./llm-setup";
-import { useGetOs } from "../hooks/use-get-os";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useIAChat } from "@/store/ia-chat";
 import { ZoomToolbar } from "../toolbars/zoom.toolbar";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export function RoomHeaderShadowDom() {
-  const os = useGetOs();
-
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
@@ -471,9 +469,7 @@ export function RoomHeaderShadowDom() {
                   >
                     <Braces /> Print state to console
                     <DropdownMenuShortcut>
-                      {[SYSTEM_OS.MAC as string].includes(os) && "⌥ ⌘ C"}
-                      {[SYSTEM_OS.WINDOWS as string].includes(os) &&
-                        "Alt Ctrl C"}
+                      {formatForDisplay("Alt+Mod+C")}
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
                   <DropdownMenuItem

@@ -12,9 +12,8 @@ import {
   Star,
 } from "lucide-react";
 import React from "react";
-import { ShortcutElement } from "../../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const useShapesTools = () => {
   const instance = useWeave((state) => state.instance);
@@ -46,14 +45,9 @@ export const useShapesTools = () => {
       rectangleTool: {
         icon: <Square className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Rectangle tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "R",
-                [SYSTEM_OS.OTHER]: "R",
-              }}
-            />
+            {formatForDisplay("R")}
           </div>
         ),
         onClick: () => triggerTool("rectangleTool"),
@@ -62,14 +56,9 @@ export const useShapesTools = () => {
       ellipseTool: {
         icon: <Circle className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Ellipsis tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "E",
-                [SYSTEM_OS.OTHER]: "E",
-              }}
-            />
+            {formatForDisplay("E")}
           </div>
         ),
         onClick: () => triggerTool("ellipseTool"),
@@ -78,14 +67,9 @@ export const useShapesTools = () => {
       regularPolygonTool: {
         icon: <Hexagon className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Regular Polygon tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "P",
-                [SYSTEM_OS.OTHER]: "P",
-              }}
-            />
+            {formatForDisplay("P")}
           </div>
         ),
         onClick: () => triggerTool("regularPolygonTool"),
@@ -94,14 +78,9 @@ export const useShapesTools = () => {
       starTool: {
         icon: <Star className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Star tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "J",
-                [SYSTEM_OS.OTHER]: "J",
-              }}
-            />
+            {formatForDisplay("J")}
           </div>
         ),
         onClick: () => triggerTool("starTool"),
@@ -110,14 +89,9 @@ export const useShapesTools = () => {
       strokeTool: {
         icon: <PenLine className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Line tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "L",
-                [SYSTEM_OS.OTHER]: "L",
-              }}
-            />
+            {formatForDisplay("L")}
           </div>
         ),
         onClick: () => {
@@ -128,14 +102,9 @@ export const useShapesTools = () => {
       arrowTool: {
         icon: <MoveUpRight className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Arrow tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "L",
-                [SYSTEM_OS.OTHER]: "L",
-              }}
-            />
+            {formatForDisplay("L")}
           </div>
         ),
         onClick: () => {
@@ -158,14 +127,9 @@ export const useShapesTools = () => {
       brushTool: {
         icon: <Brush className="px-2" size={40} strokeWidth={1} />,
         label: (
-          <div className="flex gap-3 justify-start items-center">
+          <div className="text-xs flex gap-3 justify-start items-center">
             <p>Brush tool</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "B",
-                [SYSTEM_OS.OTHER]: "B",
-              }}
-            />
+            {formatForDisplay("B")}
           </div>
         ),
         onClick: () => triggerTool("brushTool"),

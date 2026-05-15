@@ -4,10 +4,9 @@
 
 import { BringToFront, ArrowUp, ArrowDown, SendToBack } from "lucide-react";
 import React from "react";
-import { ShortcutElement } from "../../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveElementInstance } from "@inditextech/weave-types";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const useNodeLayeringTool = () => {
   const instance = useWeave((state) => state.instance);
@@ -28,12 +27,7 @@ export const useNodeLayeringTool = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Bring to front</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "]",
-                [SYSTEM_OS.OTHER]: "]",
-              }}
-            />
+            {formatForDisplay("]")}
           </div>
         ),
         onClick: () => {
@@ -56,12 +50,7 @@ export const useNodeLayeringTool = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Move up</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "⌘ ]",
-                [SYSTEM_OS.OTHER]: "Ctrl ]",
-              }}
-            />
+            {formatForDisplay("Mod+]")}
           </div>
         ),
         onClick: () => {
@@ -84,12 +73,7 @@ export const useNodeLayeringTool = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Move down</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "⌘ [",
-                [SYSTEM_OS.OTHER]: "Ctrl [",
-              }}
-            />
+            {formatForDisplay("Mod+[")}
           </div>
         ),
         onClick: () => {
@@ -112,12 +96,7 @@ export const useNodeLayeringTool = () => {
         label: (
           <div className="flex gap-3 justify-start items-center">
             <p>Send to back</p>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: "J",
-                [SYSTEM_OS.OTHER]: "J",
-              }}
-            />
+            {formatForDisplay("J")}
           </div>
         ),
         onClick: () => {
@@ -136,7 +115,7 @@ export const useNodeLayeringTool = () => {
         active: () => false,
       },
     }),
-    [instance, node]
+    [instance, node],
   );
 
   return NODE_LAYERING_TOOL;

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SquareDashed, TextSelect } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const HelpSelection = () => {
   return (
@@ -13,20 +13,14 @@ export const HelpSelection = () => {
         <HelpShortcutElement
           icon={<TextSelect />}
           label="Select all"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ A",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl A",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+A")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<SquareDashed />}
           label="Select none"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ Esc",
-            [SYSTEM_OS.OTHER]: "⇧ Esc",
-          }}
+          shortcuts={formatForDisplay("Shift+Esc")}
         />
       </div>
     </div>

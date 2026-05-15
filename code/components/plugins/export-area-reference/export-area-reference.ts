@@ -2,7 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeavePlugin } from "@inditextech/weave-sdk";
+import { BoundingBox } from "@inditextech/weave-types";
+import {
+  WeavePlugin,
+  Guide,
+  GUIDE_KIND,
+  GUIDE_ORIENTATION,
+} from "@inditextech/weave-sdk";
 import {
   ExportAreaReferencePluginConfig,
   ExportAreaReferencePluginParams,
@@ -49,12 +55,7 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
     this.layer?.show();
   }
 
-  getExportRect(params?: { relativeTo?: Konva.Container }): {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } {
+  getExportRect(params?: { relativeTo?: Konva.Container }): BoundingBox | null {
     const stage = this.instance.getStage();
 
     const renderAreaNode = stage.findOne("#export-area-reference-rect") as
@@ -62,7 +63,7 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
       | undefined;
 
     if (!renderAreaNode) {
-      throw new Error("Render area node not found");
+      return null;
     }
 
     const box = renderAreaNode.getClientRect({
@@ -112,6 +113,11 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
     });
 
     this.renderReference();
+
+    const hooks = this.instance.getHooks();
+    hooks.callHook("snappingManagerPlugin:onAddCustomGuides", {
+      guides: this.getExportAreaGuides(stage),
+    });
   }
 
   changeSize(newSize: string) {
@@ -154,7 +160,7 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
       fontSize: 12 / scale,
       fontFamily: "Roboto Mono, monospace",
       opacity: 0.7,
-      fill: "#ff2c2cff",
+      fill: "#000000",
       draggable: false,
       listening: false,
     });
@@ -174,7 +180,7 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
       fontSize: 12 / scale,
       fontFamily: "Roboto Mono, monospace",
       opacity: 0.7,
-      fill: "#ff2c2cff",
+      fill: "#000000",
       draggable: false,
       listening: false,
     });
@@ -186,23 +192,23 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
 
     referenceAreaLayer.add(referenceTextDetails);
 
-    const exportRect = new Konva.Rect({
-      id: "export-area-reference-export-rect",
-      name: "export-area-reference",
-      x: actualSize.width / 2,
-      y: actualSize.height / 2,
-      width: actualSize.width,
-      height: actualSize.height,
-      stroke: "#ff2c2cff",
-      strokeScaleEnabled: false,
-      strokeWidth: 0,
-      fill: "transparent",
-      opacity: 0.7,
-      draggable: false,
-      listening: false,
-    });
+    // const exportRect = new Konva.Rect({
+    //   id: "export-area-reference-export-rect",
+    //   name: "export-area-reference",
+    //   x: actualSize.width / 2,
+    //   y: actualSize.height / 2,
+    //   width: actualSize.width,
+    //   height: actualSize.height,
+    //   stroke: "#000000",
+    //   strokeScaleEnabled: false,
+    //   strokeWidth: 0,
+    //   fill: "transparent",
+    //   opacity: 0.7,
+    //   draggable: false,
+    //   listening: false,
+    // });
 
-    referenceAreaLayer.add(exportRect);
+    // referenceAreaLayer.add(exportRect);
 
     const referenceRect = new Konva.Rect({
       id: "export-area-reference-rect",
@@ -212,10 +218,11 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
       width: actualSize.width,
       height: actualSize.height,
       fillAfterStrokeEnabled: true,
-      stroke: "#ff2c2cff",
+      stroke: "#000000",
+      dash: [6, 6],
       strokeScaleEnabled: false,
       strokeWidth: 1,
-      opacity: 1,
+      opacity: 0.7,
       draggable: false,
       listening: false,
     });
@@ -247,5 +254,80 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
   disable(): void {
     this.layer?.hide();
     this.enabled = false;
+  }
+
+  getExportAreaGuides(relativeTo?: Konva.Node | null): Guide[] {
+    const stage = this.instance.getStage();
+    const renderAreaNode = stage.findOne("#export-area-reference-rect") as
+      | Konva.Rect
+      | undefined;
+
+    if (!renderAreaNode) {
+      return [];
+    }
+
+    if (!relativeTo) {
+      return [];
+    }
+
+    const rect = renderAreaNode.getClientRect({
+      ...(relativeTo && {
+        relativeTo: relativeTo as unknown as Konva.Container,
+      }),
+      skipStroke: true,
+    });
+    return this.rectToGuides("exportArea", rect);
+  }
+
+  private rectToGuides(sourceId: string, rect: BoundingBox): Guide[] {
+    const mainLayer = this.instance.getMainLayer();
+    if (!mainLayer) {
+      return [];
+    }
+
+    return [
+      {
+        orientation: GUIDE_ORIENTATION.VERTICAL,
+        value: rect.x,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-vertical-start`,
+        containerId: mainLayer.id(),
+      },
+      {
+        orientation: GUIDE_ORIENTATION.VERTICAL,
+        value: rect.x + rect.width / 2,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-vertical-middle`,
+        containerId: mainLayer.id(),
+      },
+      {
+        orientation: GUIDE_ORIENTATION.VERTICAL,
+        value: rect.x + rect.width,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-vertical-end`,
+        containerId: mainLayer.id(),
+      },
+      {
+        orientation: GUIDE_ORIENTATION.HORIZONTAL,
+        value: rect.y,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-horizontal-start`,
+        containerId: mainLayer.id(),
+      },
+      {
+        orientation: GUIDE_ORIENTATION.HORIZONTAL,
+        value: rect.y + rect.height / 2,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-horizontal-middle`,
+        containerId: mainLayer.id(),
+      },
+      {
+        orientation: GUIDE_ORIENTATION.HORIZONTAL,
+        value: rect.y + rect.height,
+        kind: GUIDE_KIND.STATIC,
+        guideId: `${sourceId}-${mainLayer.id()}-horizontal-end`,
+        containerId: mainLayer.id(),
+      },
+    ];
   }
 }

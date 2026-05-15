@@ -50,7 +50,7 @@ export const ManageIdleDisconnection = () => {
       timeoutRef.current = setTimeout(async () => {
         setShowIdleWarning(false);
         sessionStorage.removeItem(`weave.js_${room}`);
-        console.log("AQUI disconnect?");
+        console.log("Idle disconnect");
         await instance?.getStore().disconnect();
         navigate({ to: "/" });
       }, TIME_UNTIL_DISCONNECTION_SECONDS * 1000);

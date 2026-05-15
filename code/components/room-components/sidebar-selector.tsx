@@ -12,23 +12,13 @@ import {
   DropdownMenuGroup,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { cn, SYSTEM_OS } from "@/lib/utils";
-import {
-  SwatchBook,
-  Projector,
-  Images,
-  ChevronDown,
-  ChevronUp,
-  MessageCircle,
-  LayoutPanelTop,
-  SquareMousePointer,
-  Video,
-  BotMessageSquare,
-} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useWeave } from "@inditextech/weave-react";
 import { useIAChat } from "@/store/ia-chat";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 type SidebarSelectorProps = {
   title: string;
@@ -88,96 +78,109 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           {selectedNodes.length > 0 && (
             <>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="font-light text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
                   sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
                 }}
               >
-                <SquareMousePointer strokeWidth={1} /> Selection
+                Selection
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
             </>
           )}
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
-            <Images strokeWidth={1} /> Images
+            Images
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
+              {formatForDisplay("Shift+I")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.videos);
             }}
           >
-            <Video strokeWidth={1} /> Videos
+            Videos
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ V" : "Alt Ctrl V"}
+              {formatForDisplay("Shift+V")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
-            <Projector strokeWidth={1} /> Frames
+            Frames
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
+              {formatForDisplay("Shift+F")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              setMenuOpen(false);
+              sidebarToggle(SIDEBAR_ELEMENTS.guides);
+            }}
+          >
+            Guides
+            <DropdownMenuShortcut>
+              {formatForDisplay("Shift+G")}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          {/* <DropdownMenuItem
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.templates);
             }}
           >
-            <LayoutPanelTop strokeWidth={1} /> Templates
+            Templates
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ T" : "Alt Ctrl T"}
+              {formatForDisplay("Shift+T")}
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
-            <SwatchBook strokeWidth={1} /> Color tokens
+            Color tokens
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? "⌥ ⌘ C" : "Alt Ctrl C"}
+              {formatForDisplay("Shift+C")}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           {threadsEnabled && (
             <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              className="font-light text-xs cursor-pointer hover:rounded-none w-full"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setMenuOpen(false);
                 sidebarToggle(SIDEBAR_ELEMENTS.comments);
               }}
             >
-              <MessageCircle strokeWidth={1} /> Comments
+              Comments
               <DropdownMenuShortcut>
-                {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
+                {formatForDisplay("Shift+O")}
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
@@ -185,14 +188,14 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="font-light text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
                   sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
                 }}
               >
-                <BotMessageSquare strokeWidth={1} /> AI Assistant
+                AI Assistant
               </DropdownMenuItem>
             </>
           )}

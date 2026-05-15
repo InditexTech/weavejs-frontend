@@ -112,6 +112,11 @@ export const useGetPageThumbnail = () => {
 
       const exportRect = exportAreaReferencePlugin.getExportRect();
 
+      if (!exportRect) {
+        setGenerationState("generated");
+        return;
+      }
+
       clonedStage.toBlob({
         x: exportRect.x,
         y: exportRect.y,

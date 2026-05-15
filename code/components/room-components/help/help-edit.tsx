@@ -11,8 +11,8 @@ import {
   Undo,
   Redo,
 } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const HelpEdit = () => {
   return (
@@ -21,62 +21,41 @@ export const HelpEdit = () => {
         <HelpShortcutElement
           icon={<ClipboardCopy />}
           label="Copy"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ C",
-            [SYSTEM_OS.OTHER]: "Ctrl C",
-          }}
+          shortcuts={formatForDisplay("Mod+C")}
         />
         <HelpShortcutElement
           icon={<ClipboardPaste />}
           label="Paste"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ P",
-            [SYSTEM_OS.OTHER]: "Ctrl P",
-          }}
+          shortcuts={formatForDisplay("Mod+P")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<Copy />}
           label="Duplicate"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ D",
-            [SYSTEM_OS.OTHER]: "Ctrl D",
-          }}
+          shortcuts={formatForDisplay("Mod+D")}
         />
         <HelpShortcutElement
           icon={<Undo />}
           label="Undo"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ ,",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl ,",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+,")}
         />
         <HelpShortcutElement
           icon={<Redo />}
           label="Redo"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ .",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl .",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+.")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<ImageDown />}
           label="Export selected as image"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ E",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+E")}
         />
         <HelpShortcutElement
           icon={<MonitorDown />}
           label="Export viewport as image"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ V",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl V",
-          }}
+          shortcuts={formatForDisplay("Shift+Mod+V")}
         />
       </div>
     </div>

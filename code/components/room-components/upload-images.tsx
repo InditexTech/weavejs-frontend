@@ -133,7 +133,6 @@ export function UploadImages() {
           uploadImageFunction,
           onStartUploading,
           onFinishedUploading,
-          forceMainContainer: false,
           ...(position && { position }),
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

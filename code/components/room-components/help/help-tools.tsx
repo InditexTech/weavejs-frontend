@@ -14,9 +14,9 @@ import {
   Type,
   Frame,
 } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
 import { HelpShortcutElement } from "./help-shortcut-element";
 import { useCollaborationRoom } from "@/store/store";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const HelpTools = () => {
   const threadsEnabled = useCollaborationRoom(
@@ -29,88 +29,58 @@ export const HelpTools = () => {
         <HelpShortcutElement
           icon={<MousePointer />}
           label="Select tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "S",
-            [SYSTEM_OS.OTHER]: "S",
-          }}
+          shortcuts={formatForDisplay("S")}
         />
         <HelpShortcutElement
           icon={<Frame />}
           label="Frame tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "F",
-            [SYSTEM_OS.OTHER]: "F",
-          }}
+          shortcuts={formatForDisplay("F")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<Square />}
           label="Rectangle tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "R",
-            [SYSTEM_OS.OTHER]: "R",
-          }}
+          shortcuts={formatForDisplay("R")}
         />
         <HelpShortcutElement
           icon={<PenLine />}
           label="Line tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "L",
-            [SYSTEM_OS.OTHER]: "L",
-          }}
+          shortcuts={formatForDisplay("L")}
         />
         <HelpShortcutElement
           icon={<Brush />}
           label="Brush tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "B",
-            [SYSTEM_OS.OTHER]: "B",
-          }}
+          shortcuts={formatForDisplay("B")}
         />
         <HelpShortcutElement
           icon={<Type />}
           label="Text tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "T",
-            [SYSTEM_OS.OTHER]: "T",
-          }}
+          shortcuts={formatForDisplay("T")}
         />
       </div>
       <div className="flex flex-col gap-3">
         <HelpShortcutElement
           icon={<ImagePlus />}
           label="Image tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "I",
-            [SYSTEM_OS.OTHER]: "I",
-          }}
+          shortcuts={formatForDisplay("I")}
         />
         <HelpShortcutElement
           icon={<Images />}
           label="Images tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "O",
-            [SYSTEM_OS.OTHER]: "O",
-          }}
+          shortcuts={formatForDisplay("O")}
         />
         {threadsEnabled && (
           <HelpShortcutElement
             icon={<MessageSquare />}
             label="Comment tool"
-            shortcuts={{
-              [SYSTEM_OS.MAC]: "H",
-              [SYSTEM_OS.OTHER]: "H",
-            }}
+            shortcuts={formatForDisplay("H")}
           />
         )}
         <HelpShortcutElement
           icon={<SwatchBook />}
           label="Color Token tool"
-          shortcuts={{
-            [SYSTEM_OS.MAC]: "P",
-            [SYSTEM_OS.OTHER]: "P",
-          }}
+          shortcuts={formatForDisplay("P")}
         />
       </div>
     </div>

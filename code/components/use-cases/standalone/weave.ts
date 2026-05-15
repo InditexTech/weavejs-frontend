@@ -517,7 +517,8 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   }),
   new WeaveStageKeyboardMovePlugin({
     config: {
-      movementDelta: 5,
+      movementDelta: 1,
+      shiftMovementDelta: 10,
     },
   }),
 ];
