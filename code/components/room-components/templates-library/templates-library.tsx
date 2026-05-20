@@ -9,7 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
-import { SquareCheck, SquareX, Trash2 } from "lucide-react";
+import {
+  LayoutPanelTop,
+  LoaderCircle,
+  SquareCheck,
+  SquareX,
+  Trash2,
+} from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -19,6 +25,7 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
@@ -31,12 +38,16 @@ import Konva from "konva";
 import { setTemplateOnPosition } from "@/components/utils/templates";
 import { SidebarHeader } from "../sidebar-header";
 import { useGetSession } from "../hooks/use-get-session";
-// import { eventBus } from "@/components/utils/events-bus";
+import { useCreatePageFromTemplate } from "../hooks/use-create-page-from-template";
 
 const TEMPLATES_LIMIT = 20;
 
 export const TemplatesLibrary = () => {
   const instance = useWeave((state) => state.instance);
+
+  const [kind, setKind] = React.useState<"template" | "imageTemplate" | "all">(
+    "template",
+  );
 
   const [selectedTemplates, setSelectedTemplates] = React.useState<
     TemplateEntity[]
@@ -72,6 +83,10 @@ export const TemplatesLibrary = () => {
     onError() {
       toast.error("Error requesting images deletion.");
     },
+  });
+
+  const { createPageFromTemplate } = useCreatePageFromTemplate({
+    roomId: room ?? "",
   });
 
   const handleDeleteTemplate = React.useCallback(
@@ -134,7 +149,7 @@ export const TemplatesLibrary = () => {
   }, [instance]);
 
   const query = useInfiniteQuery({
-    queryKey: ["getTemplates", room],
+    queryKey: ["getTemplates", room, kind],
     queryFn: async ({ pageParam }) => {
       if (!room) {
         return [];
@@ -142,6 +157,8 @@ export const TemplatesLibrary = () => {
 
       return await getTemplates(
         room ?? "",
+        kind === "all" ? undefined : kind,
+        undefined,
         pageParam as number,
         TEMPLATES_LIMIT,
       );
@@ -222,10 +239,6 @@ export const TemplatesLibrary = () => {
     return null;
   }
 
-  // if (sidebarActive !== SIDEBAR_ELEMENTS.templates) {
-  //   return null;
-  // }
-
   return (
     <div
       className={cn("w-full h-full", {
@@ -288,22 +301,51 @@ export const TemplatesLibrary = () => {
           </div>
         </div>
       )}
-
-      {templates.length === 0 && (
-        <div className="col-span-1 w-full h-[calc(100%-57px)] px-5 flex flex-col justify-center items-center text-sm text-center font-inter font-light">
-          <b className="font-normal text-[18px]">No templates</b>
-          <span className="text-[14px]">
-            Save a node or a selection of nodes
-            <br />
-            as a template.
-          </span>
+      {!query.isLoading &&
+        !query.isFetchingNextPage &&
+        templates.length === 0 && (
+          <div
+            className={cn(
+              "col-span-1 w-full px-5 flex flex-col justify-center items-center text-sm text-center font-inter font-light",
+              {
+                ["h-[calc(100%-57px-52px)]"]: !showSelection,
+                ["h-[calc(100%-57px-40px-52px)]"]: showSelection,
+              },
+            )}
+          >
+            <b className="font-normal text-[18px]">No templates defined</b>
+            <span className="text-[14px] max-w-[240px]">
+              Save a node or a selection of nodes as a template.
+              <br />
+              <br />
+              Use it to start new pages with predefined content and structure.
+            </span>
+          </div>
+        )}
+      {query.isLoading && !query.isFetchingNextPage && (
+        <div
+          className={cn(
+            "col-span-1 w-full px-5 flex flex-col justify-center items-center text-sm text-center font-inter font-light",
+            {
+              ["h-[calc(100%-57px-52px)]"]: !showSelection,
+              ["h-[calc(100%-57px-40px-52px)]"]: showSelection,
+            },
+          )}
+        >
+          <LoaderCircle strokeWidth={1} size={48} className="animate-spin" />
+          <div className="flex flex-col justify-center items-center gap-1">
+            <p className="font-light text-xl text-[#757575]">
+              LOADING TEMPLATES
+            </p>
+            <p className="font-light text-base">Please wait...</p>
+          </div>
         </div>
       )}
-      {templates.length > 0 && (
+      {query.isFetched && templates.length > 0 && (
         <ScrollArea
           className={cn("w-full overflow-auto", {
-            ["h-[calc(100%-57px-40px-40px)]"]: showSelection,
-            ["h-[calc(100%-57px)]"]: !showSelection,
+            ["h-[calc(100%-57px-52px)]"]: !showSelection,
+            ["h-[calc(100%-57px-40px-52px)]"]: showSelection,
           })}
         >
           <div
@@ -350,7 +392,35 @@ export const TemplatesLibrary = () => {
                         {templateComponent}
                       </div>
                     </ContextMenuTrigger>
-                    <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
+                    <ContextMenuContent className="w-[240px] rounded-none border-[0.5px] border-[#c9c9c9] drop-shadow">
+                      {template.kind === "template" && (
+                        <>
+                          <ContextMenuItem
+                            className="rounded-none uppercase font-inter text-xs"
+                            onClick={() => {
+                              try {
+                                const templateData = JSON.parse(
+                                  template.templateData,
+                                );
+                                createPageFromTemplate(
+                                  template.templateId,
+                                  templateData,
+                                );
+                              } catch {
+                                toast.error("Error parsing template data");
+                              }
+                            }}
+                          >
+                            <LayoutPanelTop
+                              strokeWidth={1}
+                              size={16}
+                              className="mr-2"
+                            />
+                            New page from template
+                          </ContextMenuItem>
+                          <ContextMenuSeparator />
+                        </>
+                      )}
                       <ContextMenuItem
                         className="rounded-none uppercase font-inter text-xs"
                         onClick={() => {
@@ -374,9 +444,11 @@ export const TemplatesLibrary = () => {
           </div>
         </ScrollArea>
       )}
-      {showSelection && (
-        <TemplatesLibraryActions selectedTemplates={selectedTemplates} />
-      )}
+      <TemplatesLibraryActions
+        selectedTemplates={selectedTemplates}
+        kind={kind}
+        setKind={setKind}
+      />
     </div>
   );
 };

@@ -50,7 +50,7 @@ export const RoomLeftSidebar = ({
           viewType === "fixed",
         ["top-[62px] left-[62px] w-[400px] h-[calc(100%-54px-16px-40px)] drop-shadow"]:
           viewType === "floating" && showLeftSidebarFloating,
-        ["fixed pointer-events-auto bg-white border-r border-r-[#c9c9c9]"]:
+        ["fixed pointer-events-auto bg-white border-r-[0.5px] border-r-[#c9c9c9]"]:
           !imageCroppingEnabled &&
           ((viewType === "floating" && showLeftSidebarFloating) ||
             viewType === "fixed"),

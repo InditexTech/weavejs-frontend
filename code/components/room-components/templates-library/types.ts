@@ -9,6 +9,8 @@ export type TemplateEntity = {
   templateId: string;
   status: TemplateStatus;
   name: string;
+  kind: string;
+  imageSlots: number;
   linkedNodeType: string | null;
   templateImage: string;
   templateData: string;

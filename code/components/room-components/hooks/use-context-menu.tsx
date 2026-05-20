@@ -33,7 +33,7 @@ import {
   Lock,
   EyeOff,
   Link,
-  // PackagePlus,
+  PackagePlus,
   PackageOpen,
   Paperclip,
   PanelLeftRightDashed,
@@ -47,7 +47,7 @@ import { useIAChat } from "@/store/ia-chat";
 import Konva from "konva";
 import { useHandleGuides } from "./use-handle-guides";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
-// import { useJsonTemplate } from "./use-json-template";
+import { useJsonTemplate } from "./use-json-template";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -75,12 +75,16 @@ function useContextMenu() {
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
-  const setSaveDialogVisible = useTemplates(
+  const setTemplateData = useTemplates((state) => state.setData);
+  const setTemplateSaveDialogVisible = useTemplates(
     (state) => state.setSaveDialogVisible,
+  );
+  const setTemplateSaveDialogKind = useTemplates(
+    (state) => state.setSaveDialogKind,
   );
 
   const { isExporting } = useExportPageToImageServerSide();
-  // const { generateJsonTemplate } = useJsonTemplate();
+  const { generateTemplate, generateImageTemplate } = useJsonTemplate();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
 
@@ -455,57 +459,72 @@ function useContextMenu() {
         });
       }
 
-      // if (!singleLocked && nodes.length > 0) {
-      //   options.push({
-      //     id: "div-templates-1",
-      //     type: "divider",
-      //   });
-      //   // SAVE AS TEMPLATE
-      //   options.push({
-      //     id: "save-as-template",
-      //     type: "button",
-      //     label: (
-      //       <div className="w-full flex justify-between items-center">
-      //         <div>Save as template</div>
-      //       </div>
-      //     ),
-      //     icon: <PackagePlus size={16} />,
-      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
-      //     onClick: () => {
-      //       setSaveDialogVisible(true);
-      //       setContextMenuShow(false);
-      //     },
-      //   });
-      //   // SAVE AS TEMPLATE
-      //   options.push({
-      //     id: "save-as-json-template",
-      //     type: "button",
-      //     label: (
-      //       <div className="w-full flex justify-between items-center">
-      //         <div>Save as JSON template</div>
-      //       </div>
-      //     ),
-      //     icon: <PackagePlus size={16} />,
-      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
-      //     onClick: async () => {
-      //       try {
-      //         const template = generateJsonTemplate(nodes);
-      //         await navigator.clipboard.writeText(JSON.stringify(template));
-      //         toast.success("JSON template copied to clipboard.");
-      //       } catch (error) {
-      //         console.error(error);
-      //         if (error instanceof Error && error.cause === "NoInstance") {
-      //           toast.error("Weave instance is not available.");
-      //         }
-      //         if (error instanceof Error && error.cause === "NoNodesSelected") {
-      //           toast.error("No nodes selected to generate JSON template.");
-      //         }
-      //       }
+      if (!singleLocked && nodes.length > 0) {
+        options.push({
+          id: "div-templates-1",
+          type: "divider",
+        });
+        // SAVE AS TEMPLATE
+        options.push({
+          id: "save-as-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Save as template</div>
+            </div>
+          ),
+          icon: <PackagePlus size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            try {
+              const template = generateTemplate(nodes);
 
-      //       setContextMenuShow(false);
-      //     },
-      //   });
-      // }
+              setTemplateData(template);
+              setTemplateSaveDialogKind("template");
+              setTemplateSaveDialogVisible(true);
+              setContextMenuShow(false);
+            } catch (error) {
+              console.error(error);
+              if (error instanceof Error && error.cause === "NoInstance") {
+                toast.error("Weave instance is not available.");
+              }
+              if (error instanceof Error && error.cause === "NoNodesSelected") {
+                toast.error("No nodes selected to generate JSON template.");
+              }
+            }
+          },
+        });
+        // SAVE AS IMAGE TEMPLATE
+        options.push({
+          id: "save-as-image-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Save as images template</div>
+            </div>
+          ),
+          icon: <PackagePlus size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            try {
+              const template = generateImageTemplate(nodes);
+
+              setTemplateData(template);
+              setTemplateSaveDialogKind("imageTemplate");
+              setTemplateSaveDialogVisible(true);
+              setContextMenuShow(false);
+            } catch (error) {
+              console.error(error);
+              if (error instanceof Error && error.cause === "NoInstance") {
+                toast.error("Weave instance is not available.");
+              }
+              if (error instanceof Error && error.cause === "NoNodesSelected") {
+                toast.error("No nodes selected to generate JSON template.");
+              }
+            }
+          },
+        });
+      }
 
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
@@ -729,7 +748,8 @@ function useContextMenu() {
       aiChatEnabled,
       promptInputAttachmentsController,
       setLinkedNode,
-      setSaveDialogVisible,
+      setTemplateSaveDialogKind,
+      setTemplateSaveDialogVisible,
       setExportConfigVisible,
       setExportNodes,
       isExporting,

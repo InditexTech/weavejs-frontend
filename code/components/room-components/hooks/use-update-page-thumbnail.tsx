@@ -12,6 +12,7 @@ import { putPageThumbnail } from "@/api/pages/put-page-thumbnail";
 import { sleep } from "@/lib/utils";
 import { getEmmiter } from "./use-tasks-events";
 import Konva from "konva";
+import { debounce } from "lodash";
 
 export const useUpdatePageThumbnail = () => {
   const [roomState, setRoomState] = React.useState<
@@ -20,6 +21,13 @@ export const useUpdatePageThumbnail = () => {
 
   const instance = useWeave((state) => state.instance);
   const isRoomSwitching = useWeave((state) => state.room.switching);
+
+  const [lastUpdate, setLastUpdate] = React.useState<number>(0);
+  const [doUpdatePageThumbnail, setDoUpdatePageThumbnail] =
+    React.useState<boolean>(false);
+  const [actualLeaderId, setActualLeaderId] = React.useState<string | null>(
+    null,
+  );
 
   const leaderId = useCollaborationRoom((state) => state.leaderId);
   const clientId = useCollaborationRoom((state) => state.clientId);
@@ -35,6 +43,15 @@ export const useUpdatePageThumbnail = () => {
   React.useEffect(() => {
     setRoomState("idle");
   }, [actualPageId]);
+
+  React.useEffect(() => {
+    if (actualLeaderId !== leaderId) {
+      setActualLeaderId(leaderId);
+      if (leaderId === clientId) {
+        setDoUpdatePageThumbnail(true);
+      }
+    }
+  }, [clientId, leaderId, actualLeaderId]);
 
   React.useEffect(() => {
     if (!instance) {
@@ -96,7 +113,7 @@ export const useUpdatePageThumbnail = () => {
       return;
     }
 
-    const takePageThumbnail = async (isLoaded: boolean = false) => {
+    const takePageThumbnail = async () => {
       if (!instance) {
         return;
       }
@@ -111,10 +128,6 @@ export const useUpdatePageThumbnail = () => {
         );
 
       if (!exportAreaReferencePlugin) {
-        return;
-      }
-
-      if (!isLoaded && roomState !== "loaded") {
         return;
       }
 
@@ -138,48 +151,47 @@ export const useUpdatePageThumbnail = () => {
         return;
       }
 
-      clonedStage.toBlob({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const blob: any = await clonedStage.toBlob({
         x: exportRect.x,
         y: exportRect.y,
         width: exportRect.width,
         height: exportRect.height,
         pixelRatio: (1 / stage.scaleX()) * 0.3,
         mimeType: "image/png",
-        callback: (blob: Blob | null) => {
-          if (!blob) {
-            return;
-          }
-
-          const reader = new FileReader();
-
-          reader.onloadend = () => {
-            getEmmiter().emit("pageThumbnailUpdated", {
-              roomId: roomId ?? "",
-              pageId: actualPageId ?? "",
-              dataURL: reader.result as string,
-            });
-          };
-
-          reader.onerror = () => {
-            console.error();
-          };
-
-          reader.readAsDataURL(blob);
-
-          if (leaderId === clientId) {
-            updatePageThumbnail.mutate({
-              roomId: roomId ?? "",
-              pageId: actualPageId ?? "",
-              thumbnail: blob,
-            });
-          }
-        },
       });
+
+      if (!blob) {
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        getEmmiter().emit("pageThumbnailUpdated", {
+          roomId: roomId ?? "",
+          pageId: actualPageId ?? "",
+          dataURL: reader.result as string,
+        });
+      };
+
+      reader.onerror = () => {
+        console.error();
+      };
+
+      reader.readAsDataURL(blob);
+
+      if (leaderId === clientId && Date.now() > lastUpdate) {
+        setLastUpdate(Date.now());
+        updatePageThumbnail.mutate({
+          roomId: roomId ?? "",
+          pageId: actualPageId ?? "",
+          thumbnail: blob,
+        });
+      }
     };
 
-    const onAsyncElementsLoadedHandler = () => {
-      takePageThumbnail(true);
-    };
+    const debouncedTakePageThumbnail = debounce(takePageThumbnail, 500);
 
     const onRenderHandler = async () => {
       if (!instance) {
@@ -190,26 +202,24 @@ export const useUpdatePageThumbnail = () => {
         await sleep(100);
       }
 
-      takePageThumbnail();
+      debouncedTakePageThumbnail();
     };
 
     instance.addEventListener("onRender", onRenderHandler);
-    instance.addEventListener(
-      "onAsyncElementsLoaded",
-      onAsyncElementsLoadedHandler,
-    );
+
+    if (doUpdatePageThumbnail) {
+      setDoUpdatePageThumbnail(false);
+      debouncedTakePageThumbnail();
+    }
 
     return () => {
       instance.removeEventListener("onRender", onRenderHandler);
-      instance.removeEventListener(
-        "onAsyncElementsLoaded",
-        onAsyncElementsLoadedHandler,
-      );
     };
   }, [
     instance,
     roomId,
     updatePageThumbnail,
+    doUpdatePageThumbnail,
     leaderId,
     clientId,
     roomState,

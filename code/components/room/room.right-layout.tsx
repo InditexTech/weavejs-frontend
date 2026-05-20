@@ -14,7 +14,7 @@ import { NodeProperties } from "../room-components/overlay/node-properties";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { Comments } from "../room-components/comment/comments";
 import { VideosLibrary } from "../room-components/videos-library/videos-library";
-// import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
+import { TemplatesLibrary } from "../room-components/templates-library/templates-library";
 import { ChatBot } from "../room-components/ai-components/chatbot";
 import { useIAChat } from "@/store/ia-chat";
 import { useWeave } from "@inditextech/weave-react";
@@ -44,7 +44,7 @@ export const RoomRightSidebar = () => {
       className={cn(
         "z-0 top-0 right-0 w-[400px] flex flex-col justify-between",
         {
-          ["fixed top-0 right-0 bottom-0 h-[calc(100%-65px-40px)] w-[400px]"]:
+          ["fixed top-0 right-0 bottom-0 h-[calc(100%-40px)] w-[400px] border-l-[0.5px] border-l-[#c9c9c9]"]:
             viewType === "fixed",
           ["absolute top-[62px] right-[8px] w-[400px] h-[calc(100%-54px-16px-40px)]"]:
             viewType === "floating",
@@ -74,9 +74,10 @@ export const RoomRightSidebar = () => {
         {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
           !isRoomSwitching && (
             <div
-              className={cn("w-full h-full bg-white", {
+              className={cn("w-full h-[calc(100%-65px)] bg-white", {
                 // ["border-t-[0.5px] border-[#c9c9c9]"]: viewType === "fixed",
-                ["border-[0.5px] border-[#c9c9c9]"]: viewType === "floating",
+                ["h-full border-[0.5px] border-[#c9c9c9]"]:
+                  viewType === "floating",
                 ["visible pointer-events-auto"]:
                   !imageCroppingEnabled &&
                   ((viewType === "floating" && showRightSidebarFloating) ||
@@ -93,7 +94,7 @@ export const RoomRightSidebar = () => {
                     <NodeProperties />
                     <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
                     <GuidesLibrary key={SIDEBAR_ELEMENTS.guides} />
-                    {/* <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} /> */}
+                    <TemplatesLibrary key={SIDEBAR_ELEMENTS.templates} />
                     <VideosLibrary key={SIDEBAR_ELEMENTS.videos} />
                     <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
                     <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />

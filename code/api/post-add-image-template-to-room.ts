@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export type PostAddTemplateToRoomPayload = {
+export type PostAddImageTemplateToRoomPayload = {
   roomId: string;
   pageId: string;
   templateId: string;
@@ -13,15 +13,17 @@ export type PostAddTemplateToRoomPayload = {
       y: number;
     };
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parameters: Record<string, any>;
 };
 
-export const postAddTemplateToRoom = async (
-  payload: PostAddTemplateToRoomPayload,
+export const postAddImageTemplateToRoom = async (
+  payload: PostAddImageTemplateToRoomPayload,
 ) => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
-  const endpoint = `${apiEndpoint}/${hubName}/templates/add-template-to-room`;
+  const endpoint = `${apiEndpoint}/${hubName}/templates/add-image-template-to-room`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -32,7 +34,7 @@ export const postAddTemplateToRoom = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error("Failed to add template to room: " + errorData.error);
+    throw new Error("Failed to add image template to room: " + errorData.error);
   }
 
   const data = await response.json();

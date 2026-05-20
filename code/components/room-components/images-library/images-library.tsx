@@ -360,15 +360,7 @@ export const ImagesLibrary = () => {
     const newSelectedImages = [];
 
     for (const image of imagesToRender) {
-      const appImage = appImages.find(
-        (appImage) => appImage.props.imageId === image.imageId,
-      );
-
-      if (
-        typeof appImage === "undefined" &&
-        ["completed"].includes(image.status) &&
-        image.removalJobId === null
-      ) {
+      if (["completed"].includes(image.status) && image.removalJobId === null) {
         newSelectedImages.push(image);
       }
     }
@@ -625,17 +617,8 @@ export const ImagesLibrary = () => {
                               <div className="group relative w-full">
                                 {imageComponent}
                                 {showSelection &&
-                                  typeof appImage === "undefined" &&
-                                  !(
-                                    ["pending", "working"].includes(
-                                      image.status,
-                                    ) ||
-                                    (image.removalJobId !== null &&
-                                      image.removalStatus !== null &&
-                                      ["pending", "working"].includes(
-                                        image.removalStatus,
-                                      ))
-                                  ) && (
+                                  ["completed"].includes(image.status) &&
+                                  image.removalJobId === null && (
                                     <div className="absolute top-[8px] right-[8px] z-10">
                                       <Checkbox
                                         id="terms"
@@ -660,7 +643,7 @@ export const ImagesLibrary = () => {
                                 )}
                               </div>
                             </ContextMenuTrigger>
-                            <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
+                            <ContextMenuContent className="w-[240px] rounded-none border-[0.5px] border-[#c9c9c9] drop-shadow">
                               {typeof appImage !== "undefined" && (
                                 <>
                                   <ContextMenuItem

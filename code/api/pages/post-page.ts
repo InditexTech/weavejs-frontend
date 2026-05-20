@@ -9,7 +9,22 @@ export const postPage = async (
     name,
     thumbnail,
     position,
-  }: { pageId: string; name: string; thumbnail: string; position?: number },
+    templateId,
+    target,
+  }: {
+    pageId: string;
+    name: string;
+    thumbnail: string;
+    position?: number;
+    templateId?: string;
+    target?: {
+      id: string;
+      position: {
+        x: number;
+        y: number;
+      };
+    };
+  },
 ) => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
@@ -26,11 +41,13 @@ export const postPage = async (
       name,
       thumbnail,
       position,
+      templateId,
+      target,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Error creating chat: ${response.statusText}`);
+    throw new Error(`Error creating page: ${response.statusText}`);
   }
 
   const data = await response.json();

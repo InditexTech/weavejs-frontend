@@ -5,12 +5,16 @@
 export const postTemplate = async ({
   roomId,
   name,
+  kind,
+  imageSlots,
   linkedNodeType,
   templateImage,
   templateData,
 }: {
   roomId: string;
   name: string;
+  kind: string;
+  imageSlots?: number;
   linkedNodeType: string | null;
   templateImage: string;
   templateData: string;
@@ -26,6 +30,8 @@ export const postTemplate = async ({
     },
     body: JSON.stringify({
       name,
+      kind,
+      ...(imageSlots && { imageSlots }),
       linkedNodeType,
       templateImage,
       templateData,

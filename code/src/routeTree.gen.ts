@@ -16,9 +16,7 @@ import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as V1StartupIndexRouteImport } from './routes/v1/startup/index'
 import { Route as V1ReadinessIndexRouteImport } from './routes/v1/readiness/index'
 import { Route as V1LivenessIndexRouteImport } from './routes/v1/liveness/index'
-import { Route as UseCasesTemplatesIndexRouteImport } from './routes/use-cases/templates/index'
 import { Route as UseCasesStandaloneIndexRouteImport } from './routes/use-cases/standalone/index'
-import { Route as UseCasesTemplatesInstanceIdRouteImport } from './routes/use-cases/templates/$instanceId'
 import { Route as UseCasesStandaloneInstanceIdRouteImport } from './routes/use-cases/standalone/$instanceId'
 import { Route as ApiAiChatsChatIdRouteImport } from './routes/api/ai/chats/$chatId'
 
@@ -57,22 +55,11 @@ const V1LivenessIndexRoute = V1LivenessIndexRouteImport.update({
   path: '/v1/liveness/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UseCasesTemplatesIndexRoute = UseCasesTemplatesIndexRouteImport.update({
-  id: '/use-cases/templates/',
-  path: '/use-cases/templates/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const UseCasesStandaloneIndexRoute = UseCasesStandaloneIndexRouteImport.update({
   id: '/use-cases/standalone/',
   path: '/use-cases/standalone/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UseCasesTemplatesInstanceIdRoute =
-  UseCasesTemplatesInstanceIdRouteImport.update({
-    id: '/use-cases/templates/$instanceId',
-    path: '/use-cases/templates/$instanceId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const UseCasesStandaloneInstanceIdRoute =
   UseCasesStandaloneInstanceIdRouteImport.update({
     id: '/use-cases/standalone/$instanceId',
@@ -91,9 +78,7 @@ export interface FileRoutesByFullPath {
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error/': typeof ErrorIndexRoute
   '/use-cases/standalone/$instanceId': typeof UseCasesStandaloneInstanceIdRoute
-  '/use-cases/templates/$instanceId': typeof UseCasesTemplatesInstanceIdRoute
   '/use-cases/standalone/': typeof UseCasesStandaloneIndexRoute
-  '/use-cases/templates/': typeof UseCasesTemplatesIndexRoute
   '/v1/liveness/': typeof V1LivenessIndexRoute
   '/v1/readiness/': typeof V1ReadinessIndexRoute
   '/v1/startup/': typeof V1StartupIndexRoute
@@ -105,9 +90,7 @@ export interface FileRoutesByTo {
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error': typeof ErrorIndexRoute
   '/use-cases/standalone/$instanceId': typeof UseCasesStandaloneInstanceIdRoute
-  '/use-cases/templates/$instanceId': typeof UseCasesTemplatesInstanceIdRoute
   '/use-cases/standalone': typeof UseCasesStandaloneIndexRoute
-  '/use-cases/templates': typeof UseCasesTemplatesIndexRoute
   '/v1/liveness': typeof V1LivenessIndexRoute
   '/v1/readiness': typeof V1ReadinessIndexRoute
   '/v1/startup': typeof V1StartupIndexRoute
@@ -120,9 +103,7 @@ export interface FileRoutesById {
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error/': typeof ErrorIndexRoute
   '/use-cases/standalone/$instanceId': typeof UseCasesStandaloneInstanceIdRoute
-  '/use-cases/templates/$instanceId': typeof UseCasesTemplatesInstanceIdRoute
   '/use-cases/standalone/': typeof UseCasesStandaloneIndexRoute
-  '/use-cases/templates/': typeof UseCasesTemplatesIndexRoute
   '/v1/liveness/': typeof V1LivenessIndexRoute
   '/v1/readiness/': typeof V1ReadinessIndexRoute
   '/v1/startup/': typeof V1StartupIndexRoute
@@ -136,9 +117,7 @@ export interface FileRouteTypes {
     | '/rooms/access-link'
     | '/error/'
     | '/use-cases/standalone/$instanceId'
-    | '/use-cases/templates/$instanceId'
     | '/use-cases/standalone/'
-    | '/use-cases/templates/'
     | '/v1/liveness/'
     | '/v1/readiness/'
     | '/v1/startup/'
@@ -150,9 +129,7 @@ export interface FileRouteTypes {
     | '/rooms/access-link'
     | '/error'
     | '/use-cases/standalone/$instanceId'
-    | '/use-cases/templates/$instanceId'
     | '/use-cases/standalone'
-    | '/use-cases/templates'
     | '/v1/liveness'
     | '/v1/readiness'
     | '/v1/startup'
@@ -164,9 +141,7 @@ export interface FileRouteTypes {
     | '/rooms/access-link'
     | '/error/'
     | '/use-cases/standalone/$instanceId'
-    | '/use-cases/templates/$instanceId'
     | '/use-cases/standalone/'
-    | '/use-cases/templates/'
     | '/v1/liveness/'
     | '/v1/readiness/'
     | '/v1/startup/'
@@ -179,9 +154,7 @@ export interface RootRouteChildren {
   RoomsAccessLinkRoute: typeof RoomsAccessLinkRoute
   ErrorIndexRoute: typeof ErrorIndexRoute
   UseCasesStandaloneInstanceIdRoute: typeof UseCasesStandaloneInstanceIdRoute
-  UseCasesTemplatesInstanceIdRoute: typeof UseCasesTemplatesInstanceIdRoute
   UseCasesStandaloneIndexRoute: typeof UseCasesStandaloneIndexRoute
-  UseCasesTemplatesIndexRoute: typeof UseCasesTemplatesIndexRoute
   V1LivenessIndexRoute: typeof V1LivenessIndexRoute
   V1ReadinessIndexRoute: typeof V1ReadinessIndexRoute
   V1StartupIndexRoute: typeof V1StartupIndexRoute
@@ -239,25 +212,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof V1LivenessIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/use-cases/templates/': {
-      id: '/use-cases/templates/'
-      path: '/use-cases/templates'
-      fullPath: '/use-cases/templates/'
-      preLoaderRoute: typeof UseCasesTemplatesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/use-cases/standalone/': {
       id: '/use-cases/standalone/'
       path: '/use-cases/standalone'
       fullPath: '/use-cases/standalone/'
       preLoaderRoute: typeof UseCasesStandaloneIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/use-cases/templates/$instanceId': {
-      id: '/use-cases/templates/$instanceId'
-      path: '/use-cases/templates/$instanceId'
-      fullPath: '/use-cases/templates/$instanceId'
-      preLoaderRoute: typeof UseCasesTemplatesInstanceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/use-cases/standalone/$instanceId': {
@@ -283,9 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoomsAccessLinkRoute: RoomsAccessLinkRoute,
   ErrorIndexRoute: ErrorIndexRoute,
   UseCasesStandaloneInstanceIdRoute: UseCasesStandaloneInstanceIdRoute,
-  UseCasesTemplatesInstanceIdRoute: UseCasesTemplatesInstanceIdRoute,
   UseCasesStandaloneIndexRoute: UseCasesStandaloneIndexRoute,
-  UseCasesTemplatesIndexRoute: UseCasesTemplatesIndexRoute,
   V1LivenessIndexRoute: V1LivenessIndexRoute,
   V1ReadinessIndexRoute: V1ReadinessIndexRoute,
   V1StartupIndexRoute: V1StartupIndexRoute,

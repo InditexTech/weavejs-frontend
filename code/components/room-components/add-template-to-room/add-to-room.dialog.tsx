@@ -9,42 +9,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React from "react";
 import { X } from "lucide-react";
-import { useTemplatesUseCase } from "../../store/store";
-import { useAddToRoom } from "../../store/add-to-room";
-import { AddToRoomSelectRoom } from "./add-to-room.select-room";
 import { AddToRoomSelectTemplate } from "./add-to-room.select-template";
 import { AddToRoomConfirmation } from "./add-to-room.confirmation";
 import { AddToRoomDialogSteps } from "./add-to-room.dialog.steps";
-import { AddToRoomSelectPage } from "./add-to-room.select-page";
+import { useAddTemplateToRoom } from "@/store/add-template-to-room";
+import { AddToRoomConfiguration } from "./add-to-room.configuration";
 
 export function AddToRoomDialog() {
-  const step = useAddToRoom((state) => state.step);
-
-  const addToRoomOpen = useTemplatesUseCase((state) => state.addToRoom.open);
-  const setAddToRoomOpen = useTemplatesUseCase(
-    (state) => state.setAddToRoomOpen,
-  );
+  const step = useAddTemplateToRoom((state) => state.step);
+  const visible = useAddTemplateToRoom((state) => state.visible);
+  const setVisible = useAddTemplateToRoom((state) => state.setVisible);
 
   return (
-    <Dialog
-      open={addToRoomOpen}
-      onOpenChange={(open) => setAddToRoomOpen(open)}
-    >
+    <Dialog open={visible} onOpenChange={(open) => setVisible(open)}>
       <form>
         <DialogContent className="w-full rounded-none min-w-4/12 max-w-4/12 min-h-[calc(100dvh-48px)] max-h-[calc(100dvh-48px)]">
           <div className="w-full h-full flex flex-col gap-5">
             <DialogHeader>
               <div className="w-full flex gap-5 justify-between items-center">
                 <DialogTitle className="font-inter text-2xl font-normal uppercase">
-                  Add to Room
+                  Add Images from Template
                 </DialogTitle>
                 <DialogClose asChild>
                   <button
                     className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
                     onClick={() => {
-                      setAddToRoomOpen(false);
+                      setVisible(false);
                     }}
                   >
                     <X size={16} strokeWidth={1} />
@@ -53,9 +44,8 @@ export function AddToRoomDialog() {
               </div>
             </DialogHeader>
             <AddToRoomDialogSteps />
-            {step === "select-room" && <AddToRoomSelectRoom />}
-            {step === "select-page" && <AddToRoomSelectPage />}
             {step === "select-template" && <AddToRoomSelectTemplate />}
+            {step === "configuration" && <AddToRoomConfiguration />}
             {step === "confirm" && <AddToRoomConfirmation />}
           </div>
         </DialogContent>

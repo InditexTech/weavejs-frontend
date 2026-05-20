@@ -29,11 +29,15 @@ export const UploadedImage = ({
 
   React.useEffect(() => {
     const getDownscaledImage = async () => {
-      const dataURL = await downscaleImageFromURL(imageUrl, {
-        maxWidth: 200,
-        maxHeight: 200,
-      });
-      setDownscaledImageDataUrl(dataURL);
+      try {
+        const dataURL = await downscaleImageFromURL(imageUrl, {
+          maxWidth: 200,
+          maxHeight: 200,
+        });
+        setDownscaledImageDataUrl(dataURL);
+      } catch (ex) {
+        console.error("Error downscaling image", ex);
+      }
     };
 
     if (imageUrl) {

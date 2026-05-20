@@ -3,54 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { useAddToRoom } from "../../store/add-to-room";
 import { cn } from "@/lib/utils";
+import { useAddTemplateToRoom } from "@/store/add-template-to-room";
 
 export function AddToRoomDialogSteps() {
-  const step = useAddToRoom((state) => state.step);
+  const step = useAddTemplateToRoom((state) => state.step);
 
   return (
     <div className="flex gap-3 justify-center items-center my-5">
-      <div
-        className={cn(
-          "font-inter rounded-full bg-black text-white text-base w-[32px] h-[32px] flex justify-center items-center",
-          {
-            ["bg-black text-white"]: step === "select-room",
-            ["bg-[#c9c9c9] text-black"]: step !== "select-room",
-          },
-        )}
-      >
-        1
-      </div>
-      <div
-        className={cn("font-inter text-base", {
-          ["text-black"]: step === "select-room",
-          ["text-[#c9c9c9]"]: step !== "select-room",
-        })}
-      >
-        ROOM
-      </div>
-      <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
-      <div
-        className={cn(
-          "font-inter rounded-full bg-black text-white text-base w-[32px] h-[32px] flex justify-center items-center",
-          {
-            ["bg-black text-white"]: step === "select-page",
-            ["bg-[#c9c9c9] text-black"]: step !== "select-page",
-          },
-        )}
-      >
-        2
-      </div>
-      <div
-        className={cn("font-inter text-base", {
-          ["text-black"]: step === "select-page",
-          ["text-[#c9c9c9]"]: step !== "select-page",
-        })}
-      >
-        PAGE
-      </div>
-      <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
       <div
         className={cn(
           "font-inter rounded-full bg-[#c9c9c9] text-black text-base w-[32px] h-[32px] flex justify-center items-center",
@@ -60,7 +20,7 @@ export function AddToRoomDialogSteps() {
           },
         )}
       >
-        3
+        1
       </div>
       <div
         className={cn("font-inter text-base", {
@@ -75,12 +35,32 @@ export function AddToRoomDialogSteps() {
         className={cn(
           "font-inter rounded-full bg-[#c9c9c9] text-black text-base w-[32px] h-[32px] flex justify-center items-center",
           {
+            ["bg-black text-white"]: step === "configuration",
+            ["bg-[#c9c9c9] text-black"]: step !== "configuration",
+          },
+        )}
+      >
+        2
+      </div>
+      <div
+        className={cn("font-inter text-base", {
+          ["text-black"]: step === "configuration",
+          ["text-[#c9c9c9]"]: step !== "configuration",
+        })}
+      >
+        SETUP
+      </div>
+      <div className="w-[1px] h-[20px] bg-[#c9c9c9]"></div>
+      <div
+        className={cn(
+          "font-inter rounded-full bg-[#c9c9c9] text-black text-base w-[32px] h-[32px] flex justify-center items-center",
+          {
             ["bg-black text-white"]: step === "confirm",
             ["bg-[#c9c9c9] text-black"]: step !== "confirm",
           },
         )}
       >
-        4
+        3
       </div>
       <div
         className={cn("font-inter text-base", {
@@ -88,7 +68,7 @@ export function AddToRoomDialogSteps() {
           ["text-[#c9c9c9]"]: step !== "confirm",
         })}
       >
-        CONFIRM
+        RESUME
       </div>
     </div>
   );

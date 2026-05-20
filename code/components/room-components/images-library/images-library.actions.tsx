@@ -6,7 +6,7 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { BrushCleaning, Trash } from "lucide-react";
+import { LayoutPanelTop, Trash } from "lucide-react";
 import { WeaveStateElement } from "@inditextech/weave-types";
 import { delImage } from "@/api/v2/del-image";
 import { useWeave } from "@inditextech/weave-react";
@@ -15,6 +15,7 @@ import { postRemoveBackground as postRemoveBackgroundV2 } from "@/api/v2/post-re
 import { ImageEntity } from "./types";
 import { cn } from "@/lib/utils";
 import { useGetSession } from "../hooks/use-get-session";
+import { ImageInfo, useAddTemplateToRoom } from "@/store/add-template-to-room";
 
 type ImagesLibraryActions = {
   images: ImageEntity[];
@@ -35,10 +36,41 @@ export const ImagesLibraryActions = ({
 }: Readonly<ImagesLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
+  const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
+  const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
   const { session } = useGetSession();
 
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
+  const actualPageId = useCollaborationRoom(
+    (state) => state.pages.actualPageId,
+  );
+
+  const setRoomAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setRoom,
+  );
+  const setPageAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setPage,
+  );
+  const setStepAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setStep,
+  );
+  const setTemplateAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setTemplate,
+  );
+  const setTemplateParametersAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setTemplateParameters,
+  );
+  const setImagesAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setImages,
+  );
+  const setVisibleAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setVisible,
+  );
+  const setInitializedAddTemplateToPageDialog = useAddTemplateToRoom(
+    (state) => state.setInitialized,
+  );
 
   const mutationUploadV2 = useMutation({
     mutationFn: async ({
@@ -206,15 +238,43 @@ export const ImagesLibraryActions = ({
           key="remove-background-selected"
           className="cursor-pointer flex gap-2 justify-center items-center h-[40px] font-inter text-xs text-center bg-transparent hover:text-[#c9c9c9]"
           onClick={() => {
-            for (const image of realSelectedImages) {
-              handleRemoveBackground(image);
-            }
-            setShowSelection(false);
+            if (!room) return;
 
-            setSelectedImages([]);
+            if (!actualPageId) return;
+
+            setRoomAddTemplateToPageDialog({
+              id: room,
+              name: "",
+              create: false,
+            });
+            setPageAddTemplateToPageDialog({
+              id: actualPageId,
+              name: "",
+            });
+            setStepAddTemplateToPageDialog("select-template");
+            setTemplateAddTemplateToPageDialog(undefined);
+            setTemplateParametersAddTemplateToPageDialog({});
+
+            const selectedImagesInfo: ImageInfo[] = selectedImages.map(
+              (image) => ({
+                id: image.imageId,
+                url: `${apiEndpoint}/${hubName}/rooms/${room}/images/${image.imageId}`,
+                size: {
+                  width: image.width ?? 0,
+                  height: image.height ?? 0,
+                },
+              }),
+            );
+            const sortedSelectedImagesInfo = selectedImagesInfo.sort((a, b) =>
+              a.id.localeCompare(b.id),
+            );
+
+            setImagesAddTemplateToPageDialog(sortedSelectedImagesInfo);
+            setVisibleAddTemplateToPageDialog(true);
+            setInitializedAddTemplateToPageDialog(false);
           }}
         >
-          <BrushCleaning strokeWidth={1} size={16} />
+          <LayoutPanelTop strokeWidth={1} size={16} />
         </button>,
       );
     }
