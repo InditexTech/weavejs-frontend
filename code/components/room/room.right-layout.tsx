@@ -42,11 +42,11 @@ export const RoomRightSidebar = () => {
   return (
     <section
       className={cn(
-        "z-0 top-0 right-0 w-[400px] flex flex-col justify-between",
+        "z-0 top-0 right-0 w-[500px] flex flex-col justify-between",
         {
-          ["fixed top-0 right-0 bottom-0 h-[calc(100%-40px)] w-[400px] border-l-[0.5px] border-l-[#c9c9c9]"]:
+          ["fixed top-0 right-0 bottom-0 h-[calc(100%-40px)] w-[500px] border-l-[0.5px] border-l-[#c9c9c9]"]:
             viewType === "fixed",
-          ["absolute top-[62px] right-[8px] w-[400px] h-[calc(100%-54px-16px-40px)]"]:
+          ["absolute top-[62px] right-[8px] w-[500px] h-[calc(100%-54px-16px-40px)]"]:
             viewType === "floating",
           ["h-[65px]"]: imageCroppingEnabled,
           ["bottom-[8px] h-[calc(100%-54px-16px-40px)]"]:
@@ -67,7 +67,7 @@ export const RoomRightSidebar = () => {
         })}
       >
         {viewType === "fixed" && (
-          <div className="w-full flex justify-end items-center gap-3 p-5 py-3 border-b-[0.5px] border-[#c9c9c9]">
+          <div className="w-full flex justify-end items-center gap-3 p-5 py-3 bg-white border-b-[0.5px] border-[#c9c9c9]">
             <RoomUser />
           </div>
         )}

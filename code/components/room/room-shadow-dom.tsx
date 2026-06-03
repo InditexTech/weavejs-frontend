@@ -32,6 +32,8 @@ import { useCommentsHandler } from "../room-components/hooks/use-comments-handle
 import { useLoadPage } from "../room-components/hooks/use-load-page";
 import { useUpdatePageThumbnail } from "../room-components/hooks/use-update-page-thumbnail";
 import { useChangePage } from "../room-components/hooks/use-change-page";
+import { useMutation } from "@tanstack/react-query";
+import { postRoomImageFallback } from "@/api/post-room-image-fallback";
 // import useGetRendererKonvaReactReconciler from "../room-components/hooks/use-get-renderer-konva-react-reconciler";
 
 type RoomWrapperProps = {
@@ -57,7 +59,11 @@ export const Room = () => {
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
+  const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
+  const actualPageId = useCollaborationRoom(
+    (state) => state.pages.actualPageId,
+  );
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
   const comBusConnected = useCollaborationRoom(
     (state) => state.commBus.connected,
@@ -67,6 +73,9 @@ export const Room = () => {
   );
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError,
+  );
+  const roomImageFallback = useCollaborationRoom(
+    (state) => state.roomImageFallback,
   );
 
   const { loadedParams } = useHandleRouteParams();
@@ -144,6 +153,58 @@ export const Room = () => {
   useUpdatePageThumbnail();
   useChangePage();
 
+  const getCachedImageFallback = React.useCallback(
+    (imageId: string) => {
+      return roomImageFallback[imageId];
+    },
+    [roomImageFallback],
+  );
+
+  const mutateAddRoomImageFallback = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      roomId,
+      pageId,
+      imageFallbackId,
+      imageFallbackDataURL,
+    }: {
+      userId: string;
+      clientId: string;
+      roomId: string;
+      pageId: string;
+      imageFallbackId: string;
+      imageFallbackDataURL: string;
+    }) => {
+      return await postRoomImageFallback(
+        userId,
+        clientId,
+        roomId,
+        pageId,
+        imageFallbackId,
+        imageFallbackDataURL,
+      );
+    },
+  });
+
+  const addImageFallback = React.useCallback(
+    async (imageId: string, dataURL: string) => {
+      if (!clientId) {
+        return;
+      }
+
+      mutateAddRoomImageFallback.mutate({
+        clientId,
+        userId: session?.user.id ?? "",
+        roomId: room ?? "",
+        pageId: actualPageId ?? "",
+        imageFallbackId: imageId,
+        imageFallbackDataURL: dataURL,
+      });
+    },
+    [clientId, session, room, actualPageId],
+  );
+
   const isBrowser =
     typeof window !== "undefined" && typeof window.document !== "undefined";
 
@@ -194,7 +255,7 @@ export const Room = () => {
             store={storeProvider}
             renderer={rendererProvider}
             fonts={FONTS}
-            nodes={NODES()}
+            nodes={NODES(getCachedImageFallback, addImageFallback)}
             plugins={PLUGINS(getUser)}
             actions={ACTIONS(getUser)}
           >

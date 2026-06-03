@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import {
-  LayoutPanelTop,
+  ClipboardCopy,
   LoaderCircle,
   SquareCheck,
   SquareX,
+  StickyNotePlus,
   Trash2,
 } from "lucide-react";
 import { useWeave } from "@inditextech/weave-react";
@@ -58,6 +59,9 @@ export const TemplatesLibrary = () => {
   const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
   const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
+  const setActiveTemplate = useCollaborationRoom(
+    (state) => state.setActiveTemplate,
+  );
 
   const { session } = useGetSession();
 
@@ -258,7 +262,7 @@ export const TemplatesLibrary = () => {
                 onCheckedChange={(checked) => {
                   setShowSelection(checked);
                 }}
-                className="w-[32px] cursor-pointer"
+                className="!w-[32px] cursor-pointer"
               />
               <Label
                 htmlFor="selection-mode"
@@ -396,7 +400,28 @@ export const TemplatesLibrary = () => {
                       {template.kind === "template" && (
                         <>
                           <ContextMenuItem
-                            className="rounded-none uppercase font-inter text-xs"
+                            className="rounded-none font-light text-xs cursor-pointer"
+                            onClick={() => {
+                              try {
+                                setActiveTemplate(template);
+                                toast.success(
+                                  `Template ${template.name} set as active`,
+                                );
+                              } catch {
+                                toast.error("Error setting actual template");
+                              }
+                            }}
+                          >
+                            <ClipboardCopy
+                              strokeWidth={1}
+                              size={16}
+                              className="mr-2"
+                            />
+                            Set as active
+                          </ContextMenuItem>
+                          <ContextMenuSeparator />
+                          <ContextMenuItem
+                            className="rounded-none font-light text-xs cursor-pointer"
                             onClick={() => {
                               try {
                                 const templateData = JSON.parse(
@@ -411,18 +436,18 @@ export const TemplatesLibrary = () => {
                               }
                             }}
                           >
-                            <LayoutPanelTop
+                            <StickyNotePlus
                               strokeWidth={1}
                               size={16}
                               className="mr-2"
                             />
-                            New page from template
+                            Create page from template
                           </ContextMenuItem>
                           <ContextMenuSeparator />
                         </>
                       )}
                       <ContextMenuItem
-                        className="rounded-none uppercase font-inter text-xs"
+                        className="rounded-none font-light text-xs cursor-pointer"
                         onClick={() => {
                           handleDeleteTemplate(template);
                         }}

@@ -2,7 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { v4 as uuidv4 } from "uuid";
+import { TemplateEntity } from "@/components/room-components/templates-library/types";
 import { clsx, type ClassValue } from "clsx";
+import Konva from "konva";
+import { Weave, WeaveStateManipulation } from "@inditextech/weave-sdk";
+import { type WeaveStateElement } from "@inditextech/weave-types";
+import * as Y from "yjs";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -53,4 +59,78 @@ export function stringToColor(str: string) {
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const updateNodeId = (node: WeaveStateElement): WeaveStateElement => {
+  const newId = uuidv4();
+
+  const updatedNode = {
+    ...node,
+    key: newId,
+    props: {
+      ...node.props,
+      id: newId,
+    },
+  };
+
+  if (node.props.children) {
+    updatedNode.props.children = node.props.children.map((child) =>
+      updateNodeId(child as WeaveStateElement),
+    );
+  }
+
+  return updatedNode;
+};
+
+export function addTemplateAtPosition(params: {
+  instance: Weave;
+  template: TemplateEntity;
+  containerId: string;
+  position: Konva.Vector2d;
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const elements: Y.Map<any>[] = [];
+
+  const { instance, position, template, containerId } = params;
+
+  const roomDocument = instance.getStore().getDocument();
+
+  try {
+    const templateData = JSON.parse(template.templateData);
+
+    for (let i = 0; i < templateData.length; i++) {
+      const node = templateData[i];
+      const nodeWithNewId = updateNodeId(node as WeaveStateElement);
+      const positionedNode = {
+        ...nodeWithNewId,
+        props: {
+          ...nodeWithNewId.props,
+          x: nodeWithNewId.props.x + position.x,
+          y: nodeWithNewId.props.y + position.y,
+        },
+      };
+      const { element } = WeaveStateManipulation.mapNodeToYjs(
+        positionedNode as unknown as WeaveStateElement,
+      );
+
+      if (!element) {
+        continue;
+      }
+
+      elements.push(element);
+    }
+
+    roomDocument.transact(() => {
+      const layer = WeaveStateManipulation.getYjsElement(
+        roomDocument,
+        containerId,
+      );
+
+      if (layer) {
+        WeaveStateManipulation.addElements(layer, elements);
+      }
+    });
+  } catch (ex) {
+    console.error("Error parsing template data or mapping to Yjs:", ex);
+  }
 }

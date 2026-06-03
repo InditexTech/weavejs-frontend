@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 "use client";
 
 import * as React from "react";
@@ -133,9 +129,9 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 }
 
 const InputGroupInput = React.forwardRef<
-  React.ElementRef<"input">,
+  React.ComponentRef<typeof Input>,
   React.ComponentProps<"input">
->(({ className, ...props }, ref) => {
+>(function InputGroupInput({ className, ...props }, ref) {
   return (
     <Input
       ref={ref}
@@ -152,9 +148,9 @@ const InputGroupInput = React.forwardRef<
 InputGroupInput.displayName = "InputGroupInput";
 
 const InputGroupTextarea = React.forwardRef<
-  React.ElementRef<"textarea">,
+  React.ComponentRef<typeof Textarea>,
   React.ComponentProps<"textarea">
->(({ className, ...props }, ref) => {
+>(function InputGroupTextarea({ className, ...props }, ref) {
   return (
     <Textarea
       ref={ref}

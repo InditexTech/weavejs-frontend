@@ -14,6 +14,7 @@ import {
   Italic,
   RemoveFormatting,
   Strikethrough,
+  Type,
   Underline,
 } from "lucide-react";
 import { WeaveFont, WeaveStateElement } from "@inditextech/weave-types";
@@ -23,6 +24,8 @@ import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
 import InputFontFamily from "../inputs/input-font-family";
 import { InputNumber } from "../inputs/input-number";
+
+const LIGHT_WEIGHT = 300;
 
 export function TextProperties() {
   const instance = useWeave((state) => state.instance);
@@ -259,6 +262,54 @@ export function TextProperties() {
                 ) {
                   items = [...items];
                   items.push("bold");
+                }
+
+                if (items.length === 0) {
+                  items = ["normal"];
+                }
+
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontStyle: items.join(" "),
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<Type size={20} strokeWidth={1} />}
+              // disabled={!weaveFont?.supportedStyles?.includes(100)}
+              pressed={
+                (actualNode.props.fontStyle ?? "normal").indexOf(
+                  LIGHT_WEIGHT,
+                ) !== -1
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                let items = [
+                  ...(actualNode.props.fontStyle ?? "normal")
+                    .split(" ")
+                    .filter((e: string | number) => e !== "normal"),
+                ];
+                if (
+                  (actualNode.props.fontStyle ?? "normal").indexOf(
+                    LIGHT_WEIGHT,
+                  ) !== -1
+                ) {
+                  items = items.filter(
+                    (e: string | number) => e !== LIGHT_WEIGHT,
+                  );
+                }
+                if (
+                  (actualNode.props.fontStyle ?? "normal").indexOf(
+                    LIGHT_WEIGHT,
+                  ) === -1
+                ) {
+                  items = [...items];
+                  items.push(LIGHT_WEIGHT);
                 }
 
                 if (items.length === 0) {

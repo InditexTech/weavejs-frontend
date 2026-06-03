@@ -10,12 +10,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPages } from "@/api/pages/get-pages";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
-import { getRoom } from "@/api/get-room";
 import { getPageByIndex } from "@/api/pages/get-page-by-index";
 import { Divider } from "../overlay/divider";
 import { useBreakpoint } from "../overlay/hooks/use-breakpoint";
 import { Badge } from "@/components/ui/badge";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
+import { getRoomData } from "@/components/utils/data";
 
 export const PagesToolbar = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -60,6 +60,12 @@ export const PagesToolbar = () => {
   const setPagesActualPageId = useCollaborationRoom(
     (state) => state.setPagesActualPageId,
   );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
 
   const { data: roomPages, isFetched: pagesIsFetched } = useQuery({
     queryKey: ["getPages", roomId ?? ""],
@@ -102,11 +108,13 @@ export const PagesToolbar = () => {
       }
 
       try {
-        const data = await queryClient.fetchQuery({
-          queryKey: ["roomData", pageElement.pageId],
-          queryFn: () => getRoom(pageElement.pageId),
-        });
-
+        const { roomData: data } = await getRoomData(
+          queryClient,
+          roomId,
+          pageElement.pageId,
+          setRoomDataStatus,
+          setRoomImageFallback,
+        );
         store.switchToRoom(pageElement.pageId, data);
         // eslint-disable-next-line no-empty
       } catch {

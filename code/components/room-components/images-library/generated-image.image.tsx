@@ -52,9 +52,11 @@ export const GeneratedImage = React.memo(
               <div className="absolute inset-0 checkered transition-transform duration-500 group-hover:opacity-60"></div>
               <div
                 className="w-full border border-[#c9c9c9] object-cover pointer-events-none block relative"
-                style={{
-                  aspectRatio: `${image.aspectRatio}`,
-                }}
+                style={
+                  image.aspectRatio
+                    ? { aspectRatio: image.aspectRatio }
+                    : undefined
+                }
               >
                 <div className="absolute top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-0 justify-center items-center">
                   <Settings strokeWidth={1} size={32} color="white" />
@@ -66,10 +68,11 @@ export const GeneratedImage = React.memo(
           <>
             <div
               className="w-full block object-cover bg-[#ededed] flex justify-center items-center relative transition-transform duration-500 group-hover:opacity-60"
-              style={{
-                width: `100%`,
-                aspectRatio: `${image.aspectRatio}`,
-              }}
+              style={
+                image.aspectRatio
+                  ? { width: "100%", aspectRatio: image.aspectRatio }
+                  : { width: "100%" }
+              }
               id={image.imageId}
             >
               <CircleOff strokeWidth={1} size={32} color="black" />
@@ -81,9 +84,9 @@ export const GeneratedImage = React.memo(
             <div className="absolute inset-0 checkered transition-transform duration-500 group-hover:opacity-60"></div>
             <img
               className="w-full block border border-[#c9c9c9] object-cover relative transition-transform duration-500 group-hover:opacity-60"
-              style={{
-                aspectRatio: `${image.aspectRatio}`,
-              }}
+              style={
+                image.aspectRatio ? { aspectRatio: image.aspectRatio } : undefined
+              }
               key={image.imageId}
               id={image.imageId}
               data-image-url={imageUrl}

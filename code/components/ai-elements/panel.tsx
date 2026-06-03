@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import { cn } from "@/lib/utils";
 import { Panel as PanelPrimitive } from "@xyflow/react";
 import type { ComponentProps } from "react";

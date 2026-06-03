@@ -16,6 +16,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 import merge from "lodash/merge";
+import { TemplateEntity } from "@/components/room-components/templates-library/types";
 
 type PresentationModeState = "idle" | "loading" | "loaded" | "error";
 
@@ -23,7 +24,8 @@ type NodePropertiesAction = "create" | "update" | undefined;
 
 type CommentsStatus = "pending" | "resolved" | "all";
 
-type RoomDataStatus = "idle" | "loading" | "loaded" | "error";
+type RoomInfoDataStatus = "idle" | "loading" | "loaded" | "error";
+export type RoomDataStatus = "pending" | "success" | "error";
 
 export const BACKGROUND_COLOR = {
   ["WHITE"]: "#FFFFFF",
@@ -131,6 +133,9 @@ interface CollaborationRoomState {
     visible: boolean;
     loadedPages: number;
     status: PresentationModeState;
+    ui: {
+      visible: boolean;
+    };
   };
   connection: {
     tests: {
@@ -149,6 +154,9 @@ interface CollaborationRoomState {
   clientId: string | undefined;
   leaderId: string | null;
   room: string | undefined;
+  roomImageFallback: Record<string, string>;
+  roomImageFallbackLoaded: boolean;
+  roomImageFallbackLoading: boolean;
   roomInfo: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any | undefined;
@@ -156,7 +164,8 @@ interface CollaborationRoomState {
     loading: boolean;
     loaded: boolean;
   };
-  status: RoomDataStatus;
+  status: RoomInfoDataStatus;
+  dataStatus: RoomDataStatus;
   contextMenu: {
     show: boolean;
     position: Vector2d;
@@ -248,6 +257,10 @@ interface CollaborationRoomState {
     };
     images: Record<string, HTMLImageElement>;
     pages: { title: string; nodes: string[] }[];
+    count: number | null;
+  };
+  templates: {
+    active: TemplateEntity | null;
   };
   setSigningIn: (newSigningIn: boolean) => void;
   setShowMinimap: (newShowMinimap: boolean) => void;
@@ -257,7 +270,8 @@ interface CollaborationRoomState {
   ) => void;
   setClientId: (newClientId: string | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
-  setRoomStatus: (newStatus: RoomDataStatus) => void;
+  setRoomStatus: (newStatus: RoomInfoDataStatus) => void;
+  setRoomDataStatus: (newStatus: RoomDataStatus) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
   setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
@@ -320,6 +334,7 @@ interface CollaborationRoomState {
   setFramesExportVisible: (newVisible: boolean) => void;
   setFramesExporting: (newExporting: boolean) => void;
   setFramesPages: (newPages: { title: string; nodes: string[] }[]) => void;
+  setFramesCount: (newCount: number | null) => void;
   setViewType: (newView: ViewType) => void;
   setShowLeftSidebarFloating: (newShowLeftSidebarFloating: boolean) => void;
   setShowRightSidebarFloating: (newShowRightSidebarFloating: boolean) => void;
@@ -358,6 +373,7 @@ interface CollaborationRoomState {
   setPresentationStatus: (newStatus: PresentationModeState) => void;
   setPresentationInstanceId: (newInstanceId: string | null) => void;
   setPresentationPagesStatus: (loadedPages: number) => void;
+  setPresentationUiVisible: (newVisible: boolean) => void;
   setGridEnabled: (newEnabled: boolean) => void;
   setGridType: (newType: WeaveStageGridType) => void;
   setGridDotsKind: (newDotsKind: WeaveStageGridDotType) => void;
@@ -365,6 +381,10 @@ interface CollaborationRoomState {
   setUICommentsVisible: (newVisible: boolean) => void;
   setUIReferenceAreaVisible: (newVisible: boolean) => void;
   setSelectedGuide: (newSelectedGuide: Guide | null) => void;
+  setActiveTemplate: (newActiveTemplate: TemplateEntity | null) => void;
+  setRoomImageFallback: (imageFallback: Record<string, string>) => void;
+  setRoomImageFallbackLoaded: (loaded: boolean) => void;
+  setRoomImageFallbackLoading: (loading: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -380,9 +400,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
 
   let configurationFromStorage = {};
   if (typeof sessionStorage !== "undefined") {
-    configurationFromStorage = JSON.parse(
-      sessionStorage.getItem("weave_ai_configuration") || "{}",
-    );
+    try {
+      configurationFromStorage = JSON.parse(
+        sessionStorage.getItem("weave_ai_configuration") || "{}",
+      );
+    } catch (ex) {
+      console.error("Error parsing configuration from storage", ex);
+      configurationFromStorage = {};
+    }
   }
 
   const finalConfiguration = merge(
@@ -447,6 +472,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     clientId: undefined,
     leaderId: null,
     room: undefined,
+    roomImageFallback: {},
+    roomImageFallbackLoaded: false,
+    roomImageFallbackLoading: false,
     roomInfo: {
       data: undefined,
       loading: false,
@@ -454,6 +482,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       error: undefined,
     },
     status: "idle",
+    dataStatus: "pending",
     sidebar: {
       previouslyActive: null,
       active: SIDEBAR_ELEMENTS.nodeProperties,
@@ -564,12 +593,16 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       },
       images: {},
       pages: [],
+      count: null,
     },
     presentation: {
       visible: false,
       instanceId: null,
       loadedPages: 0,
       status: "idle",
+      ui: {
+        visible: true,
+      },
     },
     colorToken: {
       library: {
@@ -581,6 +614,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     },
     nodesTree: {
       visible: false,
+    },
+    templates: {
+      active: null,
     },
     setSigningIn: (newSigningIn) =>
       set((state) => ({
@@ -618,6 +654,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       set((state) => ({
         ...state,
         status: newStatus,
+      })),
+    setRoomDataStatus: (newStatus) =>
+      set((state) => ({
+        ...state,
+        dataStatus: newStatus,
       })),
     setContextMenuShow: (newContextMenuShow) =>
       set((state) => ({
@@ -1203,6 +1244,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           images: newImages,
         },
       })),
+    setFramesCount: (newCount) =>
+      set((state) => ({
+        ...state,
+        frames: {
+          ...state.frames,
+          count: newCount,
+        },
+      })),
     setPresentationVisible: (newVisible) =>
       set((state) => ({
         ...state,
@@ -1233,6 +1282,17 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
         presentation: {
           ...state.presentation,
           loadedPages,
+        },
+      })),
+    setPresentationUiVisible: (newVisible) =>
+      set((state) => ({
+        ...state,
+        presentation: {
+          ...state.presentation,
+          ui: {
+            ...state.presentation.ui,
+            visible: newVisible,
+          },
         },
       })),
     setGridEnabled: (newEnabled) =>
@@ -1300,6 +1360,29 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           ...state.guides,
           selected: newSelectedGuide,
         },
+      })),
+    setActiveTemplate: (newActiveTemplate) =>
+      set((state) => ({
+        ...state,
+        templates: {
+          ...state.templates,
+          active: newActiveTemplate,
+        },
+      })),
+    setRoomImageFallback: (imageFallback) =>
+      set((state) => ({
+        ...state,
+        roomImageFallback: imageFallback,
+      })),
+    setRoomImageFallbackLoaded: (loaded) =>
+      set((state) => ({
+        ...state,
+        roomImageFallbackLoaded: loaded,
+      })),
+    setRoomImageFallbackLoading: (loading) =>
+      set((state) => ({
+        ...state,
+        roomImageFallbackLoading: loading,
       })),
   };
 });

@@ -251,7 +251,7 @@ export const VideosLibrary = () => {
                 onCheckedChange={(checked) => {
                   setShowSelection(checked);
                 }}
-                className="w-[32px] cursor-pointer"
+                className="!w-[32px] cursor-pointer"
               />
               <Label
                 htmlFor="selection-mode"

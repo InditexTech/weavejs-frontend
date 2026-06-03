@@ -26,7 +26,8 @@ export const Route = createFileRoute("/api/ai/chats/$chatId")({
           );
         }
 
-        const { messages, imageOption } = await request.json();
+        const { messages, pageId, imageOption, referenceNodes } =
+          await request.json();
         const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
         const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
@@ -42,6 +43,8 @@ export const Route = createFileRoute("/api/ai/chats/$chatId")({
           },
           body: JSON.stringify({
             messages,
+            pageId,
+            referenceNodes,
             imageOption,
           }),
         });

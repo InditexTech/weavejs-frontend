@@ -1,6 +1,4 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+"use client";
 
 import {
   Collapsible,
@@ -53,7 +51,7 @@ export const SourcesContent = ({
     className={cn(
       "mt-3 flex w-fit flex-col gap-2",
       "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
-      className,
+      className
     )}
     {...props}
   />

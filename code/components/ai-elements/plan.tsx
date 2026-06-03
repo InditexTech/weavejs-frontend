@@ -1,11 +1,9 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  // CardAction,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -20,12 +18,13 @@ import {
 import { cn } from "@/lib/utils";
 import { ChevronsUpDownIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
+
 import { Shimmer } from "./shimmer";
 
-type PlanContextValue = {
+interface PlanContextValue {
   isStreaming: boolean;
-};
+}
 
 const PlanContext = createContext<PlanContextValue | null>(null);
 
@@ -46,13 +45,17 @@ export const Plan = ({
   isStreaming = false,
   children,
   ...props
-}: PlanProps) => (
-  <PlanContext.Provider value={{ isStreaming }}>
-    <Collapsible asChild data-slot="plan" {...props}>
-      <Card className={cn("shadow-none", className)}>{children}</Card>
-    </Collapsible>
-  </PlanContext.Provider>
-);
+}: PlanProps) => {
+  const contextValue = useMemo(() => ({ isStreaming }), [isStreaming]);
+
+  return (
+    <PlanContext.Provider value={contextValue}>
+      <Collapsible asChild data-slot="plan" {...props}>
+        <Card className={cn("shadow-none", className)}>{children}</Card>
+      </Collapsible>
+    </PlanContext.Provider>
+  );
+};
 
 export type PlanHeaderProps = ComponentProps<typeof CardHeader>;
 
@@ -106,11 +109,11 @@ export const PlanDescription = ({
   );
 };
 
-// export type PlanActionProps = ComponentProps<typeof CardAction>;
+export type PlanActionProps = ComponentProps<typeof CardAction>;
 
-// export const PlanAction = (props: PlanActionProps) => (
-//   <CardAction data-slot="plan-action" {...props} />
-// );
+export const PlanAction = (props: PlanActionProps) => (
+  <CardAction data-slot="plan-action" {...props} />
+);
 
 export type PlanContentProps = ComponentProps<typeof CardContent>;
 

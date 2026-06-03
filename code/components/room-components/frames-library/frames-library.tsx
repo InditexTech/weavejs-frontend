@@ -41,6 +41,7 @@ export const FramesLibrary = () => {
   const setFramesImages = useCollaborationRoom(
     (state) => state.setFramesImages,
   );
+  const setFramesCount = useCollaborationRoom((state) => state.setFramesCount);
 
   const [framesAvailable, setFramesAvailable] = React.useState<Konva.Node[]>(
     [],
@@ -91,6 +92,18 @@ export const FramesLibrary = () => {
 
     handleFrames();
   }, [instance, appState, sidebarActive]);
+
+  React.useEffect(() => {
+    if (instance && appState?.weave) {
+      const nodes = instance.findNodesByType(
+        appState.weave as WeaveStateElement,
+        "frame",
+      );
+      setFramesCount(nodes.length);
+    } else {
+      setFramesCount(null);
+    }
+  }, [instance, appState, setFramesCount]);
 
   React.useEffect(() => {
     const loadImage = async (node: Konva.Node) => {

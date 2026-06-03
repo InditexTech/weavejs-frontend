@@ -50,7 +50,7 @@ export const RoomCanvas = () => {
       className={cn(
         "fixed top-0 bottom-0 h-[calc(100%-40px)] flex z-0 overflow-hidden relative",
         {
-          ["left-[400px] right-[400px] w-[calc(100%-400px-400px)] max-w-[calc(100%-400px-400px)]"]:
+          ["left-[500px] right-[500px] w-[calc(100%-500px-500px)] max-w-[calc(100%-500px-500px)]"]:
             !viewType || viewType === "fixed",
           ["!left-[0px] !top-[54px] right-0 w-[calc(100%)] h-[calc(100%-54px-40px)]"]:
             viewType === "floating",

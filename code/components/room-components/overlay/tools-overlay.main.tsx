@@ -154,7 +154,7 @@ export function ToolsOverlayMain() {
       className={cn(
         "absolute flex gap-2 justify-center items-center top-[81px] bottom-[48px] xl:top-[16px]] 2xl:left-[16px] 2xl:bottom-[56px] 2xl:right-auto border-r-[#c9c9c9] pointer-events-none",
         {
-          ["left-[408px] 2xl:left-[408px] drop-shadow"]: viewType === "fixed",
+          ["left-[508px] 2xl:left-[508px] drop-shadow"]: viewType === "fixed",
           ["!left-[8px] bg-transparent !top-[0px] !bottom-[0px] z-1"]:
             viewType === "floating",
         },

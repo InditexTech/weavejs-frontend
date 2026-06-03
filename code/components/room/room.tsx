@@ -41,8 +41,10 @@ import { DeleteRoomPageDialog } from "../room-components/overlay/delete-room-pag
 import { Logo } from "../utils/logo";
 import { useLoadRoom } from "../room-components/hooks/use-load-room";
 import { SignOverlay } from "../sign-overlay/sign-overlay";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RoomAccessLinkDialog } from "../room-components/overlay/room-acces-link";
+import { useLoadRoomImageFallback } from "../room-components/hooks/use-load-room-image-fallback";
+import { postRoomImageFallback } from "@/api/post-room-image-fallback";
 
 export const Room = () => {
   return (
@@ -59,14 +61,17 @@ const RoomInternal = () => {
   const [initialized, setInitialized] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
-  const clientId = useCollaborationRoom((state) => state.clientId);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
 
   const comBusConnected = useCollaborationRoom(
     (state) => state.commBus.connected,
   );
+  const clientId = useCollaborationRoom((state) => state.clientId);
   const room = useCollaborationRoom((state) => state.room);
+  const actualPageId = useCollaborationRoom(
+    (state) => state.pages.actualPageId,
+  );
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
   const loadingFetchConnectionUrl = useCollaborationRoom(
     (state) => state.fetchConnectionUrl.loading,
@@ -93,6 +98,12 @@ const RoomInternal = () => {
   );
   const setShowRightSidebarFloating = useCollaborationRoom(
     (state) => state.setShowRightSidebarFloating,
+  );
+  const roomImageFallback = useCollaborationRoom(
+    (state) => state.roomImageFallback,
+  );
+  const roomImageFallbackLoaded = useCollaborationRoom(
+    (state) => state.roomImageFallbackLoaded,
   );
 
   const { loadedParams } = useHandleRouteParams();
@@ -131,6 +142,58 @@ const RoomInternal = () => {
       image: session?.user.image,
     } as WeaveUser;
   }, [session, clientId]);
+
+  const getCachedImageFallback = React.useCallback(
+    (imageId: string) => {
+      return roomImageFallback[imageId];
+    },
+    [roomImageFallback],
+  );
+
+  const mutateAddRoomImageFallback = useMutation({
+    mutationFn: async ({
+      userId,
+      clientId,
+      roomId,
+      pageId,
+      imageFallbackId,
+      imageFallbackDataURL,
+    }: {
+      userId: string;
+      clientId: string;
+      roomId: string;
+      pageId: string;
+      imageFallbackId: string;
+      imageFallbackDataURL: string;
+    }) => {
+      return await postRoomImageFallback(
+        userId,
+        clientId,
+        roomId,
+        pageId,
+        imageFallbackId,
+        imageFallbackDataURL,
+      );
+    },
+  });
+
+  const addImageFallback = React.useCallback(
+    async (imageId: string, dataURL: string) => {
+      if (!clientId) {
+        return;
+      }
+
+      mutateAddRoomImageFallback.mutate({
+        clientId,
+        userId: session?.user.id ?? "",
+        roomId: room ?? "",
+        pageId: actualPageId ?? "",
+        imageFallbackId: imageId,
+        imageFallbackDataURL: dataURL,
+      });
+    },
+    [clientId, session, room, actualPageId],
+  );
 
   const upscaleConfiguration = useCollaborationRoom(
     (state) => state.configuration.upscale,
@@ -262,6 +325,7 @@ const RoomInternal = () => {
   }, [status, initialized, pagesManaged, setInitialized]);
 
   useLoadRoom();
+  useLoadRoomImageFallback();
   useTasksEvents();
   useCommentsHandler();
   useLoadPage();
@@ -306,6 +370,7 @@ const RoomInternal = () => {
         session &&
         storeProvider &&
         rendererProvider &&
+        roomImageFallbackLoaded &&
         pagesManaged &&
         comBusConnected && (
           <ChatBotPromptProvider>
@@ -316,7 +381,7 @@ const RoomInternal = () => {
               renderer={rendererProvider}
               store={storeProvider}
               fonts={FONTS}
-              nodes={NODES()}
+              nodes={NODES(getCachedImageFallback, addImageFallback)}
               plugins={PLUGINS(getUser)}
               actions={ACTIONS(getUser)}
               performance={performanceConfiguration}

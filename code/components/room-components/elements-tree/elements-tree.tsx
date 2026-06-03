@@ -312,8 +312,10 @@ export const ElementsTree = () => {
     function handleOnStateChange() {
       if (!instance) return [];
 
-      const nodesTree = instance.getElementsTree();
-      setElementsTree(nodesTree);
+      React.startTransition(() => {
+        const nodesTree = instance.getElementsTree();
+        setElementsTree(nodesTree);
+      });
     }
 
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING) {
@@ -331,15 +333,17 @@ export const ElementsTree = () => {
 
   React.useEffect(() => {
     function handleOnNodesSelectedChange(nodes: WeaveSelection[]) {
-      if (nodes.length > 1) {
-        setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
-      }
+      React.startTransition(() => {
+        if (nodes.length > 1) {
+          setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
+        }
 
-      setSelectedNodes(
-        nodes
-          .map((node) => node.node?.key)
-          .filter((key) => typeof key !== "undefined"),
-      );
+        setSelectedNodes(
+          nodes
+            .map((node) => node.node?.key)
+            .filter((key) => typeof key !== "undefined"),
+        );
+      });
     }
 
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING) {

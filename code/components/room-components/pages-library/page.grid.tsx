@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { getRoom } from "@/api/get-room";
 import { cn } from "@/lib/utils";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
@@ -12,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Archive, Pencil } from "lucide-react";
 import { useHandlePageThumbnailChange } from "../hooks/use-handle-page-thumbnail-change";
 import { Badge } from "@/components/ui/badge";
+import { getRoomData } from "@/components/utils/data";
 
 type PageGridProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,20 +49,32 @@ export const PageGrid = ({ page, index }: Readonly<PageGridProps>) => {
   const setRoomsPageDeleteVisible = useCollaborationRoom(
     (state) => state.setRoomsPageDeleteVisible,
   );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
 
   const queryClient = useQueryClient();
 
   const handleSwitchPage = React.useCallback(async () => {
     if (!instance) return;
 
+    if (!roomId) return;
+
+    if (!page.pageId) return;
+
     const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
     try {
-      const data = await queryClient.fetchQuery({
-        queryKey: ["roomData", page.pageId],
-        queryFn: () => getRoom(page.pageId),
-      });
-
+      const { roomData: data } = await getRoomData(
+        queryClient,
+        roomId,
+        page.pageId,
+        setRoomDataStatus,
+        setRoomImageFallback,
+      );
       store.switchToRoom(page.pageId, data);
       // eslint-disable-next-line no-empty
     } catch {
@@ -75,6 +87,7 @@ export const PageGrid = ({ page, index }: Readonly<PageGridProps>) => {
     setPagesGridVisible(false);
   }, [
     instance,
+    roomId,
     page,
     queryClient,
     setPagesActualPage,

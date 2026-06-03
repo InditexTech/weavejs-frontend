@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { getRoom } from "@/api/get-room";
 import { cn } from "@/lib/utils";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
@@ -11,6 +10,7 @@ import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pub
 import { useQueryClient } from "@tanstack/react-query";
 import { Archive, Pencil } from "lucide-react";
 import { useHandlePageThumbnailChange } from "../hooks/use-handle-page-thumbnail-change";
+import { getRoomData } from "@/components/utils/data";
 
 type PageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,11 +19,15 @@ type PageProps = {
 };
 
 export const Page = ({ page, index }: Readonly<PageProps>) => {
+  const elementRef = React.useRef<HTMLDivElement | null>(null);
   const imageRef = React.useRef<HTMLImageElement | null>(null);
   const imageFallbackRef = React.useRef<HTMLDivElement | null>(null);
 
   const instance = useWeave((state) => state.instance);
 
+  const pagesListVisible = useCollaborationRoom(
+    (state) => state.pages.listVisible,
+  );
   const roomId = useCollaborationRoom((state) => state.room);
   const actualPages = useCollaborationRoom((state) => state.pages.actualPages);
   const actualPageId = useCollaborationRoom(
@@ -49,11 +53,19 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
   const setRoomsPageDeleteVisible = useCollaborationRoom(
     (state) => state.setRoomsPageDeleteVisible,
   );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
 
   const queryClient = useQueryClient();
 
   const handleSwitchPage = React.useCallback(async () => {
     if (!instance) return;
+
+    if (!roomId) return;
 
     const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
@@ -68,10 +80,13 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
     );
 
     if (!switchToPageElement) {
-      const switchToPageElement = await queryClient.fetchQuery({
-        queryKey: ["roomData", page.pageId],
-        queryFn: () => getRoom(page.pageId),
-      });
+      const { roomData: switchToPageElement } = await getRoomData(
+        queryClient,
+        roomId,
+        page.pageId,
+        setRoomDataStatus,
+        setRoomImageFallback,
+      );
 
       if (switchToPageElement) {
         store.switchToRoom(page.pageId, switchToPageElement);
@@ -91,6 +106,7 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
     }
   }, [
     instance,
+    roomId,
     page,
     queryClient,
     setPagesActualPage,
@@ -102,8 +118,22 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
 
   const thumbnail = useHandlePageThumbnailChange({ page });
 
+  React.useEffect(() => {
+    if (
+      pagesListVisible &&
+      actualPageId === page.pageId &&
+      elementRef.current
+    ) {
+      elementRef.current.scrollIntoView({
+        behavior: "instant",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [pagesListVisible, actualPageId, page.pageId]);
+
   return (
-    <div className="flex flex-col gap-2">
+    <div ref={elementRef} className="flex flex-col gap-2">
       <div
         role="button"
         className={cn(

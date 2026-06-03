@@ -1,15 +1,11 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 const Textarea = React.forwardRef<
-  React.ElementRef<"textarea">,
+  React.ComponentRef<"textarea">,
   React.ComponentProps<"textarea">
->(({ className, ...props }, ref) => {
+>(function Textarea({ className, ...props }, ref) {
   return (
     <textarea
       ref={ref}

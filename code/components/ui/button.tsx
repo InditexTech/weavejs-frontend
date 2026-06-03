@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
@@ -43,36 +39,34 @@ const buttonVariants = cva(
 );
 
 const Button = React.forwardRef<
-  HTMLButtonElement,
+  React.ComponentRef<"button">,
   React.ComponentProps<"button"> &
     VariantProps<typeof buttonVariants> & {
       asChild?: boolean;
     }
->(
-  (
-    {
-      className,
-      variant = "default",
-      size = "default",
-      asChild = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const Comp = asChild ? Slot.Root : "button";
-
-    return (
-      <Comp
-        ref={ref}
-        data-slot="button"
-        data-variant={variant}
-        data-size={size}
-        className={cn(buttonVariants({ variant, size, className }))}
-        {...props}
-      />
-    );
+>(function Button(
+  {
+    className,
+    variant = "default",
+    size = "default",
+    asChild = false,
+    ...props
   },
-);
+  ref,
+) {
+  const Comp = asChild ? Slot.Root : "button";
+
+  return (
+    <Comp
+      ref={ref}
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+});
 
 Button.displayName = "Button";
 

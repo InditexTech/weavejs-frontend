@@ -46,9 +46,9 @@ export const RoomLeftSidebar = ({
   return (
     <section
       className={cn("", {
-        ["top-0 left-0 bottom-0 h-[calc(100%-40px)] w-[400px]"]:
+        ["top-0 left-0 bottom-0 h-[calc(100%-40px)] w-[500px]"]:
           viewType === "fixed",
-        ["top-[62px] left-[62px] w-[400px] h-[calc(100%-54px-16px-40px)] drop-shadow"]:
+        ["top-[62px] left-[62px] w-[500px] h-[calc(100%-54px-16px-40px)] drop-shadow"]:
           viewType === "floating" && showLeftSidebarFloating,
         ["fixed pointer-events-auto bg-white border-r-[0.5px] border-r-[#c9c9c9]"]:
           !imageCroppingEnabled &&

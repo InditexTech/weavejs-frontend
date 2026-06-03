@@ -26,14 +26,12 @@ import { postTemplate } from "@/api/post-template";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import Konva from "konva";
-import { cn, sleep } from "@/lib/utils";
 import { useJsonTemplate } from "../hooks/use-json-template";
 
 export function SaveTemplateDialog() {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const room = useCollaborationRoom((state) => state.room);
-  const viewType = useCollaborationRoom((state) => state.viewType);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
   );
@@ -98,8 +96,6 @@ export function SaveTemplateDialog() {
         },
         WEAVE_EXPORT_RETURN_FORMAT.DATA_URL,
       )) as string;
-
-      await sleep(1000);
 
       setGeneratingImagePreview(false);
       setTemplateImage(selectionPreviewURL);
@@ -347,22 +343,6 @@ export function SaveTemplateDialog() {
           </DialogContent>
         </form>
       </Dialog>
-      {generatingImagePreview && (
-        <div
-          className={cn(
-            "absolute bg-white z-[49] flex flex-col justify-center items-center",
-            {
-              ["top-0 left-[400px] right-[400px] bottom-[40px]"]:
-                viewType === "fixed",
-              ["top-[54.5px] left-[0px] right-[0px] bottom-[40px]"]:
-                viewType === "floating",
-            },
-          )}
-        >
-          <div className="font-light text-xl">GENERATING TEMPLATE PREVIEW</div>
-          <div className="font-light text-base">please wait...</div>
-        </div>
-      )}
     </>
   );
 }

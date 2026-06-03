@@ -79,6 +79,12 @@ export const ChatBot = () => {
 
   React.useEffect(() => {
     async function createDefaultChat() {
+      console.log(
+        "Creating default chat with threadId:",
+        threadId,
+        "and resourceId:",
+        resourceId,
+      );
       await mutationCreateChat.mutate({
         roomId: room ?? "",
         chatId: threadId,
@@ -89,7 +95,7 @@ export const ChatBot = () => {
       queryClient.invalidateQueries({ queryKey });
     }
 
-    if (!isFetching && isFetched && !chatData) {
+    if (!isFetching && isFetched && !chatData && threadId !== "not-defined") {
       createDefaultChat();
     }
   }, [

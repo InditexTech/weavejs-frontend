@@ -1,17 +1,11 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+"use client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ToolUIPart } from "ai";
-import {
-  type ComponentProps,
-  createContext,
-  type ReactNode,
-  useContext,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext, useMemo } from "react";
 
 type ToolUIPartApproval =
   | {
@@ -41,10 +35,10 @@ type ToolUIPartApproval =
     }
   | undefined;
 
-type ConfirmationContextValue = {
+interface ConfirmationContextValue {
   approval: ToolUIPartApproval;
   state: ToolUIPart["state"];
-};
+}
 
 const ConfirmationContext = createContext<ConfirmationContextValue | null>(
   null,
@@ -71,13 +65,18 @@ export const Confirmation = ({
   state,
   ...props
 }: ConfirmationProps) => {
+  const contextValue = useMemo(() => ({ approval, state }), [approval, state]);
+
   if (!approval || state === "input-streaming" || state === "input-available") {
     return null;
   }
 
   return (
-    <ConfirmationContext.Provider value={{ approval, state }}>
-      <Alert className={cn("flex flex-col gap-2", className)} {...props} />
+    <ConfirmationContext.Provider value={contextValue}>
+      <Alert
+        className={cn("w-full flex flex-col gap-2 !rounded-none", className)}
+        {...props}
+      />
     </ConfirmationContext.Provider>
   );
 };
@@ -91,24 +90,24 @@ export const ConfirmationTitle = ({
   <AlertDescription className={cn("inline", className)} {...props} />
 );
 
-export type ConfirmationRequestProps = {
+export interface ConfirmationRequestProps {
   children?: ReactNode;
-};
+}
 
 export const ConfirmationRequest = ({ children }: ConfirmationRequestProps) => {
   const { state } = useConfirmation();
 
   // Only show when approval is requested
-  if ((state as string) !== "approval-requested") {
+  if (state !== "approval-requested") {
     return null;
   }
 
   return children;
 };
 
-export type ConfirmationAcceptedProps = {
+export interface ConfirmationAcceptedProps {
   children?: ReactNode;
-};
+}
 
 export const ConfirmationAccepted = ({
   children,
@@ -118,9 +117,9 @@ export const ConfirmationAccepted = ({
   // Only show when approved and in response states
   if (
     !approval?.approved ||
-    ((state as string) !== "approval-responded" &&
-      (state as string) !== "output-denied" &&
-      (state as string) !== "output-available")
+    (state !== "approval-responded" &&
+      state !== "output-denied" &&
+      state !== "output-available")
   ) {
     return null;
   }
@@ -128,9 +127,9 @@ export const ConfirmationAccepted = ({
   return children;
 };
 
-export type ConfirmationRejectedProps = {
+export interface ConfirmationRejectedProps {
   children?: ReactNode;
-};
+}
 
 export const ConfirmationRejected = ({
   children,
@@ -140,9 +139,9 @@ export const ConfirmationRejected = ({
   // Only show when rejected and in response states
   if (
     approval?.approved !== false ||
-    ((state as string) !== "approval-responded" &&
-      (state as string) !== "output-denied" &&
-      (state as string) !== "output-available")
+    (state !== "approval-responded" &&
+      state !== "output-denied" &&
+      state !== "output-available")
   ) {
     return null;
   }
@@ -159,7 +158,7 @@ export const ConfirmationActions = ({
   const { state } = useConfirmation();
 
   // Only show when approval is requested
-  if ((state as string) !== "approval-requested") {
+  if (state !== "approval-requested") {
     return null;
   }
 
@@ -174,5 +173,5 @@ export const ConfirmationActions = ({
 export type ConfirmationActionProps = ComponentProps<typeof Button>;
 
 export const ConfirmationAction = (props: ConfirmationActionProps) => (
-  <Button className="h-8 px-3 text-sm" type="button" {...props} />
+  <Button className="h-8 px-3 text-sm !rounded-none" type="button" {...props} />
 );

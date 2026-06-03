@@ -23,7 +23,7 @@ export const AIToolbar = () => {
   const aiChatHidden = useIAChat((state) => state.hidden);
   const setAiChatHidden = useIAChat((state) => state.setHidden);
 
-  useHotkey({ key: "I", mod: false, shift: true }, () => {
+  useHotkey({ key: "C", mod: true, shift: true }, () => {
     setAiChatHidden(!aiChatHidden);
   });
 

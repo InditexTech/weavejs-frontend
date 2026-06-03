@@ -26,7 +26,10 @@ import {
   WeaveCommentNodeViewAction,
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
-import { WeaveElementInstance } from "@inditextech/weave-types";
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+} from "@inditextech/weave-types";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
@@ -37,12 +40,14 @@ import {
 } from "../../room-components/comment/comment-dom";
 import { getUserShort } from "./../users";
 import { ThreadEntity } from "../../room-components/hooks/types";
-// import resources from "./resources/resources2.json";
 import { BACKGROUND_COLOR } from "@/store/store";
 
 const ENABLED_RESOURCES = false;
 
-export const NODES = () => [
+export const NODES = (
+  getCachedImageFallback: (imageId: string) => string | undefined,
+  addImageFallback: (imageId: string, dataURL: string) => Promise<void>,
+) => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
@@ -82,7 +87,19 @@ export const NODES = () => [
         ],
         keepRatio: true,
       },
-      useFallbackImage: true,
+      imageFallback: {
+        enabled: true,
+        getId: (props: WeaveElementAttributes) => {
+          return props.imageId as string;
+        },
+        getDataURL: (imageFallbackId: string) => {
+          const cachedImageFallback = getCachedImageFallback(imageFallbackId);
+          return cachedImageFallback ?? "";
+        },
+        onPersist: (params: WeaveElementAttributes, dataURL: string) => {
+          addImageFallback(params.imageId as string, dataURL);
+        },
+      },
       urlTransformer: (
         url: string,
         //node?: Konva.Node

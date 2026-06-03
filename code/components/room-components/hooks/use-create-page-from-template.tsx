@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postPage } from "@/api/pages/post-page";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useCollaborationRoom } from "@/store/store";
-import { getRoom } from "@/api/get-room";
+import { getRoomData } from "@/components/utils/data";
 
 type UseCreatePageFromTemplateProps = {
   roomId: string;
@@ -24,6 +24,7 @@ export const useCreatePageFromTemplate = (
 
   const instance = useWeave((state) => state.instance);
 
+  const room = useCollaborationRoom((state) => state.room);
   const pagesAmount = useCollaborationRoom((state) => state.pages.amount);
   const setPagesActualPage = useCollaborationRoom(
     (state) => state.setPagesActualPage,
@@ -31,12 +32,20 @@ export const useCreatePageFromTemplate = (
   const setPagesActualPageId = useCollaborationRoom(
     (state) => state.setPagesActualPageId,
   );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
 
   const queryClient = useQueryClient();
 
   const handleSwitchPage = React.useCallback(
     async (pageIndex: number, pageId: string) => {
       if (!instance) return;
+
+      if (!room) return;
 
       const queryKeyPages = ["getPages", hookParams.roomId];
       queryClient.invalidateQueries({ queryKey: queryKeyPages });
@@ -47,11 +56,13 @@ export const useCreatePageFromTemplate = (
       const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
       try {
-        const data = await queryClient.fetchQuery({
-          queryKey: ["roomData", pageId],
-          queryFn: () => getRoom(pageId),
-        });
-
+        const { roomData: data } = await getRoomData(
+          queryClient,
+          room,
+          pageId,
+          setRoomDataStatus,
+          setRoomImageFallback,
+        );
         store.switchToRoom(pageId, data);
         // eslint-disable-next-line no-empty
       } catch {
@@ -63,6 +74,7 @@ export const useCreatePageFromTemplate = (
     },
     [
       instance,
+      room,
       queryClient,
       hookParams.roomId,
       setPagesActualPage,
@@ -79,6 +91,7 @@ export const useCreatePageFromTemplate = (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       templateData: any;
     }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const boundingBox = WeaveStateManipulation.getNodesBoundingBox(
         params.templateData,
       );

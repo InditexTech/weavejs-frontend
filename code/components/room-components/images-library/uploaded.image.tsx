@@ -10,10 +10,10 @@ import { downscaleImageFromURL } from "@inditextech/weave-sdk";
 
 type UploadedImageProps = { image: ImageEntity; selected: boolean };
 
-export const UploadedImage = ({
+export const UploadedImage = React.memo(function UploadedImage({
   image,
   selected,
-}: Readonly<UploadedImageProps>) => {
+}: Readonly<UploadedImageProps>) {
   const [downscaledImageDataUrl, setDownscaledImageDataUrl] = React.useState<
     string | null
   >(null);
@@ -53,8 +53,15 @@ export const UploadedImage = ({
     return null;
   }
 
+  // Reserve the exact space the image will occupy while the thumbnail loads.
+  // This prevents layout shifts and keeps the column grid stable.
   if (!downscaledImageDataUrl) {
-    return null;
+    return (
+      <div
+        className="w-full bg-zinc-100 animate-pulse"
+        style={image.aspectRatio ? { aspectRatio: image.aspectRatio } : { minHeight: "100px" }}
+      />
+    );
   }
 
   return (
@@ -72,9 +79,9 @@ export const UploadedImage = ({
     >
       <img
         className="w-full block object-cover relative transition-transform duration-500 group-hover:opacity-60"
-        style={{
-          aspectRatio: `${image.aspectRatio}`,
-        }}
+        style={
+          image.aspectRatio ? { aspectRatio: image.aspectRatio } : undefined
+        }
         id={image.imageId}
         data-image-id={image.imageId}
         data-image-url={imageUrl}
@@ -90,4 +97,4 @@ export const UploadedImage = ({
         )}
     </div>
   );
-};
+});

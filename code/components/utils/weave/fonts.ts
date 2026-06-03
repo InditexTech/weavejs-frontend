@@ -98,6 +98,26 @@ export const FONTS = async (): Promise<WeaveFont[]> => {
   await interItalicBold.load();
   document.fonts.add(interItalicBold);
 
+  // INTER LIGHT FONT
+
+  const interLight = new FontFace("Inter", "url(/fonts/Inter_18pt-Light.ttf)", {
+    weight: "300",
+    style: "normal",
+  });
+  await interLight.load();
+  document.fonts.add(interLight);
+
+  const interLightItalic = new FontFace(
+    "Inter",
+    "url(/fonts/Inter_18pt-LightItalic.ttf)",
+    {
+      weight: "300",
+      style: "italic",
+    },
+  );
+  await interLightItalic.load();
+  document.fonts.add(interLightItalic);
+
   fonts.push({
     id: "Inter",
     name: `Inter, sans-serif`,

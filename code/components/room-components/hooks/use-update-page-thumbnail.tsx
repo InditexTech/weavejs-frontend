@@ -137,6 +137,10 @@ export const useUpdatePageThumbnail = () => {
 
       const stage = instance.getStage();
 
+      if (!stage) {
+        return;
+      }
+
       const clonedStage = stage.clone();
       const mainLayer = clonedStage.findOne("#mainLayer") as
         | Konva.Layer
@@ -160,6 +164,8 @@ export const useUpdatePageThumbnail = () => {
         pixelRatio: (1 / stage.scaleX()) * 0.3,
         mimeType: "image/png",
       });
+
+      clonedStage.destroy();
 
       if (!blob) {
         return;

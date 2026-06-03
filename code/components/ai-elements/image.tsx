@@ -1,9 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-/* eslint-disable */
-
 import { cn } from "@/lib/utils";
 import type { Experimental_GeneratedImage } from "ai";
 
@@ -14,7 +8,8 @@ export type ImageProps = Experimental_GeneratedImage & {
 
 export const Image = ({
   base64,
-  // uint8Array,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  uint8Array: _uint8Array,
   mediaType,
   ...props
 }: ImageProps) => (

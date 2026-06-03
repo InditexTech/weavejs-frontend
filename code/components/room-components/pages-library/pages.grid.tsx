@@ -17,9 +17,9 @@ import { Plus } from "lucide-react";
 import { postPage } from "@/api/pages/post-page";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
-import { getRoom } from "@/api/get-room";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { useOnInView } from "react-intersection-observer";
+import { getRoomData } from "@/components/utils/data";
 
 export const PagesGrid = () => {
   const viewportRef = React.useRef<HTMLDivElement>(null);
@@ -45,6 +45,12 @@ export const PagesGrid = () => {
   const setPagesActualPages = useCollaborationRoom(
     (state) => state.setPagesActualPages,
   );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
 
   React.useEffect(() => {
     if (viewportRef.current) {
@@ -58,6 +64,8 @@ export const PagesGrid = () => {
     async (pageIndex: number, pageId: string) => {
       if (!instance) return;
 
+      if (!roomId) return;
+
       const queryKeyPages = ["getPages", roomId ?? ""];
       queryClient.invalidateQueries({ queryKey: queryKeyPages });
 
@@ -67,11 +75,13 @@ export const PagesGrid = () => {
       const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
       try {
-        const data = await queryClient.fetchQuery({
-          queryKey: ["roomData", pageId],
-          queryFn: () => getRoom(pageId),
-        });
-
+        const { roomData: data } = await getRoomData(
+          queryClient,
+          roomId,
+          pageId,
+          setRoomDataStatus,
+          setRoomImageFallback,
+        );
         store.switchToRoom(pageId, data);
         // eslint-disable-next-line no-empty
       } catch {
@@ -175,7 +185,7 @@ export const PagesGrid = () => {
   });
 
   return (
-    <ScrollArea.Root className="w-full h-[calc(100%-60px-74px)]">
+    <ScrollArea.Root className="w-full h-[calc(100%-74px)]">
       <ScrollArea.Viewport className="@container h-full" ref={viewportRef}>
         {firstLoad && query.isFetching && !query.isFetchingNextPage && (
           <div className="w-full h-full flex justify-center items-center">

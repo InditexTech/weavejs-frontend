@@ -25,6 +25,8 @@ type ImagesLibraryActions = {
   setShowSelection: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setSelectedImages: any;
+  onOptimisticDelete: (imageId: string) => void;
+  onRollbackDelete: (imageId: string) => void;
 };
 
 export const ImagesLibraryActions = ({
@@ -33,6 +35,8 @@ export const ImagesLibraryActions = ({
   selectedImages,
   setShowSelection,
   setSelectedImages,
+  onOptimisticDelete,
+  onRollbackDelete,
 }: Readonly<ImagesLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
@@ -119,9 +123,10 @@ export const ImagesLibraryActions = ({
         imageId,
       );
     },
-    onMutate: () => {
+    onMutate: (imageId: string) => {
       const toastId = toast.loading("Requesting images deletion...");
-      return { toastId };
+      onOptimisticDelete(imageId);
+      return { toastId, imageId };
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSettled: (_, __, ___, context: any) => {
@@ -129,7 +134,11 @@ export const ImagesLibraryActions = ({
         toast.dismiss(context.toastId);
       }
     },
-    onError() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(_, __, context: any) {
+      if (context?.imageId) {
+        onRollbackDelete(context.imageId);
+      }
       toast.error("Error requesting images deletion.");
     },
   });
@@ -170,6 +179,8 @@ export const ImagesLibraryActions = ({
         const dataBase64Url = canvas.toDataURL("image/png");
 
         const dataBase64 = dataBase64Url.split(",")[1];
+
+        canvas.remove();
 
         mutationUploadV2.mutate({
           userId: session?.user.id ?? "",
