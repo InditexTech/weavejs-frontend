@@ -29,6 +29,8 @@ path = [
     "code/justfile",
     "code/package*.json",
     "code/tsconfig.json",
+    "code/components/ui/**",
+    "code/components/ai-elements/**"
 ]
 SPDX-FileCopyrightText = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
 SPDX-License-Identifier = "Apache-2.0"
