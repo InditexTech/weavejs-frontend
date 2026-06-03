@@ -15,7 +15,7 @@ import {
 import React from "react";
 import { X } from "lucide-react";
 import { useCollaborationRoom } from "@/store/store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useLoadPageInfo } from "../hooks/use-load-page-info";
 import { delPage } from "@/api/pages/del-page";
@@ -45,6 +45,8 @@ export function DeleteRoomPageDialog() {
 
   const { data: pageInfo } = useLoadPageInfo(roomId ?? "", pageId ?? "");
 
+  const queryClient = useQueryClient();
+
   const archivePage = useMutation({
     mutationFn: async ({
       roomId,
@@ -65,8 +67,10 @@ export function DeleteRoomPageDialog() {
       }
       setArchiving(false);
     },
-    onSuccess: () => {
+    onSuccess: (_, { roomId: rid }) => {
       toast.success(`Page archived successfully`);
+      queryClient.invalidateQueries({ queryKey: ["getPagesInfiniteGrid", rid] });
+      queryClient.invalidateQueries({ queryKey: ["getPagesInfiniteList", rid] });
     },
     onError() {
       toast.error(`Failed to archive the page. Please check and try again`);

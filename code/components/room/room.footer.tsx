@@ -23,6 +23,7 @@ import { ExportToolbar } from "../room-components/toolbars/export.toolbar";
 import { Badge } from "../ui/badge";
 import { UISetupToolbar } from "../room-components/toolbars/ui-setup.toolbar";
 import { PresentationToolbar } from "../room-components/toolbars/presentation.toolbar";
+import { MemoryToolbar } from "../room-components/toolbars/memory.toolbar";
 
 export const RoomFooter = () => {
   const isRoomSwitching = useWeave((state) => state.room.switching);
@@ -70,6 +71,7 @@ export const RoomFooter = () => {
           )}
           <ConnectedUsers />
           <UISetupToolbar />
+          <MemoryToolbar />
           {/* {asyncElementsState !== "loaded" && (
             <>
               <Divider className="h-[20px]" />

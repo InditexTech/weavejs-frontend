@@ -13,18 +13,34 @@ import useHandleRouteParams from "../hooks/use-handle-route-params";
 import { Logo } from "@/components/utils/logo";
 import { Ban, LoaderCircle } from "lucide-react";
 import { SessionLogin } from "@/components/session/session.login";
+import { useWeave } from "@inditextech/weave-react";
+
+const STATES_MAP = {
+  STARTING: "starting",
+  LOADING_ROOM_INFORMATION: "loading room definition",
+  LOADING_ROOM_DATA: "loading room data",
+  LOADING_ROOM_METADATA: "loading room metadata",
+  CONNECTING_TO_ROOM: "connecting to room",
+  LOADING_ROOM: "loading room",
+  ROOM_LOADED: "room loaded",
+};
 
 export function RoomLoader() {
   const navigate = useNavigate();
 
+  const status = useWeave((state) => state.status);
+
   const room = useCollaborationRoom((state) => state.room);
-  const roomStatus = useCollaborationRoom((state) => state.status);
+  const roomDataStatus = useCollaborationRoom((state) => state.dataStatus);
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
   const roomInfoLoading = useCollaborationRoom(
     (state) => state.roomInfo.loading,
   );
   const roomInfoLoaded = useCollaborationRoom((state) => state.roomInfo.loaded);
   const roomInfoError = useCollaborationRoom((state) => state.roomInfo.error);
+  const roomImageFallbackLoading = useCollaborationRoom(
+    (state) => state.roomImageFallbackLoading,
+  );
 
   const { loadedParams } = useHandleRouteParams();
 
@@ -32,16 +48,27 @@ export function RoomLoader() {
 
   const loadingDescription = React.useMemo(() => {
     if (roomInfoLoading) {
-      return "loading room information";
+      return STATES_MAP.LOADING_ROOM_INFORMATION;
     }
-    if (roomStatus === "loading") {
-      return "loading room data";
+    if (roomDataStatus === "pending") {
+      return STATES_MAP.LOADING_ROOM_DATA;
     }
-    if (roomStatus === "loaded") {
-      return "starting room";
+    if (roomImageFallbackLoading) {
+      return STATES_MAP.LOADING_ROOM_METADATA;
     }
-    return "";
-  }, [roomStatus, roomInfoLoading]);
+    if (["idle", "starting"].includes(status)) {
+      return STATES_MAP.STARTING;
+    }
+    if (status === "connectingToRoom") {
+      return STATES_MAP.CONNECTING_TO_ROOM;
+    }
+    if (status === "loadingRoom") {
+      return STATES_MAP.LOADING_ROOM;
+    }
+    return STATES_MAP.ROOM_LOADED;
+  }, [status, roomImageFallbackLoading, roomDataStatus, roomInfoLoading]);
+
+  console.log("loadingDescription", loadingDescription);
 
   if (isPending) {
     return null;

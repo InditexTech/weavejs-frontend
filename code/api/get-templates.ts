@@ -4,13 +4,15 @@
 
 export const getTemplates = async (
   roomId: string,
+  kind?: string,
+  imageSlots?: number,
   offset: number = 0,
   limit: number = 20,
 ) => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
-  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/templates?offset=${offset}&limit=${limit}`;
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}/templates?offset=${offset}&limit=${limit}${kind ? `&kind=${kind}` : ""}${imageSlots ? `&imageSlots=${imageSlots}` : ""}`;
 
   const response = await fetch(endpoint);
   const data = await response.json();

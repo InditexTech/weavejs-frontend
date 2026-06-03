@@ -12,13 +12,25 @@ import { TemplateEntity } from "./types";
 import { cn } from "@/lib/utils";
 import { delTemplate } from "@/api/del-template";
 import { useGetSession } from "../hooks/use-get-session";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type TemplatesLibraryActions = {
   selectedTemplates: TemplateEntity[];
+  kind: "template" | "imageTemplate" | "all";
+  setKind: (kind: "template" | "imageTemplate" | "all") => void;
 };
 
 export const TemplatesLibraryActions = ({
   selectedTemplates,
+  kind,
+  setKind,
 }: Readonly<TemplatesLibraryActions>) => {
   const instance = useWeave((state) => state.instance);
 
@@ -90,18 +102,49 @@ export const TemplatesLibraryActions = ({
   }
 
   return (
-    <div className="w-full h-[40px] p-3 px-6 bg-white flex justify-between items-center border-t-[0.5px] border-[#c9c9c9]">
+    <div className="w-full h-[52px] p-3 px-6 bg-white flex justify-between items-center border-t-[0.5px] border-[#c9c9c9]">
       <div
         className={cn("flex gap-2 items-center font-inter font-light text-xs", {
           ["justify-start"]: actions.length > 0,
-          ["w-full justify-center"]: actions.length === 0,
+          ["w-full justify-start"]: actions.length === 0,
         })}
       >
-        {actions.length > 0 ? (
-          "SELECTION ACTIONS"
-        ) : (
-          <span>select a template</span>
-        )}
+        <Select
+          value={kind}
+          onValueChange={(value) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setKind(value as any);
+          }}
+        >
+          <SelectTrigger className="font-inter text-xs rounded-none !h-[30px] !border-black !shadow-none">
+            <SelectValue placeholder="Kind" />
+          </SelectTrigger>
+          <SelectContent
+            className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+            align="start"
+          >
+            <SelectGroup>
+              <SelectItem
+                value="all"
+                className="font-inter text-xs rounded-none"
+              >
+                ALL
+              </SelectItem>
+              <SelectItem
+                value="template"
+                className="font-inter text-xs rounded-none"
+              >
+                TEMPLATE
+              </SelectItem>
+              <SelectItem
+                value="imageTemplate"
+                className="font-inter text-xs rounded-none"
+              >
+                IMAGE TEMPLATE
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex gap-2 justify-end items-center">{actions}</div>
     </div>

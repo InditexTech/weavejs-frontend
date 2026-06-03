@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export type PostAddTemplateToRoomPayload = {
-  roomId?: string;
-  roomName?: string;
-  frameName: string;
-  templateInstanceId: string;
+  roomId: string;
+  pageId: string;
   templateId: string;
-  imagesIds: string[];
+  target: {
+    id: string;
+    position: {
+      x: number;
+      y: number;
+    };
+  };
 };
 
 export const postAddTemplateToRoom = async (

@@ -251,7 +251,7 @@ export const VideosLibrary = () => {
                 onCheckedChange={(checked) => {
                   setShowSelection(checked);
                 }}
-                className="w-[32px] cursor-pointer"
+                className="!w-[32px] cursor-pointer"
               />
               <Label
                 htmlFor="selection-mode"
@@ -411,7 +411,7 @@ export const VideosLibrary = () => {
                             )}
                           </div>
                         </ContextMenuTrigger>
-                        <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
+                        <ContextMenuContent className="w-[240px] rounded-none border-[0.5px] border-[#c9c9c9] drop-shadow">
                           {typeof appVideo !== "undefined" && (
                             <>
                               <ContextMenuItem

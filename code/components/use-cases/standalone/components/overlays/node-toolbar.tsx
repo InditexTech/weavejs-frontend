@@ -8,6 +8,7 @@ import Konva from "konva";
 import {
   WEAVE_STORE_CONNECTION_STATUS,
   WeaveElementInstance,
+  WeaveSelection,
   WeaveStateElement,
 } from "@inditextech/weave-types";
 import {
@@ -1664,11 +1665,10 @@ export const NodeToolbar = () => {
                 }
 
                 if (!actualNode && nodes.length > 1) {
-                  for (const node of nodes) {
-                    if (node.node) {
-                      instance.removeNode(node.node);
-                    }
-                  }
+                  const elements = nodes
+                    .map((n: WeaveSelection) => n.node)
+                    .filter((n) => n !== undefined);
+                  instance.removeNodes(elements);
                 }
               }}
               label={

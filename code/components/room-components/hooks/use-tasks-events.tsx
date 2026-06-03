@@ -115,6 +115,7 @@ export const useTasksEvents = () => {
     if (
       !pageId ||
       !session?.user.id ||
+      !clientId ||
       !roomInfo ||
       !roomInfoLoaded ||
       roomInfoError
@@ -123,7 +124,7 @@ export const useTasksEvents = () => {
     }
 
     async function connectToRoomCoomBus() {
-      if (!pageId || !session?.user.id) {
+      if (!pageId || !session?.user.id || !clientId) {
         return;
       }
 
@@ -184,6 +185,14 @@ export const useTasksEvents = () => {
           ].includes(type)
         ) {
           const queryKey = ["getImages", room];
+          queryClient.invalidateQueries({ queryKey });
+        }
+
+        if (
+          ["fallbackImageUpdated"].includes(type) &&
+          message.status === "completed"
+        ) {
+          const queryKey = ["roomImageFallbackData", room ?? "", pageId ?? ""];
           queryClient.invalidateQueries({ queryKey });
         }
 
@@ -253,68 +262,89 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastExportPageToImageRef.current) {
+              // If we missed the "created" event (e.g. client connected after
+              // the job was already queued), create a toast now so the user
+              // sees feedback and the download still triggers.
+              if (!toastExportPageToImageRef.current) {
+                toastExportPageToImageRef.current = toast.loading(
+                  "Export page to image",
+                  {
+                    description: "Completed, triggering download",
+                    duration: Infinity,
+                  },
+                );
+              } else {
                 toast.loading("Export page to image", {
                   id: toastExportPageToImageRef.current,
                   description: "Completed, triggering download",
                   duration: 4000,
                 });
-
-                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
-
-                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
-
-                const res = await fetch(url);
-
-                if (!res.ok) {
-                  setImageExporting(false);
-                  toast.error("Export page to image", {
-                    id: toastExportPageToImageRef.current,
-                    description: "Failed to download image, try again",
-                    duration: 4000,
-                  });
-                  return;
-                }
-
-                toast.loading("Export page to image", {
-                  id: toastExportPageToImageRef.current,
-                  description: "Downloading image, please wait",
-                  duration: Infinity,
-                });
-
-                const blob = await res.blob();
-
-                toast.dismiss(toastExportPageToImageRef.current);
-
-                const objectUrl = URL.createObjectURL(blob);
-
-                const a = document.createElement("a");
-                a.href = objectUrl;
-                if (message.data.responseType === "zip") {
-                  a.download = "export.zip";
-                } else if (message.data.responseType === "blob") {
-                  a.download = `export.${message.data.extension}`;
-                }
-                a.click();
-
-                URL.revokeObjectURL(objectUrl);
-
-                setImageExporting(false);
               }
+
+              const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+              const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+              const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/${message.data.exportedImageId}?responseType=${message.data.responseType}`;
+
+              const res = await fetch(url);
+
+              if (!res.ok) {
+                setImageExporting(false);
+                toast.error("Export page to image", {
+                  id: toastExportPageToImageRef.current,
+                  description: "Failed to download image, try again",
+                  duration: 4000,
+                });
+                toastExportPageToImageRef.current = null;
+                return;
+              }
+
+              toast.loading("Export page to image", {
+                id: toastExportPageToImageRef.current,
+                description: "Downloading image, please wait",
+                duration: Infinity,
+              });
+
+              const blob = await res.blob();
+
+              toast.dismiss(toastExportPageToImageRef.current);
+
+              const objectUrl = URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = objectUrl;
+              if (message.data.responseType === "zip") {
+                a.download = "export.zip";
+              } else if (message.data.responseType === "blob") {
+                a.download = `export.${message.data.extension}`;
+              }
+              a.click();
+
+              URL.revokeObjectURL(objectUrl);
+
+              setImageExporting(false);
               toastExportPageToImageRef.current = null;
               break;
             }
             case "failed": {
-              if (toastExportPageToImageRef.current) {
+              // Handle failure even if the "created" event was missed.
+              if (!toastExportPageToImageRef.current) {
+                toastExportPageToImageRef.current = toast.error(
+                  "Export page to image",
+                  {
+                    description: "Failed to export page to image, try again",
+                    duration: 4000,
+                  },
+                );
+              } else {
                 toast.error("Export page to image", {
                   id: toastExportPageToImageRef.current,
                   description: "Failed to export page to image, try again",
                   duration: 4000,
                 });
-
-                setImageExporting(false);
               }
+
+              setImageExporting(false);
               toastExportPageToImageRef.current = null;
               break;
             }
@@ -355,68 +385,85 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastExportRoomToPdfRef.current) {
+              if (!toastExportRoomToPdfRef.current) {
+                toastExportRoomToPdfRef.current = toast.loading(
+                  "Export room to PDF",
+                  {
+                    description: "Completed, triggering download",
+                    duration: Infinity,
+                  },
+                );
+              } else {
                 toast.loading("Export room to PDF", {
                   id: toastExportRoomToPdfRef.current,
                   description: "Completed, triggering download",
                   duration: 4000,
                 });
-
-                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
-
-                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
-
-                const res = await fetch(url);
-
-                if (!res.ok) {
-                  setImageExporting(false);
-                  toast.error("Export room to PDF", {
-                    id: toastExportRoomToPdfRef.current,
-                    description: "Failed to download PDF, try again",
-                    duration: 4000,
-                  });
-                  return;
-                }
-
-                toast.loading("Export room to PDF", {
-                  id: toastExportRoomToPdfRef.current,
-                  description: "Downloading PDF, please wait",
-                  duration: Infinity,
-                });
-
-                const blob = await res.blob();
-
-                toast.dismiss(toastExportRoomToPdfRef.current);
-
-                const objectUrl = URL.createObjectURL(blob);
-
-                const a = document.createElement("a");
-                a.href = objectUrl;
-                if (message.data.responseType === "zip") {
-                  a.download = "export.zip";
-                } else if (message.data.responseType === "blob") {
-                  a.download = "export.png";
-                }
-                a.click();
-
-                URL.revokeObjectURL(objectUrl);
-
-                setImageExporting(false);
               }
+
+              const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+              const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+              const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
+
+              const res = await fetch(url);
+
+              if (!res.ok) {
+                setImageExporting(false);
+                toast.error("Export room to PDF", {
+                  id: toastExportRoomToPdfRef.current,
+                  description: "Failed to download PDF, try again",
+                  duration: 4000,
+                });
+                toastExportRoomToPdfRef.current = null;
+                return;
+              }
+
+              toast.loading("Export room to PDF", {
+                id: toastExportRoomToPdfRef.current,
+                description: "Downloading PDF, please wait",
+                duration: Infinity,
+              });
+
+              const blob = await res.blob();
+
+              toast.dismiss(toastExportRoomToPdfRef.current);
+
+              const objectUrl = URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = objectUrl;
+              if (message.data.responseType === "zip") {
+                a.download = "export.zip";
+              } else if (message.data.responseType === "blob") {
+                a.download = "export.png";
+              }
+              a.click();
+
+              URL.revokeObjectURL(objectUrl);
+
+              setImageExporting(false);
               toastExportRoomToPdfRef.current = null;
               break;
             }
             case "failed": {
-              if (toastExportRoomToPdfRef.current) {
+              if (!toastExportRoomToPdfRef.current) {
+                toastExportRoomToPdfRef.current = toast.error(
+                  "Export room to PDF",
+                  {
+                    description: "Failed to export room to PDF, try again",
+                    duration: 4000,
+                  },
+                );
+              } else {
                 toast.error("Export room to PDF", {
                   id: toastExportRoomToPdfRef.current,
                   description: "Failed to export room to PDF, try again",
                   duration: 4000,
                 });
-
-                setImageExporting(false);
               }
+
+              setImageExporting(false);
               toastExportRoomToPdfRef.current = null;
               break;
             }
@@ -457,62 +504,79 @@ export const useTasksEvents = () => {
               break;
             }
             case "completed": {
-              if (toastExportFramesToPdfRef.current) {
-                const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-                const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
-
-                const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
-
-                const res = await fetch(url);
-
-                if (!res.ok) {
-                  setFramesExporting(false);
-                  toast.error("Export frames to PDF", {
-                    id: toastExportFramesToPdfRef.current,
-                    description: "Failed to download PDF, try again",
-                    duration: 4000,
-                  });
-                  return;
-                }
-
-                toast.loading("Export frames to PDF", {
-                  id: toastExportFramesToPdfRef.current,
-                  description: "Downloading PDF, please wait",
-                  duration: Infinity,
-                });
-
-                const blob = await res.blob();
-
-                toast.dismiss(toastExportFramesToPdfRef.current);
-
-                const objectUrl = URL.createObjectURL(blob);
-
-                const a = document.createElement("a");
-                a.href = objectUrl;
-                if (message.data.responseType === "zip") {
-                  a.download = "export.zip";
-                } else if (message.data.responseType === "blob") {
-                  a.download = "export.pdf";
-                }
-                a.click();
-
-                URL.revokeObjectURL(objectUrl);
-
-                setFramesExporting(false);
+              if (!toastExportFramesToPdfRef.current) {
+                toastExportFramesToPdfRef.current = toast.loading(
+                  "Export frames to PDF",
+                  {
+                    description: "Completed, triggering download",
+                    duration: Infinity,
+                  },
+                );
               }
+
+              const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+              const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
+
+              const url = `${apiEndpoint}/${hubName}/rooms/${room}/export/pdf/${message.data.exportedPdfId}?responseType=${message.data.responseType}`;
+
+              const res = await fetch(url);
+
+              if (!res.ok) {
+                setFramesExporting(false);
+                toast.error("Export frames to PDF", {
+                  id: toastExportFramesToPdfRef.current,
+                  description: "Failed to download PDF, try again",
+                  duration: 4000,
+                });
+                toastExportFramesToPdfRef.current = null;
+                return;
+              }
+
+              toast.loading("Export frames to PDF", {
+                id: toastExportFramesToPdfRef.current,
+                description: "Downloading PDF, please wait",
+                duration: Infinity,
+              });
+
+              const blob = await res.blob();
+
+              toast.dismiss(toastExportFramesToPdfRef.current);
+
+              const objectUrl = URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = objectUrl;
+              if (message.data.responseType === "zip") {
+                a.download = "export.zip";
+              } else if (message.data.responseType === "blob") {
+                a.download = "export.pdf";
+              }
+              a.click();
+
+              URL.revokeObjectURL(objectUrl);
+
+              setFramesExporting(false);
               toastExportFramesToPdfRef.current = null;
               break;
             }
             case "failed": {
-              if (toastExportFramesToPdfRef.current) {
+              if (!toastExportFramesToPdfRef.current) {
+                toastExportFramesToPdfRef.current = toast.error(
+                  "Export frames to PDF",
+                  {
+                    description: "Failed to export frames to PDF, try again",
+                    duration: 4000,
+                  },
+                );
+              } else {
                 toast.error("Export frames to PDF", {
                   id: toastExportFramesToPdfRef.current,
                   description: "Failed to export frames to PDF, try again",
                   duration: 4000,
                 });
-
-                setFramesExporting(false);
               }
+
+              setFramesExporting(false);
               toastExportFramesToPdfRef.current = null;
               break;
             }
@@ -538,6 +602,20 @@ export const useTasksEvents = () => {
             }
             case "completed": {
               const presentationInstance = message.data.presentationModeId;
+              if (typeof sessionStorage !== "undefined") {
+                try {
+                  sessionStorage.setItem(
+                    `weave_${room}_presentation_instance_id`,
+                    JSON.stringify(presentationInstance),
+                  );
+                } catch (ex) {
+                  console.error(
+                    "Error saving presentation instance id to storage",
+                    ex,
+                  );
+                }
+              }
+              toast.success("Presentation is ready");
               setPresentationInstanceId(presentationInstance);
               setPresentationStatus("loaded");
               break;

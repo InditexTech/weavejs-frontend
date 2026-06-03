@@ -33,7 +33,7 @@ import {
   Lock,
   EyeOff,
   Link,
-  // PackagePlus,
+  PackagePlus,
   PackageOpen,
   Paperclip,
   PanelLeftRightDashed,
@@ -47,7 +47,8 @@ import { useIAChat } from "@/store/ia-chat";
 import Konva from "konva";
 import { useHandleGuides } from "./use-handle-guides";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
-// import { useJsonTemplate } from "./use-json-template";
+import { useJsonTemplate } from "./use-json-template";
+import { addTemplateAtPosition } from "@/lib/utils";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
@@ -73,14 +74,23 @@ function useContextMenu() {
   const linkedNode = useCollaborationRoom((state) => state.linkedNode);
   const setLinkedNode = useCollaborationRoom((state) => state.setLinkedNode);
 
-  const aiChatEnabled = useIAChat((state) => state.enabled);
+  const activeTemplate = useCollaborationRoom(
+    (state) => state.templates.active,
+  );
 
-  const setSaveDialogVisible = useTemplates(
+  const aiChatEnabled = useIAChat((state) => state.enabled);
+  const addReference = useIAChat((state) => state.addReference);
+
+  const setTemplateData = useTemplates((state) => state.setData);
+  const setTemplateSaveDialogVisible = useTemplates(
     (state) => state.setSaveDialogVisible,
+  );
+  const setTemplateSaveDialogKind = useTemplates(
+    (state) => state.setSaveDialogKind,
   );
 
   const { isExporting } = useExportPageToImageServerSide();
-  // const { generateJsonTemplate } = useJsonTemplate();
+  const { generateTemplate, generateImageTemplate } = useJsonTemplate();
 
   const promptInputAttachmentsController = usePromptInputAttachments();
 
@@ -165,6 +175,28 @@ function useContextMenu() {
             promptInputAttachmentsController.add([file]);
 
             toast.dismiss(id);
+          },
+        });
+        options.push({
+          id: "set-prompt-reference",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Set as prompt reference</div>
+            </div>
+          ),
+          icon: <Paperclip size={16} />,
+          onClick: async () => {
+            setContextMenuShow(false);
+
+            for (const node of nodes) {
+              addReference?.({
+                type: "source-document",
+                sourceId: node.node?.key ?? "",
+                mediaType: node.node?.type ?? "unknown",
+                title: `[${node.node?.type ?? "unknown"}] ${node.node?.key ?? "-"}`,
+              });
+            }
           },
         });
         // LINK IMAGE TOOLS
@@ -329,7 +361,7 @@ function useContextMenu() {
         type: "button",
         label: (
           <div className="w-full flex justify-between items-center">
-            <div>Paste here</div>
+            <div>Paste clipboard here</div>
             {formatForDisplay("Mod+P")}
           </div>
         ),
@@ -344,6 +376,57 @@ function useContextMenu() {
           }
         },
       });
+
+      if (activeTemplate !== null) {
+        options.push({
+          id: "div-templates-2",
+          type: "divider",
+        });
+        options.push({
+          id: "paste-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Materialize active template here</div>
+            </div>
+          ),
+          icon: <ClipboardPaste size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: () => {
+            if (!instance) return;
+            const stage = instance.getStage();
+
+            const containerId = instance.getMainLayer()?.id() ?? "";
+            let pos: Konva.Vector2d | null | undefined =
+              stage.getRelativePointerPosition();
+
+            if (!pos) return;
+
+            const { mousePoint, container } =
+              instance.getMousePointer(pos);
+            let position = mousePoint;
+
+            if (!mousePoint) {
+              toast.error("Unable to get cursor position.");
+            }
+
+            if (container !== instance.getMainLayer()) {
+              pos = container?.getRelativePointerPosition();
+
+              if (pos) {
+                position = pos;
+              }
+            }
+
+            addTemplateAtPosition({
+              instance,
+              template: activeTemplate,
+              containerId,
+              position,
+            });
+          },
+        });
+      }
 
       if (
         nodes.length === 0 ||
@@ -455,57 +538,72 @@ function useContextMenu() {
         });
       }
 
-      // if (!singleLocked && nodes.length > 0) {
-      //   options.push({
-      //     id: "div-templates-1",
-      //     type: "divider",
-      //   });
-      //   // SAVE AS TEMPLATE
-      //   options.push({
-      //     id: "save-as-template",
-      //     type: "button",
-      //     label: (
-      //       <div className="w-full flex justify-between items-center">
-      //         <div>Save as template</div>
-      //       </div>
-      //     ),
-      //     icon: <PackagePlus size={16} />,
-      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
-      //     onClick: () => {
-      //       setSaveDialogVisible(true);
-      //       setContextMenuShow(false);
-      //     },
-      //   });
-      //   // SAVE AS TEMPLATE
-      //   options.push({
-      //     id: "save-as-json-template",
-      //     type: "button",
-      //     label: (
-      //       <div className="w-full flex justify-between items-center">
-      //         <div>Save as JSON template</div>
-      //       </div>
-      //     ),
-      //     icon: <PackagePlus size={16} />,
-      //     disabled: !["selectionTool"].includes(actActionActive ?? ""),
-      //     onClick: async () => {
-      //       try {
-      //         const template = generateJsonTemplate(nodes);
-      //         await navigator.clipboard.writeText(JSON.stringify(template));
-      //         toast.success("JSON template copied to clipboard.");
-      //       } catch (error) {
-      //         console.error(error);
-      //         if (error instanceof Error && error.cause === "NoInstance") {
-      //           toast.error("Weave instance is not available.");
-      //         }
-      //         if (error instanceof Error && error.cause === "NoNodesSelected") {
-      //           toast.error("No nodes selected to generate JSON template.");
-      //         }
-      //       }
+      if (!singleLocked && nodes.length > 0) {
+        options.push({
+          id: "div-templates-1",
+          type: "divider",
+        });
+        // SAVE AS TEMPLATE
+        options.push({
+          id: "save-as-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Save selection as template</div>
+            </div>
+          ),
+          icon: <PackagePlus size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            try {
+              const template = generateTemplate(nodes);
 
-      //       setContextMenuShow(false);
-      //     },
-      //   });
-      // }
+              setTemplateData(template);
+              setTemplateSaveDialogKind("template");
+              setTemplateSaveDialogVisible(true);
+              setContextMenuShow(false);
+            } catch (error) {
+              console.error(error);
+              if (error instanceof Error && error.cause === "NoInstance") {
+                toast.error("Weave instance is not available.");
+              }
+              if (error instanceof Error && error.cause === "NoNodesSelected") {
+                toast.error("No nodes selected to generate JSON template.");
+              }
+            }
+          },
+        });
+        // SAVE AS IMAGE TEMPLATE
+        options.push({
+          id: "save-as-image-template",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Save selection as images template</div>
+            </div>
+          ),
+          icon: <PackagePlus size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            try {
+              const template = generateImageTemplate(nodes);
+
+              setTemplateData(template);
+              setTemplateSaveDialogKind("imageTemplate");
+              setTemplateSaveDialogVisible(true);
+              setContextMenuShow(false);
+            } catch (error) {
+              console.error(error);
+              if (error instanceof Error && error.cause === "NoInstance") {
+                toast.error("Weave instance is not available.");
+              }
+              if (error instanceof Error && error.cause === "NoNodesSelected") {
+                toast.error("No nodes selected to generate JSON template.");
+              }
+            }
+          },
+        });
+      }
 
       if (!singleLocked && nodes.length > 0) {
         // SEPARATOR
@@ -711,11 +809,10 @@ function useContextMenu() {
           ),
           icon: <Trash size={16} />,
           onClick: () => {
-            for (const node of nodes) {
-              if (node.node) {
-                instance.removeNode(node.node);
-              }
-            }
+            const elements = nodes
+              .map((n: WeaveSelection) => n.node)
+              .filter((n) => n !== undefined);
+            instance.removeNodes(elements);
 
             setContextMenuShow(false);
           },
@@ -726,10 +823,13 @@ function useContextMenu() {
     },
     [
       instance,
+      activeTemplate,
+      addReference,
       aiChatEnabled,
       promptInputAttachmentsController,
       setLinkedNode,
-      setSaveDialogVisible,
+      setTemplateSaveDialogKind,
+      setTemplateSaveDialogVisible,
       setExportConfigVisible,
       setExportNodes,
       isExporting,

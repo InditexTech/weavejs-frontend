@@ -1,10 +1,6 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   Card,
-  // CardAction,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -55,9 +51,9 @@ export const NodeDescription = (props: NodeDescriptionProps) => (
   <CardDescription {...props} />
 );
 
-// export type NodeActionProps = ComponentProps<typeof CardAction>;
+export type NodeActionProps = ComponentProps<typeof CardAction>;
 
-// export const NodeAction = (props: NodeActionProps) => <CardAction {...props} />;
+export const NodeAction = (props: NodeActionProps) => <CardAction {...props} />;
 
 export type NodeContentProps = ComponentProps<typeof CardContent>;
 

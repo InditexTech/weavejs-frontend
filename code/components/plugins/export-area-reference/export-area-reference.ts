@@ -232,8 +232,8 @@ export class ExportAreaReferencePlugin extends WeavePlugin {
     referenceText.moveToBottom();
     referenceRect.moveToBottom();
 
-    referenceAreaLayer.moveToBottom();
-    referenceAreaLayer.moveUp();
+    referenceAreaLayer.moveToTop();
+    // referenceAreaLayer.moveUp();
   }
 
   setRightText(text: string) {

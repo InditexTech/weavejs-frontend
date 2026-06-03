@@ -4,8 +4,6 @@
 
 import {
   PromptInput,
-  PromptInputAttachment,
-  PromptInputAttachments,
   PromptInputBody,
   PromptInputFooter,
   type PromptInputMessage,
@@ -18,6 +16,7 @@ import {
   PromptInputSelectContent,
   PromptInputSelectTrigger,
   PromptInputSelectValue,
+  PromptInputHeader,
 } from "@/components/ai-elements/prompt-input";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +38,16 @@ import { Label } from "@/components/ui/label";
 import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWeave } from "@inditextech/weave-react";
+import {
+  Attachment,
+  AttachmentData,
+  AttachmentInfo,
+  AttachmentPreview,
+  AttachmentRemove,
+  Attachments,
+} from "@/components/ai-elements/attachments";
+import { usePromptInputReferencedSources } from "@/components/ai-elements/prompt-input";
+import { SourceDocumentUIPart } from "ai";
 
 const GEMINI_IMAGE_ASPECT_RATIOS = [
   "1:1",
@@ -67,10 +76,10 @@ const MODELS = [
   //   providers: ["openai"],
   // },
   {
-    id: "gemini/gemini-3-pro-image-preview",
-    name: "Gemini 3 Pro",
-    chef: "Gemini",
-    chefSlug: "google",
+    id: "gemini-3.1-flash-image-preview",
+    name: "Gemini 3 Pro (Preview)",
+    provider: "Gemini",
+    slug: "google",
     providers: ["google"],
   },
 ];
@@ -82,6 +91,11 @@ const ChatBotPrompt = () => {
 
   const selectionActive = useWeave((state) => state.selection.active);
 
+  const room = useCollaborationRoom((state) => state.room);
+  const actualPageId = useCollaborationRoom(
+    (state) => state.pages.actualPageId,
+  );
+  const threadId = useIAChat((state) => state.threadId);
   const hidden = useIAChat((state) => state.hidden);
   const imageModel = useIAChat((state) => state.imageOptions.model);
   const imagesSamples = useIAChat((state) => state.imageOptions.samples);
@@ -99,7 +113,11 @@ const ChatBotPrompt = () => {
   const scrollToBottom = useIAChat((state) => state.scrollToBottom);
 
   const selectedModelData = MODELS.find((model) => model.id === imageModel);
-  const chefs = Array.from(new Set(MODELS.map((model) => model.chef)));
+  const models = Array.from(new Set(MODELS.map((model) => model.provider)));
+
+  const [references, setReferences] = React.useState<SourceDocumentUIPart[]>(
+    [],
+  );
 
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive,
@@ -109,11 +127,12 @@ const ChatBotPrompt = () => {
   );
 
   const handleSubmit = React.useCallback(
-    (message: PromptInputMessage) => {
+    async (message: PromptInputMessage) => {
       const hasText = Boolean(message.text);
       const hasAttachments = Boolean(message.files?.length);
+      const hasReferences = Boolean(references?.length);
 
-      if (!(hasText || hasAttachments)) {
+      if (!(hasText || hasAttachments || hasReferences)) {
         return;
       }
 
@@ -126,8 +145,19 @@ const ChatBotPrompt = () => {
         scrollToBottom();
       }
 
+      if (!room || !actualPageId) {
+        console.error("Room or actualPageId is not available.");
+        return;
+      }
+
+      if (threadId === "not-defined") {
+        return;
+      }
+
       sendMessage(message, {
         body: {
+          pageId: actualPageId,
+          referenceNodes: references,
           imageOption: {
             model: imageModel,
             samples: imagesSamples,
@@ -142,6 +172,7 @@ const ChatBotPrompt = () => {
       setShowRightSidebarFloating(true);
     },
     [
+      references,
       imageModel,
       imagesSamples,
       imageAspectRatio,
@@ -155,8 +186,6 @@ const ChatBotPrompt = () => {
     ],
   );
 
-  const attachments = usePromptInputAttachments();
-
   return (
     <div
       className={cn(
@@ -169,26 +198,20 @@ const ChatBotPrompt = () => {
     >
       <div
         className={cn(
-          "relative w-[600px] pointer-events-auto border-[0.5px] border-[#c9c9c9]",
+          "relative w-[800px] pointer-events-auto border-[0.5px] border-[#c9c9c9]",
           {
             ["pointer-events-none"]: selectionActive,
             ["pointer-events-auto"]: !selectionActive,
           },
         )}
       >
-        {attachments.files.length > 0 && (
-          <div className="w-full bg-white border-b border-[#c9c9c9] p-3">
-            <PromptInputAttachments>
-              {(attachment) => <PromptInputAttachment data={attachment} />}
-            </PromptInputAttachments>
-          </div>
-        )}
         <PromptInput
           globalDrop
           multiple
           onSubmit={handleSubmit}
           className="bg-white flex flex-col"
         >
+          <PromptInputHeaderDisplay setReferences={setReferences} />
           <PromptInputBody>
             <PromptInputTextarea
               ref={textareaRef}
@@ -207,7 +230,7 @@ const ChatBotPrompt = () => {
               <ModelSelector onOpenChange={setOpen} open={open}>
                 <ModelSelectorTrigger asChild>
                   <Button
-                    className="w-[140px] h-[40px] px-3 border-[#c9c9c9] rounded-none font-inter text-xs cursor-pointer"
+                    className="w-[140px] h-[40px] px-3 border-0 border-[#c9c9c9] shadow-none rounded-none font-inter text-xs cursor-pointer"
                     variant="outline"
                   >
                     <Label className="font-inter text-xs text-[#c9c9c9]">
@@ -224,30 +247,28 @@ const ChatBotPrompt = () => {
                   <ModelSelectorInput placeholder="Search models..." />
                   <ModelSelectorList>
                     <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-                    {chefs.map((chef) => (
-                      <ModelSelectorGroup heading={chef} key={chef}>
-                        {MODELS.filter((model) => model.chef === chef).map(
-                          (model) => (
-                            <ModelSelectorItem
-                              key={model.id}
-                              onSelect={() => {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                setImageModel(model.id as any);
-                                setOpen(false);
-                              }}
-                              value={model.id}
-                            >
-                              <ModelSelectorName>
-                                {model.name}
-                              </ModelSelectorName>
-                              {imageModel === model.id ? (
-                                <CheckIcon className="ml-auto size-4" />
-                              ) : (
-                                <div className="ml-auto size-4" />
-                              )}
-                            </ModelSelectorItem>
-                          ),
-                        )}
+                    {models.map((model) => (
+                      <ModelSelectorGroup heading={model} key={model}>
+                        {MODELS.filter(
+                          (actModel) => model === actModel.provider,
+                        ).map((model) => (
+                          <ModelSelectorItem
+                            key={model.id}
+                            onSelect={() => {
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              setImageModel(model.id as any);
+                              setOpen(false);
+                            }}
+                            value={model.id}
+                          >
+                            <ModelSelectorName>{model.name}</ModelSelectorName>
+                            {imageModel === model.id ? (
+                              <CheckIcon className="ml-auto size-4" />
+                            ) : (
+                              <div className="ml-auto size-4" />
+                            )}
+                          </ModelSelectorItem>
+                        ))}
                       </ModelSelectorGroup>
                     ))}
                   </ModelSelectorList>
@@ -257,7 +278,7 @@ const ChatBotPrompt = () => {
                 value={`${imagesSamples}`}
                 onValueChange={(value) => setImagesSamples(parseInt(value, 10))}
               >
-                <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs">
+                <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs !h-[40px] rounded-none">
                   <div className="flex justify-start items-center gap-3">
                     <Label className="font-inter text-xs text-[#c9c9c9]">
                       Amount
@@ -299,7 +320,7 @@ const ChatBotPrompt = () => {
                 value={imageAspectRatio}
                 onValueChange={setImageAspectRatio}
               >
-                <PromptInputSelectTrigger className="cursor-pointer font-inter  text-xs">
+                <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs !h-[40px] rounded-none">
                   <div className="flex justify-start items-center gap-3">
                     <Label className="font-inter text-xs text-[#c9c9c9]">
                       Aspect Ratio
@@ -311,7 +332,7 @@ const ChatBotPrompt = () => {
                   </div>
                 </PromptInputSelectTrigger>
                 <PromptInputSelectContent className="rounded-none">
-                  {imageModel === "gemini/gemini-3-pro-image-preview" &&
+                  {imageModel === "gemini-3.1-flash-image-preview" &&
                     GEMINI_IMAGE_ASPECT_RATIOS.map((ratio) => (
                       <PromptInputSelectItem
                         key={ratio}
@@ -340,7 +361,7 @@ const ChatBotPrompt = () => {
                   setImageSize(value);
                 }}
               >
-                <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs">
+                <PromptInputSelectTrigger className="cursor-pointer font-inter text-xs !h-[40px] rounded-none">
                   <div className="flex justify-start items-center gap-3">
                     <Label className="font-inter text-xs text-[#c9c9c9]">
                       Size
@@ -352,7 +373,7 @@ const ChatBotPrompt = () => {
                   </div>
                 </PromptInputSelectTrigger>
                 <PromptInputSelectContent className="rounded-none">
-                  {imageModel === "gemini/gemini-3-pro-image-preview" &&
+                  {imageModel === "gemini-3.1-flash-image-preview" &&
                     GEMINI_IMAGE_SIZES.map((size) => (
                       <PromptInputSelectItem
                         key={size}
@@ -406,12 +427,99 @@ const ChatBotPrompt = () => {
             </PromptInputTools>
             <PromptInputSubmit
               className="cursor-pointer rounded-none"
-              status={status}
+              disabled={threadId === "not-defined" || threadId === "undefined"}
+              status={threadId === "not-defined" ? undefined : status}
             />
           </PromptInputFooter>
         </PromptInput>
       </div>
     </div>
+  );
+};
+
+const PromptInputAttachmentsDisplay = () => {
+  const attachments = usePromptInputAttachments();
+  const refs = usePromptInputReferencedSources();
+
+  const handleRemove = React.useCallback(
+    (id: string) => refs.remove(id),
+    [refs],
+  );
+
+  if (attachments.files.length === 0 && refs.sources.length === 0) {
+    return null;
+  }
+
+  return (
+    <Attachments variant="inline">
+      {attachments.files.map((attachment) => (
+        <Attachment
+          data={attachment}
+          key={attachment.id}
+          onRemove={() => attachments.remove(attachment.id)}
+        >
+          <AttachmentPreview />
+          <AttachmentRemove />
+        </Attachment>
+      ))}
+      {refs.sources.map((source) => (
+        <SourceItem
+          key={source.id}
+          onRemove={handleRemove}
+          source={source as AttachmentData}
+        />
+      ))}
+    </Attachments>
+  );
+};
+
+interface SourceItemProps {
+  source: AttachmentData;
+  onRemove: (id: string) => void;
+}
+
+const SourceItem = React.memo(({ source, onRemove }: SourceItemProps) => {
+  const handleRemove = React.useCallback(
+    () => onRemove(source.id),
+    [onRemove, source.id],
+  );
+  return (
+    <Attachment data={source} key={source.id} onRemove={handleRemove}>
+      <AttachmentPreview />
+      <AttachmentInfo />
+      <AttachmentRemove />
+    </Attachment>
+  );
+});
+
+type PromptInputHeaderDisplayProps = {
+  setReferences: React.Dispatch<React.SetStateAction<SourceDocumentUIPart[]>>;
+};
+
+const PromptInputHeaderDisplay = ({
+  setReferences,
+}: Readonly<PromptInputHeaderDisplayProps>) => {
+  const refs = usePromptInputReferencedSources();
+  const attachments = usePromptInputAttachments();
+
+  const setAddReference = useIAChat((state) => state.setAddReference);
+
+  React.useEffect(() => {
+    setReferences(refs.sources);
+  }, [refs.sources]);
+
+  React.useEffect(() => {
+    setAddReference(refs.add);
+  }, []);
+
+  if (refs.sources.length === 0 && attachments.files.length === 0) {
+    return null;
+  }
+
+  return (
+    <PromptInputHeader className="w-full p-3 border-b-[0.5px] border-[#c9c9c9] flex gap-1">
+      <PromptInputAttachmentsDisplay />
+    </PromptInputHeader>
   );
 };
 

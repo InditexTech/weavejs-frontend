@@ -39,11 +39,11 @@ export function useOnPasteExternalImage() {
   const queryClient = useQueryClient();
 
   const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async (params: { file: File; imageId: string }) => {
       if (workloadsEnabled) {
-        return await postImageV2(room ?? "", file);
+        return await postImageV2(room ?? "", params.imageId, params.file);
       }
-      return await postImage(room ?? "", file);
+      return await postImage(room ?? "", params.file);
     },
   });
 
@@ -179,25 +179,28 @@ export function useOnPasteExternalImage() {
           imageSize.height,
         );
 
-        const uploadImageFunction = async (file: File) => {
+        const uploadImageFunction = async (file: File, resourceId: string) => {
           const toastId = toast.loading("Uploading image...", {
             duration: Infinity,
             dismissible: false,
           });
 
-          const data = await mutationUpload.mutateAsync(file, {
-            onSuccess: async () => {
-              toast.dismiss(toastId);
-              toast.success("Image uploaded successfully");
-            },
-            onError: (ex) => {
-              toast.dismiss(toastId);
-              toast.error("Error uploading image");
+          const data = await mutationUpload.mutateAsync(
+            { file, imageId: resourceId },
+            {
+              onSuccess: async () => {
+                toast.dismiss(toastId);
+                toast.success("Image uploaded successfully");
+              },
+              onError: (ex) => {
+                toast.dismiss(toastId);
+                toast.error("Error uploading image");
 
-              console.error(ex);
-              console.error("Error uploading image");
+                console.error(ex);
+                console.error("Error uploading image");
+              },
             },
-          });
+          );
 
           const room = data.image.roomId;
           const imageId = data.image.imageId;

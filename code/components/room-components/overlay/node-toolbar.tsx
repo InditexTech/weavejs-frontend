@@ -12,6 +12,7 @@ import {
   WeaveElementInstance,
   WeaveStateElement,
   WEAVE_EXPORT_RETURN_FORMAT,
+  WeaveSelection,
 } from "@inditextech/weave-types";
 import { useMutation } from "@tanstack/react-query";
 import { postRemoveBackground } from "@/api/v2/post-remove-background";
@@ -2609,11 +2610,10 @@ export const NodeToolbar = () => {
                 }
 
                 if (!actualNode && nodes.length > 1) {
-                  for (const node of nodes) {
-                    if (node.node) {
-                      instance.removeNode(node.node);
-                    }
-                  }
+                  const elements = nodes
+                    .map((n: WeaveSelection) => n.node)
+                    .filter((n) => n !== undefined);
+                  instance.removeNodes(elements);
                 }
               }}
               label={

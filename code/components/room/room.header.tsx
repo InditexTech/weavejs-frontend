@@ -390,7 +390,7 @@ export function RoomHeader() {
           ["pointer-events-auto"]: !selectionActive,
           ["absolute top-0 left-0 right-0 bg-white border-b-[0.5px] border-[#c9c9c9]"]:
             viewType === "floating",
-          ["h-[57px]"]: viewType === "fixed",
+          ["h-[57px] border-b-[0.5px] border-[#c9c9c9]"]: viewType === "fixed",
         })}
       >
         <div

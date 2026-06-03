@@ -41,6 +41,7 @@ import { ExportRoomToPdfConfigDialog } from "../room-components/overlay/export-r
 import { ExportPageToImageConfigDialog } from "../room-components/overlay/export-page-to-image-config";
 import { ExportFramesToPDFConfigDialog } from "../room-components/overlay/export-frames-to-pdf-config";
 import { PresentationMode } from "./presentation-mode/presentation-mode";
+import { AddToRoomDialog } from "../room-components/add-template-to-room/add-to-room.dialog";
 
 type RoomLayoutProps = {
   inShadowDom: boolean;
@@ -153,6 +154,7 @@ export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
             <ExportFramesToPDFConfigDialog />
             <LlmSetupDialog />
             <AppConfigurationDialog />
+            <AddToRoomDialog />
           </>
         )}
         {/* <div className="absolute right-[420px] bottom-[60px] z-[100] bg-white border-[0.5px] border-[#c9c9c9]">

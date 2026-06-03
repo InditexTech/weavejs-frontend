@@ -37,8 +37,6 @@ export function RoomPageSelector() {
     (state) => state.setRoomsPageEditVisible,
   );
 
-  const viewType = useCollaborationRoom((state) => state.viewType);
-
   return (
     <div
       className={cn(
@@ -46,7 +44,6 @@ export function RoomPageSelector() {
         {
           ["pointer-events-none"]: selectionActive,
           ["pointer-events-auto"]: !selectionActive,
-          ["border-t-[0.5px] border-[#c9c9c9]"]: viewType === "fixed",
         },
       )}
     >

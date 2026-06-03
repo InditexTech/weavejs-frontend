@@ -60,12 +60,16 @@ export const useManageRoomPages = (roomId: string | undefined) => {
 
   const queryClient = useQueryClient();
 
+  // Prevents double-creation if the effect fires again before status catches up.
+  const pageCreationAttemptedRef = React.useRef(false);
+
   React.useEffect(() => {
     const queryKey = ["getPagesInit"];
     queryClient.invalidateQueries({ queryKey });
     setActualPage(0);
     setActualPageId(null);
     setStatus("idle");
+    pageCreationAttemptedRef.current = false;
   }, [roomId, setActualPage, setActualPageId, queryClient]);
 
   React.useEffect(() => {
@@ -86,6 +90,8 @@ export const useManageRoomPages = (roomId: string | undefined) => {
     return [];
   }, [roomPages, pagesIsFetched]);
 
+  const createPageMutate = createPage.mutate;
+
   React.useEffect(() => {
     if (!roomId) {
       return;
@@ -101,7 +107,14 @@ export const useManageRoomPages = (roomId: string | undefined) => {
       setStatus("managed");
     }
     if (pages.length === 0 && status === "loaded") {
-      createPage.mutate({
+      // Guard against double-creation: TanStack Query's useSyncExternalStore
+      // can force a synchronous re-render when the mutation goes pending,
+      // outrunning the setStatus("creating") update and re-entering this branch.
+      if (pageCreationAttemptedRef.current) {
+        return;
+      }
+      pageCreationAttemptedRef.current = true;
+      createPageMutate({
         pageId: uuidv4(),
         name: "New page",
         thumbnail: "",
@@ -112,10 +125,10 @@ export const useManageRoomPages = (roomId: string | undefined) => {
   }, [
     status,
     pages,
-    createPage,
+    createPageMutate,
     setActualPage,
     setActualPageId,
-    setRoomStatus,
+    roomId,
   ]);
 
   return status === "managed";

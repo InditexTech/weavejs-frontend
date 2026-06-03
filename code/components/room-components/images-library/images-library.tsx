@@ -6,7 +6,6 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { useOnInView } from "react-intersection-observer";
-import Masonry from "react-responsive-masonry";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -68,6 +67,12 @@ export const ImagesLibrary = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const imageStoreRef = React.useRef(new Map<string, any>());
+  // IDs of images for which a delete request is in-flight.
+  // The image stays in the list with a visual overlay until the server
+  // confirms deletion and the refetch removes it from the store.
+  const [pendingDeletions, setPendingDeletions] = React.useState(
+    new Set<string>(),
+  );
   const [forceRender, setForceRender] = React.useState(0);
 
   const [selectedImages, setSelectedImages] = React.useState<ImageEntity[]>([]);
@@ -82,7 +87,6 @@ export const ImagesLibrary = () => {
   const workloadsEnabled = useCollaborationRoom(
     (state) => state.features.workloads,
   );
-
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
   const mutationUploadV2 = useMutation({
@@ -132,9 +136,10 @@ export const ImagesLibrary = () => {
         imageId,
       );
     },
-    onMutate: () => {
+    onMutate: (imageId: string) => {
       const toastId = toast.loading("Requesting images deletion...");
-      return { toastId };
+      setPendingDeletions((prev) => new Set([...prev, imageId]));
+      return { toastId, imageId };
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSettled: (_, __, ___, context: any) => {
@@ -142,7 +147,15 @@ export const ImagesLibrary = () => {
         toast.dismiss(context.toastId);
       }
     },
-    onError() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(_, __, context: any) {
+      if (context?.imageId) {
+        setPendingDeletions((prev) => {
+          const next = new Set(prev);
+          next.delete(context.imageId);
+          return next;
+        });
+      }
       toast.error("Error requesting images deletion.");
     },
   });
@@ -183,6 +196,8 @@ export const ImagesLibrary = () => {
         const dataBase64Url = canvas.toDataURL("image/png");
 
         const dataBase64 = dataBase64Url.split(",")[1];
+
+        canvas.remove();
 
         mutationUploadV2.mutate({
           userId: session?.user.id ?? "",
@@ -235,6 +250,7 @@ export const ImagesLibrary = () => {
 
     const store = imageStoreRef.current;
     const nextIds = new Set<string>();
+    let changed = false;
 
     for (const page of query.data.pages) {
       for (const img of page.items) {
@@ -247,25 +263,34 @@ export const ImagesLibrary = () => {
         // ADD
         if (!existing) {
           store.set(imageId, img);
+          changed = true;
           continue;
         }
 
         // UPDATE (only if something changed)
         if (existing.status !== img.status) {
           store.set(imageId, img);
+          changed = true;
         }
       }
     }
 
-    // REMOVE
-    for (const id of store.keys()) {
-      if (!nextIds.has(id)) {
-        store.delete(id);
+    // REMOVE — deferred until all pages are fetched to prevent intermediate
+    // flicker caused by useInfiniteQuery updating query.data page-by-page.
+    if (!query.isFetching) {
+      for (const id of store.keys()) {
+        if (!nextIds.has(id)) {
+          store.delete(id);
+          changed = true;
+        }
       }
     }
 
-    setForceRender((v) => v + 1);
-  }, [query.data]);
+    // Only re-render the list when the store actually changed.
+    if (changed) {
+      setForceRender((v) => v + 1);
+    }
+  }, [query.data, query.isFetching]);
 
   const appImages = React.useMemo(() => {
     function extractImages(
@@ -360,15 +385,7 @@ export const ImagesLibrary = () => {
     const newSelectedImages = [];
 
     for (const image of imagesToRender) {
-      const appImage = appImages.find(
-        (appImage) => appImage.props.imageId === image.imageId,
-      );
-
-      if (
-        typeof appImage === "undefined" &&
-        ["completed"].includes(image.status) &&
-        image.removalJobId === null
-      ) {
+      if (["completed"].includes(image.status) && image.removalJobId === null) {
         newSelectedImages.push(image);
       }
     }
@@ -422,7 +439,7 @@ export const ImagesLibrary = () => {
                     setSelectedImages([]);
                   }
                 }}
-                className="w-[32px] cursor-pointer"
+                className="!w-[32px] cursor-pointer"
               />
               <Label
                 htmlFor="selection-mode"
@@ -510,7 +527,6 @@ export const ImagesLibrary = () => {
                       const images: WeaveImagesURL[] = [];
 
                       for (const image of selectedImages) {
-                        const imageId = uuidv4();
                         const imageSize = {
                           width: image.width ?? 0,
                           height: image.height ?? 0,
@@ -528,10 +544,9 @@ export const ImagesLibrary = () => {
 
                         images.push({
                           url: imageURL,
-                          fallback: imageDom.dataset.imageFallback ?? "",
                           width: imageSize.width,
                           height: imageSize.height,
-                          imageId,
+                          imageId: image.imageId,
                         });
                       }
 
@@ -560,7 +575,6 @@ export const ImagesLibrary = () => {
                       imageTool.setDragAndDropProperties({
                         imageURL: {
                           url: e.target.dataset.imageUrl,
-                          fallback: e.target.dataset.imageFallback,
                           width: e.target.naturalWidth,
                           height: e.target.naturalHeight,
                         },
@@ -569,10 +583,11 @@ export const ImagesLibrary = () => {
                     }
                   }}
                 >
-                  <Masonry
-                    columnsCount={2}
-                    gutter="1px"
+                  {/* CSS columns keeps all items in one parent so React reconciles
+                      by key — no remounting when items are added/removed. */}
+                  <div
                     className="w-full min-h-[calc(100%)]"
+                    style={{ columns: 2, columnGap: "1px" }}
                   >
                     {imagesToRender.map((image) => {
                       const appImage = appImages.find(
@@ -602,8 +617,13 @@ export const ImagesLibrary = () => {
 
                       return (
                         <div
-                          key={`${image.imageId}-${image.status}`}
-                          className="w-full"
+                          key={image.imageId}
+                          className={cn(
+                            "w-full",
+                            pendingDeletions.has(image.imageId) &&
+                              "pointer-events-none",
+                          )}
+                          style={{ breakInside: "avoid", marginBottom: "1px" }}
                           onClick={() => {
                             if (
                               showSelection &&
@@ -621,21 +641,15 @@ export const ImagesLibrary = () => {
                           }}
                         >
                           <ContextMenu>
-                            <ContextMenuTrigger>
+                            <ContextMenuTrigger asChild>
                               <div className="group relative w-full">
                                 {imageComponent}
+                                {pendingDeletions.has(image.imageId) && (
+                                  <div className="pulseOverlay" />
+                                )}
                                 {showSelection &&
-                                  typeof appImage === "undefined" &&
-                                  !(
-                                    ["pending", "working"].includes(
-                                      image.status,
-                                    ) ||
-                                    (image.removalJobId !== null &&
-                                      image.removalStatus !== null &&
-                                      ["pending", "working"].includes(
-                                        image.removalStatus,
-                                      ))
-                                  ) && (
+                                  ["completed"].includes(image.status) &&
+                                  image.removalJobId === null && (
                                     <div className="absolute top-[8px] right-[8px] z-10">
                                       <Checkbox
                                         id="terms"
@@ -660,7 +674,7 @@ export const ImagesLibrary = () => {
                                 )}
                               </div>
                             </ContextMenuTrigger>
-                            <ContextMenuContent className="w-52 rounded-none border-0 border-[#c9c9c9] shadow-none">
+                            <ContextMenuContent className="w-[240px] rounded-none border-[0.5px] border-[#c9c9c9] drop-shadow">
                               {typeof appImage !== "undefined" && (
                                 <>
                                   <ContextMenuItem
@@ -718,7 +732,7 @@ export const ImagesLibrary = () => {
                         </div>
                       );
                     })}
-                  </Masonry>
+                  </div>
                 </div>
                 {!query.isFetching &&
                   !query.isFetchingNextPage &&
@@ -749,6 +763,16 @@ export const ImagesLibrary = () => {
           selectedImages={selectedImages}
           setShowSelection={setShowSelection}
           setSelectedImages={setSelectedImages}
+          onOptimisticDelete={(imageId) => {
+            setPendingDeletions((prev) => new Set([...prev, imageId]));
+          }}
+          onRollbackDelete={(imageId) => {
+            setPendingDeletions((prev) => {
+              const next = new Set(prev);
+              next.delete(imageId);
+              return next;
+            });
+          }}
         />
       )}
     </div>

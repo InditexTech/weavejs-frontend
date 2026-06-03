@@ -38,6 +38,7 @@ export const ChatBotDialogDeleteChat = ({
 
   const resourceId = useIAChat((state) => state.resourceId);
   const setAiView = useIAChat((state) => state.setView);
+  const setThreadId = useIAChat((state) => state.setThreadId);
 
   const queryClient = useQueryClient();
 
@@ -78,6 +79,7 @@ export const ChatBotDialogDeleteChat = ({
         `weave.js_${room}_${session?.user.id ?? ""}_ai_thread_id`,
       );
       setOpen(false);
+      setThreadId("not-defined");
       setAiView("chats");
 
       toast.success("Chat deleted successfully");

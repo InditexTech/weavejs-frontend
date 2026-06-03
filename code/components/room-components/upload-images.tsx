@@ -43,11 +43,11 @@ export function UploadImages() {
   const queryClient = useQueryClient();
 
   const mutationUpload = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async (params: { file: File; imageId: string }) => {
       if (workloadsEnabled) {
-        return await postImageV2(room ?? "", file);
+        return await postImageV2(room ?? "", params.imageId, params.file);
       }
-      return await postImage(room ?? "", file);
+      return await postImage(room ?? "", params.file);
     },
   });
 
@@ -77,8 +77,11 @@ export function UploadImages() {
 
       let toastId: string | number | undefined = undefined;
 
-      const uploadImageFunction = async (file: File) => {
-        const data = await mutationUpload.mutateAsync(file);
+      const uploadImageFunction = async (file: File, resourceId: string) => {
+        const data = await mutationUpload.mutateAsync({
+          file,
+          imageId: resourceId,
+        });
         const room = data.image.roomId;
         const imageId = data.image.imageId;
 

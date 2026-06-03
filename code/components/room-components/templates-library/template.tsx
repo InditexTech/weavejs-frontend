@@ -7,12 +7,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useWeave } from "@inditextech/weave-react";
 import { TemplateEntity } from "./types";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 type TemplateProps = {
   template: TemplateEntity;
   selected: boolean;
   showSelection: boolean;
   onChange: (checked: string | boolean) => void;
+};
+
+const KINDS_MAP: Record<string, string> = {
+  imageTemplate: "image template",
+  template: "template",
 };
 
 export const Template = ({
@@ -31,22 +37,24 @@ export const Template = ({
     <div
       key={template.templateId}
       className={cn(
-        "group block flex flex-col gap-0 w-full object-cover bg-white relative border border-[#c9c9c9]overflow-hidden",
+        "group block flex flex-col gap-0 w-full object-cover bg-white relative border border-[#c9c9c9]overflow-hidden rounded-md overflow-hidden",
         {
           ["cursor-pointer"]:
             ["completed"].includes(template.status) &&
-            template.removalJobId === null,
+            template.removalJobId === null &&
+            showSelection,
         },
       )}
     >
-      <img
-        className="bg-[#d6d6d6] w-full aspect-video block object-contain relative transition-transform duration-500 group-hover:opacity-60"
-        src={template.templateImage}
-        alt="A template"
-        data-template-data={template.templateData}
-      />
-      <div className="w-full flex p-3 justify-between items-center gap-3 border-t border-[#c9c9c9]">
-        <div className="font-inter text-xs truncate">{template.name}</div>
+      <div className="w-full flex p-4 py-3 justify-between items-center gap-3 border-b border-[#c9c9c9]">
+        <div
+          className={cn("font-inter text-sm truncate", {
+            ["max-w-[calc(340px-32px-20px)]"]: showSelection,
+            ["max-w-[calc(340px-32px)]"]: !showSelection,
+          })}
+        >
+          {template.name}
+        </div>
         {showSelection && (
           <Checkbox
             id="terms"
@@ -57,6 +65,24 @@ export const Template = ({
               onChange(checked);
             }}
           />
+        )}
+      </div>
+      <img
+        className={cn(
+          "bg-[#d6d6d6] w-full aspect-video block object-contain relative",
+          {
+            ["transition-transform duration-500 group-hover:opacity-60"]:
+              showSelection,
+          },
+        )}
+        src={template.templateImage}
+        alt="A template"
+        data-template-data={template.templateData}
+      />
+      <div className="w-full flex p-4 py-3 justify-between items-center gap-3 border-t border-[#c9c9c9]">
+        <Badge variant="outline">{KINDS_MAP[template.kind]}</Badge>
+        {template.kind === "imageTemplate" && (
+          <Badge>{template.imageSlots} image slot(s)</Badge>
         )}
       </div>
       {template.removalJobId !== null &&

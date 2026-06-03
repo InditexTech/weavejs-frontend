@@ -10,7 +10,7 @@ import {
   WeaveFrameToolAction,
   WeaveImageToolAction,
   WeaveImagesToolAction,
-  WeavePenToolAction,
+  // WeavePenToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
   WeaveTextToolAction,
@@ -29,7 +29,9 @@ import {
   WeaveConnectorToolAction,
   WeaveGuideToolAction,
 } from "@inditextech/weave-sdk";
-import { type WeaveUser } from "@inditextech/weave-types";
+import {
+  type WeaveUser,
+} from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../../actions/color-token-tool/color-token-tool";
 import { ImageTemplateToolAction } from "../../actions/image-template-tool/image-template-tool";
 import { MaskToolAction } from "../../actions/mask-tool/mask-tool";
@@ -45,7 +47,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveEraserToolAction(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
-  new WeavePenToolAction(),
+  // new WeavePenToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),
   new WeaveImagesToolAction(),

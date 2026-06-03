@@ -2,9 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const postImage = async (roomId: string, file: File) => {
+export const postImage = async (
+  roomId: string,
+  imageId: string,
+  file: File,
+) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("imageId", imageId);
 
   const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;

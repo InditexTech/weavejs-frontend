@@ -23,12 +23,19 @@ function useGetAzureWebPubsubProvider({
     React.useState<WeaveStoreAzureWebPubsub | null>(null);
   const room = useCollaborationRoom((state) => state.room);
   const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
 
   const { session } = useGetSession();
 
-  const { data: pageData, isFetched: pageDataIsFetched } = useQuery({
+  const {
+    data: pageData,
+    status,
+    isFetched: pageDataIsFetched,
+  } = useQuery({
     queryKey: ["roomData", pageId ?? ""],
-    queryFn: () => {
+    queryFn: async () => {
       return getRoom(pageId ?? "");
     },
     initialData: undefined,
@@ -42,6 +49,10 @@ function useGetAzureWebPubsubProvider({
       typeof pageId !== "undefined" &&
       typeof session !== "undefined",
   });
+
+  React.useEffect(() => {
+    setRoomDataStatus(status);
+  }, [status]);
 
   const queryClient = useQueryClient();
 

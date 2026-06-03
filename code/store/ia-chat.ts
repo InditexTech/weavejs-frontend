@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PromptInputMessage } from "@/components/ai-elements/prompt-input";
-import { ChatRequestOptions, ChatStatus } from "ai";
+import { ChatRequestOptions, ChatStatus, SourceDocumentUIPart } from "ai";
 import { create } from "zustand";
 
 export type ImageSizeGemini = "1K" | "2K" | "4K";
@@ -26,7 +26,7 @@ export type ImageQualityChatGTP = "low" | "medium" | "high";
 
 export type AvailableImageModels =
   | "openai/gpt-image-1"
-  | "gemini/gemini-3-pro-image-preview";
+  | "gemini-3.1-flash-image-preview";
 
 export type ImageOptions =
   | {
@@ -37,7 +37,7 @@ export type ImageOptions =
       size: ImageSizeChatGTP;
     }
   | {
-      model: "gemini/gemini-3-pro-image-preview";
+      model: "gemini-3.1-flash-image-preview";
       samples: number;
       aspectRatio: ImageAspectRatioGemini;
       quality?: undefined;
@@ -58,6 +58,9 @@ interface IAChatState {
   loaded: boolean;
   view: "chat" | "chats";
   imageOptions: ImageOptions;
+  addReference:
+    | ((sources: SourceDocumentUIPart | SourceDocumentUIPart[]) => void)
+    | undefined;
   scrollToBottom: (() => void) | null;
   sendMessage:
     | ((
@@ -65,6 +68,11 @@ interface IAChatState {
         options?: ChatRequestOptions,
       ) => Promise<void>)
     | null;
+  setAddReference: (
+    newAddReference:
+      | ((sources: SourceDocumentUIPart | SourceDocumentUIPart[]) => void)
+      | undefined,
+  ) => void;
   setEnabled: (newEnabled: boolean) => void;
   setStatus: (newStatus: ChatStatus) => void;
   setDefined: (newDefined: boolean) => void;
@@ -112,12 +120,18 @@ export const useIAChat = create<IAChatState>()((set) => {
     loaded: false,
     view: "chat",
     imageOptions: {
-      model: "gemini/gemini-3-pro-image-preview",
+      model: "gemini-3.1-flash-image-preview",
       samples: 1,
-      aspectRatio: "1:1",
+      aspectRatio: "16:9",
       quality: undefined,
       size: "1K",
     },
+    addReference: undefined,
+    setAddReference: (newAddReference) =>
+      set((state) => ({
+        ...state,
+        addReference: newAddReference,
+      })),
     setEnabled: (newEnabled) =>
       set((state) => ({
         ...state,

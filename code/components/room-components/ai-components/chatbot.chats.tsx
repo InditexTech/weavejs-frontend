@@ -62,13 +62,15 @@ export const ChatBotChats = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col overflow-auto">
+    <div className="w-full h-full flex flex-col overflow-auto items-center">
       {allChats.length === 0 && (
-        <ConversationEmptyState
-          description="Ask the bot a question to start a new chat. Or create it by clicking on the create chat button."
-          icon={<MessagesSquare className="size-6" />}
-          title="Chats"
-        />
+        <div className="max-w-[400px] h-full flex flex-col justify-center items-center">
+          <ConversationEmptyState
+            description="Ask the bot a question to start a new chat. Or create it by clicking on the create chat button."
+            icon={<MessagesSquare className="size-6" />}
+            title="Chats"
+          />
+        </div>
       )}
 
       {

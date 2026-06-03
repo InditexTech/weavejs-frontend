@@ -384,3 +384,15 @@
   -webkit-transform: scaleX(1) scaleY(1) scaleZ(1);
   transform: scaleX(1) scaleY(1) scaleZ(1);
 }
+
+/* Chrome, Safari, Edge */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
