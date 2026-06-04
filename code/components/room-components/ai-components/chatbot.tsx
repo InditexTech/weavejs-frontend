@@ -151,6 +151,8 @@ export const ChatBot = () => {
     setResourceId,
   ]);
 
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
   // if (activeSidebar !== SIDEBAR_ELEMENTS.aiChat) {
   //   return null;
   // }
@@ -167,77 +169,87 @@ export const ChatBot = () => {
       >
         <SidebarHeader
           actions={
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[20px] hover:text-[#c9c9c9]"
-                    onClick={async () => {
-                      if (!room) return;
+            AI_AVAILABLE && (
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent w-[20px] h-[20px] hover:text-[#c9c9c9]"
+                      onClick={async () => {
+                        if (!room) return;
 
-                      const queryKey = ["getChats", resourceId];
-                      await queryClient.invalidateQueries({ queryKey });
+                        const queryKey = ["getChats", resourceId];
+                        await queryClient.invalidateQueries({ queryKey });
 
-                      const newTreadId = uuidv4();
+                        const newTreadId = uuidv4();
 
-                      sessionStorage.setItem(
-                        `weave.js_${room}_${session?.user.id}_ai_thread_id`,
-                        newTreadId,
-                      );
+                        sessionStorage.setItem(
+                          `weave.js_${room}_${session?.user.id}_ai_thread_id`,
+                          newTreadId,
+                        );
 
-                      await postChat(room, newTreadId, resourceId, {
-                        status: "active",
-                        title: "Untitled chat",
-                      });
+                        await postChat(room, newTreadId, resourceId, {
+                          status: "active",
+                          title: "Untitled chat",
+                        });
 
-                      setThreadId(newTreadId);
-                      setAiView("chat");
-                    }}
+                        setThreadId(newTreadId);
+                        setAiView("chat");
+                      }}
+                    >
+                      <MessageCirclePlus
+                        className="group-disabled:text-[#cccccc]"
+                        size={20}
+                        strokeWidth={1}
+                      />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    sideOffset={8}
+                    side="bottom"
+                    align="end"
+                    className="rounded-none"
                   >
-                    <MessageCirclePlus
-                      className="group-disabled:text-[#cccccc]"
-                      size={20}
-                      strokeWidth={1}
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  sideOffset={8}
-                  side="bottom"
-                  align="end"
-                  className="rounded-none"
-                >
-                  New chat
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                    New chat
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
           }
         >
           <SidebarSelector title="AI Assistant" />
         </SidebarHeader>
-        <ChatBotChatInfo chat={chatData?.chat} />
-        <div
-          className={cn("", {
-            ["h-[calc(100%-57px-67px)]"]: aiView === "chat",
-            ["h-[calc(100%-57px)]"]: aiView === "chats",
-          })}
-        >
-          {isFetching && aiView === "chat" && (
-            <div className="w-full h-full flex flex-col justify-center items-center">
-              <OrbitProgress
-                color="#000000"
-                size="small"
-                text=""
-                textColor=""
-              />
-              <div className="font-inter text-sm">Loading assistant chat</div>
+        {AI_AVAILABLE && (
+          <>
+            <ChatBotChatInfo chat={chatData?.chat} />
+            <div
+              className={cn("", {
+                ["h-[calc(100%-57px-67px)]"]: aiView === "chat",
+                ["h-[calc(100%-57px)]"]: aiView === "chats",
+              })}
+            >
+              {isFetching && aiView === "chat" && (
+                <div className="w-full h-full flex flex-col justify-center items-center">
+                  <OrbitProgress
+                    color="#000000"
+                    size="small"
+                    text=""
+                    textColor=""
+                  />
+                  <div className="font-inter text-sm">
+                    Loading assistant chat
+                  </div>
+                </div>
+              )}
+              {!isFetching && aiView === "chat" && (
+                <ChatBotConversation
+                  initialMessages={chatData?.messages ?? []}
+                />
+              )}
+              {!isFetching && aiView === "chats" && <ChatBotChats />}
             </div>
-          )}
-          {!isFetching && aiView === "chat" && (
-            <ChatBotConversation initialMessages={chatData?.messages ?? []} />
-          )}
-          {!isFetching && aiView === "chats" && <ChatBotChats />}
-        </div>
+          </>
+        )}
       </div>
     </>
   );

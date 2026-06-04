@@ -58,6 +58,8 @@ export const SidebarSelectorFooter = () => {
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
@@ -193,7 +195,7 @@ export const SidebarSelectorFooter = () => {
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
-          {aiChatEnabled && (
+          {aiChatEnabled && AI_AVAILABLE && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem

@@ -138,33 +138,30 @@ export const ChatBotConversation = ({
   const appHost = import.meta.env.VITE_APP_HOST;
   const endpoint = `${appHost}/api/ai/chats/${threadId}`;
 
-  const { messages, status, regenerate, sendMessage, setMessages } =
-    useChat({
-      messages: initialMessages,
-      resume: false,
-      transport: new DefaultChatTransport({
-        api: endpoint,
-        headers: {
-          ai_room_id: room ?? "",
-          ai_resource_id: resourceId,
-        },
-      }),
-      onFinish: ({ messages }) => {
-        const filteredMessages = messages.map((message) => {
-          return {
-            ...message,
-            parts: message.parts.filter(
-              (part) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const data = (part as any).data;
-                return data?.transient === undefined || data?.transient === false;
-              }
-            ),
-          };
-        });
-        setMessages(filteredMessages);
+  const { messages, status, regenerate, sendMessage, setMessages } = useChat({
+    messages: initialMessages,
+    resume: false,
+    transport: new DefaultChatTransport({
+      api: endpoint,
+      headers: {
+        ai_room_id: room ?? "",
+        ai_resource_id: resourceId,
       },
-    });
+    }),
+    onFinish: ({ messages }) => {
+      const filteredMessages = messages.map((message) => {
+        return {
+          ...message,
+          parts: message.parts.filter((part) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const data = (part as any).data;
+            return data?.transient === undefined || data?.transient === false;
+          }),
+        };
+      });
+      setMessages(filteredMessages);
+    },
+  });
 
   React.useEffect(() => {
     setStatus(status);
@@ -178,6 +175,10 @@ export const ChatBotConversation = ({
     sendMessage,
     setSendMessage,
   ]);
+
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
+  if (!AI_AVAILABLE) return null;
 
   if (!messages) return null;
 
@@ -264,7 +265,8 @@ export const ChatBotConversation = ({
                       );
 
                       const title = WORKFLOW_NAME_MAPPING[partAny.data.name];
-                      const status = WORKFLOW_STATUS_MAPPING[partAny.data.status];
+                      const status =
+                        WORKFLOW_STATUS_MAPPING[partAny.data.status];
                       const icon =
                         WORKFLOW_STATUS_ICON_MAPPING[partAny.data.status];
 
@@ -418,21 +420,26 @@ export const ChatBotConversation = ({
                                     icon={Images}
                                     label="Generated images"
                                   >
-                                    {step?.images.map((image: { imageId: string; url: string }, index: number) => (
-                                      <ChainOfThoughtImage
-                                        caption={`Image ${index + 1}`}
-                                        key={image.imageId}
-                                      >
-                                        <img
-                                          data-image-id={image.imageId}
-                                          data-image-url={image.url}
-                                          draggable="true"
-                                          src={image.url}
-                                          alt={`Generated image ${index + 1}`}
-                                          className="object-cover aspect-auto border-[0.5px] border-[#c9c9c9] rounded"
-                                        />
-                                      </ChainOfThoughtImage>
-                                    ))}
+                                    {step?.images.map(
+                                      (
+                                        image: { imageId: string; url: string },
+                                        index: number,
+                                      ) => (
+                                        <ChainOfThoughtImage
+                                          caption={`Image ${index + 1}`}
+                                          key={image.imageId}
+                                        >
+                                          <img
+                                            data-image-id={image.imageId}
+                                            data-image-url={image.url}
+                                            draggable="true"
+                                            src={image.url}
+                                            alt={`Generated image ${index + 1}`}
+                                            className="object-cover aspect-auto border-[0.5px] border-[#c9c9c9] rounded"
+                                          />
+                                        </ChainOfThoughtImage>
+                                      ),
+                                    )}
                                   </ChainOfThoughtStep>
                                 )}
                               </React.Fragment>
@@ -446,59 +453,82 @@ export const ChatBotConversation = ({
                         <Task className="w-full" key={`${message.id}-${index}`}>
                           <TaskTrigger title={partAny.data.title ?? "Tasks"} />
                           <TaskContent>
-                            {tasks.map((task: { id: string; name: string; status: string; tools?: { toolCallId: string; toolName: string; status: string; type: string; args: unknown; result: unknown }[] }) => {
-                              let variant: "outline" | "secondary" | "destructive" = "outline";
-                              if (
-                                ["generated", "completed"].includes(task.status)
-                              ) {
-                                variant = "secondary";
-                              }
-                              if (task.status === "failed") {
-                                variant = "destructive";
-                              }
+                            {tasks.map(
+                              (task: {
+                                id: string;
+                                name: string;
+                                status: string;
+                                tools?: {
+                                  toolCallId: string;
+                                  toolName: string;
+                                  status: string;
+                                  type: string;
+                                  args: unknown;
+                                  result: unknown;
+                                }[];
+                              }) => {
+                                let variant:
+                                  | "outline"
+                                  | "secondary"
+                                  | "destructive" = "outline";
+                                if (
+                                  ["generated", "completed"].includes(
+                                    task.status,
+                                  )
+                                ) {
+                                  variant = "secondary";
+                                }
+                                if (task.status === "failed") {
+                                  variant = "destructive";
+                                }
 
-                              return (
-                                <TaskItem key={task.id}>
-                                  <div className="w-full flex flex-col justify-start items-center gap-3">
-                                    <div className="w-full flex justify-between items-center gap-3">
-                                      <span>{task.name}</span>
-                                      <Badge
-                                        className="font-light text-xs"
-                                        variant={variant}
-                                      >
-                                        {task.status}
-                                      </Badge>{" "}
-                                    </div>
-                                    {(task?.tools ?? []).length > 0 && (
-                                      <div className="w-full flex gap-1 flex-col justify-start items-center">
-                                        {task.tools!.map((toolCall) => (
-                                          <Tool key={toolCall.toolCallId}>
-                                            <ToolHeader
-                                              state={toolCall.status as ToolPart["state"]}
-                                              title={toolCall.toolName.replace(
-                                                "weavejsLocal_",
-                                                "",
-                                              )}
-                                              className="cursor-pointer"
-                                              type={toolCall.type as ToolUIPart["type"]}
-                                            />
-                                            <ToolContent>
-                                              <ToolInput
-                                                input={toolCall.args}
-                                              />
-                                              <ToolOutput
-                                                output={toolCall.result}
-                                                errorText={undefined}
-                                              />
-                                            </ToolContent>
-                                          </Tool>
-                                        ))}
+                                return (
+                                  <TaskItem key={task.id}>
+                                    <div className="w-full flex flex-col justify-start items-center gap-3">
+                                      <div className="w-full flex justify-between items-center gap-3">
+                                        <span>{task.name}</span>
+                                        <Badge
+                                          className="font-light text-xs"
+                                          variant={variant}
+                                        >
+                                          {task.status}
+                                        </Badge>{" "}
                                       </div>
-                                    )}
-                                  </div>
-                                </TaskItem>
-                              );
-                            })}
+                                      {(task?.tools ?? []).length > 0 && (
+                                        <div className="w-full flex gap-1 flex-col justify-start items-center">
+                                          {task.tools!.map((toolCall) => (
+                                            <Tool key={toolCall.toolCallId}>
+                                              <ToolHeader
+                                                state={
+                                                  toolCall.status as ToolPart["state"]
+                                                }
+                                                title={toolCall.toolName.replace(
+                                                  "weavejsLocal_",
+                                                  "",
+                                                )}
+                                                className="cursor-pointer"
+                                                type={
+                                                  toolCall.type as ToolUIPart["type"]
+                                                }
+                                              />
+                                              <ToolContent>
+                                                <ToolInput
+                                                  input={toolCall.args}
+                                                />
+                                                <ToolOutput
+                                                  output={toolCall.result}
+                                                  errorText={undefined}
+                                                />
+                                              </ToolContent>
+                                            </Tool>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TaskItem>
+                                );
+                              },
+                            )}
                           </TaskContent>
                         </Task>
                       );
@@ -591,7 +621,10 @@ export const ChatBotConversation = ({
                           >
                             <MessageContent>
                               <MessageResponse>
-                                {(part.output as Record<string, unknown>)?.result as string}
+                                {
+                                  (part.output as Record<string, unknown>)
+                                    ?.result as string
+                                }
                               </MessageResponse>
                             </MessageContent>
                             {isLastMessage && (
@@ -611,7 +644,8 @@ export const ChatBotConversation = ({
                                   className="w-[40px] cursor-pointer"
                                   onClick={() =>
                                     navigator.clipboard.writeText(
-                                      (part.output as Record<string, unknown>)?.result as string,
+                                      (part.output as Record<string, unknown>)
+                                        ?.result as string,
                                     )
                                   }
                                   label="Copy"
@@ -646,7 +680,12 @@ export const ChatBotConversation = ({
                           {attachments.length > 0 && (
                             <Attachments>
                               {attachments.map((attachment, index) => (
-                                <Attachment data={attachment as import("@/components/ai-elements/attachments").AttachmentData} key={index}>
+                                <Attachment
+                                  data={
+                                    attachment as import("@/components/ai-elements/attachments").AttachmentData
+                                  }
+                                  key={index}
+                                >
                                   <AttachmentPreview />
                                 </Attachment>
                               ))}

@@ -126,6 +126,8 @@ const ChatBotPrompt = () => {
     (state) => state.setShowRightSidebarFloating,
   );
 
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
   const handleSubmit = React.useCallback(
     async (message: PromptInputMessage) => {
       const hasText = Boolean(message.text);
@@ -151,6 +153,10 @@ const ChatBotPrompt = () => {
       }
 
       if (threadId === "not-defined") {
+        return;
+      }
+
+      if (!AI_AVAILABLE) {
         return;
       }
 

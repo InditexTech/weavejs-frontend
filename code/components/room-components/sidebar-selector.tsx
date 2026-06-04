@@ -44,11 +44,13 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
   const framesCount = useCollaborationRoom((state) => state.frames.count);
   const queryClient = useQueryClient();
-  const imagesQueryData = queryClient.getQueryData<{ pages: { total: number }[] }>(
-    ["getImages", room],
-  );
+  const imagesQueryData = queryClient.getQueryData<{
+    pages: { total: number }[];
+  }>(["getImages", room]);
   const imagesTotal = imagesQueryData?.pages?.[0]?.total ?? null;
 
   const { data: videosCountData } = useQuery({
@@ -57,7 +59,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     enabled: !!room,
     staleTime: 30_000,
   });
-  const videosTotal = (videosCountData as { total?: number } | undefined)?.total ?? null;
+  const videosTotal =
+    (videosCountData as { total?: number } | undefined)?.total ?? null;
 
   const { data: templatesCountData } = useQuery({
     queryKey: ["getTemplatesCount", room, "template"],
@@ -65,7 +68,8 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     enabled: !!room,
     staleTime: 30_000,
   });
-  const templatesTotal = (templatesCountData as { total?: number } | undefined)?.total ?? null;
+  const templatesTotal =
+    (templatesCountData as { total?: number } | undefined)?.total ?? null;
 
   const formatBadgeCount = (count: number) => (count > 999 ? "+999" : count);
 
@@ -116,14 +120,15 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             {formatBadgeCount(framesCount)}
           </Badge>
         )}
-        {sidebarActive === SIDEBAR_ELEMENTS.templates && templatesTotal !== null && (
-          <Badge
-            variant="secondary"
-            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
-          >
-            {formatBadgeCount(templatesTotal)}
-          </Badge>
-        )}
+        {sidebarActive === SIDEBAR_ELEMENTS.templates &&
+          templatesTotal !== null && (
+            <Badge
+              variant="secondary"
+              className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
+            >
+              {formatBadgeCount(templatesTotal)}
+            </Badge>
+          )}
         {menuOpen ? (
           <ChevronUp size={20} strokeWidth={1} />
         ) : (
@@ -291,7 +296,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
-          {aiChatEnabled && (
+          {aiChatEnabled && AI_AVAILABLE && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem

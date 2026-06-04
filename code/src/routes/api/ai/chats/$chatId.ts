@@ -26,6 +26,13 @@ export const Route = createFileRoute("/api/ai/chats/$chatId")({
           );
         }
 
+        if (process.env.VITE_AI_AVAILABLE !== "true") {
+          return Response.json(
+            { error: "AI features are not available" },
+            { status: 503, headers: { "Content-Type": "application/json" } },
+          );
+        }
+
         const { messages, pageId, imageOption, referenceNodes } =
           await request.json();
         const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;

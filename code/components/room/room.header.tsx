@@ -62,6 +62,8 @@ import { formatForDisplay } from "@tanstack/react-hotkeys";
 export function RoomHeader() {
   const navigate = useNavigate();
 
+  const AI_AVAILABLE = import.meta.env.VITE_AI_AVAILABLE === "true";
+
   const instance = useWeave((state) => state.instance);
   const selectionActive = useWeave((state) => state.selection.active);
   const isRoomSwitching = useWeave((state) => state.room.switching);
@@ -738,23 +740,25 @@ export function RoomHeader() {
                         )}
                         Connection testing
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-xs cursor-pointer hover:rounded-none"
-                        disabled={
-                          !isRoomReady || (isRoomReady && aiChatEnabled)
-                        }
-                        onPointerDown={() => {
-                          setAiChatSetupVisible(true);
-                          setMenuOpen(false);
-                        }}
-                      >
-                        {aiChatEnabled ? (
-                          <Check size={16} strokeWidth={1} />
-                        ) : (
-                          <div className="w-[16px] h-[16px]" />
-                        )}
-                        IA Capabilities
-                      </DropdownMenuItem>
+                      {AI_AVAILABLE && (
+                        <DropdownMenuItem
+                          className="text-xs cursor-pointer hover:rounded-none"
+                          disabled={
+                            !isRoomReady || (isRoomReady && aiChatEnabled)
+                          }
+                          onPointerDown={() => {
+                            setAiChatSetupVisible(true);
+                            setMenuOpen(false);
+                          }}
+                        >
+                          {aiChatEnabled ? (
+                            <Check size={16} strokeWidth={1} />
+                          ) : (
+                            <div className="w-[16px] h-[16px]" />
+                          )}
+                          IA Capabilities
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem
                         className="text-xs cursor-pointer hover:rounded-none w-full"
                         disabled={!isRoomReady}
