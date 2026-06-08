@@ -402,8 +402,7 @@ function useContextMenu() {
 
             if (!pos) return;
 
-            const { mousePoint, container } =
-              instance.getMousePointer(pos);
+            const { mousePoint, container } = instance.getMousePointer(pos);
             let position = mousePoint;
 
             if (!mousePoint) {
@@ -587,6 +586,8 @@ function useContextMenu() {
           onClick: async () => {
             try {
               const template = generateImageTemplate(nodes);
+
+              console.log("template", template);
 
               setTemplateData(template);
               setTemplateSaveDialogKind("imageTemplate");

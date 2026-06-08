@@ -19,10 +19,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { AddToRoomRenderTemplate } from "./add-to-room.render-template";
 import { Input } from "@/components/ui/input";
+import {
+  imageTemplateSchema,
+  type ImageTemplate,
+} from "../hooks/image-template.schema";
+import type { TemplateParameters } from "../hooks/template-parameters.schema";
 
 export function AddToRoomConfiguration() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [templateData, setTemplateData] = React.useState<any>(null);
+  const [templateData, setTemplateData] = React.useState<ImageTemplate | null>(
+    null,
+  );
 
   const [text, setText] = React.useState("");
 
@@ -50,8 +56,14 @@ export function AddToRoomConfiguration() {
     if (!template) return;
 
     try {
-      const templateData = JSON.parse(template.templateData);
-      setTemplateData(templateData);
+      const parsed = JSON.parse(template.templateData);
+      const result = imageTemplateSchema.safeParse(parsed);
+      if (!result.success) {
+        console.error("Invalid image template data:", result.error);
+        setTemplateData(null);
+        return;
+      }
+      setTemplateData(result.data);
     } catch {
       setTemplateData(null);
     }
@@ -67,8 +79,7 @@ export function AddToRoomConfiguration() {
         a.id.localeCompare(b.id),
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const imageTemplateParameters: Record<string, any> = {
+      const imageTemplateParameters: TemplateParameters = {
         ...templateParameters,
       };
 
@@ -78,16 +89,15 @@ export function AddToRoomConfiguration() {
         const nodeId = node.id;
         if (imageNode) {
           imageTemplateParameters[nodeId] = {
-            ...imageTemplateParameters[nodeId],
             nodeId,
-            kind: "image",
+            kind: "image" as const,
             properties: {
               image: {
                 source: imageNode.url,
                 width: imageNode.size.width,
                 height: imageNode.size.height,
               },
-              fit: "cover",
+              fit: "cover" as const,
             },
           };
         } else {
@@ -100,7 +110,18 @@ export function AddToRoomConfiguration() {
         imageTemplateParameters,
       );
 
-      setTemplateParameters(defaultTemplateParameters);
+      // setupTemplateDefaults returns entries for all node kinds (including frames).
+      // Only "image" and "text" entries are parameterized — filter out the rest
+      // so the strict Zod schema in setTemplateParameters accepts the update.
+      const filteredDefaults: TemplateParameters = Object.fromEntries(
+        Object.entries(
+          defaultTemplateParameters as Record<string, { kind: string }>,
+        ).filter(
+          ([, entry]) => entry.kind === "image" || entry.kind === "text",
+        ),
+      ) as TemplateParameters;
+
+      setTemplateParameters(filteredDefaults);
       setInitialized(true);
     }
   }, [
@@ -121,7 +142,8 @@ export function AddToRoomConfiguration() {
 
   React.useEffect(() => {
     if (selectedNode && nodeMetadata?.kind === "text") {
-      setText(templateParameters?.[selectedNode]?.properties?.text || "");
+      const entry = templateParameters?.[selectedNode];
+      setText((entry?.kind === "text" ? entry.properties.text : "") || "");
     } else {
       setText("");
     }
@@ -158,18 +180,18 @@ export function AddToRoomConfiguration() {
                           onClick={
                             selectedNode
                               ? () => {
-                                  const newParameters = {
+                                  const newParameters: TemplateParameters = {
                                     ...templateParameters,
                                     [selectedNode]: {
                                       nodeId: selectedNode,
-                                      kind: "image",
+                                     kind: "image" as const,
                                       properties: {
                                         image: {
                                           source: image.url,
                                           width: image.size.width,
                                           height: image.size.height,
                                         },
-                                        fit: "cover",
+                                       fit: "cover" as const,
                                       },
                                     },
                                   };
@@ -204,7 +226,7 @@ export function AddToRoomConfiguration() {
                   size="xs"
                   variant="destructive"
                   onClick={() => {
-                    const newParameters = {
+                    const newParameters: TemplateParameters = {
                       ...templateParameters,
                     };
                     delete newParameters[selectedNode];
@@ -230,17 +252,22 @@ export function AddToRoomConfiguration() {
                 <div>Image format</div>
                 <Select
                   value={
-                    templateParameters?.[selectedNode]?.properties?.fit ||
-                    "cover"
+                    (() => {
+                      const entry = templateParameters?.[selectedNode];
+                      return (entry?.kind === "image" ? entry.properties.fit : undefined) || "cover";
+                    })()
                   }
                   onValueChange={(value) => {
-                    const newParameters = {
+                    const fit = value as "cover" | "contain";
+                    const existing = templateParameters[selectedNode];
+                    if (existing?.kind !== "image") return;
+                    const newParameters: TemplateParameters = {
                       ...templateParameters,
                       [selectedNode]: {
-                        ...templateParameters[selectedNode],
+                        ...existing,
                         properties: {
-                          ...templateParameters[selectedNode]?.properties,
-                          fit: value,
+                          ...existing.properties,
+                          fit,
                         },
                       },
                     };
@@ -291,14 +318,16 @@ export function AddToRoomConfiguration() {
                     }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        const newParameters = {
+                        const existing = templateParameters[selectedNode];
+                        if (existing?.kind !== "text") return;
+                        const newParameters: TemplateParameters = {
                           ...templateParameters,
                           [selectedNode]: {
-                            ...templateParameters[selectedNode],
+                            ...existing,
                             nodeId: selectedNode,
-                            kind: "text",
+                            kind: "text" as const,
                             properties: {
-                              ...templateParameters[selectedNode].properties,
+                              ...existing.properties,
                               text,
                             },
                           },

@@ -4,6 +4,10 @@
 
 import { TemplateEntity } from "@/components/room-components/templates-library/types";
 import { create } from "zustand";
+import {
+  templateParametersSchema,
+  type TemplateParameters,
+} from "@/components/room-components/hooks/template-parameters.schema";
 
 type Step = "select-template" | "configuration" | "confirm";
 
@@ -40,8 +44,7 @@ interface AddTemplateToRoomState {
     };
     scale: number;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parameters: Record<string, any>;
+  parameters: TemplateParameters;
   initialized: boolean;
   images: ImageInfo[];
   selectedNode: string | null;
@@ -50,8 +53,7 @@ interface AddTemplateToRoomState {
   setRoom: (room: Room | undefined) => void;
   setPage: (room: Page | undefined) => void;
   setTemplate: (template: TemplateEntity | undefined) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setTemplateParameters: (params: Record<string, any>) => void;
+  setTemplateParameters: (params: TemplateParameters) => void;
   setImages: (images: ImageInfo[]) => void;
   setSelectedNode: (nodeId: string | null) => void;
   setInitialized: (initialized: boolean) => void;
@@ -83,8 +85,14 @@ export const useAddTemplateToRoom = create<AddTemplateToRoomState>()((set) => ({
   setRoom: (room) => set((state) => ({ ...state, room })),
   setPage: (page) => set((state) => ({ ...state, page })),
   setTemplate: (template) => set((state) => ({ ...state, template })),
-  setTemplateParameters: (parameters) =>
-    set((state) => ({ ...state, parameters })),
+  setTemplateParameters: (parameters) => {
+    const result = templateParametersSchema.safeParse(parameters);
+    if (!result.success) {
+      console.error("Invalid template parameters:", result.error);
+      return;
+    }
+    set((state) => ({ ...state, parameters: result.data }));
+  },
   setImages: (images) => set((state) => ({ ...state, images })),
   setSelectedNode: (selectedNode) =>
     set((state) => ({ ...state, selectedNode })),

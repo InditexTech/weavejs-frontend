@@ -2,6 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { ZodError } from "zod";
+import {
+  templateParametersSchema,
+  type TemplateParameters,
+} from "@/components/room-components/hooks/template-parameters.schema";
+
 export type PostAddImageTemplateToRoomPayload = {
   roomId: string;
   pageId: string;
@@ -13,13 +19,24 @@ export type PostAddImageTemplateToRoomPayload = {
       y: number;
     };
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parameters: Record<string, any>;
+  parameters: TemplateParameters;
 };
 
 export const postAddImageTemplateToRoom = async (
   payload: PostAddImageTemplateToRoomPayload,
 ) => {
+  try {
+    templateParametersSchema.parse(payload.parameters);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new Error(
+        `Invalid template parameters before sending request: ${error.message}`,
+        { cause: "InvalidTemplateParameters" },
+      );
+    }
+    throw error;
+  }
+
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 

@@ -8,6 +8,11 @@ import { BoundingBox, WeaveSelection } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import Konva from "konva";
 import { cn } from "@/lib/utils";
+import { ZodError } from "zod";
+import {
+  imageTemplateSchema,
+  type ImageTemplate,
+} from "./image-template.schema";
 
 function getGroupTopLeft(instance: Weave, nodes: WeaveSelection[]) {
   if (!nodes.length) return null;
@@ -475,15 +480,16 @@ const mapImageNode = (
 export const useJsonTemplate = () => {
   const instance = useWeave((state) => state.instance);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getNodeMetadata = React.useCallback((template: any, nodeId: string) => {
-    return findNodeById(template, nodeId);
-  }, []);
+  const getNodeMetadata = React.useCallback(
+    (template: ImageTemplate, nodeId: string) => {
+      return findNodeById(template, nodeId);
+    },
+    [],
+  );
 
   const getTemplateToHTML = React.useCallback(
     (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      template: any,
+      template: ImageTemplate,
       parentSize: { width: number; height: number },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       parameters: Record<string, any>,
@@ -508,15 +514,14 @@ export const useJsonTemplate = () => {
 
   const setupTemplateDefaults = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (template: any, parameters: Record<string, any>) => {
+    (template: ImageTemplate, parameters: Record<string, any>) => {
       return templateSetDefaults(template, parameters);
     },
     [],
   );
 
   const getTemplateNodesMetadata = React.useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (template: any, filter: string[] = []) => {
+    (template: ImageTemplate, filter: string[] = []) => {
       return extractNodesMetadata(template, filter);
     },
     [],
@@ -555,7 +560,7 @@ export const useJsonTemplate = () => {
   );
 
   const generateImageTemplate = React.useCallback(
-    (nodes: WeaveSelection[]) => {
+    (nodes: WeaveSelection[]): ImageTemplate => {
       if (!instance)
         throw new Error("Instance is required to generate JSON template", {
           cause: "NoInstance",
@@ -581,11 +586,23 @@ export const useJsonTemplate = () => {
         );
       }
 
-      return {
+      const result = {
         version: "1.0",
         name: "test",
         nodes: mappedNodes,
       };
+
+      try {
+        return imageTemplateSchema.parse(result);
+      } catch (error) {
+        if (error instanceof ZodError) {
+          throw new Error(
+            `Generated image template is invalid: ${error.message}`,
+            { cause: "InvalidTemplate" },
+          );
+        }
+        throw error;
+      }
     },
     [instance],
   );
