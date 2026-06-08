@@ -587,8 +587,6 @@ function useContextMenu() {
             try {
               const template = generateImageTemplate(nodes);
 
-              console.log("template", template);
-
               setTemplateData(template);
               setTemplateSaveDialogKind("imageTemplate");
               setTemplateSaveDialogVisible(true);

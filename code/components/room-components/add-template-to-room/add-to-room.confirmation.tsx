@@ -59,9 +59,6 @@ export function AddToRoomConfirmation() {
   const setImages = useAddTemplateToRoom((state) => state.setImages);
   const [processing, setProcessing] = React.useState(false);
 
-  console.log("template", template);
-  console.log("templateParameters", templateParameters);
-
   const mutationAddToRoom = useMutation({
     mutationFn: async (payload: PostAddImageTemplateToRoomPayload) => {
       return await postAddImageTemplateToRoom(payload);
