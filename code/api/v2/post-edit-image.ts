@@ -28,12 +28,13 @@ export const postEditImage = async (
   const apiEndpoint = import.meta.env.VITE_API_V2_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
-  const endpoint = `${apiEndpoint}/${hubName}/rooms/${params.roomId}/images/edit?password=${password}`;
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${params.roomId}/images/edit`;
 
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-AI-Password": password ?? "",
     },
     body: JSON.stringify({
       prompt: params.prompt,

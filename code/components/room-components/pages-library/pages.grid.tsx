@@ -51,6 +51,9 @@ export const PagesGrid = () => {
   const setRoomImageFallback = useCollaborationRoom(
     (state) => state.setRoomImageFallback,
   );
+  const setRoomPageAdding = useCollaborationRoom(
+    (state) => state.setRoomPageAdding,
+  );
 
   React.useEffect(() => {
     if (viewportRef.current) {
@@ -75,19 +78,27 @@ export const PagesGrid = () => {
       const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
       try {
-        const { roomData: data } = await getRoomData(
-          queryClient,
-          roomId,
-          pageId,
-          setRoomDataStatus,
-          setRoomImageFallback,
-        );
-        store.switchToRoom(pageId, data);
+        const offlineData =
+          await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(pageId);
+
+        if (!offlineData) {
+          const { roomData: data } = await getRoomData(
+            queryClient,
+            roomId,
+            pageId,
+            setRoomDataStatus,
+            setRoomImageFallback,
+          );
+          store.switchToRoom(pageId, data);
+        } else {
+          store.switchToRoom(pageId, undefined);
+        }
         // eslint-disable-next-line no-empty
       } catch {
         store.switchToRoom(pageId, undefined);
       }
 
+      setRoomPageAdding(false);
       setPagesActualPage(pageIndex);
       setPagesActualPageId(pageId);
     },
@@ -168,6 +179,8 @@ export const PagesGrid = () => {
       if (!roomId) {
         throw new Error("Room ID is required to create a page");
       }
+
+      setRoomPageAdding(true);
 
       return await postPage(roomId, params);
     },

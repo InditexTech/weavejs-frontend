@@ -69,6 +69,8 @@ export function StrokeProperties() {
   if (
     [
       "arrow",
+      "image",
+      "image-with-title",
       "image-template",
       "group",
       "mask",

@@ -34,6 +34,9 @@ export function DeleteRoomPageDialog() {
   const setRoomsPageDeleteVisible = useCollaborationRoom(
     (state) => state.setRoomsPageDeleteVisible,
   );
+  const setRoomPageRemoving = useCollaborationRoom(
+    (state) => state.setRoomPageRemoving,
+  );
 
   React.useEffect(() => {
     if (deleteRoomPageVisible) {
@@ -55,6 +58,7 @@ export function DeleteRoomPageDialog() {
       roomId: string;
       pageId: string;
     }) => {
+      setRoomPageRemoving(true);
       setArchiving(true);
       setRoomsPageDeleteVisible(false);
       loadingRef.current = toast.loading(`Archiving the page, please wait...`);
@@ -62,15 +66,19 @@ export function DeleteRoomPageDialog() {
       return await delPage(roomId, pageId);
     },
     onSettled: () => {
+      setArchiving(false);
       if (loadingRef.current) {
         toast.dismiss(loadingRef.current);
       }
-      setArchiving(false);
     },
     onSuccess: (_, { roomId: rid }) => {
       toast.success(`Page archived successfully`);
-      queryClient.invalidateQueries({ queryKey: ["getPagesInfiniteGrid", rid] });
-      queryClient.invalidateQueries({ queryKey: ["getPagesInfiniteList", rid] });
+      queryClient.invalidateQueries({
+        queryKey: ["getPagesInfiniteGrid", rid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getPagesInfiniteList", rid],
+      });
     },
     onError() {
       toast.error(`Failed to archive the page. Please check and try again`);

@@ -5,14 +5,16 @@
 import {
   Brush,
   Circle,
-  Hexagon,
+  // Hexagon,
   MoveUpRight,
   PenLine,
+  Pentagon,
   Square,
   Star,
 } from "lucide-react";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
+import { WeavePolygonToolAction } from "@inditextech/weave-sdk";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 export const useShapesTools = () => {
@@ -64,16 +66,40 @@ export const useShapesTools = () => {
         onClick: () => triggerTool("ellipseTool"),
         active: () => actualAction === "ellipseTool",
       },
-      regularPolygonTool: {
-        icon: <Hexagon className="px-2" size={40} strokeWidth={1} />,
+      // regularPolygonTool: {
+      //   icon: <Hexagon className="px-2" size={40} strokeWidth={1} />,
+      //   label: (
+      //     <div className="text-xs flex gap-3 justify-start items-center">
+      //       <p>Regular Polygon tool</p>
+      //       {formatForDisplay("P")}
+      //     </div>
+      //   ),
+      //   onClick: () => triggerTool("regularPolygonTool"),
+      //   active: () => actualAction === "regularPolygonTool",
+      // },
+      polygonTool: {
+        icon: <Pentagon className="px-2" size={40} strokeWidth={1} />,
         label: (
           <div className="text-xs flex gap-3 justify-start items-center">
-            <p>Regular Polygon tool</p>
+            <p>Polygon tool</p>
             {formatForDisplay("P")}
           </div>
         ),
-        onClick: () => triggerTool("regularPolygonTool"),
-        active: () => actualAction === "regularPolygonTool",
+        onClick: () => {
+          if (!instance) return;
+
+          triggerTool("polygonTool");
+
+          const polygonTool =
+            instance.getActionHandler<WeavePolygonToolAction>("polygonTool");
+
+          if (!polygonTool) return;
+
+          polygonTool.updateProps({
+            scaleFactor: 2,
+          });
+        },
+        active: () => actualAction === "polygonTool",
       },
       starTool: {
         icon: <Star className="px-2" size={40} strokeWidth={1} />,

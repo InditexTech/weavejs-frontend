@@ -12,17 +12,22 @@ import {
 export const useIsRoomReady = () => {
   const status = useWeave((state) => state.status);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-  const asyncElementsState = useWeave((state) => state.asyncElements.state);
+  // const asyncElementsState = useWeave((state) => state.asyncElements.state);
   const isSwitchingRoom = useWeave((state) => state.room.switching);
 
   const roomIsReady = React.useMemo(() => {
     return !(
       status !== WEAVE_INSTANCE_STATUS.RUNNING ||
       weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
-      asyncElementsState !== "loaded" ||
+      // asyncElementsState !== "loaded" ||
       isSwitchingRoom
     );
-  }, [weaveConnectionStatus, status, asyncElementsState, isSwitchingRoom]);
+  }, [
+    weaveConnectionStatus,
+    status,
+    //asyncElementsState,
+    isSwitchingRoom,
+  ]);
 
   return roomIsReady;
 };

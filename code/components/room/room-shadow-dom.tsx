@@ -34,6 +34,7 @@ import { useUpdatePageThumbnail } from "../room-components/hooks/use-update-page
 import { useChangePage } from "../room-components/hooks/use-change-page";
 import { useMutation } from "@tanstack/react-query";
 import { postRoomImageFallback } from "@/api/post-room-image-fallback";
+import { UploadImageWithTitle } from "../room-components/upload-image-with-title";
 // import useGetRendererKonvaReactReconciler from "../room-components/hooks/use-get-renderer-konva-react-reconciler";
 
 type RoomWrapperProps = {
@@ -260,6 +261,7 @@ export const Room = () => {
             actions={ACTIONS(getUser)}
           >
             <UploadImage />
+            <UploadImageWithTitle />
             <UploadImages />
             <UploadVideo />
             <RoomLayout inShadowDom />

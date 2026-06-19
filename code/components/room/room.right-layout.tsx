@@ -35,6 +35,21 @@ export const RoomRightSidebar = () => {
 
   const aiChatEnabled = useIAChat((state) => state.enabled);
 
+  const afterLoadFit = useCollaborationRoom((state) => state.afterLoadFit);
+  const roomPageFetching = useCollaborationRoom(
+    (state) => state.pages.fetching,
+  );
+  const roomPageAdding = useCollaborationRoom((state) => state.pages.adding);
+  const roomPageRemoving = useCollaborationRoom(
+    (state) => state.pages.removing,
+  );
+
+  const showContent = React.useMemo(() => {
+    return (
+      afterLoadFit && !roomPageFetching && !roomPageAdding && !roomPageRemoving
+    );
+  }, [afterLoadFit, roomPageFetching, roomPageAdding, roomPageRemoving]);
+
   if (WEAVE_STORE_CONNECTION_STATUS.CONNECTED !== weaveConnectionStatus) {
     return null;
   }
@@ -72,6 +87,7 @@ export const RoomRightSidebar = () => {
           </div>
         )}
         {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
+          showContent &&
           !isRoomSwitching && (
             <div
               className={cn("w-full h-[calc(100%-65px)] bg-white", {

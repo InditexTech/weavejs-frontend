@@ -153,8 +153,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
                   sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
                 }}
               >
-                <span className="w-[36px] shrink-0" />
-                Selection
+                <span className="flex-1 ml-2">Selection</span>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -168,16 +167,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.images);
             }}
           >
-            <span className="w-[36px] shrink-0 flex items-center justify-center">
-              {imagesTotal !== null && (
-                <Badge
-                  variant="secondary"
-                  className="w-full h-[16px] justify-center rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
-                >
-                  {formatBadgeCount(imagesTotal)}
-                </Badge>
-              )}
-            </span>
             <span className="flex-1 ml-2">Images</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+I")}
@@ -191,16 +180,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.videos);
             }}
           >
-            <span className="w-[36px] shrink-0 flex items-center justify-center">
-              {videosTotal !== null && (
-                <Badge
-                  variant="secondary"
-                  className="w-full h-[16px] justify-center rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
-                >
-                  {formatBadgeCount(videosTotal)}
-                </Badge>
-              )}
-            </span>
             <span className="flex-1 ml-2">Videos</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+V")}
@@ -214,16 +193,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.frames);
             }}
           >
-            <span className="w-[36px] shrink-0 flex items-center justify-center">
-              {framesCount !== null && (
-                <Badge
-                  variant="secondary"
-                  className="w-full h-[16px] justify-center rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
-                >
-                  {formatBadgeCount(framesCount)}
-                </Badge>
-              )}
-            </span>
             <span className="flex-1 ml-2">Frames</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+F")}
@@ -237,7 +206,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.guides);
             }}
           >
-            <span className="w-[36px] shrink-0" />
             <span className="flex-1 ml-2">Guides</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+G")}
@@ -251,16 +219,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.templates);
             }}
           >
-            <span className="w-[36px] shrink-0 flex items-center justify-center">
-              {templatesTotal !== null && (
-                <Badge
-                  variant="secondary"
-                  className="w-full h-[16px] justify-center rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
-                >
-                  {formatBadgeCount(templatesTotal)}
-                </Badge>
-              )}
-            </span>
             <span className="flex-1 ml-2">Templates</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+T")}
@@ -274,7 +232,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
               sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
             }}
           >
-            <span className="w-[36px] shrink-0" />
             <span className="flex-1 ml-2">Color tokens</span>
             <DropdownMenuShortcut>
               {formatForDisplay("Shift+C")}
@@ -289,7 +246,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
                 sidebarToggle(SIDEBAR_ELEMENTS.comments);
               }}
             >
-              <span className="w-[36px] shrink-0" />
               <span className="flex-1 ml-2">Comments</span>
               <DropdownMenuShortcut>
                 {formatForDisplay("Shift+O")}
@@ -307,7 +263,6 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
                   sidebarToggle(SIDEBAR_ELEMENTS.aiChat);
                 }}
               >
-                <span className="w-[36px] shrink-0" />
                 <span className="ml-2">AI Assistant</span>
               </DropdownMenuItem>
             </>

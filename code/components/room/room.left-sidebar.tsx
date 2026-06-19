@@ -31,6 +31,20 @@ export const RoomLeftSidebar = ({
   const imageCroppingEnabled = useCollaborationRoom(
     (state) => state.images.cropping.enabled,
   );
+  const afterLoadFit = useCollaborationRoom((state) => state.afterLoadFit);
+  const roomPageFetching = useCollaborationRoom(
+    (state) => state.pages.fetching,
+  );
+  const roomPageAdding = useCollaborationRoom((state) => state.pages.adding);
+  const roomPageRemoving = useCollaborationRoom(
+    (state) => state.pages.removing,
+  );
+
+  const showContent = React.useMemo(() => {
+    return (
+      afterLoadFit && !roomPageFetching && !roomPageAdding && !roomPageRemoving
+    );
+  }, [afterLoadFit, roomPageFetching, roomPageAdding, roomPageRemoving]);
 
   // if (
   //   WEAVE_STORE_CONNECTION_STATUS.CONNECTED !== weaveConnectionStatus &&
@@ -61,20 +75,9 @@ export const RoomLeftSidebar = ({
     >
       {inShadowDom && viewType === "fixed" && <RoomHeaderShadowDom />}
       {!inShadowDom && viewType === "fixed" && <RoomHeader />}
-      {WEAVE_STORE_CONNECTION_STATUS.CONNECTED !== weaveConnectionStatus &&
-        !isRoomSwitching && (
-          <div className="w-full h-full flex justify-center items-center font-inter text-lg uppercase">
-            {/* disconnected */}
-          </div>
-        )}
-      {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
-        isRoomSwitching && (
-          <div className="w-full h-full flex justify-center items-center font-inter text-lg uppercase">
-            {/* switching page */}
-          </div>
-        )}
       {viewType === "fixed" && <RoomPageSelector />}
-      {WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
+      {showContent &&
+        WEAVE_STORE_CONNECTION_STATUS.CONNECTED === weaveConnectionStatus &&
         !isRoomSwitching && <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />}
     </section>
   );

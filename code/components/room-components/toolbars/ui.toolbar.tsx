@@ -10,7 +10,6 @@ import {
   setSessionConfig,
 } from "@/components/utils/session-config";
 import { useWeave } from "@inditextech/weave-react";
-import { useIsRoomReady } from "../hooks/use-is-room-ready";
 
 export const UIToolbar = () => {
   const isRoomSwitching = useWeave((state) => state.room.switching);
@@ -18,8 +17,6 @@ export const UIToolbar = () => {
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
   const viewType = useCollaborationRoom((state) => state.viewType);
   const setViewType = useCollaborationRoom((state) => state.setViewType);
-
-  const isRoomReady = useIsRoomReady();
 
   return (
     <>
@@ -31,7 +28,7 @@ export const UIToolbar = () => {
             <Minimize2 size={20} strokeWidth={1} />
           )
         }
-        disabled={!isRoomReady || isRoomSwitching}
+        disabled={isRoomSwitching}
         onClick={() => {
           if (!roomInfo) {
             return;

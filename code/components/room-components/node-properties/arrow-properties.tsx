@@ -147,7 +147,11 @@ export function ArrowProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["stroke", "connector"].includes(actualNode.type)) {
+  if (
+    ["stroke", "connector", "image", "image-with-title"].includes(
+      actualNode.type,
+    )
+  ) {
     return null;
   }
 

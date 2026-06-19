@@ -56,6 +56,7 @@ type SidebarActiveKeys = keyof typeof SIDEBAR_ELEMENTS;
 export type SidebarActive = (typeof SIDEBAR_ELEMENTS)[SidebarActiveKeys] | null;
 
 interface CollaborationRoomState {
+  afterLoadFit: boolean;
   signingIn: boolean;
   viewType: ViewType;
   showLeftSidebarFloating: boolean;
@@ -91,6 +92,7 @@ interface CollaborationRoomState {
   features: {
     workloads: boolean;
     threads: boolean;
+    indexedDb: boolean;
   };
   fetchConnectionUrl: {
     loading: boolean;
@@ -100,6 +102,9 @@ interface CollaborationRoomState {
     selected: Guide | null;
   };
   pages: {
+    fetching: boolean;
+    adding: boolean;
+    removing: boolean;
     listVisible: boolean;
     gridVisible: boolean;
     amount: number;
@@ -231,6 +236,7 @@ interface CollaborationRoomState {
     adding: boolean;
     showSelectFiles: boolean;
     showSelectFile: boolean;
+    showSelectFileWithTitle: boolean;
     transforming: boolean;
     transformingOperation: TransformingOperation;
     cropping: {
@@ -287,6 +293,7 @@ interface CollaborationRoomState {
   setUploadingImage: (newUploadingImage: boolean) => void;
   setShowSelectFilesImages: (newShowSelectFilesImages: boolean) => void;
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
+  setShowSelectFileWithTitleImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
     newFinishUploadCallbackImage: FinishUploadCallback | null,
@@ -385,6 +392,10 @@ interface CollaborationRoomState {
   setRoomImageFallback: (imageFallback: Record<string, string>) => void;
   setRoomImageFallbackLoaded: (loaded: boolean) => void;
   setRoomImageFallbackLoading: (loading: boolean) => void;
+  setAfterLoadFit: (afterLoadFit: boolean) => void;
+  setRoomPageFetching: (fetching: boolean) => void;
+  setRoomPageAdding: (adding: boolean) => void;
+  setRoomPageRemoving: (removing: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
@@ -416,6 +427,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
   );
 
   return {
+    afterLoadFit: false,
     signingIn: false,
     viewType: "floating",
     showLeftSidebarFloating: false,
@@ -444,6 +456,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
     features: {
       workloads: true,
       threads: true,
+      indexedDb: true,
     },
     connection: {
       tests: {
@@ -497,6 +510,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       },
     },
     pages: {
+      fetching: false,
+      adding: false,
+      removing: false,
       listVisible: false,
       gridVisible: false,
       amount: 0,
@@ -568,6 +584,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       adding: false,
       showSelectFiles: false,
       showSelectFile: false,
+      showSelectFileWithTitle: false,
       transforming: false,
       transformingOperation: undefined,
       cropping: {
@@ -715,6 +732,14 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       set((state) => ({
         ...state,
         images: { ...state.images, showSelectFile: newShowSelectFileImage },
+      })),
+    setShowSelectFileWithTitleImage: (newShowSelectFileWithTitleImage) =>
+      set((state) => ({
+        ...state,
+        images: {
+          ...state.images,
+          showSelectFileWithTitle: newShowSelectFileWithTitleImage,
+        },
       })),
     setShowSelectFilesImages: (newShowSelectFilesImages) =>
       set((state) => ({
@@ -1383,6 +1408,35 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       set((state) => ({
         ...state,
         roomImageFallbackLoading: loading,
+      })),
+    setAfterLoadFit: (afterLoadFit) =>
+      set((state) => ({
+        ...state,
+        afterLoadFit: afterLoadFit,
+      })),
+    setRoomPageFetching: (fetching) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          fetching: fetching,
+        },
+      })),
+    setRoomPageAdding: (adding) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          adding: adding,
+        },
+      })),
+    setRoomPageRemoving: (removing) =>
+      set((state) => ({
+        ...state,
+        pages: {
+          ...state.pages,
+          removing: removing,
+        },
       })),
   };
 });

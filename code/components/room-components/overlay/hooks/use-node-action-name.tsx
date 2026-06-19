@@ -34,6 +34,8 @@ export const useNodeActionName = () => {
         return "Ellipse";
       case "regular-polygon":
         return "Regular Polygon";
+      case "polygon":
+        return "Polygon";
       case "stroke":
         return "Stroke";
       case "stroke-single":
@@ -53,6 +55,8 @@ export const useNodeActionName = () => {
       case "image-template":
         return "Image Template";
       case "image":
+        return "Image";
+      case "image-with-title":
         return "Image";
       case "star":
         return "Star";
@@ -82,6 +86,8 @@ export const useNodeActionName = () => {
         return "Ellipse";
       case "regularPolygonTool":
         return "Regular Polygon";
+      case "polygonTool":
+        return "Polygon";
       case "brushTool":
         return "Stroke";
       case WEAVE_IMAGE_TOOL_ACTION_NAME:

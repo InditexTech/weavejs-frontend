@@ -29,7 +29,7 @@ export const postGenerateImageV2 = async (
   const apiEndpoint = import.meta.env.VITE_API_V3_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
-  const endpoint = `${apiEndpoint}/${hubName}/rooms/${params.roomId}/images/generate?password=${password}`;
+  const endpoint = `${apiEndpoint}/${hubName}/rooms/${params.roomId}/images/generate`;
 
   const response = await fetch(endpoint, {
     method: "POST",
@@ -37,6 +37,7 @@ export const postGenerateImageV2 = async (
       "Content-Type": "application/json",
       "x-weave-user-id": params.userId,
       "x-weave-client-id": params.clientId,
+      "X-AI-Password": password ?? "",
     },
     body: JSON.stringify({
       model: options.model,

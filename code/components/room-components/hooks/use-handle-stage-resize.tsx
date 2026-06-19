@@ -5,11 +5,16 @@
 import { useWeave } from "@inditextech/weave-react";
 import React from "react";
 import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
+import { useCollaborationRoom } from "@/store/store";
 
 export const useHandleStageResize = () => {
   const instance = useWeave((state) => state.instance);
   const roomLoaded = useWeave((state) => state.room.loaded);
   const status = useWeave((state) => state.status);
+
+  const setAfterLoadFit = useCollaborationRoom(
+    (state) => state.setAfterLoadFit,
+  );
 
   React.useEffect(() => {
     if (!instance) return;
@@ -25,9 +30,17 @@ export const useHandleStageResize = () => {
       }
     };
 
+    const handleOnFitToPage = () => {
+      setTimeout(() => {
+        setAfterLoadFit(true);
+      }, 0);
+    };
+
+    instance.addEventListener("onFitToPage", handleOnFitToPage);
     instance.addEventListener("onStageResize", handleStageResize);
 
     return () => {
+      instance.removeEventListener("onFitToPage", handleOnFitToPage);
       instance.removeEventListener("onStageResize", handleStageResize);
     };
   }, [instance, status, roomLoaded]);

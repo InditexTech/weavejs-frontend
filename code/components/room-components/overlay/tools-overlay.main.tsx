@@ -17,7 +17,7 @@ import {
   Eraser,
   Circle,
   Star,
-  Hexagon,
+  // Hexagon,
   MessageSquare,
   Video,
   PenLine,
@@ -29,6 +29,7 @@ import {
   ChevronLeft,
   Frame,
   EllipsisVertical,
+  Pentagon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +55,7 @@ import { useOtherTools } from "./hooks/use-other-tools";
 import { useBreakpoint } from "./hooks/use-breakpoint";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { IMAGE_WITH_TITLE_ACTION_NAME } from "@/components/actions/image-with-title-tool/constants";
 
 export function ToolsOverlayMain() {
   const [barOrientation, setBarOrientation] = React.useState<
@@ -83,6 +85,21 @@ export function ToolsOverlayMain() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads,
   );
+  const afterLoadFit = useCollaborationRoom((state) => state.afterLoadFit);
+  const roomPageFetching = useCollaborationRoom(
+    (state) => state.pages.fetching,
+  );
+  const roomPageAdding = useCollaborationRoom((state) => state.pages.adding);
+  const roomPageRemoving = useCollaborationRoom(
+    (state) => state.pages.removing,
+  );
+
+  const showContent = React.useMemo(() => {
+    return (
+      afterLoadFit && !roomPageFetching && !roomPageAdding && !roomPageRemoving
+    );
+  }, [afterLoadFit, roomPageFetching, roomPageAdding, roomPageRemoving]);
+
   // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
@@ -144,6 +161,10 @@ export function ToolsOverlayMain() {
   }, [breakpoint]);
 
   const isRoomReady = useIsRoomReady();
+
+  if (!isRoomReady || !showContent) {
+    return null;
+  }
 
   if (imageCroppingEnabled) {
     return null;
@@ -306,7 +327,7 @@ export function ToolsOverlayMain() {
               >
                 <Circle size={20} strokeWidth={1} /> Ellipse tool
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 className="text-xs cursor-pointer hover:rounded-none w-full"
                 onPointerDown={() => {
                   setShapesMenuOpen(false);
@@ -317,6 +338,18 @@ export function ToolsOverlayMain() {
                 }}
               >
                 <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
+              </DropdownMenuItem> */}
+              <DropdownMenuItem
+                className="text-xs cursor-pointer hover:rounded-none w-full"
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setMediaMenuOpen(false);
+                  setOtherToolsMenuOpen(false);
+                  setActualShapeTool("polygonTool");
+                  SHAPES_TOOLS["polygonTool"].onClick();
+                }}
+              >
+                <Pentagon size={20} strokeWidth={1} /> Polygon tool
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-xs cursor-pointer hover:rounded-none w-full"
@@ -476,6 +509,18 @@ export function ToolsOverlayMain() {
                 }}
               >
                 <Images size={20} strokeWidth={1} /> Images tool
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-xs cursor-pointer hover:rounded-none w-full"
+                onPointerDown={() => {
+                  setShapesMenuOpen(false);
+                  setMediaMenuOpen(false);
+                  setOtherToolsMenuOpen(false);
+                  setActualMediaTool(IMAGE_WITH_TITLE_ACTION_NAME);
+                  MEDIA_TOOLS[IMAGE_WITH_TITLE_ACTION_NAME].onClick();
+                }}
+              >
+                <Image size={20} strokeWidth={1} /> Image with Title tool
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel className="font-light text-xs">

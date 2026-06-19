@@ -30,6 +30,8 @@ import { SidebarHeader } from "../sidebar-header";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 import { cn } from "@/lib/utils";
+import { ImageWithTitleProperties } from "../node-properties/image-with-title-properties";
+import { LabelProperties } from "../node-properties/label-properties";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -183,6 +185,7 @@ export const NodeProperties = () => {
         <div className="w-full flex flex-col">
           <MetaProperties />
           <ImageProperties />
+          <ImageWithTitleProperties />
           <ColorTokenProperties />
           <ImageTemplateProperties />
           <FrameProperties />
@@ -197,6 +200,7 @@ export const NodeProperties = () => {
           <FillProperties />
           <StrokeProperties />
           <TextProperties />
+          <LabelProperties />
           <div className="w-full h-[24px]"></div>
         </div>
       </ScrollArea>

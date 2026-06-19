@@ -24,6 +24,7 @@ import {
   WeaveConnectorNode,
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
+  WeavePolygonNode,
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
 import {
@@ -33,6 +34,7 @@ import {
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
+import { ImageWithTitleNode } from "@/components/nodes/image-with-title/image-with-title";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import {
   createCommentDOM,
@@ -123,7 +125,9 @@ export const NODES = (
         return url;
       },
       onDblClick: (instance: WeaveImageNode, node: Konva.Group) => {
-        instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
+        if (node.getParent()?.getAttrs()?.nodeType !== "image-with-title") {
+          instance.triggerCrop(node, { cmdCtrl: { triggered: false } });
+        }
       },
     },
   }),
@@ -241,4 +245,6 @@ export const NODES = (
   new ColorTokenNode(),
   new ImageTemplateNode(),
   new PantoneNode(),
+  new ImageWithTitleNode(),
+  new WeavePolygonNode(),
 ];

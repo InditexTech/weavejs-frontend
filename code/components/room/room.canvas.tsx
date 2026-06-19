@@ -11,7 +11,6 @@ import {
 } from "@inditextech/weave-types";
 import { cn } from "@/lib/utils";
 import { ConnectionTestsOverlay } from "../room-components/overlay/connection-tests-overlay";
-import { Progress } from "../ui/progress";
 
 export const WEAVE_INSTANCE_STATUS_MAP = {
   ["idle"]: "Idle",
@@ -23,27 +22,42 @@ export const WEAVE_INSTANCE_STATUS_MAP = {
   ["running"]: "Ready",
 } as const;
 
-export const RoomCanvas = () => {
+export const RoomCanvas = React.memo(() => {
   const isRoomSwitching = useWeave((state) => state.room.switching);
   const status = useWeave((state) => state.status);
   const roomLoaded = useWeave((state) => state.room.loaded);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
+  const afterLoadFit = useCollaborationRoom((state) => state.afterLoadFit);
   const actualPageElement = useCollaborationRoom(
     (state) => state.pages.actualPageElement,
   );
-  const asyncElementsLoaded = useWeave((state) => state.asyncElements.loaded);
-  const asyncElementsTotal = useWeave((state) => state.asyncElements.total);
-  const asyncElementsState = useWeave((state) => state.asyncElements.state);
   const viewType = useCollaborationRoom((state) => state.viewType);
   const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   const backgroundColor = useCollaborationRoom(
     (state) => state.backgroundColor,
   );
+  const roomPageFetching = useCollaborationRoom(
+    (state) => state.pages.fetching,
+  );
+  const roomPageAdding = useCollaborationRoom((state) => state.pages.adding);
+  const roomPageRemoving = useCollaborationRoom(
+    (state) => state.pages.removing,
+  );
 
   const roomFullyLoaded = React.useMemo(() => {
     return status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded;
   }, [status, roomLoaded]);
+
+  const showOverlay = React.useMemo(() => {
+    return (
+      weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR ||
+      weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTING ||
+      weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED ||
+      (isRoomSwitching &&
+        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED)
+    );
+  }, [weaveConnectionStatus, isRoomSwitching]);
 
   return (
     <section
@@ -67,19 +81,20 @@ export const RoomCanvas = () => {
           ["pointer-events-none"]:
             weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
             !roomFullyLoaded ||
-            status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-            asyncElementsState !== "loaded",
-          ["pointer-events-auto"]:
-            roomFullyLoaded && asyncElementsState === "loaded",
-          ["invisible"]: status !== WEAVE_INSTANCE_STATUS.RUNNING,
-          ["visible"]: status === WEAVE_INSTANCE_STATUS.RUNNING,
+            status !== WEAVE_INSTANCE_STATUS.RUNNING,
+          ["pointer-events-auto"]: roomFullyLoaded,
+          ["invisible"]:
+            status !== WEAVE_INSTANCE_STATUS.RUNNING || !afterLoadFit,
+          ["visible"]: status === WEAVE_INSTANCE_STATUS.RUNNING && afterLoadFit,
         })}
       ></div>
       <div className="absolute top-0 left-0 right-0 bottom-0 shadow-[inset_0_2px_6px_rgba(0,0,0,0.10)] pointer-events-none"></div>
       {(isRoomSwitching ||
-        (!isRoomSwitching && asyncElementsState !== "loaded") ||
-        (!isRoomSwitching && status !== WEAVE_INSTANCE_STATUS.RUNNING)) && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/50 z-11 !pointer-events-none">
+        !afterLoadFit ||
+        roomPageFetching ||
+        roomPageAdding ||
+        roomPageRemoving) && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-black/50 z-11 pointer-events-auto">
           <div className="w-[380px] max-w-[380px] flex flex-col p-8 bg-white justify-center items-center gap-8">
             <div className="w-full flex flex-col gap-[2px] justify-center items-center">
               <div className="text-center text-base text-[#757575]">
@@ -90,36 +105,20 @@ export const RoomCanvas = () => {
               </div>
             </div>
             <div className="w-full flex flex-col gap-1 justify-center items-center">
-              {!isRoomSwitching && asyncElementsState !== "loaded" && (
-                <div className="w-full flex justify-between items-center">
-                  <div className="font-light text-xs text-center whitespace-nowrap">
-                    {`${asyncElementsLoaded} / ${asyncElementsTotal}`} assets
-                  </div>
-                  <div className="font-light text-xs text-center whitespace-nowrap">
-                    {Math.round(
-                      (asyncElementsLoaded / asyncElementsTotal) * 100,
-                    )}
-                    %
-                  </div>
-                </div>
-              )}
-              <Progress
-                className="w-[300px]"
-                value={
-                  !(!isRoomSwitching && asyncElementsState !== "loaded")
-                    ? 0
-                    : (asyncElementsLoaded / asyncElementsTotal) * 100
-                }
-              />
               <div className="w-full flex justify-center items-center">
                 <div className="font-light text-xs text-center whitespace-nowrap">
                   {isRoomSwitching && <span>Changing page</span>}
-                  {!isRoomSwitching &&
-                    status !== WEAVE_INSTANCE_STATUS.RUNNING && (
-                      <span>{WEAVE_INSTANCE_STATUS_MAP[status]}</span>
-                    )}
-                  {!isRoomSwitching && asyncElementsState !== "loaded" && (
-                    <span>Preloading assets</span>
+                  {!isRoomSwitching && !afterLoadFit && (
+                    <span>Initializing</span>
+                  )}
+                  {!isRoomSwitching && roomPageFetching && (
+                    <span>Fetching page data</span>
+                  )}
+                  {!isRoomSwitching && roomPageAdding && (
+                    <span>Creating page</span>
+                  )}
+                  {!isRoomSwitching && roomPageRemoving && (
+                    <span>Archiving page</span>
                   )}
                 </div>
               </div>
@@ -127,23 +126,11 @@ export const RoomCanvas = () => {
           </div>
         </div>
       )}
-      {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.ERROR && (
-        <div className="absolute top-0 left-0 right-0 bottom-0">
-          <div className="w-full h-full bg-black/5 flex justify-center items-center pointer-events-none" />
+      {showOverlay && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+          <div className="w-full h-full bg-black/50 flex justify-center items-center" />
         </div>
       )}
-      {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTING && (
-        <div className="absolute top-0 left-0 right-0 bottom-0">
-          <div className="w-full h-full bg-black/5 flex justify-center items-center pointer-events-none" />
-        </div>
-      )}
-      {!isRoomSwitching &&
-        weaveConnectionStatus ===
-          WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED && (
-          <div className="absolute top-0 left-0 right-0 bottom-0">
-            <div className="w-full h-full bg-black/5 flex justify-center items-center pointer-events-none" />
-          </div>
-        )}
       {roomFullyLoaded && (
         <>
           <ConnectionTestsOverlay />
@@ -161,4 +148,4 @@ export const RoomCanvas = () => {
       )}
     </section>
   );
-};
+});

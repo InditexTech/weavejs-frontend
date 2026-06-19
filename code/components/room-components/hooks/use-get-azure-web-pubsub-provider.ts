@@ -9,6 +9,7 @@ import React from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { getRoom } from "@/api/get-room";
 import { useGetSession } from "./use-get-session";
+import { useHasIndexedDBData } from "./use-has-indexeddb-data";
 
 function useGetAzureWebPubsubProvider({
   loadedParams,
@@ -19,8 +20,12 @@ function useGetAzureWebPubsubProvider({
   pagesManaged: boolean;
   getUser: () => WeaveUser;
 }) {
+  const [loadedData, setLoadedData] = React.useState<boolean>(false);
   const [wsProvider, setWsProvider] =
     React.useState<WeaveStoreAzureWebPubsub | null>(null);
+  const indexedDbEnabled = useCollaborationRoom(
+    (state) => state.features.indexedDb,
+  );
   const room = useCollaborationRoom((state) => state.room);
   const pageId = useCollaborationRoom((state) => state.pages.actualPageId);
   const setRoomDataStatus = useCollaborationRoom(
@@ -29,6 +34,13 @@ function useGetAzureWebPubsubProvider({
 
   const { session } = useGetSession();
 
+  const { checkedData, hasData } = useHasIndexedDBData(pageId ?? "", {
+    indexedDB: { enabled: indexedDbEnabled },
+  });
+
+  const loadData =
+    (indexedDbEnabled && !hasData && checkedData) || !indexedDbEnabled;
+
   const {
     data: pageData,
     status,
@@ -36,7 +48,9 @@ function useGetAzureWebPubsubProvider({
   } = useQuery({
     queryKey: ["roomData", pageId ?? ""],
     queryFn: async () => {
-      return getRoom(pageId ?? "");
+      const data = getRoom(pageId ?? "");
+      setLoadedData(true);
+      return data;
     },
     initialData: undefined,
     staleTime: 0,
@@ -45,7 +59,9 @@ function useGetAzureWebPubsubProvider({
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     enabled:
+      !loadedData &&
       pagesManaged &&
+      loadData &&
       typeof pageId !== "undefined" &&
       typeof session !== "undefined",
   });
@@ -54,12 +70,22 @@ function useGetAzureWebPubsubProvider({
     setRoomDataStatus(status);
   }, [status]);
 
+  const roomDataLoaded = React.useMemo(() => {
+    if (!indexedDbEnabled) {
+      return pageDataIsFetched;
+    }
+
+    return (
+      (checkedData && !hasData && pageDataIsFetched) || (checkedData && hasData)
+    );
+  }, [checkedData, hasData, pageDataIsFetched, indexedDbEnabled]);
+
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
     if (
       loadedParams &&
-      pageDataIsFetched &&
+      roomDataLoaded &&
       room &&
       pageId &&
       session &&
@@ -79,6 +105,9 @@ function useGetAzureWebPubsubProvider({
         {
           roomId: pageId ?? "",
           url: `${apiEndpoint}/${hubName}/rooms/[roomId]/connect`,
+          indexedDb: {
+            enabled: indexedDbEnabled,
+          },
         },
       );
 
@@ -87,10 +116,10 @@ function useGetAzureWebPubsubProvider({
   }, [
     getUser,
     pageId,
-    pageDataIsFetched,
     wsProvider,
     pageData,
     queryClient,
+    roomDataLoaded,
     loadedParams,
     room,
     session,

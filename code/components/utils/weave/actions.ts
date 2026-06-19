@@ -16,7 +16,7 @@ import {
   WeaveTextToolAction,
   WeaveStarToolAction,
   WeaveStrokeToolAction,
-  WeaveRegularPolygonToolAction,
+  // WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveFitToScreenToolAction,
@@ -28,12 +28,12 @@ import {
   WeaveMeasureToolAction,
   WeaveConnectorToolAction,
   WeaveGuideToolAction,
+  WeavePolygonToolAction,
 } from "@inditextech/weave-sdk";
-import {
-  type WeaveUser,
-} from "@inditextech/weave-types";
+import { type WeaveUser } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../../actions/color-token-tool/color-token-tool";
 import { ImageTemplateToolAction } from "../../actions/image-template-tool/image-template-tool";
+import { ImageWithTitleToolAction } from "../../actions/image-with-title-tool/image-with-title-tool";
 import { MaskToolAction } from "../../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../../actions/fuzzy-mask-tool/fuzzy-mask-tool";
 import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser-tool";
@@ -54,9 +54,10 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveFrameToolAction(),
   new WeaveStarToolAction(),
   new WeaveStrokeToolAction(),
-  new WeaveRegularPolygonToolAction(),
+  // new WeaveRegularPolygonToolAction(),
   new ColorTokenToolAction(),
   new ImageTemplateToolAction(),
+  new ImageWithTitleToolAction(),
   new WeaveTextToolAction(),
   new WeaveVideoToolAction(),
   new WeaveConnectorToolAction(),
@@ -100,4 +101,5 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   }),
   new FitToPageToolAction(),
   new WeaveGuideToolAction(),
+  new WeavePolygonToolAction(),
 ];

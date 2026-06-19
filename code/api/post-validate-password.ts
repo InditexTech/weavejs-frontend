@@ -5,9 +5,12 @@
 export const postValidatePassword = async (password: string) => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
 
-  const endpoint = `${apiEndpoint}/ai/password/validate?password=${password}`;
+  const endpoint = `${apiEndpoint}/ai/password/validate`;
   const response = await fetch(endpoint, {
     method: "POST",
+    headers: {
+      "X-AI-Password": password,
+    },
   });
 
   if (!response.ok) {

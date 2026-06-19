@@ -24,7 +24,7 @@ export function ImageProperties() {
 
   if (!instance || !actualNode) return null;
 
-  if (!["image"].includes(actualNode.type)) {
+  if (!["image", "image-with-title"].includes(actualNode.type)) {
     return null;
   }
 

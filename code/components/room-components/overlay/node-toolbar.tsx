@@ -60,6 +60,11 @@ import {
   FlipVertical2,
   Ruler,
   Settings,
+  Triangle,
+  Diamond,
+  Pentagon,
+  Hexagon,
+  Octagon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -70,6 +75,7 @@ import {
   WeaveMeasureNode,
   WeaveTextNode,
   TEXT_LAYOUT,
+  WeavePolygonToolAction,
 } from "@inditextech/weave-sdk";
 import { ToolbarDivider } from "../toolbar/toolbar-divider";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -93,6 +99,8 @@ export const NodeToolbar = () => {
   const [movingImageTemplate, setMovingImageTemplate] =
     React.useState<Konva.Group | null>(null);
 
+  const [actualPolygonPreset, setActualPolygonPreset] =
+    React.useState<string>("pentagon");
   const [actualMenusOpen, setActualMenusOpen] = React.useState<string[]>([]);
 
   const [isSelecting] = React.useState(false);
@@ -460,6 +468,198 @@ export const NodeToolbar = () => {
 
     return actualNode.props.fit;
   }, [isImageTemplate, actualNode]);
+
+  React.useEffect(() => {
+    if (["polygonTool"].includes(actualAction ?? "")) {
+      if (!instance) return;
+
+      const polygonTool =
+        instance.getActionHandler<WeavePolygonToolAction>("polygonTool");
+
+      if (!polygonTool) return;
+
+      setActualPolygonPreset(polygonTool.getPolygonPreset());
+    }
+  }, [instance, actualAction]);
+
+  if (["polygonTool"].includes(actualAction ?? "")) {
+    return (
+      <div
+        className={cn("pointer-events-none", {
+          ["absolute top-[8px] left-[8px] right-[8px] flex gap-2 justify-center items-center"]:
+            breakpoint === "2xl",
+          ["absolute top-0 left-0 right-0 bottom-0"]: breakpoint !== "2xl",
+          ["!top-[62px]"]: viewType === "floating",
+          ["!top-[8px]"]: viewType === "fixed",
+        })}
+      >
+        <div
+          className={cn(
+            "pointer-events-none flex gap-[16px] justify-center items-center  pointer-events-auto",
+            {
+              ["relative flex"]: breakpoint === "2xl",
+            },
+          )}
+        >
+          <div className="flex gap-0 justify-center items-center bg-white border rounded-none border-zinc-200 drop-shadow">
+            <div className="flex gap-[2px] h-[40px] justify-end items-center px-1 my-1">
+              <ToolbarButton
+                className="rounded-none !min-w-[40px] !w-[40px] !h-[40px]"
+                icon={<Triangle className="px-0" size={20} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={actualPolygonPreset === "triangle"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance) return;
+
+                  const polygonTool =
+                    instance.getActionHandler<WeavePolygonToolAction>(
+                      "polygonTool",
+                    );
+
+                  if (!polygonTool) return;
+
+                  setActualPolygonPreset("triangle");
+                  polygonTool.setPolygonPreset("triangle");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Triangle</p>
+                  </div>
+                }
+                tooltipSide="top"
+                tooltipAlign="center"
+              />
+              <ToolbarButton
+                className="rounded-none !min-w-[40px] !w-[40px] !h-[40px]"
+                icon={<Diamond className="px-0" size={20} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={actualPolygonPreset === "diamond"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance) return;
+
+                  const polygonTool =
+                    instance.getActionHandler<WeavePolygonToolAction>(
+                      "polygonTool",
+                    );
+
+                  if (!polygonTool) return;
+
+                  setActualPolygonPreset("diamond");
+                  polygonTool.setPolygonPreset("diamond");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Rhombus</p>
+                  </div>
+                }
+                tooltipSide="top"
+                tooltipAlign="center"
+              />
+              <ToolbarButton
+                className="rounded-none !min-w-[40px] !w-[40px] !h-[40px]"
+                icon={<Pentagon className="px-0" size={20} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={actualPolygonPreset === "pentagon"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance) return;
+
+                  const polygonTool =
+                    instance.getActionHandler<WeavePolygonToolAction>(
+                      "polygonTool",
+                    );
+
+                  if (!polygonTool) return;
+
+                  setActualPolygonPreset("pentagon");
+                  polygonTool.setPolygonPreset("pentagon");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Pentagon</p>
+                  </div>
+                }
+                tooltipSide="top"
+                tooltipAlign="center"
+              />
+              <ToolbarButton
+                className="rounded-none !min-w-[40px] !w-[40px] !h-[40px]"
+                icon={<Hexagon className="px-0" size={20} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={actualPolygonPreset === "hexagon"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance) return;
+
+                  const polygonTool =
+                    instance.getActionHandler<WeavePolygonToolAction>(
+                      "polygonTool",
+                    );
+
+                  if (!polygonTool) return;
+
+                  setActualPolygonPreset("hexagon");
+                  polygonTool.setPolygonPreset("hexagon");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Hexagon</p>
+                  </div>
+                }
+                tooltipSide="top"
+                tooltipAlign="center"
+              />
+
+              <ToolbarButton
+                className="rounded-none !min-w-[40px] !w-[40px] !h-[40px]"
+                icon={<Octagon className="px-0" size={20} strokeWidth={1} />}
+                disabled={
+                  weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                }
+                active={actualPolygonPreset === "octagon"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!instance) return;
+
+                  const polygonTool =
+                    instance.getActionHandler<WeavePolygonToolAction>(
+                      "polygonTool",
+                    );
+
+                  if (!polygonTool) return;
+
+                  setActualPolygonPreset("octagon");
+                  polygonTool.setPolygonPreset("octagon");
+                }}
+                label={
+                  <div className="flex gap-3 justify-start items-center">
+                    <p>Octagon</p>
+                  </div>
+                }
+                tooltipSide="top"
+                tooltipAlign="center"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (dontRender) {
     return null;

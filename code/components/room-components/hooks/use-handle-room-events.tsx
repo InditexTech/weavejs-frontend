@@ -10,6 +10,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import { useGetSession } from "./use-get-session";
 import { useNavigate } from "@tanstack/react-router";
+import { getRoomData } from "@/components/utils/data";
 
 export const useHandleRoomEvents = () => {
   const navigate = useNavigate();
@@ -36,6 +37,15 @@ export const useHandleRoomEvents = () => {
   );
   const setPagesGridVisible = useCollaborationRoom(
     (state) => state.setPagesGridVisible,
+  );
+  const setRoomDataStatus = useCollaborationRoom(
+    (state) => state.setRoomDataStatus,
+  );
+  const setRoomImageFallback = useCollaborationRoom(
+    (state) => state.setRoomImageFallback,
+  );
+  const setRoomPageRemoving = useCollaborationRoom(
+    (state) => state.setRoomPageRemoving,
   );
 
   const { session } = useGetSession();
@@ -155,8 +165,11 @@ export const useHandleRoomEvents = () => {
 
   // PAGE DELETED
   React.useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handlePageDeleted = (payload: { pageId: string; goToPage: any }) => {
+    const handlePageDeleted = async (payload: {
+      pageId: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      goToPage: any;
+    }) => {
       if (!instance) return;
 
       const goToPage = payload.goToPage;
@@ -170,8 +183,24 @@ export const useHandleRoomEvents = () => {
       if (actualPageId === payload.pageId) {
         const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
-        store.switchToRoom(goToPage.pageId, goToPage);
+        const offlineData = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(
+          goToPage.pageId,
+        );
 
+        if (!offlineData) {
+          const { roomData: data } = await getRoomData(
+            queryClient,
+            goToPage.roomId,
+            goToPage.pageId,
+            setRoomDataStatus,
+            setRoomImageFallback,
+          );
+          store.switchToRoom(goToPage.pageId, data);
+        } else {
+          store.switchToRoom(goToPage.pageId, undefined);
+        }
+
+        setRoomPageRemoving(false);
         setPagesActualPage(goToPage.index);
         setPagesActualPageId(goToPage.pageId);
         setPagesListVisible(false);
@@ -196,5 +225,7 @@ export const useHandleRoomEvents = () => {
     setPagesActualPageId,
     setPagesGridVisible,
     setPagesListVisible,
+    setRoomDataStatus,
+    setRoomImageFallback,
   ]);
 };

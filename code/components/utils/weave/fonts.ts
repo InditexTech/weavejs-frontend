@@ -3,234 +3,218 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveFont } from "@inditextech/weave-types";
+import { type WeaveFontFamily } from "@inditextech/weave-sdk";
 
-export const FONTS = async (): Promise<WeaveFont[]> => {
-  const fonts: WeaveFont[] = [];
-
-  // ARIAL FONT
-  const arialRegular = new FontFace("Arial", "url(/fonts/ARIAL.TTF)", {
-    weight: "400",
-    style: "normal",
-  });
-  await arialRegular.load();
-  document.fonts.add(arialRegular);
-
-  const arialBold = new FontFace("Arial", "url(/fonts/ARIALBD.TTF)", {
-    weight: "700",
-    style: "normal",
-  });
-  await arialBold.load();
-  document.fonts.add(arialBold);
-
-  const arialItalic = new FontFace("Arial", "url(/fonts/ARIALI.TTF)", {
-    weight: "400",
-    style: "italic",
-  });
-  await arialItalic.load();
-  document.fonts.add(arialItalic);
-
-  const arialItalicBold = new FontFace("Arial", "url(/fonts/ARIALBI.TTF)", {
-    weight: "700",
-    style: "italic",
-  });
-  await arialItalicBold.load();
-  document.fonts.add(arialItalicBold);
-
-  fonts.push({
-    id: "Arial",
-    name: "Arial, sans-serif",
-    offsetY: 0,
-    supportedStyles: ["normal", "italic", "bold"],
-  });
-
-  // FUZZY BUBBLES
-
-  const fuzzyBubblesRegular = new FontFace(
-    "Fuzzy Bubbles",
-    "url(/fonts/FuzzyBubbles-Regular.ttf)",
-    { weight: "400", style: "normal" },
-  );
-  await fuzzyBubblesRegular.load();
-  document.fonts.add(fuzzyBubblesRegular);
-
-  const fuzzyBubblesBold = new FontFace(
-    "Fuzzy Bubbles",
-    "url(/fonts/FuzzyBubbles-Bold.ttf)",
-    { weight: "700", style: "normal" },
-  );
-  await fuzzyBubblesBold.load();
-  document.fonts.add(fuzzyBubblesBold);
-
-  fonts.push({
-    id: "FuzzyBubbles",
-    name: "Fuzzy Bubbles, cursive",
-    offsetY: 0,
-    supportedStyles: ["normal", "bold"],
-  });
-
-  // INTER FONT
-  const interRegular = new FontFace("Inter", "url(/fonts/inter-regular.ttf)", {
-    weight: "400",
-    style: "normal",
-  });
-  await interRegular.load();
-  document.fonts.add(interRegular);
-
-  const interBold = new FontFace("Inter", "url(/fonts/inter-bold.ttf)", {
-    weight: "700",
-    style: "normal",
-  });
-  await interBold.load();
-  document.fonts.add(interBold);
-
-  const interItalic = new FontFace("Inter", "url(/fonts/inter-italic.ttf)", {
-    weight: "400",
-    style: "italic",
-  });
-  await interItalic.load();
-  document.fonts.add(interItalic);
-
-  const interItalicBold = new FontFace(
-    "Inter",
-    "url(/fonts/inter-italic-bold.ttf)",
-    { weight: "700", style: "italic" },
-  );
-  await interItalicBold.load();
-  document.fonts.add(interItalicBold);
-
-  // INTER LIGHT FONT
-
-  const interLight = new FontFace("Inter", "url(/fonts/Inter_18pt-Light.ttf)", {
-    weight: "300",
-    style: "normal",
-  });
-  await interLight.load();
-  document.fonts.add(interLight);
-
-  const interLightItalic = new FontFace(
-    "Inter",
-    "url(/fonts/Inter_18pt-LightItalic.ttf)",
-    {
-      weight: "300",
-      style: "italic",
+const loadArialFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Arial",
+    offset: {
+      x: 0,
+      y: 0.6,
     },
-  );
-  await interLightItalic.load();
-  document.fonts.add(interLightItalic);
-
-  fonts.push({
-    id: "Inter",
-    name: `Inter, sans-serif`,
-    offsetY: 0,
     supportedStyles: ["normal", "italic", "bold"],
-  });
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/ARIAL.TTF)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/ARIALBD.TTF)",
+      },
+      {
+        weight: "400",
+        style: "italic",
+        source: "url(/fonts/ARIALI.TTF)",
+      },
+      {
+        weight: "700",
+        style: "italic",
+        source: "url(/fonts/ARIALBI.TTF)",
+      },
+    ],
+  };
+};
 
-  // NOTO SANS MONO
-
-  const notoSansMonoRegular = new FontFace(
-    "Noto Sans Mono",
-    "url(/fonts/NotoSansMono-Regular.ttf)",
-    { weight: "400", style: "normal" },
-  );
-  await notoSansMonoRegular.load();
-  document.fonts.add(notoSansMonoRegular);
-
-  const notoSansMonoBold = new FontFace(
-    "Noto Sans Mono",
-    "url(/fonts/NotoSansMono-Bold.ttf)",
-    { weight: "700", style: "normal" },
-  );
-  await notoSansMonoBold.load();
-  document.fonts.add(notoSansMonoBold);
-
-  fonts.push({
-    id: "Noto Sans Mono",
-    name: "Noto Sans Mono, monospace",
-    offsetY: 0,
+const loadFuzzyBubblesFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Fuzzy Bubbles",
+    offset: {
+      x: 0,
+      y: 1.1,
+    },
     supportedStyles: ["normal", "bold"],
-  });
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/FuzzyBubbles-Regular.ttf)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/FuzzyBubbles-Bold.ttf)",
+      },
+    ],
+  };
+};
 
-  // ROBOTO MONO FONT
-
-  const robotoMonoRegular = new FontFace(
-    "RobotoMono",
-    "url(/fonts/RobotoMono-Regular.ttf)",
-    { weight: "400", style: "normal" },
-  );
-  await robotoMonoRegular.load();
-  document.fonts.add(robotoMonoRegular);
-
-  const robotoMonoItalic = new FontFace(
-    "RobotoMono",
-    "url(/fonts/RobotoMono-Italic.ttf)",
-    { weight: "400", style: "italic" },
-  );
-  await robotoMonoItalic.load();
-  document.fonts.add(robotoMonoItalic);
-
-  const robotoMonoBold = new FontFace(
-    "RobotoMono",
-    "url(/fonts/RobotoMono-Bold.ttf)",
-    { weight: "700", style: "normal" },
-  );
-  await robotoMonoBold.load();
-  document.fonts.add(robotoMonoBold);
-
-  const robotoMonoItalicBold = new FontFace(
-    "RobotoMono",
-    "url(/fonts/RobotoMono-BoldItalic.ttf)",
-    { weight: "700", style: "italic" },
-  );
-  await robotoMonoItalicBold.load();
-  document.fonts.add(robotoMonoItalicBold);
-
-  fonts.push({
-    id: "RobotoMono",
-    name: "Roboto Mono, monospace",
-    offsetY: 0,
+const loadInterFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Inter",
+    offset: {
+      x: 0,
+      y: 1.1,
+    },
     supportedStyles: ["normal", "italic", "bold"],
-  });
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/inter-regular.ttf)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/inter-bold.ttf)",
+      },
+      {
+        weight: "400",
+        style: "italic",
+        source: "url(/fonts/inter-italic.ttf)",
+      },
+      {
+        weight: "700",
+        style: "italic",
+        source: "url(/fonts/inter-italic-bold.ttf)",
+      },
+      {
+        weight: "300",
+        style: "normal",
+        source: "url(/fonts/Inter_18pt-Light.ttf)",
+      },
+      {
+        weight: "300",
+        style: "italic",
+        source: "url(/fonts/Inter_18pt-LightItalic.ttf)",
+      },
+    ],
+  };
+};
 
-  // SANSITA FONT
-
-  const sansitaRegular = new FontFace(
-    "Sansita",
-    "url(/fonts/sansita-regular.ttf)",
-    { weight: "400", style: "normal" },
-  );
-  await sansitaRegular.load();
-  document.fonts.add(sansitaRegular);
-
-  const sansitaBold = new FontFace("Sansita", "url(/fonts/sansita-bold.ttf)", {
-    weight: "700",
-    style: "normal",
-  });
-  await sansitaBold.load();
-  document.fonts.add(sansitaBold);
-
-  fonts.push({
-    id: "Sansita",
-    name: `Sansita, sans-serif`,
-    offsetY: 0,
+const loadNotoSansFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Noto Sans Mono",
+    offset: {
+      x: 0,
+      y: 1.2,
+    },
     supportedStyles: ["normal", "bold"],
-  });
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/NotoSansMono-Regular.ttf)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/NotoSansMono-Bold.ttf)",
+      },
+    ],
+  };
+};
 
-  // SPECIAL GOTHIC CONDENSED
+const loadRobotoFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Roboto Mono",
+    offset: {
+      x: 0,
+      y: 0.8,
+    },
+    supportedStyles: ["normal", "italic", "bold"],
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/RobotoMono-Regular.ttf)",
+      },
+      {
+        weight: "400",
+        style: "italic",
+        source: "url(/fonts/RobotoMono-Italic.ttf)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/RobotoMono-Bold.ttf)",
+      },
+      {
+        weight: "700",
+        style: "italic",
+        source: "url(/fonts/RobotoMono-BoldItalic.ttf)",
+      },
+    ],
+  };
+};
 
-  const specialGothicCondensedOneRegular = new FontFace(
-    "Special Gothic Condensed One",
-    "url(/fonts/SpecialGothicCondensedOne-Regular.ttf)",
-    { weight: "400", style: "normal" },
-  );
-  await specialGothicCondensedOneRegular.load();
-  document.fonts.add(specialGothicCondensedOneRegular);
+const loadSansitaFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Sansita",
+    offset: {
+      x: 0,
+      y: 0.5,
+    },
+    supportedStyles: ["normal", "bold"],
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/sansita-regular.ttf)",
+      },
+      {
+        weight: "700",
+        style: "normal",
+        source: "url(/fonts/sansita-bold.ttf)",
+      },
+    ],
+  };
+};
 
-  fonts.push({
-    id: "SpecialGothicCondensedOne",
-    name: "Special Gothic Condensed One, sans-serif",
-    offsetY: 0,
+const loadSpecialGothicCondensedFontFamily = (): WeaveFontFamily => {
+  return {
+    family: "Special Gothic Condensed One",
+    offset: {
+      x: 0,
+      y: 1.1,
+    },
     supportedStyles: ["normal"],
-  });
+    fontFaces: [
+      {
+        weight: "400",
+        style: "normal",
+        source: "url(/fonts/SpecialGothicCondensedOne-Regular.ttf)",
+      },
+    ],
+  };
+};
+
+export const FONTS = async (
+  loadFontsFamilies: (fontFamilies: WeaveFontFamily[]) => Promise<WeaveFont[]>,
+): Promise<WeaveFont[]> => {
+  const fontFamilies: WeaveFontFamily[] = [];
+
+  fontFamilies.push(loadArialFontFamily());
+  fontFamilies.push(loadFuzzyBubblesFontFamily());
+  fontFamilies.push(loadInterFontFamily());
+  fontFamilies.push(loadNotoSansFontFamily());
+  fontFamilies.push(loadRobotoFontFamily());
+  fontFamilies.push(loadSansitaFontFamily());
+  fontFamilies.push(loadSpecialGothicCondensedFontFamily());
+
+  const fonts = await loadFontsFamilies(fontFamilies);
 
   return fonts;
 };

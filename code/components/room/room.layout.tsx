@@ -47,144 +47,146 @@ type RoomLayoutProps = {
   inShadowDom: boolean;
 };
 
-export const RoomLayout = ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
-  useWeaveEvents();
-  useUserChanges();
-  useContextMenu();
-  useCopyPaste();
-  useHandleRoomEvents();
+export const RoomLayout = React.memo(
+  ({ inShadowDom }: Readonly<RoomLayoutProps>) => {
+    useWeaveEvents();
+    useUserChanges();
+    useContextMenu();
+    useCopyPaste();
+    useHandleRoomEvents();
 
-  const instance = useWeave((state) => state.instance);
-  const status = useWeave((state) => state.status);
-  const roomLoaded = useWeave((state) => state.room.loaded);
-  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+    const instance = useWeave((state) => state.instance);
+    const status = useWeave((state) => state.status);
+    const roomLoaded = useWeave((state) => state.room.loaded);
+    const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
-  const addingImages = useCollaborationRoom((state) => state.images.adding);
-  const uploadingVideo = useCollaborationRoom(
-    (state) => state.videos.uploading,
-  );
+    const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
+    const addingImages = useCollaborationRoom((state) => state.images.adding);
+    const uploadingVideo = useCollaborationRoom(
+      (state) => state.videos.uploading,
+    );
 
-  const viewType = useCollaborationRoom((state) => state.viewType);
+    const viewType = useCollaborationRoom((state) => state.viewType);
 
-  const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show,
-  );
-  const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position,
-  );
-  const contextMenuOptions = useCollaborationRoom(
-    (state) => state.contextMenu.options,
-  );
-  const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow,
-  );
-  const imageCroppingEnabled = useCollaborationRoom(
-    (state) => state.images.cropping.enabled,
-  );
+    const contextMenuShow = useCollaborationRoom(
+      (state) => state.contextMenu.show,
+    );
+    const contextMenuPosition = useCollaborationRoom(
+      (state) => state.contextMenu.position,
+    );
+    const contextMenuOptions = useCollaborationRoom(
+      (state) => state.contextMenu.options,
+    );
+    const setContextMenuShow = useCollaborationRoom(
+      (state) => state.setContextMenuShow,
+    );
+    const imageCroppingEnabled = useCollaborationRoom(
+      (state) => state.images.cropping.enabled,
+    );
 
-  const aiChatEnabled = useIAChat((state) => state.enabled);
+    const aiChatEnabled = useIAChat((state) => state.enabled);
 
-  useHandleFontsLoaded();
-  useHandleStageResize();
+    useHandleFontsLoaded();
+    useHandleStageResize();
 
-  useToolsEvents();
-  useKeyboardHandler();
+    useToolsEvents();
+    useKeyboardHandler();
 
-  const roomFullyLoaded = React.useMemo(() => {
-    return status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded;
-  }, [status, roomLoaded]);
+    const roomFullyLoaded = React.useMemo(() => {
+      return status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded;
+    }, [status, roomLoaded]);
 
-  const controls = useAnimation();
+    const controls = useAnimation();
 
-  React.useEffect(() => {
-    if (!instance) return;
+    React.useEffect(() => {
+      if (!instance) return;
 
-    if (roomFullyLoaded) {
-      controls.start({
-        opacity: 1,
-        transition: {
-          duration: 0.5,
-        },
-      });
-    }
-  }, [instance, roomFullyLoaded, controls]);
+      if (roomFullyLoaded) {
+        controls.start({
+          opacity: 1,
+          transition: {
+            duration: 0.5,
+          },
+        });
+      }
+    }, [instance, roomFullyLoaded, controls]);
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={controls}
-        className="absolute top-0 left-0 right-0 bottom-0 w-full h-full flex flex-col relative overflow-hidden"
-      >
-        <RoomCanvas />
-        {viewType === "floating" && (
-          <>
-            {inShadowDom && <RoomHeaderShadowDom />}
-            {!inShadowDom && <RoomHeader />}
-          </>
-        )}
-        {roomLoaded && <NodeToolbar />}
-        {<ToolsOverlay />}
-        {roomFullyLoaded && (
-          <>
-            {aiChatEnabled &&
-              !imageCroppingEnabled &&
-              WEAVE_STORE_CONNECTION_STATUS.CONNECTED ===
-                weaveConnectionStatus && <ChatBotPrompt />}
-            <ContextMenuRender
-              show={contextMenuShow}
-              onChanged={(show: boolean) => {
-                if (!show) {
-                  instance
-                    ?.getPlugin<WeaveContextMenuPlugin>("contextMenu")
-                    ?.closeContextMenu();
-                }
-                setContextMenuShow(show);
-              }}
-              position={contextMenuPosition}
-              options={contextMenuOptions}
-            />
-            <ManageIdleDisconnection />
-            <MaskSlider />
-            <SaveTemplateDialog />
-            <RemoveBackgroundActionPopup />
-            <ExportPageToImageConfigDialog />
-            <ExportRoomToPdfConfigDialog />
-            <ExportFramesToPDFConfigDialog />
-            <LlmSetupDialog />
-            <AppConfigurationDialog />
-            <AddToRoomDialog />
-          </>
-        )}
-        {/* <div className="absolute right-[420px] bottom-[60px] z-[100] bg-white border-[0.5px] border-[#c9c9c9]">
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={controls}
+          className="absolute top-0 left-0 right-0 bottom-0 w-full h-full flex flex-col relative overflow-hidden"
+        >
+          <RoomCanvas />
+          {viewType === "floating" && (
+            <>
+              {inShadowDom && <RoomHeaderShadowDom />}
+              {!inShadowDom && <RoomHeader />}
+            </>
+          )}
+          {roomLoaded && <NodeToolbar />}
+          {<ToolsOverlay />}
+          {roomFullyLoaded && (
+            <>
+              {aiChatEnabled &&
+                !imageCroppingEnabled &&
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED ===
+                  weaveConnectionStatus && <ChatBotPrompt />}
+              <ContextMenuRender
+                show={contextMenuShow}
+                onChanged={(show: boolean) => {
+                  if (!show) {
+                    instance
+                      ?.getPlugin<WeaveContextMenuPlugin>("contextMenu")
+                      ?.closeContextMenu();
+                  }
+                  setContextMenuShow(show);
+                }}
+                position={contextMenuPosition}
+                options={contextMenuOptions}
+              />
+              <ManageIdleDisconnection />
+              <MaskSlider />
+              <SaveTemplateDialog />
+              <RemoveBackgroundActionPopup />
+              <ExportPageToImageConfigDialog />
+              <ExportRoomToPdfConfigDialog />
+              <ExportFramesToPDFConfigDialog />
+              <LlmSetupDialog />
+              <AppConfigurationDialog />
+              <AddToRoomDialog />
+            </>
+          )}
+          {/* <div className="absolute right-[420px] bottom-[60px] z-[100] bg-white border-[0.5px] border-[#c9c9c9]">
           <div id="weave_stage_minimap" className="w-full h-full"></div>
         </div> */}
-        <RoomLeftSidebar inShadowDom={inShadowDom} />
-        <RoomRightSidebar />
-        <RoomFooter />
-        {addingImages && (
-          <div className="bg-black/5 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
-            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-              <Logo kind="large" variant="no-text" />
-              <div className="font-inter text-base">
-                Adding images, please wait...
+          <RoomLeftSidebar inShadowDom={inShadowDom} />
+          <RoomRightSidebar />
+          <RoomFooter />
+          {addingImages && (
+            <div className="bg-black/5 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                <Logo kind="large" variant="no-text" />
+                <div className="font-inter text-base">
+                  Adding images, please wait...
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {uploadingVideo && (
-          <div className="bg-black/5 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
-            <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-              <Logo kind="large" variant="no-text" />
-              <div className="font-inter text-base">
-                Uploading video, please wait...
+          )}
+          {uploadingVideo && (
+            <div className="bg-black/5 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0 z-[100]">
+              <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                <Logo kind="large" variant="no-text" />
+                <div className="font-inter text-base">
+                  Uploading video, please wait...
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        <PresentationMode key={roomInfo?.roomId} />
-      </motion.div>
-    </AnimatePresence>
-  );
-};
+          )}
+          <PresentationMode key={roomInfo?.roomId} />
+        </motion.div>
+      </AnimatePresence>
+    );
+  },
+);

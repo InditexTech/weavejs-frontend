@@ -68,14 +68,22 @@ export const PageGrid = ({ page, index }: Readonly<PageGridProps>) => {
     const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
     try {
-      const { roomData: data } = await getRoomData(
-        queryClient,
-        roomId,
+      const offlineData = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(
         page.pageId,
-        setRoomDataStatus,
-        setRoomImageFallback,
       );
-      store.switchToRoom(page.pageId, data);
+
+      if (!offlineData) {
+        const { roomData: data } = await getRoomData(
+          queryClient,
+          roomId,
+          page.pageId,
+          setRoomDataStatus,
+          setRoomImageFallback,
+        );
+        store.switchToRoom(page.pageId, data);
+      } else {
+        store.switchToRoom(page.pageId, undefined);
+      }
       // eslint-disable-next-line no-empty
     } catch {
       store.switchToRoom(page.pageId, undefined);

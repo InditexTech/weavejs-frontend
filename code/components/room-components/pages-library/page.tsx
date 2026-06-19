@@ -59,6 +59,9 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
   const setRoomImageFallback = useCollaborationRoom(
     (state) => state.setRoomImageFallback,
   );
+  const setRoomPageFetching = useCollaborationRoom(
+    (state) => state.setRoomPageFetching,
+  );
 
   const queryClient = useQueryClient();
 
@@ -79,30 +82,32 @@ export const Page = ({ page, index }: Readonly<PageProps>) => {
       (p) => p.pageId === page.pageId,
     );
 
-    if (!switchToPageElement) {
-      const { roomData: switchToPageElement } = await getRoomData(
-        queryClient,
-        roomId,
+    if (switchToPageElement) {
+      const data = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(
         page.pageId,
-        setRoomDataStatus,
-        setRoomImageFallback,
       );
 
-      if (switchToPageElement) {
-        store.switchToRoom(page.pageId, switchToPageElement);
+      setPagesListVisible(false);
+      setPagesGridVisible(false);
 
-        setPagesActualPage(switchToPageElementIndex + 1);
-        setPagesActualPageId(page.pageId);
-        setPagesListVisible(false);
-        setPagesGridVisible(false);
+      if (!data) {
+        setRoomPageFetching(true);
+        const { roomData } = await getRoomData(
+          queryClient,
+          roomId,
+          page.pageId,
+          setRoomDataStatus,
+          setRoomImageFallback,
+        );
+        setRoomPageFetching(false);
+
+        store.switchToRoom(page.pageId, roomData);
+      } else {
+        store.switchToRoom(page.pageId, undefined);
       }
-    } else {
-      store.switchToRoom(page.pageId, switchToPageElement);
 
       setPagesActualPage(switchToPageElementIndex + 1);
       setPagesActualPageId(page.pageId);
-      setPagesListVisible(false);
-      setPagesGridVisible(false);
     }
   }, [
     instance,

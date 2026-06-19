@@ -5,7 +5,7 @@
 import React from "react";
 import { Progress } from "@/components/ui/progress";
 import { Divider } from "../overlay/divider";
-import { Database } from "lucide-react";
+import { MemoryStick } from "lucide-react";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
 import { useWeave } from "@inditextech/weave-react";
 
@@ -18,11 +18,23 @@ export const MemoryToolbar = () => {
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       const usedJSHeap = Math.round(
-        (performance as Performance & { memory: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory.usedJSHeapSize / 1024 / 1024,
+        (
+          performance as Performance & {
+            memory: { usedJSHeapSize: number; totalJSHeapSize: number };
+          }
+        ).memory.usedJSHeapSize /
+          1024 /
+          1024,
       );
       setUsedJSHeapMemory(usedJSHeap);
       const totalJSHeap = Math.round(
-        (performance as Performance & { memory: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory.totalJSHeapSize / 1024 / 1024,
+        (
+          performance as Performance & {
+            memory: { usedJSHeapSize: number; totalJSHeapSize: number };
+          }
+        ).memory.totalJSHeapSize /
+          1024 /
+          1024,
       );
       setTotalJSHeapMemory(totalJSHeap);
     }, 1000);
@@ -43,7 +55,7 @@ export const MemoryToolbar = () => {
   return (
     <>
       <Divider className="h-[20px]" />
-      <Database strokeWidth={1} size={20} />
+      <MemoryStick strokeWidth={1} size={20} />
       <div className="flex flex-col gap-8 justify-center items-center">
         <div className="flex gap-3 justify-center items-center">
           <Progress

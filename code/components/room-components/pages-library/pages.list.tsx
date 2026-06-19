@@ -52,6 +52,9 @@ export const PagesList = () => {
   const setRoomImageFallback = useCollaborationRoom(
     (state) => state.setRoomImageFallback,
   );
+  const setRoomPageAdding = useCollaborationRoom(
+    (state) => state.setRoomPageAdding,
+  );
 
   React.useEffect(() => {
     if (viewportRef.current) {
@@ -92,19 +95,32 @@ export const PagesList = () => {
       const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
       try {
-        const { roomData: data } = await getRoomData(
-          queryClient,
-          roomId,
-          pageId,
-          setRoomDataStatus,
-          setRoomImageFallback,
-        );
-        store.switchToRoom(pageId, data);
+        const offlineData =
+          await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(pageId);
+
+        console.log("Has offline data for pageId", pageId, offlineData);
+
+        if (!offlineData) {
+          console.log("Getting data...");
+          const { roomData: data } = await getRoomData(
+            queryClient,
+            roomId,
+            pageId,
+            setRoomDataStatus,
+            setRoomImageFallback,
+          );
+          console.log("Data fetched...");
+          store.switchToRoom(pageId, data);
+        } else {
+          console.log("Switching to page...");
+          store.switchToRoom(pageId, undefined);
+        }
         // eslint-disable-next-line no-empty
       } catch {
         store.switchToRoom(pageId, undefined);
       }
 
+      setRoomPageAdding(false);
       setPagesActualPage(pageIndex);
       setPagesActualPageId(pageId);
     },
@@ -181,6 +197,8 @@ export const PagesList = () => {
       if (!roomId) {
         throw new Error("Room ID is required to create a page");
       }
+
+      setRoomPageAdding(true);
 
       return await postPage(roomId, params);
     },

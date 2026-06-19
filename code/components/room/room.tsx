@@ -45,6 +45,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RoomAccessLinkDialog } from "../room-components/overlay/room-acces-link";
 import { useLoadRoomImageFallback } from "../room-components/hooks/use-load-room-image-fallback";
 import { postRoomImageFallback } from "@/api/post-room-image-fallback";
+import { UploadImageWithTitle } from "../room-components/upload-image-with-title";
 
 export const Room = () => {
   return (
@@ -55,7 +56,7 @@ export const Room = () => {
   );
 };
 
-const RoomInternal = () => {
+const RoomInternal = React.memo(() => {
   const navigate = useNavigate();
 
   const [initialized, setInitialized] = React.useState(false);
@@ -105,12 +106,19 @@ const RoomInternal = () => {
   const roomImageFallbackLoaded = useCollaborationRoom(
     (state) => state.roomImageFallbackLoaded,
   );
+  const setAfterLoadFit = useCollaborationRoom(
+    (state) => state.setAfterLoadFit,
+  );
 
   const { loadedParams } = useHandleRouteParams();
 
   const pagesManaged = useManageRoomPages(room ?? "");
 
   const { session, isPending } = useGetSession();
+
+  React.useEffect(() => {
+    setAfterLoadFit(false);
+  }, [room, actualPageId]);
 
   React.useEffect(() => {
     if (roomInfo) {
@@ -388,6 +396,7 @@ const RoomInternal = () => {
               logModules={[]}
             >
               <UploadImage />
+              <UploadImageWithTitle />
               <UploadImages />
               <UploadVideo />
               <RoomLayout inShadowDom={false} />
@@ -408,7 +417,7 @@ const RoomInternal = () => {
       <SignOverlay />
     </>
   );
-};
+});
 
 const Toasts = () => {
   const viewType = useCollaborationRoom((state) => state.viewType);

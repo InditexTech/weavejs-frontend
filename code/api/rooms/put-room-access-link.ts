@@ -8,7 +8,7 @@ export const putRoomAccessLink = async (
 ) => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
 
-  const endpoint = `${apiEndpoint}/rooms/access-link/${accessId}`;
+  const endpoint = `${apiEndpoint}/rooms/access-link/${encodeURIComponent(accessId)}`;
 
   const response = await fetch(endpoint, {
     method: "PUT",

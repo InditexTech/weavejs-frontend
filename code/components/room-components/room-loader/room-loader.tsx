@@ -68,8 +68,6 @@ export function RoomLoader() {
     return STATES_MAP.ROOM_LOADED;
   }, [status, roomImageFallbackLoading, roomDataStatus, roomInfoLoading]);
 
-  console.log("loadingDescription", loadingDescription);
-
   if (isPending) {
     return null;
   }

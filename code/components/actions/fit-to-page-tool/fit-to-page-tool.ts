@@ -77,6 +77,8 @@ export class FitToPageToolAction extends WeaveAction {
       overrideZoom: params?.overrideZoom ?? false,
     });
 
+    this.instance.emitEvent("onFitToPage");
+
     this.previousAction = params.previousAction;
     this.cancelAction = cancelAction;
 

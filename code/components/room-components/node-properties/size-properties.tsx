@@ -61,7 +61,7 @@ export function SizeProperties() {
   );
 
   React.useEffect(() => {
-    if (actualNode && actualNode.type === "image") {
+    if (actualNode && ["image", "image-with-title"].includes(actualNode.type)) {
       setMaintainAspectRatio(true);
     }
     if (actualNode && typeof actualNode.props.keepAspectRatio !== "undefined") {
@@ -225,7 +225,9 @@ export function SizeProperties() {
             value={actualNode.props.width ?? 0.0}
             disabled={actualNode.type === "frame"}
             onChange={(value) => {
-              const isImage = actualNode.type === "image";
+              const isImage = ["image", "image-with-title"].includes(
+                actualNode.type,
+              );
               const isText = actualNode.type === "text";
 
               let newWidth = value;
@@ -272,7 +274,9 @@ export function SizeProperties() {
             value={actualNode.props.height ?? 0.0}
             disabled={actualNode.type === "frame"}
             onChange={(value) => {
-              const isImage = actualNode.type === "image";
+              const isImage = ["image", "image-with-title"].includes(
+                actualNode.type,
+              );
               const isText = actualNode.type === "text";
 
               let newWidth = actualNode.props.width;
@@ -345,7 +349,9 @@ export function SizeProperties() {
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
-                disabled={actualNode.type === "image"}
+                disabled={["image", "image-with-title"].includes(
+                  actualNode.type,
+                )}
                 icon={<Scaling size={20} strokeWidth={1} />}
                 pressed={maintainAspectRatio}
                 onClick={() => {

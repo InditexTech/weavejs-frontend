@@ -18,19 +18,17 @@ import { useIAChat } from "@/store/ia-chat";
 import { cn } from "@/lib/utils";
 import { PagesGridView } from "../room-components/pages-library/pages.grid.view";
 import { PagesListView } from "../room-components/pages-library/pages.list.view";
-// import { Progress } from "../ui/progress";
 import { ExportToolbar } from "../room-components/toolbars/export.toolbar";
 import { Badge } from "../ui/badge";
 import { UISetupToolbar } from "../room-components/toolbars/ui-setup.toolbar";
 import { PresentationToolbar } from "../room-components/toolbars/presentation.toolbar";
 import { MemoryToolbar } from "../room-components/toolbars/memory.toolbar";
+import { GroupsContextToolbar } from "../room-components/toolbars/groups-context.toolbar";
+import { AsyncAssetsToolbar } from "../room-components/toolbars/async-assets.toolbar";
 
 export const RoomFooter = () => {
   const isRoomSwitching = useWeave((state) => state.room.switching);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
-  // const asyncElementsLoaded = useWeave((state) => state.asyncElements.loaded);
-  // const asyncElementsTotal = useWeave((state) => state.asyncElements.total);
-  // const asyncElementsState = useWeave((state) => state.asyncElements.state);
 
   const viewType = useCollaborationRoom((state) => state.viewType);
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
@@ -72,31 +70,11 @@ export const RoomFooter = () => {
           <ConnectedUsers />
           <UISetupToolbar />
           <MemoryToolbar />
-          {/* {asyncElementsState !== "loaded" && (
-            <>
-              <Divider className="h-[20px]" />
-              <div className="w-full flex flex-col gap-[2px] justify-start items-center">
-                <div className="w-full flex justify-between items-center">
-                  <div className="font-inter text-xs text-center whitespace-nowrap">
-                    {`${asyncElementsLoaded} / ${asyncElementsTotal}`} assets
-                  </div>
-                  <div className="font-inter text-xs text-center whitespace-nowrap">
-                    {Math.round(
-                      (asyncElementsLoaded / asyncElementsTotal) * 100,
-                    )}
-                    %
-                  </div>
-                </div>
-                <Progress
-                  className="w-[200px]"
-                  value={(asyncElementsLoaded / asyncElementsTotal) * 100}
-                />
-              </div>
-            </>
-          )} */}
+          <AsyncAssetsToolbar />
         </div>
         <div className="flex justify-end items-center gap-3">
           {aiEnabled && <AIToolbar />}
+          <GroupsContextToolbar />
           <ExportToolbar />
           <PresentationToolbar />
           <ZoomToolbar />

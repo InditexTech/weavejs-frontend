@@ -28,7 +28,10 @@ export const RoomAccessLink = () => {
 
   const accessPayload = React.useMemo(() => {
     const params = new URLSearchParams(search);
-    return params.get("p");
+    const fromUrl = params.get("p");
+    if (fromUrl) return fromUrl;
+    // After an OAuth redirect the ?p= param is gone; recover from sessionStorage.
+    return sessionStorage.getItem("weave_access_link_payload");
   }, [search]);
 
   const tokens = React.useMemo(() => {
@@ -38,8 +41,16 @@ export const RoomAccessLink = () => {
 
     const payload = atob(accessPayload);
     const tokens = payload.split(" | ");
+    const accessId = tokens[0];
+
+    // Reject accessId values containing path-traversal or URL-delimiter characters
+    // to prevent a crafted payload from redirecting the request to a different endpoint.
+    if (/[/?#]/.test(accessId) || accessId.includes("..")) {
+      return null;
+    }
+
     return {
-      accessId: tokens[0],
+      accessId,
       accessRoomId: tokens[1],
       accessCode: tokens[2],
     };
@@ -72,6 +83,9 @@ export const RoomAccessLink = () => {
     if (!processingAccess.isIdle) {
       return;
     }
+
+    // Clear the payload from sessionStorage now that tokens are in memory.
+    sessionStorage.removeItem("weave_access_link_payload");
 
     processingAccess.mutate({
       accessId: tokens.accessId,
@@ -173,9 +187,16 @@ export const RoomAccessLink = () => {
                     variant="outline"
                     className="cursor-pointer font-inter font-light rounded-none"
                     onClick={async () => {
+                      if (accessPayload) {
+                        sessionStorage.setItem(
+                          "weave_access_link_payload",
+                          accessPayload,
+                        );
+                      }
                       await authClient.signIn.social({
                         provider: "google",
-                        callbackURL: window.location.href,
+                        callbackURL:
+                          window.location.origin + window.location.pathname,
                       });
                     }}
                   >
@@ -190,9 +211,16 @@ export const RoomAccessLink = () => {
                     variant="outline"
                     className="cursor-pointer font-inter font-light rounded-none"
                     onClick={async () => {
+                      if (accessPayload) {
+                        sessionStorage.setItem(
+                          "weave_access_link_payload",
+                          accessPayload,
+                        );
+                      }
                       await authClient.signIn.social({
                         provider: "github",
-                        callbackURL: window.location.href,
+                        callbackURL:
+                          window.location.origin + window.location.pathname,
                       });
                     }}
                   >

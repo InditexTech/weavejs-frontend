@@ -108,14 +108,22 @@ export const PagesToolbar = () => {
       }
 
       try {
-        const { roomData: data } = await getRoomData(
-          queryClient,
-          roomId,
+        const offlineData = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(
           pageElement.pageId,
-          setRoomDataStatus,
-          setRoomImageFallback,
         );
-        store.switchToRoom(pageElement.pageId, data);
+
+        if (!offlineData) {
+          const { roomData: data } = await getRoomData(
+            queryClient,
+            roomId,
+            pageElement.pageId,
+            setRoomDataStatus,
+            setRoomImageFallback,
+          );
+          store.switchToRoom(pageElement.pageId, data);
+        } else {
+          store.switchToRoom(pageElement.pageId, undefined);
+        }
         // eslint-disable-next-line no-empty
       } catch {
         store.switchToRoom(pageElement.pageId, undefined);

@@ -56,14 +56,21 @@ export const useCreatePageFromTemplate = (
       const store = instance.getStore() as WeaveStoreAzureWebPubsub;
 
       try {
-        const { roomData: data } = await getRoomData(
-          queryClient,
-          room,
-          pageId,
-          setRoomDataStatus,
-          setRoomImageFallback,
-        );
-        store.switchToRoom(pageId, data);
+        const offlineData =
+          await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(pageId);
+
+        if (!offlineData) {
+          const { roomData: data } = await getRoomData(
+            queryClient,
+            room,
+            pageId,
+            setRoomDataStatus,
+            setRoomImageFallback,
+          );
+          store.switchToRoom(pageId, data);
+        } else {
+          store.switchToRoom(pageId, undefined);
+        }
         // eslint-disable-next-line no-empty
       } catch {
         store.switchToRoom(pageId, undefined);
