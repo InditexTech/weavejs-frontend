@@ -14,7 +14,7 @@ RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev
 WORKDIR /app
 COPY package*.json ./
 RUN npm pkg delete scripts.prepare
-RUN npm ci
+RUN npm ci --force
 
 # Build step
 FROM base AS builder
