@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-frontend",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
   "repository": "github:InditexTech/weavejs-frontend",
@@ -48,7 +48,7 @@
     "@inditextech/weave-react": "5.1.1",
     "@inditextech/weave-renderer-konva-base": "5.1.1",
     "@inditextech/weave-renderer-konva-react-reconciler": "5.1.1",
-    "@inditextech/weave-store-azure-web-pubsub": "^0.36.0",
+    "@inditextech/weave-store-azure-web-pubsub": "5.1.1",
     "@inditextech/weave-store-standalone": "5.1.1",
     "@lineiconshq/free-icons": "^1.0.4",
     "@lineiconshq/react-lineicons": "^1.0.5",
