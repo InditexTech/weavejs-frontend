@@ -124,7 +124,9 @@ export function useOnPasteExternalText() {
           const textNode = textNodeHandler.create(textNodeId, {
             x: position.x,
             y: position.y,
-            layout: TEXT_LAYOUT.AUTO_ALL,
+            width: 800,
+            smartFixedWidth: true,
+            layout: TEXT_LAYOUT.SMART,
             fontSize: 20,
             fontFamily: "Arial, sans-serif",
             fill: "#000000",
