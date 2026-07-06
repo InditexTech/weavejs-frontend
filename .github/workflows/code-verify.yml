@@ -42,7 +42,7 @@ jobs:
         id: asdf-cache
         with:
           path: ~/.asdf/data
-          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('**/.tool-versions') }}
           restore-keys: |
             ${{ runner.os }}-asdf-
 
