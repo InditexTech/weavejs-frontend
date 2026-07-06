@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Konva from "konva";
 import { IMAGE_WITH_TITLE_TOOL_STATE } from "./constants";
 import type {
