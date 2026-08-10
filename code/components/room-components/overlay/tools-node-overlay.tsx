@@ -17,6 +17,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useIAChat } from "@/store/ia-chat";
+import { cn } from "@/lib/utils";
 
 export function ToolsNodeOverlay() {
   const instance = useWeave((state) => state.instance);
@@ -24,6 +25,7 @@ export function ToolsNodeOverlay() {
   const node = useWeave((state) => state.selection.node);
   const nodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
+  const viewType = useCollaborationRoom((state) => state.viewType);
 
   const selectedGuide = useCollaborationRoom((state) => state.guides.selected);
   const imageCroppingEnabled = useCollaborationRoom(
@@ -115,7 +117,7 @@ export function ToolsNodeOverlay() {
         <React.Fragment key="image-cropping-tools">
           <ToolbarButton
             className="rounded-none !w-[40px]"
-            icon={<Check className="px-2" size={40} strokeWidth={1} />}
+            icon={<Check className="h-4 w-4" strokeWidth={1} />}
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
             }
@@ -136,7 +138,7 @@ export function ToolsNodeOverlay() {
           />
           <ToolbarButton
             className="rounded-none !w-[40px]"
-            icon={<X className="px-2" size={40} strokeWidth={1} />}
+            icon={<X className="h-4 w-4" strokeWidth={1} />}
             disabled={
               weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
             }
@@ -188,7 +190,11 @@ export function ToolsNodeOverlay() {
       animate="visible"
       exit="hidden"
       variants={bottomElementVariants}
-      className="pointer-events-none absolute right-[8px] left-[8px] top-[8px] flex flex-col gap-5 justify-center items-center"
+      className={cn("pointer-events-none absolute right-[8px] left-[8px] top-[8px] flex flex-col gap-5 justify-center items-center",
+        {
+          ["!top-[62px]"]: viewType === "floating",
+          ["!top-[8px]"]: viewType === "fixed"
+        })}
     >
       {croppingTools.length > 0 && (
         <Toolbar orientation="horizontal">{croppingTools}</Toolbar>
