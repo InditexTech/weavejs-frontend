@@ -1,5 +1,6 @@
 name: Scorecard analysis
-permissions: read-all
+permissions:
+  contents: read
 on:
   push:
     # Only the default branch is supported.
@@ -11,8 +12,11 @@ jobs:
     name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       # Needed for GitHub OIDC token if publish_results is true
       id-token: write
+      # Needed to upload the SARIF file as a workflow artifact
+      actions: write
     steps:
       - name: "Checkout code"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4

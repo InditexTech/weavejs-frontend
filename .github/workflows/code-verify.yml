@@ -10,6 +10,9 @@ on:
       - "code/**"
       - ".github/workflows/code*"
 
+permissions:
+  contents: read
+
 env:
   NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
   NEXT_PUBLIC_API_ENDPOINT_HUB_NAME: ${{ vars.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME }}
