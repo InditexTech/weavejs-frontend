@@ -38,8 +38,18 @@ RUN npm run build:img
 # Runtime image step
 FROM base AS runner
 
-RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libtool autoconf automake
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    autoconf \
+    automake \
+    build-essential \
+    libcairo2-dev \
+    libgif-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    librsvg2-dev \
+    libtool && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 ENV NODE_ENV=production
