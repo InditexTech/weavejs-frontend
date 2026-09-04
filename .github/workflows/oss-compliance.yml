@@ -25,7 +25,7 @@ jobs:
       - name: Execute Repo Linter
         run: |
           echo "Installing Repo Linter"
-          npm install -g repolinter@v0.11.2
+          npm install -g --ignore-scripts repolinter@v0.11.2
           
           echo "Executing Repo Linter"
           repolinter --rulesetFile repolinter.json --dryRun .

@@ -8,13 +8,17 @@ FROM node:24 AS base
 FROM base AS deps
 
 RUN apt-get update -y
-RUN apt-get install -y bash g++ make python3
-RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libtool autoconf automake
+RUN apt-get install -y --no-install-recommends bash g++ make python3
+RUN apt-get install -y --no-install-recommends build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libtool autoconf automake
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm pkg delete scripts.prepare
-RUN npm ci --force
+# --ignore-scripts blocks arbitrary install-time scripts from all deps (supply-chain
+# hardening); canvas needs its own "install" script (prebuild-install/node-gyp) to build
+# its native addon, so it's rebuilt explicitly right after.
+RUN npm ci --force --ignore-scripts
+RUN npm rebuild canvas
 
 # Build step
 FROM base AS builder
@@ -34,8 +38,18 @@ RUN npm run build:img
 # Runtime image step
 FROM base AS runner
 
-RUN apt-get update -y
-RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libtool autoconf automake
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    autoconf \
+    automake \
+    build-essential \
+    libcairo2-dev \
+    libgif-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    librsvg2-dev \
+    libtool && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 ENV NODE_ENV=production
