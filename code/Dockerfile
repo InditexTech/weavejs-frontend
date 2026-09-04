@@ -14,7 +14,11 @@ RUN apt-get install -y --no-install-recommends build-essential libcairo2-dev lib
 WORKDIR /app
 COPY package*.json ./
 RUN npm pkg delete scripts.prepare
-RUN npm ci --force
+# --ignore-scripts blocks arbitrary install-time scripts from all deps (supply-chain
+# hardening); canvas needs its own "install" script (prebuild-install/node-gyp) to build
+# its native addon, so it's rebuilt explicitly right after.
+RUN npm ci --force --ignore-scripts
+RUN npm rebuild canvas
 
 # Build step
 FROM base AS builder
