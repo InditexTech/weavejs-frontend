@@ -9,8 +9,11 @@ export const getRoom = async (roomId: string) => {
   const endpoint = `${apiEndpoint}/${hubName}/rooms/${roomId}`;
   const response = await fetch(endpoint);
 
-  if (!response.ok && response.status === 404) {
-    throw new Error(`Room doesn't exist`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error(`Room doesn't exist`);
+    }
+    throw new Error(`Failed to fetch room data (status ${response.status})`);
   }
 
   const data = await response.bytes();

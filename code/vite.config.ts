@@ -54,6 +54,21 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 3000,
+      // Nitro's dev-mode route-rules proxy (nitro.config.ts) skips any
+      // request whose `Sec-Fetch-Dest` isn't document/iframe/frame/empty
+      // (see nitro/dist/_build/vite.dev.mjs's nitroDevMiddlewarePre), so
+      // <img> tags (Sec-Fetch-Dest: image) never reach the `/weavebff/**`
+      // proxy rule in `npm run dev` and 404. Vite's own proxy middleware
+      // runs earlier in the dev middleware stack and isn't subject to that
+      // gate, so mirror the same routeRules.proxy target here for dev only.
+      // Production builds run Nitro as the real server and are unaffected.
+      proxy: {
+        "/weavebff": {
+          target: env.VITE_BACKEND_ENDPOINT,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/weavebff/, ""),
+        },
+      },
     },
     build: {
       rollupOptions: {
