@@ -12,14 +12,17 @@ import {
   AlignStartHorizontal,
   Bold,
   Italic,
+  Link2,
   RemoveFormatting,
   Strikethrough,
   Type,
   Underline,
 } from "lucide-react";
 import { WeaveFont, WeaveStateElement } from "@inditextech/weave-types";
+import type { WeaveElementInstance } from "@inditextech/weave-types";
 import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
+import { Input } from "@/components/ui/input";
 import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
 import InputFontFamily from "../inputs/input-font-family";
@@ -27,9 +30,32 @@ import { InputNumber } from "../inputs/input-number";
 
 const LIGHT_WEIGHT = 300;
 
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+// Matches the subset of WeaveTextNode's public API (weave-sdk) this panel
+// needs. Declared locally rather than importing WeaveTextNode's type because
+// getLink/setLink/removeLink aren't in the currently published weave-sdk
+// types yet (only in the aliased local dev build via DEV_WEAVEJS_REPO_PATH).
+// Persisting/validating the link, and restoring the node's fill/decoration
+// on removal, is entirely weave-sdk's responsibility — this panel only calls
+// the three public methods, never touches `props` directly for `link`.
+interface WeaveTextLinkHandler {
+  getLink(nodeInstance: WeaveElementInstance): string | undefined;
+  setLink(nodeInstance: WeaveElementInstance, url: string): void;
+  removeLink(nodeInstance: WeaveElementInstance): void;
+}
+
 export function TextProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const selectedNodes = useWeave((state) => state.selection.nodes);
   const actualAction = useWeave((state) => state.actions.actual);
 
   const fontsValues = useCollaborationRoom((state) => state.fonts.values);
@@ -44,6 +70,10 @@ export function TextProperties() {
   const [selectedFontFamily, setSelectedFontFamily] = React.useState<
     string | null
   >(null);
+
+  const [linkEnabled, setLinkEnabled] = React.useState<boolean>(false);
+  const [linkDraft, setLinkDraft] = React.useState<string>("");
+  const [linkError, setLinkError] = React.useState<string | null>(null);
 
   const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === "create") {
@@ -61,9 +91,40 @@ export function TextProperties() {
     return undefined;
   }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
+  // The live Konva node instance behind the current selection — only
+  // available when editing an already-placed node (nodePropertiesAction ===
+  // "update"), never while just configuring defaults for the next node the
+  // create-tool will place. Hyperlink editing requires this real instance,
+  // since getLink/setLink/removeLink are instance methods on the SDK's text
+  // node handler, not something derivable from the serialized props alone.
+  const selectedTextInstance = React.useMemo(() => {
+    if (nodePropertiesAction !== "update") return undefined;
+    if (selectedNodes.length !== 1) return undefined;
+    const [selected] = selectedNodes;
+    if (selected.node?.type !== "text") return undefined;
+    return selected.instance as unknown as WeaveElementInstance;
+  }, [selectedNodes, nodePropertiesAction]);
+
+  const textLinkHandler = React.useMemo(() => {
+    return instance?.getNodeHandler<WeaveTextLinkHandler>("text");
+  }, [instance]);
+
   React.useEffect(() => {
     setSelectedFontFamily(actualNode?.props?.fontFamily ?? null);
   }, [actualNode]);
+
+  React.useEffect(() => {
+    if (!textLinkHandler || !selectedTextInstance) {
+      setLinkEnabled(false);
+      setLinkDraft("");
+      setLinkError(null);
+      return;
+    }
+    const currentLink = textLinkHandler.getLink(selectedTextInstance) ?? "";
+    setLinkEnabled(!!currentLink);
+    setLinkDraft(currentLink);
+    setLinkError(null);
+  }, [textLinkHandler, selectedTextInstance]);
 
   const weaveFont = React.useMemo(() => {
     return fontsValues.find(
@@ -124,20 +185,26 @@ export function TextProperties() {
           />
         </div>
         <div className="col-span-2">
-          <InputColor
-            label="Font color"
-            value={actualNode.props.fill}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  fill: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
+          <div
+            className={
+              linkEnabled ? "pointer-events-none opacity-50" : undefined
+            }
+          >
+            <InputColor
+              label="Font color"
+              value={actualNode.props.fill}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fill: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+          </div>
         </div>
         <InputNumber
           label="Font size (px)"
@@ -336,6 +403,7 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<RemoveFormatting size={20} strokeWidth={1} />}
+              disabled={linkEnabled}
               pressed={(actualNode.props.textDecoration ?? "") === ""}
               onClick={() => {
                 const updatedNode: WeaveStateElement = {
@@ -351,6 +419,7 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<Strikethrough size={20} strokeWidth={1} />}
+              disabled={linkEnabled}
               pressed={
                 (actualNode.props.textDecoration ?? "") === "line-through"
               }
@@ -368,6 +437,7 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<Underline size={20} strokeWidth={1} />}
+              disabled={linkEnabled}
               pressed={(actualNode.props.textDecoration ?? "") === "underline"}
               onClick={() => {
                 const updatedNode: WeaveStateElement = {
@@ -382,6 +452,11 @@ export function TextProperties() {
             />
           </div>
         </div>
+        {linkEnabled && (
+          <div className="text-[11px] text-[#757575] font-inter font-light col-span-2 -mt-2">
+            Underline is forced on while hyperlink is enabled.
+          </div>
+        )}
         <div className="w-full flex justify-between items-center gap-4 col-span-2">
           <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
             Horizontal alignment
@@ -486,6 +561,77 @@ export function TextProperties() {
             />
           </div>
         </div>
+        {selectedTextInstance && textLinkHandler && (
+          <>
+            <div className="w-full flex justify-between items-center gap-4 col-span-2">
+              <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+                Hyperlink
+              </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Link2 size={20} strokeWidth={1} />}
+                  pressed={linkEnabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (linkEnabled) {
+                      setLinkEnabled(false);
+                      setLinkDraft("");
+                      setLinkError(null);
+                      textLinkHandler.removeLink(selectedTextInstance);
+                    } else {
+                      setLinkEnabled(true);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            {linkEnabled && (
+              <div className="col-span-2 flex flex-col gap-1">
+                <Input
+                  type="text"
+                  placeholder="https://example.com"
+                  className="w-full h-[40px] rounded-none !text-[14px] !border-black font-normal text-black focus:outline-none bg-transparent shadow-none"
+                  value={linkDraft}
+                  onChange={(e) => {
+                    setLinkDraft(e.target.value);
+                    if (linkError) setLinkError(null);
+                  }}
+                  onFocus={() => {
+                    window.weaveOnFieldFocus = true;
+                  }}
+                  onBlur={() => {
+                    window.weaveOnFieldFocus = false;
+                    const trimmed = linkDraft.trim();
+                    if (trimmed === "") {
+                      setLinkEnabled(false);
+                      setLinkError(null);
+                      textLinkHandler.removeLink(selectedTextInstance);
+                      return;
+                    }
+                    if (!isValidHttpUrl(trimmed)) {
+                      setLinkError("Enter a valid http(s) URL");
+                      return;
+                    }
+                    setLinkError(null);
+                    textLinkHandler.setLink(selectedTextInstance, trimmed);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                />
+                {linkError && (
+                  <div className="text-[11px] text-red-600 font-inter font-light">
+                    {linkError}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

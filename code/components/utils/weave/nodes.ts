@@ -27,7 +27,9 @@ import {
   WeavePolygonNode,
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
+import type { WeaveTextProperties } from "@inditextech/weave-sdk";
 import {
+  DeepPartial,
   WeaveElementAttributes,
   WeaveElementInstance,
 } from "@inditextech/weave-types";
@@ -65,6 +67,16 @@ export const NODES = (
         color: BACKGROUND_COLOR.GRAY,
         width: 2,
       },
+      // TODO(weave-sdk): `link` isn't in the published @inditextech/weave-sdk
+      // types yet (feature only lives in the aliased local dev build via
+      // DEV_WEAVEJS_REPO_PATH). The intersection below can be dropped once a
+      // weave-sdk release ships `WeaveTextLinkProperties` on this type.
+      link: {
+        defaultColor: "#1155ccff",
+        hoverColor: "#3d7be0ff",
+      },
+    } as DeepPartial<WeaveTextProperties> & {
+      link: { defaultColor: string; hoverColor: string };
     },
   }),
   new WeaveImageNode({

@@ -65,6 +65,7 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
   }),
   new WeaveNodesSelectionPlugin({
     config: {
+      selectionMode: "contains",
       selection: {
         ignoreStroke: false,
         padding: 0,
