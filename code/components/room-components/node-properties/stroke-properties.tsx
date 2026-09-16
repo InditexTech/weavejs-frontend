@@ -176,6 +176,24 @@ export function StrokeProperties() {
             </div>
           </>
         )}
+        {(actualNode.type === "stroke" || actualAction === "brushTool") && (
+          <InputNumber
+            label="Brush size"
+            value={actualNode.props.strokeWidth ?? 1}
+            min={1}
+            max={50}
+            onChange={(value) => {
+              const updatedNode: WeaveStateElement = {
+                ...actualNode,
+                props: {
+                  ...actualNode.props,
+                  strokeWidth: value,
+                },
+              };
+              updateElement(updatedNode);
+            }}
+          />
+        )}
         {(["stroke-single"].includes(actualNode.type) ||
           ["strokeTool", "arrowTool"].includes(actualAction)) && (
           <>
