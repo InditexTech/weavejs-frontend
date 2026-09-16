@@ -71,6 +71,7 @@ export const NodeProperties = () => {
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
       return;
     }
 
