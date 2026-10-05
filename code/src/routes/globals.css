@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+@import "tailwindcss";
+
 /* Fonts are self-hosted (no third-party requests: GDPR). */
 @font-face {
   font-family: "Inter";
@@ -61,8 +63,6 @@
   font-display: swap;
   src: url("/fonts/NotoSansMono-Bold.ttf") format("truetype");
 }
-
-@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 

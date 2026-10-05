@@ -16,7 +16,12 @@ const ALLOWED_PREFIXES = [
   "/src/",
 ];
 
-const ALLOWED_EXACT = ["/v1", "/weavebff", COMING_SOON_PATH, "/favicon.ico"];
+const ALLOWED_EXACT = new Set([
+  "/v1",
+  "/weavebff",
+  COMING_SOON_PATH,
+  "/favicon.ico",
+]);
 
 export function isComingSoonEnabled(): boolean {
   return import.meta.env.VITE_COMING_SOON === "true";
@@ -27,6 +32,6 @@ export function isAllowedPath(pathname: string): boolean {
     pathname.length > 1 && pathname.endsWith("/")
       ? pathname.slice(0, -1)
       : pathname;
-  if (ALLOWED_EXACT.includes(path)) return true;
+  if (ALLOWED_EXACT.has(path)) return true;
   return ALLOWED_PREFIXES.some((p) => path.startsWith(p));
 }

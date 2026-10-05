@@ -66,10 +66,18 @@ function RootLayout() {
       return;
     }
     setPreview("checking");
-    resolvePreviewAccess().then((ok) => setPreview(ok ? "granted" : "denied"));
+    resolvePreviewAccess()
+      .then((ok) => setPreview(ok ? "granted" : "denied"))
+      .catch(() => setPreview("denied"));
   }, [gated, preview]);
 
   const blocked = gated && preview !== "granted";
+
+  let content: React.ReactNode = <Outlet />;
+  if (blocked) {
+    // While validating a preview key/token render nothing (no flash).
+    content = preview === "checking" ? null : <ComingSoonPage />;
+  }
 
   return (
     <html lang="en">
@@ -78,13 +86,7 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body>
-        {blocked ? (
-          preview === "checking" ? null : (
-            <ComingSoonPage />
-          )
-        ) : (
-          <Outlet />
-        )}
+        {content}
         <Scripts />
       </body>
     </html>
