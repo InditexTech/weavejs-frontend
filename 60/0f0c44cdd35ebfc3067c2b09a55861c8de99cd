@@ -1,0 +1,45 @@
+code/.dockerignore
+  s_3155053bfbf705::t_1b561319d59058 9-12
+code/README.md
+  s_3155053bfbf705::t_54f332a0cf8fcf 43-59
+code/components/coming-soon/coming-soon-page.tsx
+  s_3155053bfbf705::t_27076e4d05f4dd 1-74
+code/lib/coming-soon-preview-browser.ts
+  s_3155053bfbf705::t_562a9de3e653cf 1-54
+code/lib/coming-soon-preview.server.ts
+  s_3155053bfbf705::t_8d3fcaf9010ad3 1-44
+code/lib/coming-soon.test.ts
+  s_3155053bfbf705::t_03de13762aadb9 1-22
+code/lib/coming-soon.ts
+  s_3155053bfbf705::t_4d5dde78cc29d3 1-32
+code/nitro.config.ts
+  s_3155053bfbf705::t_576ae5e573c365 5-11
+code/server/middleware/coming-soon.ts
+  s_3155053bfbf705::t_6d7eefe0360a19 1-24
+code/src/routeTree.gen.ts
+  s_3155053bfbf705::t_2e008aaaa80d00 12,19,25-29,60-64,89,96,103,110,118,125,134,141,148,155,162,169,177,184,192-198,241-247,281,288
+code/src/routes/__root.tsx
+  s_3155053bfbf705::t_4e579bff4f27f9 11,13-19,28-34,36,38-40,54-73,81-87
+code/src/routes/coming-soon.tsx
+  s_3155053bfbf705::t_6726674ac2e8f6 1-16
+code/src/routes/globals.css
+  s_3155053bfbf705::t_577f5d8edadc2d 7-63
+code/src/routes/v1/preview/index.tsx
+  s_3155053bfbf705::t_b4fd70113cb192 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "600f0c44cdd35ebfc3067c2b09a55861c8de99cd",
+  "prompts": {},
+  "sessions": {
+    "s_3155053bfbf705": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef4c593b2ffeyyFM7UZsF4tMrT",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
