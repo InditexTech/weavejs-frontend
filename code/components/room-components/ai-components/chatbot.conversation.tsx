@@ -4,6 +4,7 @@
 
 import { DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
+import { toast } from "sonner";
 import {
   Confirmation,
   ConfirmationAction,
@@ -148,6 +149,28 @@ export const ChatBotConversation = ({
         ai_resource_id: resourceId,
       },
     }),
+    onError: (error) => {
+      let backendMessage = error.message;
+      let statusCode: number | undefined;
+      try {
+        const data = JSON.parse(error.message);
+        backendMessage = data?.error ?? error.message;
+        statusCode = data?.status;
+      } catch {
+        // not a JSON payload
+      }
+      if (statusCode === 401) {
+        toast.error("Please sign in again.");
+      } else if (
+        statusCode === 403 ||
+        statusCode === 404 ||
+        /not found|access/i.test(backendMessage)
+      ) {
+        toast.error("You don't have access to this room or page.");
+      } else {
+        toast.error("The AI request failed, please try again.");
+      }
+    },
     onFinish: ({ messages }) => {
       const filteredMessages = messages.map((message) => {
         return {
@@ -468,9 +491,8 @@ export const ChatBotConversation = ({
                                 }[];
                               }) => {
                                 let variant:
-                                  | "outline"
-                                  | "secondary"
-                                  | "destructive" = "outline";
+                                  "outline" | "secondary" | "destructive" =
+                                  "outline";
                                 if (
                                   ["generated", "completed"].includes(
                                     task.status,
