@@ -1,0 +1,23 @@
+code/components/room-components/ai-components/chatbot.conversation.tsx
+  s_77287832473849::t_58e8dd5a5240a7 7,152-173,494-495
+code/components/room-components/ai-components/chatbot.prompt.tsx
+  s_77287832473849::t_f5aab6f6bbf7b7 51,153,183-186
+code/src/routes/api/ai/chats/$chatId.ts
+  s_77287832473849::t_39b5c351288852 38-45,51-73,76-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f365cb024ed10bd0fc7e1230595a8a340039ff8d",
+  "prompts": {},
+  "sessions": {
+    "s_77287832473849": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "4156d6f1-1310-40f1-bfc1-7746c68af83c",
+        "model": "claude-haiku-4.5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
