@@ -40,3 +40,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Coming soon mode
+
+Set `VITE_COMING_SOON=true` (build-time) to show the "Coming soon" page on every route. The requested URL is kept (no redirect), so deep links like `/rooms/abc` render the page in place.
+
+- Allowlisted (served normally): `/v1/*` (health probes), `/weavebff/*`, `/coming-soon`, and static assets (`/fonts`, `/assets`, `/favicon.ico`).
+- Blocked routes respond `200` with `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store` and a `robots` meta tag.
+- No third-party requests (fonts and background image are self-hosted).
+- Set to `false` (default) to restore normal routing.
+
+### Preview bypass
+
+Set a runtime secret `COMING_SOON_BYPASS_KEY` (plain env var, **not** `VITE_`, so it never reaches the bundle). Open any URL with `?preview=<key>`:
+
+- The key is checked server-side (`POST /v1/preview`, constant-time compare) and exchanged for an HMAC-signed token (8h expiry).
+- The token is stored in `sessionStorage` (per tab, cleared on tab close) and `?preview` is stripped from the URL.
+- Unset secret = bypass disabled. This only hides the UI: `/weavebff/*` stays reachable.

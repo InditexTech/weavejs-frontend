@@ -7,3 +7,6 @@ node_modules/
 vitest.config.mts
 commitlint.config.ts
 README.md
+.env
+.env.local
+.env.*.local
