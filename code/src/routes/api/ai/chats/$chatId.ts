@@ -35,30 +35,54 @@ export const Route = createFileRoute("/api/ai/chats/$chatId")({
 
         const { messages, pageId, imageOption, referenceNodes } =
           await request.json();
+
+        if (typeof pageId !== "string" || pageId.trim() === "") {
+          return Response.json(
+            { error: "Missing pageId" },
+            { status: 400, headers: { "Content-Type": "application/json" } },
+          );
+        }
+
         const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
         const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
         const endpoint = `${backendEndpoint}/api/v1/${hubName}/rooms/${roomId}/ai/chats/${chatId}/message`;
 
-        const response = await fetch(endpoint, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            "x-weave-user-id": resourceId,
-            cookie: request.headers.get("cookie") ?? "",
-          },
-          body: JSON.stringify({
-            messages,
-            pageId,
-            referenceNodes,
-            imageOption,
-          }),
-        });
+        let response: Response;
+        try {
+          response = await fetch(endpoint, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              "x-weave-user-id": resourceId,
+              cookie: request.headers.get("cookie") ?? "",
+            },
+            body: JSON.stringify({
+              messages,
+              pageId,
+              referenceNodes,
+              imageOption,
+            }),
+          });
+        } catch {
+          return Response.json(
+            { error: "AI service is unavailable", status: 502 },
+            { status: 502 },
+          );
+        }
 
         if (!response.ok) {
-          throw new Error(
-            `Error creating chat messages: ${response.statusText}`,
+          let message = response.statusText || "Error creating chat messages";
+          try {
+            const data = await response.json();
+            message = data?.error ?? data?.message ?? message;
+          } catch {
+            // backend body is not JSON, keep the status text
+          }
+          return Response.json(
+            { error: message, status: response.status },
+            { status: response.status },
           );
         }
 

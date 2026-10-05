@@ -48,6 +48,7 @@ import {
 } from "@/components/ai-elements/attachments";
 import { usePromptInputReferencedSources } from "@/components/ai-elements/prompt-input";
 import { SourceDocumentUIPart } from "ai";
+import { toast } from "sonner";
 
 const GEMINI_IMAGE_ASPECT_RATIOS = [
   "1:1",
@@ -149,6 +150,7 @@ const ChatBotPrompt = () => {
 
       if (!room || !actualPageId) {
         console.error("Room or actualPageId is not available.");
+        toast.error("No active room or page available, please try again.");
         return;
       }
 
@@ -178,6 +180,10 @@ const ChatBotPrompt = () => {
       setShowRightSidebarFloating(true);
     },
     [
+      room,
+      actualPageId,
+      threadId,
+      AI_AVAILABLE,
       references,
       imageModel,
       imagesSamples,
