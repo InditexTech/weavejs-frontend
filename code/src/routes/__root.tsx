@@ -8,7 +8,15 @@ import {
   createRootRoute,
   HeadContent,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
+import React from "react";
+import {
+  hasPreviewCandidate,
+  resolvePreviewAccess,
+} from "../../lib/coming-soon-preview-browser";
+import { isAllowedPath, isComingSoonEnabled } from "../../lib/coming-soon";
+import { ComingSoonPage } from "@/components/coming-soon/coming-soon-page";
 import { NotFound } from "@/components/not-found/not-found";
 
 export const Route = createRootRoute({
@@ -17,10 +25,19 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       {
         name: "viewport",
-        content:
-          "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+        content: isComingSoonEnabled()
+          ? "width=device-width, initial-scale=1"
+          : "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
       },
-      { title: "TanStack Start Starter" },
+      { title: "Weave.js" },
+      {
+        name: "description",
+        content:
+          "Weave.js, an open source library to build collaborative visual canvas applications.",
+      },
+      ...(isComingSoonEnabled()
+        ? [{ name: "robots", content: "noindex, nofollow" }]
+        : []),
     ],
     links: [
       {
@@ -34,6 +51,26 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+  const { pathname } = useLocation();
+  const gated = isComingSoonEnabled() && !isAllowedPath(pathname);
+  // "idle": SSR + first client render (shows coming soon, hydrates cleanly)
+  // "checking": validating a preview key/token (render nothing, no flash)
+  const [preview, setPreview] = React.useState<
+    "idle" | "checking" | "granted" | "denied"
+  >("idle");
+
+  React.useEffect(() => {
+    if (!gated || preview !== "idle") return;
+    if (!hasPreviewCandidate()) {
+      setPreview("denied");
+      return;
+    }
+    setPreview("checking");
+    resolvePreviewAccess().then((ok) => setPreview(ok ? "granted" : "denied"));
+  }, [gated, preview]);
+
+  const blocked = gated && preview !== "granted";
+
   return (
     <html lang="en">
       <head>
@@ -41,7 +78,13 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body>
-        <Outlet />
+        {blocked ? (
+          preview === "checking" ? null : (
+            <ComingSoonPage />
+          )
+        ) : (
+          <Outlet />
+        )}
         <Scripts />
       </body>
     </html>
