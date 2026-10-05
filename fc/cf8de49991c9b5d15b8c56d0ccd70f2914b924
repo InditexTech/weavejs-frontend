@@ -1,0 +1,23 @@
+code/lib/coming-soon.ts
+  s_3155053bfbf705::t_c4518e5220478a 19-24,35
+code/src/routes/__root.tsx
+  s_3155053bfbf705::t_2fea88d008b4b9 69-71,76-81,89
+code/src/routes/globals.css
+  s_3155053bfbf705::t_0e26a1918deb60 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fccf8de49991c9b5d15b8c56d0ccd70f2914b924",
+  "prompts": {},
+  "sessions": {
+    "s_3155053bfbf705": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef4c593b2ffeyyFM7UZsF4tMrT",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
