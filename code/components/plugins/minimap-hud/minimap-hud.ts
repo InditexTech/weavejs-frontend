@@ -152,7 +152,7 @@ export function clampViewportToMinimap(
 }
 
 export class MinimapHUDPlugin extends WeavePlugin {
-  private config: MinimapHUDPluginConfig;
+  private readonly config: MinimapHUDPluginConfig;
   private enabledState: boolean = true;
   private minimapStage: Konva.Stage | null = null;
   private contentLayer: Konva.Layer | null = null;
