@@ -77,23 +77,20 @@ export class DimensionToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        e.stopPropagation();
+    const onContainerKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
         this.cleanupPreview();
         this.cancelAction();
-        return;
       }
-    });
+    };
+    stage.container().addEventListener("keydown", onContainerKeyDown);
 
-    stage.on("pointerdown", (e) => {
-      this.setTapStart(e);
-
-      this.pointers.set(e.evt.pointerId, {
-        x: e.evt.clientX,
-        y: e.evt.clientY,
-      });
+    stage.on("pointerdown", (event) => {
+      this.setTapStart(event);
+      const { pointerId, clientX, clientY } = event.evt;
+      this.pointers.set(pointerId, { x: clientX, y: clientY });
 
       if (this.state === DIMENSION_TOOL_STATE.IDLE) {
         const { mousePoint, container } = this.instance.getMousePointer();

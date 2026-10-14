@@ -16,69 +16,73 @@ import {
   DIMENSION_UNIT,
 } from "@/components/nodes/dimension/constants";
 
-export function DimensionProperties() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-  const actualAction = useWeave((state) => state.actions.actual);
-
-  const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
+function useDimensionPropertyContext() {
+  const instance = useWeave((s) => s.instance);
+  const selectedNode = useWeave((s) => s.selection.node);
+  const activeTool = useWeave((s) => s.actions.actual);
+  const propertyAction = useCollaborationRoom((s) => s.nodeProperties.action);
+  const creationDraftProps = useCollaborationRoom(
+    (s) => s.nodeProperties.createProps,
   );
 
-  const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps,
-  );
-
-  const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === "create") {
+  const target = React.useMemo<WeaveStateElement | undefined>(() => {
+    if (activeTool && propertyAction === "create") {
       return {
         key: "creating",
         type: "undefined",
-        props: {
-          ...nodeCreateProps,
-        },
+        props: { ...creationDraftProps },
       };
     }
-    if (node && nodePropertiesAction === "update") {
-      return node;
-    }
-    return undefined;
-  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return propertyAction === "update" ? selectedNode : undefined;
+  }, [activeTool, propertyAction, creationDraftProps, selectedNode]);
 
-  const updateElement = React.useCallback(
-    (updatedNode: WeaveStateElement) => {
-      if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
-        instance.updatePropsAction(actualAction, updatedNode.props);
-      }
-      if (nodePropertiesAction === "update") {
-        instance.updateNode(updatedNode);
+  const commitUpdate = React.useCallback(
+    (propsPatch: Record<string, unknown>) => {
+      if (!instance || !target) return;
+      const merged: WeaveStateElement = {
+        ...target,
+        props: { ...target.props, ...propsPatch },
+      };
+      if (activeTool && propertyAction === "create") {
+        instance.updatePropsAction(activeTool, merged.props);
+      } else if (propertyAction === "update") {
+        instance.updateNode(merged);
       }
     },
-    [instance, actualAction, nodePropertiesAction],
+    [instance, target, activeTool, propertyAction],
   );
 
-  if (!instance || !actualNode) return null;
+  return { instance, activeTool, target, commitUpdate };
+}
+
+export function DimensionProperties() {
+  const { instance, activeTool, target, commitUpdate } =
+    useDimensionPropertyContext();
+
+  if (!instance || !target) return null;
 
   if (
-    actualAction &&
-    ["selectionTool"].includes(actualAction) &&
-    !["dimension"].includes(actualNode.type)
+    activeTool &&
+    ["selectionTool"].includes(activeTool) &&
+    target.type !== "dimension"
   ) {
     return null;
   }
 
   if (
-    actualAction &&
-    !["selectionTool", "dimensionTool"].includes(actualAction)
+    activeTool &&
+    !["selectionTool", "dimensionTool"].includes(activeTool)
   ) {
     return null;
   }
 
-  const currentUnit = actualNode.props?.unit ?? DEFAULT_DIMENSION_UNIT;
-  const currentTerminator = actualNode.props?.terminator ?? DEFAULT_DIMENSION_TERMINATOR;
-  const currentStroke = actualNode.props?.stroke ?? DEFAULT_DIMENSION_STROKE;
-  const currentCustomLabel = actualNode.props?.customLabel ?? "";
+  const currentUnit =
+    (target.props?.unit as string) ?? DEFAULT_DIMENSION_UNIT;
+  const currentTerminator =
+    (target.props?.terminator as string) ?? DEFAULT_DIMENSION_TERMINATOR;
+  const currentStroke =
+    (target.props?.stroke as string) ?? DEFAULT_DIMENSION_STROKE;
+  const currentCustomLabel = (target.props?.customLabel as string) ?? "";
 
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
@@ -99,16 +103,7 @@ export function DimensionProperties() {
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      unit: u,
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
+                onClick={() => commitUpdate({ unit: u })}
               >
                 {u}
               </button>
@@ -134,16 +129,7 @@ export function DimensionProperties() {
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      terminator: val,
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
+                onClick={() => commitUpdate({ terminator: val })}
               >
                 {key}
               </button>
@@ -157,31 +143,13 @@ export function DimensionProperties() {
         <InputText
           label="Label Prefix (e.g. WIDTH:)"
           value={currentCustomLabel}
-          onChange={(value) => {
-            const updatedNode: WeaveStateElement = {
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                customLabel: value,
-              },
-            };
-            updateElement(updatedNode);
-          }}
+          onChange={(value) => commitUpdate({ customLabel: value })}
         />
 
         <InputColor
           label="Dimension Line Color"
           value={currentStroke}
-          onChange={(value) => {
-            const updatedNode: WeaveStateElement = {
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                stroke: value,
-              },
-            };
-            updateElement(updatedNode);
-          }}
+          onChange={(value) => commitUpdate({ stroke: value })}
         />
       </div>
     </div>
