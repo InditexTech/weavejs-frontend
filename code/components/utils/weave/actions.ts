@@ -40,6 +40,7 @@ import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { ThreadEntity } from "../../room-components/hooks/types";
 import { FitToPageToolAction } from "@/components/actions/fit-to-page-tool/fit-to-page-tool";
+import { MaterialSwatchToolAction } from "@/components/actions/material-swatch-tool/material-swatch-tool";
 
 export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
@@ -102,4 +103,5 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new FitToPageToolAction(),
   new WeaveGuideToolAction(),
   new WeavePolygonToolAction(),
+  new MaterialSwatchToolAction(),
 ];

@@ -70,6 +70,8 @@ export const useNodeActionName = () => {
         return "Mask";
       case "fuzzy-mask":
         return "Mask";
+      case "material-swatch":
+        return "Material Swatch";
 
       default:
         return "Unknown";
@@ -112,6 +114,8 @@ export const useNodeActionName = () => {
         return "Move";
       case "maskEraserTool":
         return "Eraser";
+      case "materialSwatchTool":
+        return "Material Swatch";
       default:
         return "Unknown";
     }

@@ -12,6 +12,7 @@ import {
   RulerDimensionLine,
   Tag,
   Video,
+  Palette,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
@@ -172,6 +173,19 @@ export const useOtherTools = () => {
         ),
         onClick: () => triggerTool("colorTokenTool"),
         active: () => actualAction === "colorTokenTool",
+      },
+      materialSwatchTool: {
+        icon: <Palette className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Material Swatch tool</p>
+            {formatForDisplay("M")}
+          </div>
+        ),
+        onClick: () => {
+          triggerTool("materialSwatchTool", nodeCreateProps);
+        },
+        active: () => actualAction === "materialSwatchTool",
       },
     }),
     [

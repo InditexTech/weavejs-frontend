@@ -65,6 +65,7 @@ export function ToolsNodeOverlay() {
         "frameTool",
         "textTool",
         "fuzzyMaskTool",
+        "materialSwatchTool",
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");

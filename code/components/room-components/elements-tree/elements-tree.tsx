@@ -37,6 +37,7 @@ import {
   Video,
   Focus,
   X,
+  Palette,
 } from "lucide-react";
 import {
   HoverCard,
@@ -74,6 +75,7 @@ const iconsMap: Record<string, any> = {
   star: Star,
   arrow: MoveUpRight,
   measure: Ruler,
+  "material-swatch": Palette,
 };
 
 function mapElementsToTree(

@@ -37,6 +37,7 @@ import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { ImageWithTitleNode } from "@/components/nodes/image-with-title/image-with-title";
+import { MaterialSwatchNode } from "@/components/nodes/material-swatch/material-swatch";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
 import {
   createCommentDOM,
@@ -259,4 +260,5 @@ export const NODES = (
   new PantoneNode(),
   new ImageWithTitleNode(),
   new WeavePolygonNode(),
+  new MaterialSwatchNode(),
 ];

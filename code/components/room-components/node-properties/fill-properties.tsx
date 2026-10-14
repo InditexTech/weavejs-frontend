@@ -77,6 +77,7 @@ export function FillProperties() {
       "fuzzy-mask",
       "text",
       "frame",
+      "material-swatch",
     ].includes(actualNode.type)
   ) {
     return null;

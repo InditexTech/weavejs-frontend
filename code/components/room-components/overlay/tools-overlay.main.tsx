@@ -30,6 +30,7 @@ import {
   Frame,
   EllipsisVertical,
   Pentagon,
+  Palette,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -648,6 +649,18 @@ export function ToolsOverlayMain() {
                   }}
                 >
                   <Tag size={20} strokeWidth={1} /> Color Reference tool
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
+                  onPointerDown={() => {
+                    setShapesMenuOpen(false);
+                    setMediaMenuOpen(false);
+                    setOtherToolsMenuOpen(false);
+                    setActualOtherTool("materialSwatchTool");
+                    OTHER_TOOLS["materialSwatchTool"].onClick();
+                  }}
+                >
+                  <Palette size={20} strokeWidth={1} /> Material Swatch tool
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="font-light text-xs">

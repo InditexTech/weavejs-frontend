@@ -32,6 +32,7 @@ import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 import { cn } from "@/lib/utils";
 import { ImageWithTitleProperties } from "../node-properties/image-with-title-properties";
 import { LabelProperties } from "../node-properties/label-properties";
+import { MaterialSwatchProperties } from "../node-properties/material-swatch-properties";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -68,6 +69,7 @@ export const NodeProperties = () => {
         "frameTool",
         "textTool",
         "fuzzyMaskTool",
+        "materialSwatchTool",
       ].includes(actualAction)
     ) {
       setNodePropertiesAction("create");
@@ -202,6 +204,7 @@ export const NodeProperties = () => {
           <StrokeProperties />
           <TextProperties />
           <LabelProperties />
+          <MaterialSwatchProperties />
           <div className="w-full h-[24px]"></div>
         </div>
       </ScrollArea>

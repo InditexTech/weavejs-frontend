@@ -79,6 +79,7 @@ export function StrokeProperties() {
       "text",
       "color-token",
       "frame",
+      "material-swatch",
     ].includes(actualNode.type)
   ) {
     return null;

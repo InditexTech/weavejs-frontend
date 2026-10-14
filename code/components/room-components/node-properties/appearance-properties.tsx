@@ -56,13 +56,16 @@ export function AppearanceProperties() {
 
   if (!instance || !actualAction || !actualNode) return null;
 
-  if (["mask", "fuzzy-mask"].includes(node?.type ?? "")) {
+  if (["mask", "fuzzy-mask", "material-swatch"].includes(node?.type ?? "")) {
     return null;
   }
 
   if (!actualAction && !actualNode) return null;
 
-  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
+  if (
+    ["colorTokenTool", "frameTool", "materialSwatchTool"].includes(actualAction)
+  )
+    return null;
 
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
