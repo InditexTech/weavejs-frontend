@@ -173,6 +173,27 @@ export const useOtherTools = () => {
         onClick: () => triggerTool("colorTokenTool"),
         active: () => actualAction === "colorTokenTool",
       },
+      dimensionTool: {
+        icon: <RulerDimensionLine className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Architectural Dimension tool</p>
+            {formatForDisplay("D")}
+          </div>
+        ),
+        onClick: () => {
+          const scale = measurementReferenceMeasurePixels
+            ? measurementReferenceMeasurePixels /
+              measurementReferenceMeasureUnits
+            : 0.01;
+          instance?.updatePropsAction("dimensionTool", {
+            unit: measurementUnits,
+            unitPerPixel: scale,
+          });
+          triggerTool("dimensionTool");
+        },
+        active: () => actualAction === "dimensionTool",
+      },
     }),
     [
       instance,
@@ -183,6 +204,7 @@ export const useOtherTools = () => {
       nodeCreateProps,
       triggerTool,
       sidebarToggle,
+      setShowSelectFileVideo,
     ],
   );
 

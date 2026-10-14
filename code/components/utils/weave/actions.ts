@@ -32,6 +32,7 @@ import {
 } from "@inditextech/weave-sdk";
 import { type WeaveUser } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../../actions/color-token-tool/color-token-tool";
+import { DimensionToolAction } from "../../actions/dimension-tool/dimension-tool";
 import { ImageTemplateToolAction } from "../../actions/image-template-tool/image-template-tool";
 import { ImageWithTitleToolAction } from "../../actions/image-with-title-tool/image-with-title-tool";
 import { MaskToolAction } from "../../actions/mask-tool/mask-tool";
@@ -55,6 +56,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveStarToolAction(),
   new WeaveStrokeToolAction(),
   // new WeaveRegularPolygonToolAction(),
+  new DimensionToolAction(),
   new ColorTokenToolAction(),
   new ImageTemplateToolAction(),
   new ImageWithTitleToolAction(),

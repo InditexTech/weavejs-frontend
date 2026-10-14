@@ -74,6 +74,7 @@ const iconsMap: Record<string, any> = {
   star: Star,
   arrow: MoveUpRight,
   measure: Ruler,
+  dimension: Ruler,
 };
 
 function mapElementsToTree(

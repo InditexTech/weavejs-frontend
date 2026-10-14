@@ -649,6 +649,18 @@ export function ToolsOverlayMain() {
                 >
                   <Tag size={20} strokeWidth={1} /> Color Reference tool
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-xs cursor-pointer hover:rounded-none w-full"
+                  onPointerDown={() => {
+                    setShapesMenuOpen(false);
+                    setMediaMenuOpen(false);
+                    setOtherToolsMenuOpen(false);
+                    setActualOtherTool("dimensionTool");
+                    OTHER_TOOLS["dimensionTool"].onClick();
+                  }}
+                >
+                  <RulerDimensionLine size={20} strokeWidth={1} /> Dimension tool
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="font-light text-xs">
                   Layout

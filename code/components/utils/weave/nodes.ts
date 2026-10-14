@@ -35,6 +35,7 @@ import {
 } from "@inditextech/weave-types";
 import { PantoneNode } from "@/components/nodes/pantone/pantone";
 import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
+import { DimensionNode } from "@/components/nodes/dimension/dimension";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
 import { ImageWithTitleNode } from "@/components/nodes/image-with-title/image-with-title";
 import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
@@ -254,6 +255,7 @@ export const NODES = (
   }),
   new WeaveConnectorNode(),
   new WeaveMeasureNode(),
+  new DimensionNode(),
   new ColorTokenNode(),
   new ImageTemplateNode(),
   new PantoneNode(),

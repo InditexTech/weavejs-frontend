@@ -64,6 +64,8 @@ export const useNodeActionName = () => {
         return "Arrow";
       case "color-token":
         return "Color Token";
+      case "dimension":
+        return "Dimension";
       case "frame":
         return "Frame";
       case "mask":
@@ -100,6 +102,8 @@ export const useNodeActionName = () => {
         return "Stroke";
       case "colorTokenTool":
         return "Color Token";
+      case "dimensionTool":
+        return "Dimension";
       case "frameTool":
         return "Frame";
       case "textTool":
