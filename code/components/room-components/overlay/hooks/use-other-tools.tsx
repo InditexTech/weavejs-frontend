@@ -11,6 +11,7 @@ import {
   MessageSquare,
   RulerDimensionLine,
   Tag,
+  StickyNote,
   Video,
 } from "lucide-react";
 import { SidebarActive, useCollaborationRoom } from "@/store/store";
@@ -172,6 +173,17 @@ export const useOtherTools = () => {
         ),
         onClick: () => triggerTool("colorTokenTool"),
         active: () => actualAction === "colorTokenTool",
+      },
+      stickyNoteTool: {
+        icon: <StickyNote className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="flex gap-3 justify-start items-center">
+            <p>Sticky Note tool</p>
+            {formatForDisplay("S")}
+          </div>
+        ),
+        onClick: () => triggerTool("stickyNoteTool"),
+        active: () => actualAction === "stickyNoteTool",
       },
     }),
     [

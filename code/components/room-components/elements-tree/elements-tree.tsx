@@ -36,6 +36,7 @@ import {
   Ruler,
   Video,
   Focus,
+  StickyNote,
   X,
 } from "lucide-react";
 import {
@@ -64,6 +65,7 @@ const iconsMap: Record<string, any> = {
   group: Group,
   video: Video,
   "color-token": Tag,
+  "sticky-note": StickyNote,
   connector: ChevronsLeftRightEllipsis,
   line: Spline,
   "stroke-single": Spline,

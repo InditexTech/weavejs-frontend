@@ -62,6 +62,7 @@ export function ToolsNodeOverlay() {
         "strokeTool",
         "arrowTool",
         "colorTokenTool",
+        "stickyNoteTool",
         "frameTool",
         "textTool",
         "fuzzyMaskTool",

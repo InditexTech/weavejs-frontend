@@ -13,6 +13,7 @@ import { StrokeProperties } from "./../node-properties/stroke-properties";
 import { TextProperties } from "./../node-properties/text-properties";
 import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
+import { StickyNoteProperties } from "../node-properties/sticky-note-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
 import { EyeOff, Lock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -188,6 +189,7 @@ export const NodeProperties = () => {
           <ImageProperties />
           <ImageWithTitleProperties />
           <ColorTokenProperties />
+          <StickyNoteProperties />
           <ImageTemplateProperties />
           <FrameProperties />
           <PositionProperties />

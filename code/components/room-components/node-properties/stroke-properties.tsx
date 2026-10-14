@@ -78,6 +78,7 @@ export function StrokeProperties() {
       "fuzzy-mask",
       "text",
       "color-token",
+      "sticky-note",
       "frame",
     ].includes(actualNode.type)
   ) {

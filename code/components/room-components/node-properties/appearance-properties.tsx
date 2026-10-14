@@ -62,7 +62,7 @@ export function AppearanceProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
+  if (["colorTokenTool", "frameTool", "stickyNoteTool"].includes(actualAction)) return null;
 
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">

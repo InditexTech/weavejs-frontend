@@ -68,6 +68,7 @@ export function FillProperties() {
       "image-with-title",
       "image-template",
       "color-token",
+      "sticky-note",
       "line",
       "arrow",
       "stroke-single",
