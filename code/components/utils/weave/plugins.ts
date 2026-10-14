@@ -40,6 +40,7 @@ import { OPERATIONS_MAP } from "./constants";
 import { ExportAreaReferencePlugin } from "@/components/plugins/export-area-reference/export-area-reference";
 import { EXPORT_AREA_SIZES } from "@/components/room-components/reference-area-size-selector";
 import { EXPORT_AREA_REFERENCE_PLUGIN_KEY } from "@/components/plugins/export-area-reference/constants";
+import { SmartGuidesPlugin } from "@/components/plugins/smart-guides/smart-guides";
 
 export const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageGridPlugin({
@@ -356,6 +357,12 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
     config: {
       sizes: EXPORT_AREA_SIZES,
       initialSize: "4K",
+    },
+  }),
+  new SmartGuidesPlugin({
+    config: {
+      snapTolerance: 6,
+      showGapDistances: true,
     },
   }),
 ];
