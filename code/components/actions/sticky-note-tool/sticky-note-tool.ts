@@ -86,32 +86,24 @@ export class StickyNoteToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        e.stopPropagation();
+    const onContainerKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
         this.cancelAction();
-        return;
       }
-    });
+    };
+    stage.container().addEventListener("keydown", onContainerKeyDown);
 
-    stage.on("pointerdown", (e) => {
-      this.setTapStart(e);
+    stage.on("pointerdown", (event) => {
+      this.setTapStart(event);
+      const { pointerId, clientX, clientY } = event.evt;
+      this.pointers.set(pointerId, { x: clientX, y: clientY });
 
-      this.pointers.set(e.evt.pointerId, {
-        x: e.evt.clientX,
-        y: e.evt.clientY,
-      });
-
-      if (
-        this.pointers.size === 2 &&
-        this.instance.getActiveAction() === STICKY_NOTE_ACTION_NAME
-      ) {
+      const isCurrentTool = this.instance.getActiveAction() === STICKY_NOTE_ACTION_NAME;
+      if (this.pointers.size === 2 && isCurrentTool) {
         this.state = STICKY_NOTE_TOOL_STATE.ADDING;
-        return;
-      }
-
-      if (this.state === STICKY_NOTE_TOOL_STATE.ADDING) {
+      } else if (this.state === STICKY_NOTE_TOOL_STATE.ADDING) {
         this.state = STICKY_NOTE_TOOL_STATE.DEFINING_SIZE;
       }
     });
