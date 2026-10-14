@@ -6,7 +6,7 @@ import { WeaveElementAttributes } from "@inditextech/weave-types";
 import { MATERIAL_CATEGORIES } from "./constants";
 
 export type MaterialCategoryType =
-  (typeof MATERIAL_CATEGORIES)[keyof typeof MATERIAL_CATEGORIES] | string;
+  (typeof MATERIAL_CATEGORIES)[keyof typeof MATERIAL_CATEGORIES];
 
 export type MaterialSwatchAttributes = WeaveElementAttributes & {
   materialName?: string;

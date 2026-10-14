@@ -185,7 +185,7 @@ export class MaterialSwatchNode extends WeaveNode {
       text: finishCode,
       fontSize: 10,
       fontFamily: "Inter, sans-serif",
-      fill: isDark ? "#71717A" : "#71717A",
+      fill: isDark ? "#A1A1AA" : "#71717A",
       width: width - 28,
       ellipsis: true,
       listening: false,
@@ -235,89 +235,88 @@ export class MaterialSwatchNode extends WeaveNode {
 
     group.setAttrs({ width, height });
 
-    const cardShadow = group.findOne(`#${id}-shadow-card`) as Konva.Rect;
-    if (cardShadow) {
-      cardShadow.setAttrs({
-        width,
-        height,
-        fill: isDark ? "#18181B" : "#FFFFFF",
-        stroke: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)",
-      });
-    }
+    this.updateCardSurfaces(group, id, width, height, sampleH, isDark, color);
+    this.updateCardTypography(group, id, width, specH, sampleH, isDark, category, materialName, finishCode, color);
+  }
 
-    const sampleRect = group.findOne(`#${id}-sample-rect`) as Konva.Rect;
-    if (sampleRect) {
-      sampleRect.setAttrs({
-        width,
-        height: sampleH,
-        fill: color,
-      });
-    }
+  private updateCardSurfaces(
+    group: Konva.Group,
+    id: string,
+    width: number,
+    height: number,
+    sampleH: number,
+    isDark: boolean,
+    color: string,
+  ): void {
+    const cardShadow = group.findOne(`#${id}-shadow-card`) as Konva.Rect | undefined;
+    cardShadow?.setAttrs({
+      width,
+      height,
+      fill: isDark ? "#18181B" : "#FFFFFF",
+      stroke: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)",
+    });
 
-    const sheen = group.findOne(`#${id}-sheen`) as Konva.Line;
-    if (sheen) {
-      sheen.setAttrs({
-        points: [0, 0, width * 0.45, 0, 0, sampleH * 0.45],
-      });
-    }
+    const sampleRect = group.findOne(`#${id}-sample-rect`) as Konva.Rect | undefined;
+    sampleRect?.setAttrs({ width, height: sampleH, fill: color });
 
-    const divider = group.findOne(`#${id}-divider`) as Konva.Line;
-    if (divider) {
-      divider.setAttrs({
-        points: [0, sampleH, width, sampleH],
-        stroke: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)",
-      });
-    }
+    const sheen = group.findOne(`#${id}-sheen`) as Konva.Line | undefined;
+    sheen?.setAttrs({ points: [0, 0, width * 0.45, 0, 0, sampleH * 0.45] });
 
-    const specGroup = group.findOne(`#${id}-spec-group`) as Konva.Group;
-    if (specGroup) {
-      specGroup.setAttrs({
-        y: sampleH,
-        width,
-        height: specH,
-      });
-    }
+    const divider = group.findOne(`#${id}-divider`) as Konva.Line | undefined;
+    divider?.setAttrs({
+      points: [0, sampleH, width, sampleH],
+      stroke: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)",
+    });
+  }
 
-    const categoryText = group.findOne(`#${id}-category-text`) as Konva.Text;
-    const categoryBg = group.findOne(`#${id}-category-bg`) as Konva.Rect;
+  private updateCardTypography(
+    group: Konva.Group,
+    id: string,
+    width: number,
+    specH: number,
+    sampleH: number,
+    isDark: boolean,
+    category: string,
+    materialName: string,
+    finishCode: string,
+    color: string,
+  ): void {
+    const specGroup = group.findOne(`#${id}-spec-group`) as Konva.Group | undefined;
+    specGroup?.setAttrs({ y: sampleH, width, height: specH });
+
+    const categoryText = group.findOne(`#${id}-category-text`) as Konva.Text | undefined;
+    const categoryBg = group.findOne(`#${id}-category-bg`) as Konva.Rect | undefined;
     if (categoryText && categoryBg) {
       categoryText.setAttrs({
         text: category.toUpperCase(),
         fill: isDark ? "#A1A1AA" : "#71717A",
       });
-      const pillW = categoryText.width() + 12;
-      const pillH = categoryText.height() + 4;
       categoryBg.setAttrs({
-        width: pillW,
-        height: pillH,
+        width: categoryText.width() + 12,
+        height: categoryText.height() + 4,
         fill: isDark ? "rgba(255, 255, 255, 0.08)" : "#F4F4F5",
       });
     }
 
-    const nameText = group.findOne(`#${id}-name-text`) as Konva.Text;
-    if (nameText) {
-      nameText.setAttrs({
-        text: materialName,
-        fill: isDark ? "#FAFAFA" : "#18181B",
-        width: width - 36,
-      });
-    }
+    const nameText = group.findOne(`#${id}-name-text`) as Konva.Text | undefined;
+    nameText?.setAttrs({
+      text: materialName,
+      fill: isDark ? "#FAFAFA" : "#18181B",
+      width: width - 36,
+    });
 
-    const finishText = group.findOne(`#${id}-finish-text`) as Konva.Text;
-    if (finishText) {
-      finishText.setAttrs({
-        text: finishCode,
-        width: width - 28,
-      });
-    }
+    const finishText = group.findOne(`#${id}-finish-text`) as Konva.Text | undefined;
+    finishText?.setAttrs({
+      text: finishCode,
+      fill: isDark ? "#A1A1AA" : "#71717A",
+      width: width - 28,
+    });
 
-    const colorChip = group.findOne(`#${id}-color-chip`) as Konva.Circle;
-    if (colorChip) {
-      colorChip.setAttrs({
-        x: width - 20,
-        fill: color,
-        stroke: isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.12)",
-      });
-    }
+    const colorChip = group.findOne(`#${id}-color-chip`) as Konva.Circle | undefined;
+    colorChip?.setAttrs({
+      x: width - 20,
+      fill: color,
+      stroke: isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.12)",
+    });
   }
 }
