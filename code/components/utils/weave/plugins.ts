@@ -40,6 +40,7 @@ import { OPERATIONS_MAP } from "./constants";
 import { ExportAreaReferencePlugin } from "@/components/plugins/export-area-reference/export-area-reference";
 import { EXPORT_AREA_SIZES } from "@/components/room-components/reference-area-size-selector";
 import { EXPORT_AREA_REFERENCE_PLUGIN_KEY } from "@/components/plugins/export-area-reference/constants";
+import { MinimapHUDPlugin } from "@/components/plugins/minimap-hud/minimap-hud";
 
 export const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageGridPlugin({
@@ -336,16 +337,7 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
     },
   }),
   new WeaveNodesMultiSelectionFeedbackPlugin(),
-  // new WeaveStageMinimapPlugin({
-  //   config: {
-  //     getContainer: () => {
-  //       return document?.getElementById("minimap") as HTMLElement;
-  //     },
-  //     id: "weave_stage_minimap",
-  //     width: 300,
-  //     fitToContentPadding: 5,
-  //   },
-  // }),
+  new MinimapHUDPlugin(),
   new WeaveStageKeyboardMovePlugin({
     config: {
       movementDelta: 0.5,

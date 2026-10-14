@@ -30,6 +30,7 @@ import {
   Frame,
   EllipsisVertical,
   Pentagon,
+  MapPinned,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -100,8 +101,8 @@ export function ToolsOverlayMain() {
     );
   }, [afterLoadFit, roomPageFetching, roomPageAdding, roomPageRemoving]);
 
-  // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
-  // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   React.useEffect(() => {
     if (
@@ -730,25 +731,24 @@ export function ToolsOverlayMain() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {/* <ToolbarButton
-          className="rounded-none !w-[40px]"
-          icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
-          disabled={
-            weaveConnectionStatus !== WEAVE_STORE_CONNECTION_STATUS.CONNECTED
-          }
-          active={showMinimap}
-          onClick={() => {
-            setShowMinimap(!showMinimap);
-          }}
-          label={
-            <div className="flex gap-3 justify-start items-center">
-              <p>Minimap</p>
-            </div>
-          }
-          tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-          tooltipAlign="center"
-        />
-        <ToolbarDivider orientation={barOrientation === "horizontal" ? "vertical" : "horizontal"} /> */}
+          <ToolbarButton
+            className="rounded-none !w-[40px]"
+            icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}
+            disabled={!isRoomReady}
+            active={showMinimap}
+            onClick={() => {
+              setShowMinimap(!showMinimap);
+            }}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Minimap</p>
+                {formatForDisplay("N")}
+              </div>
+            }
+            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
+            tooltipAlign="center"
+            size="medium"
+          />
           <ToolbarDivider
             orientation={
               barOrientation === "horizontal" ? "vertical" : "horizontal"

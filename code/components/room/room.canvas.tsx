@@ -137,10 +137,10 @@ export const RoomCanvas = React.memo(() => {
           <div
             id="minimap"
             className={cn(
-              "absolute bottom-[16px] right-[16px] border border-[#c9c9c9] w-[460px] w-auto bg-white z-[11]",
+              "absolute bottom-[16px] right-[16px] border border-[#e2e8f0] dark:border-[#27272a] shadow-lg rounded-lg overflow-hidden bg-white/95 dark:bg-[#18181b]/95 backdrop-blur-sm z-[11] transition-all",
               {
-                ["visible"]: showMinimap,
-                ["invisible"]: !showMinimap,
+                ["visible pointer-events-auto opacity-100"]: showMinimap,
+                ["invisible pointer-events-none opacity-0"]: !showMinimap,
               },
             )}
           ></div>

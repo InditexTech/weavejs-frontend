@@ -41,6 +41,8 @@ export function useKeyboardHandler() {
   const threadsEnabled = useCollaborationRoom(
     (state) => state.features.threads,
   );
+  const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
+  const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown, forceExecution?: boolean) => {
@@ -459,6 +461,16 @@ export function useKeyboardHandler() {
       } else {
         usersPointersPlugin.enable();
       }
+    },
+    {
+      enabled: keysEnabled,
+    },
+  );
+
+  useHotkey(
+    { key: "N", mod: false, shift: false },
+    () => {
+      setShowMinimap(!showMinimap);
     },
     {
       enabled: keysEnabled,
