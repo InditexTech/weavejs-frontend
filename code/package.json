@@ -88,7 +88,7 @@
     "@tanstack/react-hotkeys": "^0.4.1",
     "@tanstack/react-query": "^5.67.1",
     "@tanstack/react-router": "1.169.2",
-    "@tanstack/react-start": "1.167.64",
+    "@tanstack/react-start": "1.169.3",
     "@unpic/react": "^1.0.2",
     "@xyflow/react": "^12.10.2",
     "ai": "^6.0.191",
