@@ -13,4 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Use `WeaveTextV2Node` (native on-canvas text editing) in place of `WeaveTextNode` and warn on large text nodes (`onTextSizeWarning`).
+
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/HEAD

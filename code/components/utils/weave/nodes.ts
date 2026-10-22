@@ -10,7 +10,7 @@ import {
   WeaveGroupNode,
   WeaveRectangleNode,
   WeaveEllipseNode,
-  WeaveTextNode,
+  WeaveTextV2Node,
   WeaveImageNode,
   WeaveStarNode,
   WeaveLineNode,
@@ -60,7 +60,7 @@ export const NODES = (
   new WeaveLineNode(),
   new WeaveStrokeNode(),
   new WeaveStrokeSingleNode(),
-  new WeaveTextNode({
+  new WeaveTextV2Node({
     config: {
       outline: {
         enabled: true,
@@ -75,8 +75,10 @@ export const NODES = (
         defaultColor: "#1155ccff",
         hoverColor: "#3d7be0ff",
       },
+      sizeWarning: { threshold: 200_000 },
     } as DeepPartial<WeaveTextProperties> & {
       link: { defaultColor: string; hoverColor: string };
+      sizeWarning: { threshold: number };
     },
   }),
   new WeaveImageNode({
