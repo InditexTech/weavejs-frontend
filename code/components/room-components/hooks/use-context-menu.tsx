@@ -8,6 +8,7 @@ import {
   WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
+  WEAVE_IMAGE_CROP_END_TYPE,
 } from "@inditextech/weave-sdk";
 import { Vector2d } from "konva/lib/types";
 import {
@@ -37,6 +38,8 @@ import {
   PackageOpen,
   Paperclip,
   PanelLeftRightDashed,
+  FlipHorizontal,
+  FlipVertical,
 } from "lucide-react";
 import { useExportPageToImageServerSide } from "./use-export-page-to-image-server-side";
 import { ImageTemplateNode } from "@/components/nodes/image-template/image-template";
@@ -138,6 +141,41 @@ function useContextMenu() {
 
       const hasLinkedImageNode =
         linkedNode !== null && linkedNode.getAttrs().nodeType === "image";
+
+      if (isSingleImage) {
+        // NATIVE IMAGE FLIP
+        const flipAxes = [
+          {
+            axis: "horizontal",
+            label: "Flip horizontally",
+            icon: FlipHorizontal,
+          },
+          { axis: "vertical", label: "Flip vertically", icon: FlipVertical },
+        ] as const;
+        for (const { axis, label, icon: Icon } of flipAxes) {
+          options.push({
+            id: `flip-image-${axis}`,
+            type: "button",
+            label: (
+              <div className="w-full flex justify-between items-center">
+                <div>{label}</div>
+              </div>
+            ),
+            icon: <Icon size={16} />,
+            disabled: !!singleLocked,
+            onClick: () => {
+              const imageNode = nodes[0].instance as Konva.Group;
+              imageNode.closeCrop(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+              instance.flipImage(imageNode, { axis });
+              setContextMenuShow(false);
+            },
+          });
+        }
+        options.push({
+          id: "div-flip-image",
+          type: "divider",
+        });
+      }
 
       if (nodes.length > 0 && aiChatEnabled) {
         // LINK IMAGE AS ATTACHMENT TOOLS
