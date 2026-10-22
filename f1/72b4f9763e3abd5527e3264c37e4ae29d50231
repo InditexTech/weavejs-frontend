@@ -1,0 +1,25 @@
+code/CHANGELOG.md
+  s_36b8948f363f64::t_acc4aeb562f0e6 16-19
+code/components/room-components/hooks/use-on-paste-external-text.ts
+  s_36b8948f363f64::t_9b39df9dff69fb 15,117
+code/components/room-components/overlay/node-toolbar.tsx
+  s_36b8948f363f64::t_dae61ece752b85 76,191-212,2381
+code/components/utils/weave/nodes.ts
+  s_36b8948f363f64::t_96c7dd9d671ba1 13,63,78,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f172b4f9763e3abd5527e3264c37e4ae29d50231",
+  "prompts": {},
+  "sessions": {
+    "s_36b8948f363f64": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c2f4fa7ffeKg61TdnwvEG2it",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
