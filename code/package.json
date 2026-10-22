@@ -32,7 +32,9 @@
     "@emnapi/core": "1.11.2",
     "@emnapi/runtime": "1.11.2",
     "@emnapi/wasi-threads": "1.2.2",
-    "@tanstack/start-plugin-core": "1.169.19",
+    "@tanstack/start-plugin-core": "1.171.49",
+    "@tanstack/start-server-core": "1.169.39",
+    "katex": "0.18.2",
     "canvas": "3.2.0",
     "konva": "10.0.2",
     "linkify-it": "5.0.2",
@@ -90,8 +92,8 @@
     "@tailwindcss/postcss": "^4.2.2",
     "@tanstack/react-hotkeys": "^0.4.1",
     "@tanstack/react-query": "^5.67.1",
-    "@tanstack/react-router": "1.169.2",
-    "@tanstack/react-start": "1.167.64",
+    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-start": "1.168.60",
     "@unpic/react": "^1.0.2",
     "@xyflow/react": "^12.10.2",
     "ai": "^6.0.191",
@@ -192,8 +194,8 @@
     "tsx": "^4.20.3",
     "typescript": "^5",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.0",
+    "vite": "^8.3.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }
