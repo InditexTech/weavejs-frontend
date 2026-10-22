@@ -29,9 +29,9 @@
     "version:release": "npm ci && lerna version --no-git-tag-version --no-push --force-publish --exact --yes $RELEASE_VERSION && npm version $RELEASE_VERSION"
   },
   "overrides": {
-    "@emnapi/core": "1.11.2",
-    "@emnapi/runtime": "1.11.2",
-    "@emnapi/wasi-threads": "1.2.2",
+    "@emnapi/core": "$@emnapi/core",
+    "@emnapi/runtime": "$@emnapi/runtime",
+    "@emnapi/wasi-threads": "$@emnapi/wasi-threads",
     "@tanstack/start-plugin-core": "1.171.49",
     "@tanstack/start-server-core": "1.169.39",
     "katex": "0.18.2",
@@ -162,6 +162,9 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@emnapi/core": "1.11.2",
+    "@emnapi/runtime": "1.11.2",
+    "@emnapi/wasi-threads": "1.2.2",
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.0",
     "@tailwindcss/vite": "^4.2.2",
