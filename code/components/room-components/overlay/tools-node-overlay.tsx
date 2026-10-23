@@ -64,6 +64,7 @@ export function ToolsNodeOverlay() {
         "colorTokenTool",
         "frameTool",
         "textTool",
+        "richTextTool",
         "fuzzyMaskTool",
       ].includes(actualAction)
     ) {
@@ -191,11 +192,13 @@ export function ToolsNodeOverlay() {
       animate="visible"
       exit="hidden"
       variants={bottomElementVariants}
-      className={cn("pointer-events-none absolute right-[8px] left-[8px] top-[8px] flex flex-col gap-5 justify-center items-center",
+      className={cn(
+        "pointer-events-none absolute right-[8px] left-[8px] top-[8px] flex flex-col gap-5 justify-center items-center",
         {
           ["!top-[62px]"]: viewType === "floating",
-          ["!top-[8px]"]: viewType === "fixed"
-        })}
+          ["!top-[8px]"]: viewType === "fixed",
+        },
+      )}
     >
       {croppingTools.length > 0 && (
         <Toolbar orientation="horizontal">{croppingTools}</Toolbar>

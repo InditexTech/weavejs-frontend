@@ -67,6 +67,7 @@ export const NodeProperties = () => {
         "colorTokenTool",
         "frameTool",
         "textTool",
+        "richTextTool",
         "fuzzyMaskTool",
       ].includes(actualAction)
     ) {

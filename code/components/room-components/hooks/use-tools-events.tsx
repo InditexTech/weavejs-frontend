@@ -973,7 +973,7 @@ export const useToolsEvents = () => {
     };
 
     const handleTextCancelled = (activeAction: string) => {
-      if (activeAction !== "textTool") {
+      if (activeAction !== "textTool" && activeAction !== "richTextTool") {
         toast.dismiss(toastId);
       }
     };

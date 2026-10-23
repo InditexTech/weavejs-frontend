@@ -76,9 +76,13 @@ export const NODES = (
         hoverColor: "#3d7be0ff",
       },
       sizeWarning: { threshold: 200_000 },
+      edition: { outline: { padding: 0 } },
+      richText: { enabled: false, indentStep: 1.5 },
     } as DeepPartial<WeaveTextProperties> & {
       link: { defaultColor: string; hoverColor: string };
       sizeWarning: { threshold: number };
+      edition: { outline: { padding: number } };
+      richText: { enabled: boolean; indentStep: number };
     },
   }),
   new WeaveImageNode({

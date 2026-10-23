@@ -10,6 +10,7 @@ import {
   Images,
   Square,
   Type,
+  TextCursorInput,
   MousePointer,
   Tag,
   Undo,
@@ -550,6 +551,24 @@ export function ToolsOverlayMain() {
               <div className="flex gap-3 justify-start items-center">
                 <p>Text tool</p>
                 {formatForDisplay("T")}
+              </div>
+            }
+            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
+            tooltipAlign="center"
+            size="medium"
+          />
+          <ToolbarButton
+            className="rounded-none !w-[40px]"
+            icon={
+              <TextCursorInput className="px-2" size={40} strokeWidth={1} />
+            }
+            disabled={!isRoomReady}
+            active={actualAction === "richTextTool"}
+            onClick={() => triggerTool("richTextTool")}
+            label={
+              <div className="flex gap-3 justify-start items-center">
+                <p>Rich text tool</p>
+                {formatForDisplay("Shift+T")}
               </div>
             }
             tooltipSide={barOrientation === "horizontal" ? "top" : "right"}

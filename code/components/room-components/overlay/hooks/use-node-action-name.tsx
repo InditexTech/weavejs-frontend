@@ -104,6 +104,8 @@ export const useNodeActionName = () => {
         return "Frame";
       case "textTool":
         return "Text";
+      case "richTextTool":
+        return "Rich text";
       case "maskTool":
         return "Mask";
       case "fuzzyMaskTool":

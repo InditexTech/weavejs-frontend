@@ -27,6 +27,7 @@ import { InputColor } from "../inputs/input-color";
 import { ToggleIconButton } from "../toggle-icon-button";
 import InputFontFamily from "../inputs/input-font-family";
 import { InputNumber } from "../inputs/input-number";
+import { RichTextProperties } from "./rich-text-properties";
 
 const LIGHT_WEIGHT = 300;
 
@@ -152,7 +153,7 @@ export function TextProperties() {
   if (!actualAction && !actualNode) return null;
 
   if (
-    !["textTool"].includes(actualAction) &&
+    !["textTool", "richTextTool"].includes(actualAction) &&
     !["text"].includes(actualNode.type)
   ) {
     return null;
@@ -633,6 +634,9 @@ export function TextProperties() {
           </>
         )}
       </div>
+      {selectedTextInstance && (
+        <RichTextProperties nodeInstance={selectedTextInstance} />
+      )}
     </div>
   );
 }

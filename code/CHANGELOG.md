@@ -16,5 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Use `WeaveTextV2Node` (native on-canvas text editing) in place of `WeaveTextNode` and warn on large text nodes (`onTextSizeWarning`).
+- Add a Rich text tool (`richTextTool`, `Shift+T`) and a rich text sidebar section (marks, color, size, lists) using the per-node `richText` attribute.
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/HEAD
