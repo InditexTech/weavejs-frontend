@@ -18,6 +18,8 @@ import { useWeave } from "@inditextech/weave-react";
 import { ToggleIconButton } from "../toggle-icon-button";
 import { InputColor } from "../inputs/input-color";
 import { InputNumber } from "../inputs/input-number";
+import InputFontFamily from "../inputs/input-font-family";
+import { Input } from "@/components/ui/input";
 
 // Local structural types for the rich-text API of WeaveTextV2Node
 // (weave-sdk). They are not exported by the published SDK yet.
@@ -39,6 +41,8 @@ type SelectionFormat = {
   strike: MarkQuery;
   color: MarkQuery;
   size: MarkQuery;
+  family: MarkQuery;
+  link: MarkQuery;
   list: { kind: "ul" | "ol" | "none" | "mixed"; depth?: number };
 };
 interface RichTextHandler {
@@ -77,6 +81,8 @@ export function RichTextProperties({ nodeInstance }: Readonly<Props>) {
   );
   const enabled = !!handler?.isRichTextEnabled?.(nodeInstance);
 
+  const [linkDraft, setLinkDraft] = React.useState<string>("");
+  const [linkError, setLinkError] = React.useState<string | null>(null);
   const [format, setFormat] = React.useState<SelectionFormat | null>(null);
 
   const refresh = React.useCallback(() => {
@@ -113,7 +119,40 @@ export function RichTextProperties({ nodeInstance }: Readonly<Props>) {
     };
   }, [instance, enabled, nodeInstance, refresh]);
 
+  const currentLink =
+    typeof format?.link.value === "string" ? format.link.value : "";
+  React.useEffect(() => {
+    setLinkDraft(currentLink);
+    setLinkError(null);
+  }, [currentLink]);
+
   if (!handler || !enabled || !format) return null;
+
+  const applyLink = () => {
+    const url = linkDraft.trim();
+    if (url === "") {
+      handler.applyMark(nodeInstance, "link", undefined);
+      return;
+    }
+    try {
+      const u = new URL(url);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error();
+    } catch {
+      setLinkError("Enter a valid http(s) URL");
+      return;
+    }
+    setLinkError(null);
+    if (!handler.applyMark(nodeInstance, "link", url)) {
+      setLinkError("Select some text first");
+    }
+  };
+
+  const baseFamily =
+    (nodeInstance as unknown as { getAttr(k: string): string }).getAttr(
+      "fontFamily",
+    ) ?? "";
+  const familyValue =
+    typeof format.family.value === "string" ? format.family.value : baseFamily;
 
   const toggle = (key: MarkKey) => handler.toggleMark(nodeInstance, key);
 
@@ -152,6 +191,68 @@ export function RichTextProperties({ nodeInstance }: Readonly<Props>) {
             />
           ))}
         </div>
+      </div>
+      <div className="col-span-2">
+        <InputFontFamily
+          keepTextEditing
+          value={familyValue}
+          onChange={(value) => handler.applyMark(nodeInstance, "family", value)}
+        />
+      </div>
+      <div className="col-span-2 flex flex-col gap-1">
+        <div className="text-[12px] text-[#757575] font-inter font-light">
+          Link (selection)
+        </div>
+        <div className="flex gap-1">
+          <Input
+            type="text"
+            placeholder="https://example.com"
+            className="w-full h-[40px] rounded-none !text-[14px] !border-black font-normal text-black focus:outline-none bg-transparent shadow-none"
+            value={linkDraft}
+            onChange={(e) => {
+              setLinkDraft(e.target.value);
+              if (linkError) setLinkError(null);
+            }}
+            onFocus={() => {
+              window.weaveOnFieldFocus = true;
+            }}
+            onBlur={() => {
+              window.weaveOnFieldFocus = false;
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") {
+                e.preventDefault();
+                applyLink();
+              }
+            }}
+          />
+          <button
+            className="px-3 text-[12px] bg-black text-white cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              applyLink();
+            }}
+          >
+            Apply
+          </button>
+          <button
+            className="px-3 text-[12px] bg-white text-black border border-black cursor-pointer disabled:opacity-50"
+            disabled={currentLink === ""}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLinkDraft("");
+              handler.applyMark(nodeInstance, "link", undefined);
+            }}
+          >
+            Remove
+          </button>
+        </div>
+        {linkError && (
+          <div className="text-[11px] text-red-600 font-inter font-light">
+            {linkError}
+          </div>
+        )}
       </div>
       <div className="col-span-2">
         <InputColor

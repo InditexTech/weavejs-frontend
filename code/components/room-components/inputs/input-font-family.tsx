@@ -23,9 +23,11 @@ import { useCollaborationRoom } from "@/store/store";
 function InputFontFamily({
   value,
   onChange,
+  keepTextEditing = false,
 }: {
   value: string;
   onChange: (value: string) => void;
+  keepTextEditing?: boolean;
 }) {
   const [selectedFont, setSelectedFont] = React.useState<string>(value);
   const [open, setOpen] = React.useState(false);
@@ -64,6 +66,7 @@ function InputFontFamily({
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          {...(keepTextEditing ? { "data-weave-text-edit-keep": "" } : {})}
           className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
           align="end"
           side="top"

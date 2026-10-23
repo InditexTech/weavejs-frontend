@@ -179,22 +179,24 @@ export function TextProperties() {
         </div>
       </div> */}
       <div className="grid grid-cols-2 gap-3 w-full">
-        <div className="col-span-2">
-          <InputFontFamily
-            value={`${actualNode.props.fontFamily ?? null}`}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  fontFamily: value,
-                },
-              };
+        {!richNode && (
+          <div className="col-span-2">
+            <InputFontFamily
+              value={`${actualNode.props.fontFamily ?? null}`}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontFamily: value,
+                  },
+                };
 
-              updateElement(updatedNode);
-            }}
-          />
-        </div>
+                updateElement(updatedNode);
+              }}
+            />
+          </div>
+        )}
         {!richNode && (
           <div className="col-span-2">
             <div
@@ -587,7 +589,7 @@ export function TextProperties() {
             />
           </div>
         </div>
-        {selectedTextInstance && textLinkHandler && (
+        {selectedTextInstance && textLinkHandler && !richNode && (
           <>
             <div className="w-full flex justify-between items-center gap-4 col-span-2">
               <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
