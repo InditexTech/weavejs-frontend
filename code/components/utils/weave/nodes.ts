@@ -76,12 +76,25 @@ export const NODES = (
         hoverColor: "#3d7be0ff",
       },
       sizeWarning: { threshold: 200_000 },
-      edition: { outline: { padding: 0 } },
+      edition: {
+        outline: { padding: 0 },
+        // Keeps the caret clear of the app UI (toolbars/sidebars) when the
+        // stage pans to follow it while editing. Tune to the actual UI.
+        followPadding: { top: 100, right: 120, bottom: 140, left: 120 },
+      },
       richText: { enabled: false, indentStep: 1.5 },
     } as DeepPartial<WeaveTextProperties> & {
       link: { defaultColor: string; hoverColor: string };
       sizeWarning: { threshold: number };
-      edition: { outline: { padding: number } };
+      edition: {
+        outline: { padding: number };
+        followPadding: {
+          top: number;
+          right: number;
+          bottom: number;
+          left: number;
+        };
+      };
       richText: { enabled: boolean; indentStep: number };
     },
   }),
