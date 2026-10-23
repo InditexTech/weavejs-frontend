@@ -1,0 +1,41 @@
+code/CHANGELOG.md
+  s_36b8948f363f64::t_e867c35e8769ab 19
+code/components/room-components/hooks/use-keyboard-handler.tsx
+  s_36b8948f363f64::t_13952f45290532 357-370
+code/components/room-components/hooks/use-tools-events.tsx
+  s_36b8948f363f64::t_329c42cf5a1e8b 976
+code/components/room-components/node-properties/rich-text-properties.tsx
+  s_36b8948f363f64::t_16244ac9f517b0 1-218
+code/components/room-components/node-properties/stroke-properties.tsx
+  s_36b8948f363f64::t_63b582c7d7944b 66-70
+code/components/room-components/node-properties/text-properties.tsx
+  s_36b8948f363f64::t_77959afb61e869 30,156,637-639
+code/components/room-components/overlay/hooks/use-node-action-name.tsx
+  s_36b8948f363f64::t_20b364333b8a65 107-108
+code/components/room-components/overlay/node-properties.tsx
+  s_36b8948f363f64::t_10ad50ea4d26b8 70
+code/components/room-components/overlay/tools-node-overlay.tsx
+  s_36b8948f363f64::t_3c44993725f4f5 67,195-196,199-201
+code/components/room-components/overlay/tools-overlay.main.tsx
+  s_36b8948f363f64::t_3eaa7f1d014d86 13,560-577
+code/components/utils/weave/actions.ts
+  s_36b8948f363f64::t_36b1edc1be1296 62
+code/components/utils/weave/nodes.ts
+  s_36b8948f363f64::t_da451663a94975 79-80,84-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "39c8ab1e0ebd778893176cc579da39b36f739b8d",
+  "prompts": {},
+  "sessions": {
+    "s_36b8948f363f64": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c2f4fa7ffeKg61TdnwvEG2it",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
