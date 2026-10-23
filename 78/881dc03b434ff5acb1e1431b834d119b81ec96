@@ -1,0 +1,19 @@
+code/components/room-components/node-properties/text-properties.tsx
+  s_36b8948f363f64::t_0efe7439727a43 113-122,198-219,221,223,251-309,311-313,315-354,356-358,360-402,404-406,408-484
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "78881dc03b434ff5acb1e1431b834d119b81ec96",
+  "prompts": {},
+  "sessions": {
+    "s_36b8948f363f64": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c2f4fa7ffeKg61TdnwvEG2it",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
