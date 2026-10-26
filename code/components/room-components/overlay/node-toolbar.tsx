@@ -1411,8 +1411,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1508,8 +1507,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1605,8 +1603,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1703,8 +1700,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1801,8 +1797,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -2394,7 +2389,11 @@ export const NodeToolbar = () => {
                         return;
                       }
 
-                      nodeHandler.resetSmartLayout(nodeInstance as Konva.Text);
+                      nodeHandler.resetSmartLayout(
+                        nodeInstance as unknown as Parameters<
+                          typeof nodeHandler.resetSmartLayout
+                        >[0],
+                      );
                     }}
                     label={
                       <div className="flex gap-3 justify-start items-center">
