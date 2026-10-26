@@ -701,6 +701,7 @@ export const NodeToolbar = () => {
 
   return (
     <div
+      data-node-toolbar=""
       className={cn("pointer-events-none", {
         ["absolute top-[8px] left-[8px] right-[8px] flex gap-2 justify-center items-center"]:
           breakpoint === "2xl",

@@ -80,7 +80,8 @@ export const NODES = (
         outline: { padding: 0 },
         // Keeps the caret clear of the app UI (toolbars/sidebars) when the
         // stage pans to follow it while editing. Tune to the actual UI.
-        followPadding: { top: 100, right: 120, bottom: 140, left: 120 },
+        // Top is raised to clear the floating text toolbar.
+        followPadding: { top: 160, right: 120, bottom: 140, left: 120 },
       },
       richText: { enabled: false, indentStep: 1.5 },
     } as DeepPartial<WeaveTextProperties> & {

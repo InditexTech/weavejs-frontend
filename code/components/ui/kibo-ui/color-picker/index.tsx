@@ -417,17 +417,62 @@ export const ColorPickerOutput = ({
   );
 };
 
-type PercentageInputProps = ComponentProps<typeof Input>;
+type PercentageInputProps = Omit<ComponentProps<typeof Input>, "value"> & {
+  value: number;
+};
 
-const PercentageInput = ({ className, ...props }: PercentageInputProps) => {
+// Editable alpha (0-100). Commits on Enter / blur.
+const PercentageInput = ({
+  className,
+  value,
+  ...props
+}: PercentageInputProps) => {
+  const { hue, saturation, lightness, setAlpha, onChange } = useColorPicker();
+  const rounded = String(Math.round(value));
+  const [draft, setDraft] = useState(rounded);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) setDraft(rounded);
+  }, [rounded, focused]);
+
+  const commit = () => {
+    const n = Number.parseFloat(draft);
+    if (Number.isNaN(n)) {
+      setDraft(rounded);
+      return;
+    }
+    const next = Math.min(100, Math.max(0, n));
+    setAlpha(next);
+    onChange?.(Color.hsl(hue, saturation, lightness, next / 100).hexa());
+  };
+
   return (
     <div className="relative">
       <Input
-        readOnly
         type="text"
+        inputMode="numeric"
         {...props}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onFocus={() => {
+          setFocused(true);
+          window.weaveOnFieldFocus = true;
+        }}
+        onBlur={() => {
+          setFocused(false);
+          window.weaveOnFieldFocus = false;
+          commit();
+        }}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === "Enter") {
+            e.preventDefault();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
         className={cn(
-          "h-8 w-[3.25rem] rounded-none border-black bg-secondary px-2 text-xs font-inter shadow-none",
+          "h-8 w-[3.25rem] rounded-none border-black bg-white px-2 pr-5 text-xs font-inter shadow-none",
           className,
         )}
       />
@@ -439,6 +484,69 @@ const PercentageInput = ({ className, ...props }: PercentageInputProps) => {
 };
 
 export type ColorPickerFormatProps = HTMLAttributes<HTMLDivElement>;
+
+const HEX_RE = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+const EditableHexInput = ({ hex }: { hex: string }) => {
+  const { setHue, setSaturation, setLightness, setAlpha, onChange } =
+    useColorPicker();
+  const [draft, setDraft] = useState(hex);
+  const [focused, setFocused] = useState(false);
+  const [invalid, setInvalid] = useState(false);
+
+  useEffect(() => {
+    if (!focused) setDraft(hex);
+  }, [hex, focused]);
+
+  const commit = () => {
+    let v = draft.trim();
+    if (v !== "" && !v.startsWith("#")) v = `#${v}`;
+    if (!HEX_RE.test(v)) {
+      setInvalid(true);
+      setDraft(hex);
+      return;
+    }
+    setInvalid(false);
+    const color = Color(v);
+    const [h, s, l] = color.hsl().array();
+    setHue(h);
+    setSaturation(s);
+    setLightness(l);
+    setAlpha(color.alpha() * 100);
+    onChange?.(color.hexa());
+  };
+
+  return (
+    <Input
+      className={cn(
+        "h-8 rounded-none  border-black bg-white px-2 text-xs shadow-none",
+        { "border-red-500": invalid },
+      )}
+      type="text"
+      value={draft}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        setInvalid(false);
+      }}
+      onFocus={() => {
+        setFocused(true);
+        window.weaveOnFieldFocus = true;
+      }}
+      onBlur={() => {
+        setFocused(false);
+        window.weaveOnFieldFocus = false;
+        commit();
+      }}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") {
+          e.preventDefault();
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
+    />
+  );
+};
 
 export const ColorPickerFormat = ({
   className,
@@ -458,12 +566,7 @@ export const ColorPickerFormat = ({
         )}
         {...props}
       >
-        <Input
-          className="h-8 rounded-none  border-black bg-secondary px-2 text-xs shadow-none"
-          readOnly
-          type="text"
-          value={hex}
-        />
+        <EditableHexInput hex={hex} />
         <PercentageInput value={alpha} />
       </div>
     );
@@ -486,7 +589,7 @@ export const ColorPickerFormat = ({
         {rgb.map((value, index) => (
           <Input
             className={cn(
-              "h-8 rounded-r-none  border-black bg-secondary px-2 text-xs shadow-none",
+              "h-8 rounded-r-none  border-black bg-white px-2 text-xs shadow-none",
               index && "rounded-l-none",
               className,
             )}
@@ -513,7 +616,7 @@ export const ColorPickerFormat = ({
         {...props}
       >
         <Input
-          className="h-8 w-full rounded-none border-black bg-secondary px-2 text-xs shadow-none"
+          className="h-8 w-full rounded-none border-black bg-white px-2 text-xs shadow-none"
           readOnly
           type="text"
           value={`rgba(${rgb.join(", ")}, ${alpha}%)`}
@@ -540,7 +643,7 @@ export const ColorPickerFormat = ({
         {hsl.map((value, index) => (
           <Input
             className={cn(
-              "h-8 rounded-none border-black bg-secondary px-2 text-xs shadow-none",
+              "h-8 rounded-none border-black bg-white px-2 text-xs shadow-none",
               index && "rounded-none",
               className,
             )}

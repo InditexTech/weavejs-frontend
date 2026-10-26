@@ -58,7 +58,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new ColorTokenToolAction(),
   new ImageTemplateToolAction(),
   new ImageWithTitleToolAction(),
-  new WeaveTextToolAction(),
+  new WeaveTextToolAction({ props: { richText: false } }),
   new WeaveTextToolAction({ name: "richTextTool", props: { richText: true } }),
   new WeaveVideoToolAction(),
   new WeaveConnectorToolAction(),

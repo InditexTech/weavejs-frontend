@@ -10,7 +10,7 @@ import {
   Images,
   Square,
   Type,
-  TextCursorInput,
+  ALargeSmall,
   MousePointer,
   Tag,
   Undo,
@@ -559,9 +559,7 @@ export function ToolsOverlayMain() {
           />
           <ToolbarButton
             className="rounded-none !w-[40px]"
-            icon={
-              <TextCursorInput className="px-2" size={40} strokeWidth={1} />
-            }
+            icon={<ALargeSmall className="px-2" size={40} strokeWidth={1} />}
             disabled={!isRoomReady}
             active={actualAction === "richTextTool"}
             onClick={() => triggerTool("richTextTool")}

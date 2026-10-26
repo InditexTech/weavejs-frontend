@@ -10,7 +10,6 @@ import { SizeProperties } from "./../node-properties/size-properties";
 import { AppearanceProperties } from "./../node-properties/appearance-properties";
 import { FillProperties } from "./../node-properties/fill-properties";
 import { StrokeProperties } from "./../node-properties/stroke-properties";
-import { TextProperties } from "./../node-properties/text-properties";
 import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
@@ -201,7 +200,6 @@ export const NodeProperties = () => {
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />
-          <TextProperties />
           <LabelProperties />
           <div className="w-full h-[24px]"></div>
         </div>

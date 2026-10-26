@@ -133,6 +133,7 @@ export function useOnPasteExternalText() {
             align: "left",
             verticalAlign: "top",
             strokeEnabled: false,
+            richText: false,
             text: text.trim(),
           });
 

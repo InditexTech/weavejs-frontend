@@ -28,6 +28,7 @@ import { LlmSetupDialog } from "../room-components/overlay/llm-setup";
 import { AppConfigurationDialog } from "../room-components/overlay/app-configuration";
 import { ToolsOverlay } from "../room-components/overlay/tools-overlay";
 import { NodeToolbar } from "../room-components/overlay/node-toolbar";
+import { TextToolbar } from "../room-components/overlay/text-toolbar/text-toolbar";
 import ChatBotPrompt from "../room-components/ai-components/chatbot.prompt";
 import { ContextMenuRender } from "../room-components/context-menu";
 import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
@@ -126,6 +127,7 @@ export const RoomLayout = React.memo(
             </>
           )}
           {roomLoaded && <NodeToolbar />}
+          {roomLoaded && <TextToolbar />}
           {<ToolsOverlay />}
           {roomFullyLoaded && (
             <>
