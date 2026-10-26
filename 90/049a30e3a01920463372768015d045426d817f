@@ -1,0 +1,47 @@
+code/components/room-components/hooks/use-load-room.tsx
+  s_927318cfd205cd::t_732398ce647de1 36,38-43
+code/components/room-components/overlay/text-toolbar/text-toolbar.tsx
+  s_927318cfd205cd::t_a7ec06ee045939 219,231,256-260,569,643,792-816
+code/components/room-components/overlay/text-toolbar/types.ts
+  s_927318cfd205cd::t_5429821334d272 81-82,89-92,111-189
+code/components/room-components/overlay/text-toolbar/use-text-toolbar-actions.ts
+  s_927318cfd205cd::t_15d751a6bbaf40 8,43,47-57,72-81
+code/components/room-components/overlay/text-toolbar/use-text-toolbar-state.ts
+  s_927318cfd205cd::t_3f079cc0dff289 9,11,36-100,167-182,204-207
+code/components/room/room.canvas.tsx
+  s_927318cfd205cd::t_517660fad99c21 48-54,100,118
+code/components/room/room.layout.tsx
+  s_927318cfd205cd::t_a469487e846a44 100-101,172-173
+code/components/room/room.tsx
+  s_927318cfd205cd::t_0e43c6b74faf44 63,117-122,124-130,313-315,319-325,365-379,382,406-415
+code/components/use-cases/standalone/weave.ts
+  s_927318cfd205cd::t_d45226c46ea706 221-222
+code/components/utils/weave/nodes.ts
+  s_927318cfd205cd::t_eea38161c7cb0b 58-59,281
+code/src/routeTree.gen.ts
+  s_36b8948f363f64::t_bad43584c8d033 13,16,19-22,30-34,45-47,61-80,199-205,220-224,227-231,234-238,248-252,255-266
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "90049a30e3a01920463372768015d045426d817f",
+  "prompts": {},
+  "sessions": {
+    "s_36b8948f363f64": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c2f4fa7ffeKg61TdnwvEG2it",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_927318cfd205cd": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8793fcddffeI6jt1a9Hb3Qa7b",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
