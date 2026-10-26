@@ -1,0 +1,25 @@
+code/components/use-cases/standalone/weave.ts
+  s_46c8b79c1b6776::t_e30adbeb1fa74b 221-222
+code/components/utils/weave/nodes.ts
+  s_46c8b79c1b6776::t_614e5f0548e147 58-59,281
+code/package-lock.json
+  s_46c8b79c1b6776::t_2f2dcb5cee0c13 19-25,1232,1255,2394-2396,2399-2400,2416-2418,2421-2422,2445-2447,2450-2451,2478-2480,2483,2518-2520,2525-2526,2589-2591,2594-2595,2607-2609
+code/package.json
+  s_46c8b79c1b6776::t_c45cf6f21a72ac 54-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "db74c3fcc02a987229656ff5788233d3318ad2a5",
+  "prompts": {},
+  "sessions": {
+    "s_46c8b79c1b6776": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e874b5222ffeZ73mhSDfrSBmMb",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
