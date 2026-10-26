@@ -9,27 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ComingSoonRouteImport } from './routes/coming-soon'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComingSoonRouteImport } from './routes/coming-soon'
 import { Route as ErrorIndexRouteImport } from './routes/error/index'
-import { Route as RoomsAccessLinkRouteImport } from './routes/rooms/access-link'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
-import { Route as V1StartupIndexRouteImport } from './routes/v1/startup/index'
-import { Route as V1ReadinessIndexRouteImport } from './routes/v1/readiness/index'
-import { Route as V1PreviewIndexRouteImport } from './routes/v1/preview/index'
-import { Route as V1LivenessIndexRouteImport } from './routes/v1/liveness/index'
+import { Route as RoomsAccessLinkRouteImport } from './routes/rooms/access-link'
 import { Route as UseCasesStandaloneIndexRouteImport } from './routes/use-cases/standalone/index'
 import { Route as UseCasesStandaloneInstanceIdRouteImport } from './routes/use-cases/standalone/$instanceId'
+import { Route as V1LivenessIndexRouteImport } from './routes/v1/liveness/index'
+import { Route as V1PreviewIndexRouteImport } from './routes/v1/preview/index'
+import { Route as V1ReadinessIndexRouteImport } from './routes/v1/readiness/index'
+import { Route as V1StartupIndexRouteImport } from './routes/v1/startup/index'
 import { Route as ApiAiChatsChatIdRouteImport } from './routes/api/ai/chats/$chatId'
 
-const ComingSoonRoute = ComingSoonRouteImport.update({
-  id: '/coming-soon',
-  path: '/coming-soon',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComingSoonRoute = ComingSoonRouteImport.update({
+  id: '/coming-soon',
+  path: '/coming-soon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorIndexRoute = ErrorIndexRouteImport.update({
@@ -37,34 +37,14 @@ const ErrorIndexRoute = ErrorIndexRouteImport.update({
   path: '/error/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RoomsAccessLinkRoute = RoomsAccessLinkRouteImport.update({
-  id: '/rooms/access-link',
-  path: '/rooms/access-link',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
   id: '/rooms/$roomId',
   path: '/rooms/$roomId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const V1StartupIndexRoute = V1StartupIndexRouteImport.update({
-  id: '/v1/startup/',
-  path: '/v1/startup/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const V1ReadinessIndexRoute = V1ReadinessIndexRouteImport.update({
-  id: '/v1/readiness/',
-  path: '/v1/readiness/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const V1PreviewIndexRoute = V1PreviewIndexRouteImport.update({
-  id: '/v1/preview/',
-  path: '/v1/preview/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const V1LivenessIndexRoute = V1LivenessIndexRouteImport.update({
-  id: '/v1/liveness/',
-  path: '/v1/liveness/',
+const RoomsAccessLinkRoute = RoomsAccessLinkRouteImport.update({
+  id: '/rooms/access-link',
+  path: '/rooms/access-link',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UseCasesStandaloneIndexRoute = UseCasesStandaloneIndexRouteImport.update({
@@ -78,6 +58,26 @@ const UseCasesStandaloneInstanceIdRoute =
     path: '/use-cases/standalone/$instanceId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const V1LivenessIndexRoute = V1LivenessIndexRouteImport.update({
+  id: '/v1/liveness/',
+  path: '/v1/liveness/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V1PreviewIndexRoute = V1PreviewIndexRouteImport.update({
+  id: '/v1/preview/',
+  path: '/v1/preview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V1ReadinessIndexRoute = V1ReadinessIndexRouteImport.update({
+  id: '/v1/readiness/',
+  path: '/v1/readiness/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V1StartupIndexRoute = V1StartupIndexRouteImport.update({
+  id: '/v1/startup/',
+  path: '/v1/startup/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiChatsChatIdRoute = ApiAiChatsChatIdRouteImport.update({
   id: '/api/ai/chats/$chatId',
   path: '/api/ai/chats/$chatId',
@@ -189,18 +189,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/coming-soon': {
-      id: '/coming-soon'
-      path: '/coming-soon'
-      fullPath: '/coming-soon'
-      preLoaderRoute: typeof ComingSoonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coming-soon': {
+      id: '/coming-soon'
+      path: '/coming-soon'
+      fullPath: '/coming-soon'
+      preLoaderRoute: typeof ComingSoonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error/': {
@@ -210,13 +210,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ErrorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rooms/access-link': {
-      id: '/rooms/access-link'
-      path: '/rooms/access-link'
-      fullPath: '/rooms/access-link'
-      preLoaderRoute: typeof RoomsAccessLinkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/rooms/$roomId': {
       id: '/rooms/$roomId'
       path: '/rooms/$roomId'
@@ -224,32 +217,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoomsRoomIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/v1/startup/': {
-      id: '/v1/startup/'
-      path: '/v1/startup'
-      fullPath: '/v1/startup/'
-      preLoaderRoute: typeof V1StartupIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/v1/readiness/': {
-      id: '/v1/readiness/'
-      path: '/v1/readiness'
-      fullPath: '/v1/readiness/'
-      preLoaderRoute: typeof V1ReadinessIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/v1/preview/': {
-      id: '/v1/preview/'
-      path: '/v1/preview'
-      fullPath: '/v1/preview/'
-      preLoaderRoute: typeof V1PreviewIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/v1/liveness/': {
-      id: '/v1/liveness/'
-      path: '/v1/liveness'
-      fullPath: '/v1/liveness/'
-      preLoaderRoute: typeof V1LivenessIndexRouteImport
+    '/rooms/access-link': {
+      id: '/rooms/access-link'
+      path: '/rooms/access-link'
+      fullPath: '/rooms/access-link'
+      preLoaderRoute: typeof RoomsAccessLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/use-cases/standalone/': {
@@ -264,6 +236,34 @@ declare module '@tanstack/react-router' {
       path: '/use-cases/standalone/$instanceId'
       fullPath: '/use-cases/standalone/$instanceId'
       preLoaderRoute: typeof UseCasesStandaloneInstanceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v1/liveness/': {
+      id: '/v1/liveness/'
+      path: '/v1/liveness'
+      fullPath: '/v1/liveness/'
+      preLoaderRoute: typeof V1LivenessIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v1/preview/': {
+      id: '/v1/preview/'
+      path: '/v1/preview'
+      fullPath: '/v1/preview/'
+      preLoaderRoute: typeof V1PreviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v1/readiness/': {
+      id: '/v1/readiness/'
+      path: '/v1/readiness'
+      fullPath: '/v1/readiness/'
+      preLoaderRoute: typeof V1ReadinessIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v1/startup/': {
+      id: '/v1/startup/'
+      path: '/v1/startup'
+      fullPath: '/v1/startup/'
+      preLoaderRoute: typeof V1StartupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai/chats/$chatId': {

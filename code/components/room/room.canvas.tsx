@@ -45,6 +45,13 @@ export const RoomCanvas = React.memo(() => {
     (state) => state.pages.removing,
   );
 
+  const [hasFitted, setHasFitted] = React.useState(false);
+  React.useEffect(() => {
+    if (afterLoadFit) setHasFitted(true);
+  }, [afterLoadFit]);
+  // initial "Initializing" is covered by the room loader; only show on later switches
+  const showFitOverlay = hasFitted && !afterLoadFit;
+
   const roomFullyLoaded = React.useMemo(() => {
     return status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded;
   }, [status, roomLoaded]);
@@ -90,7 +97,7 @@ export const RoomCanvas = React.memo(() => {
       ></div>
       <div className="absolute top-0 left-0 right-0 bottom-0 shadow-[inset_0_2px_6px_rgba(0,0,0,0.10)] pointer-events-none"></div>
       {(isRoomSwitching ||
-        !afterLoadFit ||
+        showFitOverlay ||
         roomPageFetching ||
         roomPageAdding ||
         roomPageRemoving) && (
@@ -108,7 +115,7 @@ export const RoomCanvas = React.memo(() => {
               <div className="w-full flex justify-center items-center">
                 <div className="font-light text-xs text-center whitespace-nowrap">
                   {isRoomSwitching && <span>Changing page</span>}
-                  {!isRoomSwitching && !afterLoadFit && (
+                  {!isRoomSwitching && showFitOverlay && (
                     <span>Initializing</span>
                   )}
                   {!isRoomSwitching && roomPageFetching && (

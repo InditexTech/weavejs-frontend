@@ -216,6 +216,7 @@ function NumberStepper({
   label,
   icon,
   unit,
+  caption,
   hint,
   onChange,
 }: Readonly<{
@@ -227,6 +228,7 @@ function NumberStepper({
   label: string;
   icon?: React.ReactNode;
   unit?: string;
+  caption?: string;
   hint?: string;
   onChange: (v: number) => void;
 }>) {
@@ -249,6 +251,11 @@ function NumberStepper({
       {icon && (
         <span className="w-[24px] h-[32px] flex items-center justify-center text-[#757575]">
           {icon}
+        </span>
+      )}
+      {caption && (
+        <span className="mx-1 text-[11px] font-inter text-[#757575] whitespace-nowrap select-none">
+          {caption}
         </span>
       )}
       <button
@@ -559,7 +566,7 @@ export const TextToolbar = () => {
   // drop their icons and the font field narrows.
   const compact = breakpoint !== "xl" && breakpoint !== "2xl";
 
-  const { props, format, rich, mode } = state;
+  const { props, format, rich, mode, shapeLabel } = state;
   const q = (key: "bold" | "italic" | "underline" | "strike") => {
     if (rich && format) {
       return {
@@ -633,7 +640,7 @@ export const TextToolbar = () => {
         )}
       >
         <div className="flex items-center shrink-0">
-          {mode === "update" && (
+          {mode === "update" && !shapeLabel && (
             <>
               <span className="mx-1 inline-flex items-center justify-center w-[72px] h-[20px] px-0 text-[11px] font-inter font-medium uppercase tracking-wide whitespace-nowrap select-none border bg-black text-white border-black">
                 {isRichTextNode(props) ? "Rich text" : "Text"}
@@ -782,6 +789,31 @@ export const TextToolbar = () => {
               onClick={() => actions.patchProps({ verticalAlign: value })}
             />
           ))}
+          {shapeLabel && (
+            <>
+              <Divider />
+              <NumberStepper
+                label="Padding X"
+                caption="Pad X"
+                unit="px"
+                hint="Horizontal padding"
+                value={props.paddingX ?? 8}
+                step={1}
+                min={0}
+                onChange={(v) => actions.patchProps({ paddingX: v })}
+              />
+              <NumberStepper
+                label="Padding Y"
+                caption="Pad Y"
+                unit="px"
+                hint="Vertical padding"
+                value={props.paddingY ?? 8}
+                step={1}
+                min={0}
+                onChange={(v) => actions.patchProps({ paddingY: v })}
+              />
+            </>
+          )}
           {mode === "update" && (
             <>
               <Divider />

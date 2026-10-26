@@ -55,8 +55,8 @@ export const NODES = (
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
-  new WeaveRectangleNode(),
-  new WeaveEllipseNode(),
+  new WeaveRectangleNode({ config: { label: { engine: "native" } } }),
+  new WeaveEllipseNode({ config: { label: { engine: "native" } } }),
   new WeaveLineNode(),
   new WeaveStrokeNode(),
   new WeaveStrokeSingleNode(),
@@ -278,5 +278,5 @@ export const NODES = (
   new ImageTemplateNode(),
   new PantoneNode(),
   new ImageWithTitleNode(),
-  new WeavePolygonNode(),
+  new WeavePolygonNode({ config: { label: { engine: "native" } } }),
 ];

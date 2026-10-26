@@ -33,9 +33,14 @@ export const useLoadRoom = () => {
     enabled: !!roomId,
   });
 
+  const prevRoomIdRef = React.useRef<string | null | undefined>(roomId);
   React.useEffect(() => {
-    setRoomInfoData(undefined);
-    setRoomInfoError(undefined);
+    // only clear on a real room change, not on mount
+    if (prevRoomIdRef.current !== roomId) {
+      prevRoomIdRef.current = roomId;
+      setRoomInfoData(undefined);
+      setRoomInfoError(undefined);
+    }
   }, [roomId, setRoomInfoData, setRoomInfoError]);
 
   React.useEffect(() => {

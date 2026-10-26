@@ -9,7 +9,6 @@ import {
   WEAVE_STORE_CONNECTION_STATUS,
 } from "@inditextech/weave-types";
 import { Logo } from "../utils/logo";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import useContextMenu from "../room-components/hooks/use-context-menu";
 import useCopyPaste from "../room-components/hooks/use-copy-paste";
 import { MaskSlider } from "../room-components/overlay/mask-slider";
@@ -97,26 +96,9 @@ export const RoomLayout = React.memo(
       return status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded;
     }, [status, roomLoaded]);
 
-    const controls = useAnimation();
-
-    React.useEffect(() => {
-      if (!instance) return;
-
-      if (roomFullyLoaded) {
-        controls.start({
-          opacity: 1,
-          transition: {
-            duration: 0.5,
-          },
-        });
-      }
-    }, [instance, roomFullyLoaded, controls]);
-
     return (
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={controls}
+      <>
+        <div
           className="absolute top-0 left-0 right-0 bottom-0 w-full h-full flex flex-col relative overflow-hidden"
         >
           <RoomCanvas />
@@ -187,8 +169,8 @@ export const RoomLayout = React.memo(
             </div>
           )}
           <PresentationMode key={roomInfo?.roomId} />
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </>
     );
   },
 );

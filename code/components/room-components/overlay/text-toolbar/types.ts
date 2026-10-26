@@ -78,12 +78,18 @@ export type TextProps = {
   align?: string;
   verticalAlign?: string;
   richText?: boolean;
+  paddingX?: number;
+  paddingY?: number;
 };
 
 export type TextToolbarState = {
   /** Live Konva node; undefined in create mode. */
   nodeInstance: WeaveElementInstance | undefined;
   mode: "create" | "update";
+  /** Editing the internal label of a shape (rectangle, ellipse, polygon). */
+  shapeLabel?: boolean;
+  /** Live label edit session (shape label mode only). */
+  labelSession?: LabelSession;
   editing: boolean;
   rich: boolean;
   format: SelectionFormat | null;
@@ -101,4 +107,83 @@ export function isValidHttpUrl(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+export const LABEL_PROP_MAP: Record<keyof TextProps, string> = {
+  fontFamily: "labelFontFamily",
+  fill: "labelFill",
+  fontSize: "labelFontSize",
+  lineHeight: "labelLineHeight",
+  fontStyle: "labelFontStyle",
+  textDecoration: "labelTextDecoration",
+  align: "labelAlign",
+  verticalAlign: "labelVerticalAlign",
+  richText: "labelRichText",
+  paddingX: "labelPaddingX",
+  paddingY: "labelPaddingY",
+};
+
+export const SHAPE_LABEL_TYPES = [
+  "rectangle",
+  "ellipse",
+  "polygon",
+  "regular-polygon",
+];
+
+export function labelPropsToTextProps(
+  props: Record<string, unknown>,
+): TextProps {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(LABEL_PROP_MAP)) {
+    if (props[v] !== undefined) out[k] = props[v];
+  }
+  return out as TextProps;
+}
+
+export function textPatchToLabelProps(
+  patch: Partial<TextProps>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(patch)) {
+    out[LABEL_PROP_MAP[k as keyof TextProps]] = v;
+  }
+  return out;
+}
+
+// Structural type of the SDK TextEditSession used by shape labels.
+export interface LabelSession {
+  setMark(key: MarkKey, value: unknown): void;
+  toggleMark(key: MarkKey): void;
+  toggleList(kind: "ul" | "ol"): void;
+  setAlign(align: BlockAlign | undefined): void;
+  indent(): void;
+  outdent(): void;
+  getFormat(): SelectionFormat;
+}
+
+/** Wraps a label edit session as a TextHandler (selection-based marks). */
+export function createLabelHandler(
+  session: LabelSession,
+  baseFontSize: () => number,
+): TextHandler {
+  return {
+    isRichTextEnabled: () => true,
+    getSelectionFormat: () => session.getFormat(),
+    toggleMark: (_n, key) => (session.toggleMark(key), true),
+    applyMark: (_n, key, value) => {
+      let v = value;
+      if (key === "link" && typeof v === "string" && !isValidHttpUrl(v)) {
+        return false;
+      }
+      if (key === "size" && typeof v === "number") {
+        v = v / (baseFontSize() || 1);
+      }
+      session.setMark(key, v);
+      return true;
+    },
+    toggleList: (_n, kind) => (session.toggleList(kind), true),
+    indent: () => (session.indent(), true),
+    outdent: () => (session.outdent(), true),
+    setAlign: (_n, align) => (session.setAlign(align), true),
+  } as TextHandler;
 }

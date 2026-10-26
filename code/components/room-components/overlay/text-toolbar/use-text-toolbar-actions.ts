@@ -5,6 +5,7 @@
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import type { WeaveStateElement } from "@inditextech/weave-types";
+import { createLabelHandler, textPatchToLabelProps } from "./types";
 import type { TextHandler, TextProps, TextToolbarState } from "./types";
 
 // Whole-node prop -> run marks that override it. Run marks win over node
@@ -39,10 +40,21 @@ export function useTextToolbarActions(state: TextToolbarState | null) {
   const node = useWeave((s) => s.selection.node);
   const actualAction = useWeave((s) => s.actions.actual);
 
-  const handler = React.useMemo(
+  const textHandler = React.useMemo(
     () => instance?.getNodeHandler<TextHandler>("text"),
     [instance],
   );
+  const labelSession = state?.labelSession;
+  const labelNodeId = state?.shapeLabel
+    ? (state.nodeInstance as unknown as { id(): string } | undefined)?.id()
+    : undefined;
+  const handler = React.useMemo(() => {
+    if (!labelSession) return textHandler;
+    return createLabelHandler(labelSession, () => {
+      const n = labelNodeId ? instance?.getNode(labelNodeId)?.node : undefined;
+      return Number(n?.props?.labelFontSize ?? 14);
+    });
+  }, [labelSession, textHandler, instance, labelNodeId]);
 
   // Whole-node props (line height, alignment, and everything when not rich).
   const patchProps = React.useCallback(
@@ -55,6 +67,16 @@ export function useTextToolbarActions(state: TextToolbarState | null) {
             ...patch,
           });
         }
+        return;
+      }
+      if (state.shapeLabel && state.nodeInstance) {
+        const id = (state.nodeInstance as unknown as { id(): string }).id();
+        const current = instance.getNode(id)?.node;
+        if (!current) return;
+        instance.updateNode({
+          ...current,
+          props: { ...current.props, ...textPatchToLabelProps(patch) },
+        } as WeaveStateElement);
         return;
       }
       if (!node) return;
