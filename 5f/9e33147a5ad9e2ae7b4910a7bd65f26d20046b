@@ -1,0 +1,21 @@
+code/components/room-components/overlay/text-toolbar/use-text-toolbar-actions.ts
+  s_baf0882407e2a9::t_2befa5132eba7f 40,59-64,89-99
+code/components/room-components/overlay/text-toolbar/use-text-toolbar-state.ts
+  s_baf0882407e2a9::t_419da04e670415 103-125,128-152,171,205-206,236,243,254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "5f9e33147a5ad9e2ae7b4910a7bd65f26d20046b",
+  "prompts": {},
+  "sessions": {
+    "s_baf0882407e2a9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e838e8357ffeX1YK1uA5dCzsz2",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
