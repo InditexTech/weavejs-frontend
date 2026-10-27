@@ -43,7 +43,17 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "ws": ">=8.21.0",
-    "yjs": "13.6.27"
+    "yjs": "13.6.27",
+    "@azure/msal-node": "^7.1.1",
+    "better-auth": {
+      "zod": "^4.6.7"
+    },
+    "@better-auth/core": {
+      "zod": "^4.6.7"
+    },
+    "better-call": {
+      "zod": "^4.6.7"
+    }
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.192",
