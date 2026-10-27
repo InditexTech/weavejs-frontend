@@ -10,7 +10,7 @@ import {
   WeaveGroupNode,
   WeaveRectangleNode,
   WeaveEllipseNode,
-  WeaveTextNode,
+  WeaveTextV2Node,
   WeaveImageNode,
   WeaveStarNode,
   WeaveLineNode,
@@ -55,12 +55,12 @@ export const NODES = (
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
-  new WeaveRectangleNode(),
-  new WeaveEllipseNode(),
+  new WeaveRectangleNode({ config: { label: { engine: "native" } } }),
+  new WeaveEllipseNode({ config: { label: { engine: "native" } } }),
   new WeaveLineNode(),
   new WeaveStrokeNode(),
   new WeaveStrokeSingleNode(),
-  new WeaveTextNode({
+  new WeaveTextV2Node({
     config: {
       outline: {
         enabled: true,
@@ -75,8 +75,28 @@ export const NODES = (
         defaultColor: "#1155ccff",
         hoverColor: "#3d7be0ff",
       },
+      sizeWarning: { threshold: 200_000 },
+      edition: {
+        outline: { padding: 0 },
+        // Keeps the caret clear of the app UI (toolbars/sidebars) when the
+        // stage pans to follow it while editing. Tune to the actual UI.
+        // Top is raised to clear the floating text toolbar.
+        followPadding: { top: 160, right: 120, bottom: 140, left: 120 },
+      },
+      richText: { enabled: false, indentStep: 1.5 },
     } as DeepPartial<WeaveTextProperties> & {
       link: { defaultColor: string; hoverColor: string };
+      sizeWarning: { threshold: number };
+      edition: {
+        outline: { padding: number };
+        followPadding: {
+          top: number;
+          right: number;
+          bottom: number;
+          left: number;
+        };
+      };
+      richText: { enabled: boolean; indentStep: number };
     },
   }),
   new WeaveImageNode({
@@ -258,5 +278,5 @@ export const NODES = (
   new ImageTemplateNode(),
   new PantoneNode(),
   new ImageWithTitleNode(),
-  new WeavePolygonNode(),
+  new WeavePolygonNode({ config: { label: { engine: "native" } } }),
 ];

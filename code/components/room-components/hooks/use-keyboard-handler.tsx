@@ -354,6 +354,20 @@ export function useKeyboardHandler() {
     },
   );
 
+  useHotkey(
+    { key: "T", mod: false, shift: true },
+    () => {
+      if (guidesSequence) {
+        return;
+      }
+      triggerTool("richTextTool");
+    },
+    {
+      enabled: keysEnabled,
+      conflictBehavior: "allow",
+    },
+  );
+
   // OTHER TOOLS
 
   useHotkey(

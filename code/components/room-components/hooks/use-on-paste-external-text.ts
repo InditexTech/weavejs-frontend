@@ -12,7 +12,7 @@ import {
   TEXT_LAYOUT,
   WeaveNode,
   WeaveNodesSelectionPlugin,
-  WeaveTextNode,
+  WeaveTextV2Node,
 } from "@inditextech/weave-sdk";
 import { WeaveElementInstance } from "@inditextech/weave-types";
 
@@ -114,7 +114,7 @@ export function useOnPasteExternalText() {
           const text = await blob.text();
 
           const textNodeHandler =
-            instance.getNodeHandler<WeaveTextNode>("text");
+            instance.getNodeHandler<WeaveTextV2Node>("text");
 
           if (!textNodeHandler) {
             return;
@@ -133,6 +133,7 @@ export function useOnPasteExternalText() {
             align: "left",
             verticalAlign: "top",
             strokeEnabled: false,
+            richText: false,
             text: text.trim(),
           });
 

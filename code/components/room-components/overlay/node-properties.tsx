@@ -10,7 +10,6 @@ import { SizeProperties } from "./../node-properties/size-properties";
 import { AppearanceProperties } from "./../node-properties/appearance-properties";
 import { FillProperties } from "./../node-properties/fill-properties";
 import { StrokeProperties } from "./../node-properties/stroke-properties";
-import { TextProperties } from "./../node-properties/text-properties";
 import { ImageProperties } from "../node-properties/image-properties";
 import { ColorTokenProperties } from "../node-properties/color-token-properties";
 import { FrameProperties } from "../node-properties/frame-properties";
@@ -31,7 +30,6 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
 import { cn } from "@/lib/utils";
 import { ImageWithTitleProperties } from "../node-properties/image-with-title-properties";
-import { LabelProperties } from "../node-properties/label-properties";
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -67,6 +65,7 @@ export const NodeProperties = () => {
         "colorTokenTool",
         "frameTool",
         "textTool",
+        "richTextTool",
         "fuzzyMaskTool",
       ].includes(actualAction)
     ) {
@@ -200,8 +199,6 @@ export const NodeProperties = () => {
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />
-          <TextProperties />
-          <LabelProperties />
           <div className="w-full h-[24px]"></div>
         </div>
       </ScrollArea>

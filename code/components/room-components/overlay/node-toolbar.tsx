@@ -73,7 +73,7 @@ import {
   WeaveAlignNodesToolActionTriggerParams,
   WeaveVideoNode,
   WeaveMeasureNode,
-  WeaveTextNode,
+  WeaveTextV2Node,
   TEXT_LAYOUT,
   WeavePolygonToolAction,
 } from "@inditextech/weave-sdk";
@@ -185,6 +185,28 @@ export const NodeToolbar = () => {
     return () => {
       instance.addEventListener("onDrag", handleOnDrag);
       instance.addEventListener("onTransform", handleOnTransform);
+    };
+  }, [instance]);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleTextSizeWarning({
+      size,
+      threshold,
+    }: {
+      size: number;
+      threshold: number;
+    }) {
+      toast.warning("Large text node", {
+        description: `Text content is ${size.toLocaleString()} characters (threshold ${threshold.toLocaleString()}). Editing and syncing may be slow.`,
+      });
+    }
+
+    instance.addEventListener("onTextSizeWarning", handleTextSizeWarning);
+
+    return () => {
+      instance.removeEventListener("onTextSizeWarning", handleTextSizeWarning);
     };
   }, [instance]);
 
@@ -679,6 +701,7 @@ export const NodeToolbar = () => {
 
   return (
     <div
+      data-node-toolbar=""
       className={cn("pointer-events-none", {
         ["absolute top-[8px] left-[8px] right-[8px] flex gap-2 justify-center items-center"]:
           breakpoint === "2xl",
@@ -1388,8 +1411,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1485,8 +1507,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1582,8 +1603,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1680,8 +1700,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -1778,8 +1797,7 @@ export const NodeToolbar = () => {
                                 }
 
                                 const nodeImage = nodes[0].instance as
-                                  | Konva.Group
-                                  | undefined;
+                                  Konva.Group | undefined;
 
                                 if (nodeImage) {
                                   nodeImage.closeCrop(
@@ -2356,7 +2374,7 @@ export const NodeToolbar = () => {
                       }
 
                       const nodeHandler =
-                        instance.getNodeHandler<WeaveTextNode>("text");
+                        instance.getNodeHandler<WeaveTextV2Node>("text");
 
                       if (!nodeHandler) {
                         return;
@@ -2371,7 +2389,11 @@ export const NodeToolbar = () => {
                         return;
                       }
 
-                      nodeHandler.resetSmartLayout(nodeInstance as Konva.Text);
+                      nodeHandler.resetSmartLayout(
+                        nodeInstance as unknown as Parameters<
+                          typeof nodeHandler.resetSmartLayout
+                        >[0],
+                      );
                     }}
                     label={
                       <div className="flex gap-3 justify-start items-center">

@@ -60,6 +60,7 @@ const RoomInternal = React.memo(() => {
   const navigate = useNavigate();
 
   const [initialized, setInitialized] = React.useState(false);
+  const [loaderRemoved, setLoaderRemoved] = React.useState(false);
 
   const instance = useWeave((state) => state.instance);
   const status = useWeave((state) => state.status);
@@ -74,9 +75,6 @@ const RoomInternal = React.memo(() => {
     (state) => state.pages.actualPageId,
   );
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
-  const loadingFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.loading,
-  );
   const errorFetchConnectionUrl = useCollaborationRoom(
     (state) => state.fetchConnectionUrl.error,
   );
@@ -116,9 +114,20 @@ const RoomInternal = React.memo(() => {
 
   const { session, isPending } = useGetSession();
 
+  const afterLoadFit = useCollaborationRoom((state) => state.afterLoadFit);
+  const prevPageRef = React.useRef<{
+    room: string | null | undefined;
+    pageId: string | null | undefined;
+  }>({ room: undefined, pageId: undefined });
+
   React.useEffect(() => {
-    setAfterLoadFit(false);
-  }, [room, actualPageId]);
+    const prev = prevPageRef.current;
+    prevPageRef.current = { room, pageId: actualPageId };
+    // only reset on a real page/room switch, not the initial null -> id load
+    if (prev.pageId && (prev.pageId !== actualPageId || prev.room !== room)) {
+      setAfterLoadFit(false);
+    }
+  }, [room, actualPageId, setAfterLoadFit]);
 
   React.useEffect(() => {
     if (roomInfo) {
@@ -299,38 +308,21 @@ const RoomInternal = React.memo(() => {
 
   React.useEffect(() => {
     if (
-      !(
-        !loadedParams ||
-        loadingFetchConnectionUrl ||
-        !comBusConnected ||
-        status !== WEAVE_INSTANCE_STATUS.RUNNING ||
-        (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)
-      )
-    ) {
-      const ele = document.getElementById("room-loader-animation");
-      if (ele) {
-        ele.style.transition = "opacity 0.5s ease";
-        ele.style.opacity = "0";
-        ele.style.pointerEvents = "none";
-      }
-    }
-  }, [
-    loadedParams,
-    loadingFetchConnectionUrl,
-    comBusConnected,
-    status,
-    roomLoaded,
-  ]);
-
-  React.useEffect(() => {
-    if (
       !initialized &&
       pagesManaged &&
-      status === WEAVE_INSTANCE_STATUS.RUNNING
+      status === WEAVE_INSTANCE_STATUS.RUNNING &&
+      roomLoaded &&
+      afterLoadFit
     ) {
       setInitialized(true);
     }
-  }, [status, initialized, pagesManaged, setInitialized]);
+  }, [status, initialized, pagesManaged, roomLoaded, afterLoadFit]);
+
+  React.useEffect(() => {
+    if (!initialized) return;
+    const timeout = setTimeout(() => setLoaderRemoved(true), 500);
+    return () => clearTimeout(timeout);
+  }, [initialized]);
 
   useLoadRoom();
   useLoadRoomImageFallback();
@@ -370,17 +362,24 @@ const RoomInternal = React.memo(() => {
     );
   }
 
+  const gatesOpen =
+    !!roomInfo &&
+    loadedParams &&
+    !!room &&
+    !!session &&
+    !!storeProvider &&
+    !!rendererProvider &&
+    roomImageFallbackLoaded &&
+    pagesManaged &&
+    comBusConnected;
+
+  // once initialized keep Weave mounted even if a gate transiently drops
+  const keepMounted =
+    !!storeProvider && !!rendererProvider && !!session && !!room;
+
   return (
     <>
-      {roomInfo &&
-        loadedParams &&
-        room &&
-        session &&
-        storeProvider &&
-        rendererProvider &&
-        roomImageFallbackLoaded &&
-        pagesManaged &&
-        comBusConnected && (
+      {(gatesOpen || (initialized && keepMounted)) && (
           <ChatBotPromptProvider>
             <WeaveProvider
               getContainer={() => {
@@ -404,8 +403,16 @@ const RoomInternal = React.memo(() => {
             </WeaveProvider>
           </ChatBotPromptProvider>
         )}
-      {!initialized && (
-        <main className="absolute top-0 left-0 right-0 bottom-0 w-full h-full block flex justify-center items-center">
+      {!loaderRemoved && (
+        <main
+          id="room-loader-animation"
+          style={{
+            transition: "opacity 0.5s ease",
+            opacity: initialized ? 0 : 1,
+            pointerEvents: initialized ? "none" : "auto",
+          }}
+          className="absolute top-0 left-0 right-0 bottom-0 w-full h-full block flex justify-center items-center bg-white z-[200]"
+        >
           <RoomLoader />
         </main>
       )}
