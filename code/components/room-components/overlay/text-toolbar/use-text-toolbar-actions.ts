@@ -37,7 +37,7 @@ function stripMarks(blocks: unknown, keys: string[]): unknown {
 
 export function useTextToolbarActions(state: TextToolbarState | null) {
   const instance = useWeave((s) => s.instance);
-  const node = useWeave((s) => s.selection.node);
+  const selectedNode = useWeave((s) => s.selection.node);
   const actualAction = useWeave((s) => s.actions.actual);
 
   const textHandler = React.useMemo(
@@ -55,6 +55,12 @@ export function useTextToolbarActions(state: TextToolbarState | null) {
       return Number(n?.props?.labelFontSize ?? 14);
     });
   }, [labelSession, textHandler, instance, labelNodeId]);
+
+  const nodeId = (
+    state?.nodeInstance as unknown as { id?(): string } | undefined
+  )?.id?.();
+  const node =
+    selectedNode ?? (nodeId ? instance?.getNode(nodeId)?.node : undefined);
 
   // Whole-node props (line height, alignment, and everything when not rich).
   const patchProps = React.useCallback(
@@ -80,6 +86,17 @@ export function useTextToolbarActions(state: TextToolbarState | null) {
         return;
       }
       if (!node) return;
+      if (!instance.getNode(node.key)) {
+        // Not in shared state yet (being created): patch the live shape.
+        (
+          state.nodeInstance as unknown as {
+            setAttrs(a: Record<string, unknown>): void;
+            getLayer(): { batchDraw(): void } | null;
+          }
+        ).setAttrs(patch);
+        state.nodeInstance?.getLayer()?.batchDraw();
+        return;
+      }
       const overriding = state.rich
         ? []
         : Object.keys(patch).flatMap((k) => OVERRIDING_MARKS[k] ?? []);

@@ -100,13 +100,56 @@ export function useTextToolbarState(): TextToolbarState | null {
 
   const creating = !!actualAction && TEXT_ACTIONS.includes(actualAction);
 
+  // Node being edited. Right after creation the selection store may not be
+  // synced yet (the SDK selects it without emitting onNodesChange), so the
+  // edit-mode events are the source of truth.
+  const [editingShape, setEditingShape] =
+    React.useState<WeaveElementInstance | null>(null);
+  const [stateTick, setStateTick] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!instance) return;
+    const onEnter = ({ node: n }: { node: WeaveElementInstance }) =>
+      setEditingShape(n);
+    const onExit = () => setEditingShape(null);
+    const onState = () => setStateTick((t) => t + 1);
+    instance.addEventListener("onEnterTextNodeEditMode", onEnter);
+    instance.addEventListener("onExitTextNodeEditMode", onExit);
+    instance.addEventListener("onStateChange", onState);
+    return () => {
+      instance.removeEventListener("onEnterTextNodeEditMode", onEnter);
+      instance.removeEventListener("onExitTextNodeEditMode", onExit);
+      instance.removeEventListener("onStateChange", onState);
+    };
+  }, [instance]);
+
   const nodeInstance = React.useMemo(() => {
     if (creating) return undefined;
-    if (selectedNodes.length !== 1) return undefined;
-    const [selected] = selectedNodes;
-    if (selected.node?.type !== "text") return undefined;
-    return selected.instance as unknown as WeaveElementInstance;
-  }, [creating, selectedNodes]);
+    if (selectedNodes.length === 1) {
+      const [selected] = selectedNodes;
+      if (selected.node?.type !== "text") return undefined;
+      return selected.instance as unknown as WeaveElementInstance;
+    }
+    if (selectedNodes.length === 0 && editingShape) return editingShape;
+    return undefined;
+  }, [creating, selectedNodes, editingShape]);
+
+  const stateNode = React.useMemo(() => {
+    if (node && node.type === "text") return node;
+    if (!instance || !nodeInstance || nodeInstance !== editingShape)
+      return undefined;
+    const id = (nodeInstance as unknown as { id(): string }).id();
+    const found = instance.getNode(id)?.node;
+    if (found?.type === "text") return found;
+    // Not committed to the shared state yet: use the live shape attrs.
+    const attrs = (
+      nodeInstance as unknown as { getAttrs(): Record<string, unknown> }
+    ).getAttrs();
+    return { key: id, type: "text", props: attrs } as unknown as NonNullable<
+      typeof node
+    >;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, instance, nodeInstance, editingShape, stateTick]);
 
   const handler = React.useMemo(
     () => instance?.getNodeHandler<TextHandler>("text"),
@@ -125,7 +168,7 @@ export function useTextToolbarState(): TextToolbarState | null {
 
   React.useEffect(() => {
     refresh();
-  }, [refresh, node]);
+  }, [refresh, stateNode]);
 
   React.useEffect(() => {
     if (!instance) return;
@@ -159,8 +202,8 @@ export function useTextToolbarState(): TextToolbarState | null {
   }, [instance, nodeInstance, refresh]);
 
   React.useEffect(() => {
-    setEditing(false);
-  }, [nodeInstance]);
+    setEditing(!!nodeInstance && nodeInstance === editingShape);
+  }, [nodeInstance, editingShape]);
 
   return React.useMemo(() => {
     if (!instance) return null;
@@ -190,14 +233,14 @@ export function useTextToolbarState(): TextToolbarState | null {
         props: (createProps ?? {}) as TextProps,
       };
     }
-    if (!nodeInstance || !node || node.type !== "text") return null;
+    if (!nodeInstance || !stateNode) return null;
     return {
       nodeInstance,
       mode: "update",
       editing,
       rich,
       format,
-      props: (node.props ?? {}) as TextProps,
+      props: (stateNode.props ?? {}) as TextProps,
     };
   }, [
     instance,
@@ -208,7 +251,7 @@ export function useTextToolbarState(): TextToolbarState | null {
     creating,
     createProps,
     nodeInstance,
-    node,
+    stateNode,
     editing,
     rich,
     format,
