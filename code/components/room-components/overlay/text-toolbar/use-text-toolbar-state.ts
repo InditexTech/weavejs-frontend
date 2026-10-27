@@ -125,17 +125,26 @@ export function useTextToolbarState(): TextToolbarState | null {
 
   const nodeInstance = React.useMemo(() => {
     if (creating) return undefined;
+    // The edited node wins: the selection store can be stale (the SDK
+    // changes the selection without emitting onNodesChange).
+    if (editingShape) return editingShape;
     if (selectedNodes.length === 1) {
       const [selected] = selectedNodes;
       if (selected.node?.type !== "text") return undefined;
       return selected.instance as unknown as WeaveElementInstance;
     }
-    if (selectedNodes.length === 0 && editingShape) return editingShape;
     return undefined;
   }, [creating, selectedNodes, editingShape]);
 
   const stateNode = React.useMemo(() => {
-    if (node && node.type === "text") return node;
+    if (
+      node &&
+      node.type === "text" &&
+      (!editingShape ||
+        (nodeInstance as unknown as { id(): string } | undefined)?.id() ===
+          node.key)
+    )
+      return node;
     if (!instance || !nodeInstance || nodeInstance !== editingShape)
       return undefined;
     const id = (nodeInstance as unknown as { id(): string }).id();
