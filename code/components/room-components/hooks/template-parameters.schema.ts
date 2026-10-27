@@ -31,7 +31,7 @@ const textParameterSchema = z.object({
       fill: z.string().optional(),
       layout: z.string().optional(),
     })
-    .passthrough(),
+    .loose(),
 });
 
 export const templateParameterEntrySchema = z.discriminatedUnion("kind", [

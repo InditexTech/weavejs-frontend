@@ -33,7 +33,7 @@ export const imageTemplateNodeSchema: z.ZodType<ImageTemplateNode> = z.lazy(
       editable: z.boolean(),
       optional: z.boolean().optional(),
       children: z.array(imageTemplateNodeSchema).optional(),
-      defaultProperties: z.record(z.unknown()).optional(),
+      defaultProperties: z.record(z.string(), z.unknown()).optional(),
     }),
 );
 
