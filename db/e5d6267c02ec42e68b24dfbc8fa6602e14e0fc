@@ -1,0 +1,71 @@
+code/components/room-components/overlay/brush-lab-overlay.tsx
+  s_433a2258e9e25e::t_1c7bf26fbe66bd 1-546
+code/components/room-components/overlay/brush-lab-shell.tsx
+  s_433a2258e9e25e::t_4629aea4a42b8e 1-95
+code/components/room-components/overlay/brush-lab-styles.ts
+  s_433a2258e9e25e::t_6b94e9960c995f 1-54
+code/components/room-components/toolbars/memory.toolbar.test.ts
+  s_433a2258e9e25e::t_281bffad4372d6 1-26
+code/components/room-components/toolbars/memory.toolbar.tsx
+  s_433a2258e9e25e::t_3b2388ccc21bf6 12-33,42-47
+code/components/room/room.canvas.tsx
+  s_433a2258e9e25e::t_a968c4322d9a17 14-18,149-154
+code/components/room/room.header.tsx
+  s_433a2258e9e25e::t_481523e4603747 61,101-104,748-763
+code/components/utils/weave/plugins.ts
+  s_433a2258e9e25e::t_c25288bb5f4fa5 42,362-366
+code/docs/brush-lab-testers-guide.md
+  s_433a2258e9e25e::t_5f52cf6374c2d9 1-59
+code/lib/brush-lab/controls.sdk.test.ts
+  s_a27d24cd8df947::t_c3bc2f16d8656c 1-24
+code/lib/brush-lab/controls.test.ts
+  s_a27d24cd8df947::t_3e1cf8bb9bdf18 1-78
+code/lib/brush-lab/controls.ts
+  s_433a2258e9e25e::t_e69aff95a77c2e 1-116
+code/lib/brush-lab/flag.test.ts
+  s_433a2258e9e25e::t_1d1b37d084dcd1 1-24
+code/lib/brush-lab/flag.ts
+  s_433a2258e9e25e::t_1c2a7d17eb0f87 1-27
+code/lib/brush-lab/storage.test.ts
+  s_433a2258e9e25e::t_244f9a85a8ba49 1-63
+code/lib/brush-lab/storage.ts
+  s_433a2258e9e25e::t_ba2c3cf6a36587 1-56
+code/lib/viewport.test.ts
+  s_433a2258e9e25e::t_624110a1c2bcc1 1-13
+code/lib/viewport.ts
+  s_433a2258e9e25e::t_9a89de9a7db0f8 1-10
+code/other.d.ts
+  s_433a2258e9e25e::t_730aadc59e1225 6-8
+code/src/routes/__root.tsx
+  s_433a2258e9e25e::t_6b024440fbd2b2 19,29
+code/store/store.ts
+  s_433a2258e9e25e::t_f5b23c525d0889 150-152,333,470-472,953-957
+code/vite.config.ts
+  s_433a2258e9e25e::t_1f763db1734bcd 36-39
+code/vitest.config.mts
+  s_a27d24cd8df947::t_97ac09c00765d7 5,9-15,18-20,23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "dbe5d6267c02ec42e68b24dfbc8fa6602e14e0fc",
+  "prompts": {},
+  "sessions": {
+    "s_433a2258e9e25e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e789ecf60ffeALgZIRKm0KHjH9",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_a27d24cd8df947": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e76a9de98ffeTBL9kMjkyDW1Iz",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
