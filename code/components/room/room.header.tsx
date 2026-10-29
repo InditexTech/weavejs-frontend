@@ -58,6 +58,7 @@ import { RoomUser } from "./room.user";
 import { useLoadRoomUserConfig } from "../room-components/hooks/use-load-room-user-config";
 import { useIsRoomReady } from "../room-components/hooks/use-is-room-ready";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { isBrushLabEnabled } from "@/lib/brush-lab/flag";
 
 export function RoomHeader() {
   const navigate = useNavigate();
@@ -97,6 +98,10 @@ export function RoomHeader() {
     (state) => state.setBackgroundColor,
   );
 
+  const brushLabShow = useCollaborationRoom((state) => state.brushLab.show);
+  const setBrushLabShow = useCollaborationRoom(
+    (state) => state.setBrushLabShow,
+  );
   const connectionTestsShow = useCollaborationRoom(
     (state) => state.connection.tests.show,
   );
@@ -740,6 +745,22 @@ export function RoomHeader() {
                         )}
                         Connection testing
                       </DropdownMenuItem>
+                      {isBrushLabEnabled() && (
+                        <DropdownMenuItem
+                          className="text-xs cursor-pointer hover:rounded-none"
+                          onPointerDown={() => {
+                            setBrushLabShow(!brushLabShow);
+                            setMenuOpen(false);
+                          }}
+                        >
+                          {brushLabShow ? (
+                            <Check size={16} strokeWidth={1} />
+                          ) : (
+                            <div className="w-[16px] h-[16px]" />
+                          )}
+                          Brush Lab
+                        </DropdownMenuItem>
+                      )}
                       {AI_AVAILABLE && (
                         <DropdownMenuItem
                           className="text-xs cursor-pointer hover:rounded-none"

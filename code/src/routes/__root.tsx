@@ -16,6 +16,7 @@ import {
   resolvePreviewAccess,
 } from "../../lib/coming-soon-preview-browser";
 import { isAllowedPath, isComingSoonEnabled } from "../../lib/coming-soon";
+import { VIEWPORT_CONTENT } from "../../lib/viewport";
 import { ComingSoonPage } from "@/components/coming-soon/coming-soon-page";
 import { NotFound } from "@/components/not-found/not-found";
 
@@ -25,9 +26,7 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       {
         name: "viewport",
-        content: isComingSoonEnabled()
-          ? "width=device-width, initial-scale=1"
-          : "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+        content: VIEWPORT_CONTENT,
       },
       { title: "Weave.js" },
       {

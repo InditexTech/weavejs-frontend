@@ -147,6 +147,9 @@ interface CollaborationRoomState {
       show: boolean;
     };
   };
+  brushLab: {
+    show: boolean;
+  };
   drawer: {
     keyboardShortcuts: {
       visible: boolean;
@@ -327,6 +330,7 @@ interface CollaborationRoomState {
   setFontsLoaded: (newLoaded: boolean) => void;
   setFontsValues: (newValues: { id: string; name: string }[]) => void;
   setConnectionTestsShow: (newShow: boolean) => void;
+  setBrushLabShow: (newShow: boolean) => void;
   setBackgroundColor: (newBackgroundColor: BackgroundColor) => void;
   setLinkedNode: (newLinkedNode: Konva.Node | null) => void;
   setConfigurationOpen: (newOpen: boolean) => void;
@@ -462,6 +466,9 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
       tests: {
         show: false,
       },
+    },
+    brushLab: {
+      show: false,
     },
     guides: {
       selected: null,
@@ -942,6 +949,11 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => {
           ...state.connection,
           tests: { ...state.connection.tests, show: newShow },
         },
+      })),
+    setBrushLabShow: (newShow: boolean) =>
+      set((state) => ({
+        ...state,
+        brushLab: { ...state.brushLab, show: newShow },
       })),
     setBackgroundColor: (newBackgroundColor) =>
       set((state) => ({
