@@ -1,0 +1,23 @@
+code/components/room-components/overlay/brush-lab-overlay.tsx
+  s_433a2258e9e25e::t_4ee0e0782d715b 24,26,62,64-66,88-120,130-131,148,159,162,169-182,194-203,205-207,210-226,228-253,255-256,258-274
+code/docs/brush-lab-testers-guide.md
+  s_433a2258e9e25e::t_9c959c3c64728d 24,26,28-36,41-42,46
+code/lib/brush-lab/storage.ts
+  s_433a2258e9e25e::t_5e94085fa79097 57-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "b236fbeb66025f96fecd232843ccd3f6313ee983",
+  "prompts": {},
+  "sessions": {
+    "s_433a2258e9e25e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e789ecf60ffeALgZIRKm0KHjH9",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
