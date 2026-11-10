@@ -21,39 +21,28 @@ The Brush Lab exists only in a Showcase built with `VITE_BRUSH_LAB=true`. Rooms 
    - add `?lab=brush` to the room address (`https://…/rooms/<id>?lab=brush`). If you also use `?preview=<key>`, put it first:
      `?preview=<key>&lab=brush`.
 
-## Try a scenario
+## Try a brush
 
-1. In the **Try** tab, pick a scenario (**A** to **F**). **A** is how the brush has always behaved. Hover a button for what it
-   changes.
-2. Draw with the brush tool: your usual handwriting, cursive loops, the letters **n** and **v**, a translucent colour, and the same
-   at 30 %, 100 % and 200 % zoom.
-3. Switch scenario and draw the same thing again. Compare.
+The panel has one dropdown, **Brush**: Legacy (default), Fixes, Smooth, Round, Freehand and Illustrator-like.
 
-## See what the device sends
-
-- **Show on canvas** (Try tab): switch on `raw` (red dots, where the pen reported), `stabilized` (blue), `final` (green) and `pressure`. Raw dots
-  should sit on your stroke. If they do not, say so.
-- **Device** tab: pointer type, profile in use, sample rate, pressure range, tilt, frames per second and the metrics of your
-  last stroke. A yellow warning means the pen reports itself as a mouse (on Windows, check that Windows Ink is on).
-- **Ghosts** (Advanced → Ghosts): after drawing, switch on presets to see the same strokes redrawn through other presets.
-  *Clear ghosts* removes them.
-
-## Tune it
-
-- **Advanced** tab (pick a section): *Profile settings* per device (mouse, touch, Apple Pencil, desktop pen). Pick a preset or move the sliders; the change
-  applies to the next stroke.
-- *Look settings*: how the stroke is drawn (round outline, width, tapers). *Preview on this screen* shows a look on every stroke
-  here only; nobody else sees it.
+1. Pick a brush and draw: your usual handwriting, cursive loops, the letters **n** and **v**, a translucent colour, and the same at
+   30 %, 100 % and 200 % zoom.
+2. Pick another brush and draw the same thing again. Compare.
+   Or draw once and use **Compare last stroke (black) with**: choose a brush and press **Compare**. The black line is what was drawn;
+   the red line is the same pointer events replayed through the chosen brush (positions only). **Clear** removes both.
+3. **Show on canvas** switches on dots for what the pen reported (`raw`, red, should sit on your stroke), `stabilized`, `final`
+   and `pressure`.
+4. **Device** shows the pointer type, the profile in use and the sample rate. A yellow warning means the pen reports itself as a
+   mouse (on Windows, check that Windows Ink is on).
 
 ## What to paste into #1254
 
 1. Your device, browser and operating system (and driver, for a Wacom).
-2. Press **Copy report** in the Try tab and paste it: it holds the configuration, the device report and the last stroke's metrics.
-3. (Optional) the **Device** tab shows the same report live.
-4. A short note: which scenario was best, which letters or situations still look wrong, and a screenshot or photo.
+2. Press **Copy report** and paste it: it holds the configuration, the device report and the last stroke's metrics.
+3. A short note: which scenario was best, which letters or situations still look wrong, and a screenshot or photo.
 
 ## Privacy
 
-The lab does not store, upload or download your strokes or recordings. Ghosts and metrics live only in the open page and
+The lab does not store, upload or download your strokes or recordings. The comparison and the metrics live only in the open page and
 disappear on reload. The only thing the browser remembers (in `localStorage`) is the **configuration** (the settings), so a
 reload keeps them. *Reset to legacy* clears it.

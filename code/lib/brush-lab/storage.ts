@@ -54,3 +54,28 @@ export function clearBrushLabConfig(
     // nothing to clear
   }
 }
+
+export const BRUSH_LAB_SCENARIO_KEY = "weave.brushLab.scenario";
+
+/** Remembers which named brush was chosen (an id such as "A"), nothing more. */
+export function saveBrushLabScenario(
+  id: string | null,
+  storage: StorageLike | null = defaultStorage(),
+): void {
+  try {
+    if (id === null) storage?.removeItem(BRUSH_LAB_SCENARIO_KEY);
+    else storage?.setItem(BRUSH_LAB_SCENARIO_KEY, id);
+  } catch {
+    // nothing to remember
+  }
+}
+
+export function loadBrushLabScenario(
+  storage: StorageLike | null = defaultStorage(),
+): string | null {
+  try {
+    return storage?.getItem(BRUSH_LAB_SCENARIO_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
