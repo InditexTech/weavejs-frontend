@@ -64,9 +64,13 @@ export function StrokeProperties() {
   if (!actualAction && !actualNode) return null;
 
   if (
-    ["colorTokenTool", "frameTool", "textTool", "richTextTool"].includes(
-      actualAction,
-    )
+    [
+      "colorTokenTool",
+      "frameTool",
+      "textTool",
+      "richTextTool",
+      "stickyNoteTool",
+    ].includes(actualAction)
   )
     return null;
 
@@ -83,6 +87,7 @@ export function StrokeProperties() {
       "text",
       "color-token",
       "frame",
+      "sticky-note",
     ].includes(actualNode.type)
   ) {
     return null;

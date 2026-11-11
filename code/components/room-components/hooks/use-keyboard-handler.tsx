@@ -275,6 +275,16 @@ export function useKeyboardHandler() {
   );
 
   useHotkey(
+    { key: "N", mod: false, shift: false },
+    () => {
+      triggerTool("stickyNoteTool");
+    },
+    {
+      enabled: keysEnabled,
+    },
+  );
+
+  useHotkey(
     { key: "J", mod: false, shift: false },
     () => {
       triggerTool("starTool");

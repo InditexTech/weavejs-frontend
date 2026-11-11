@@ -11,6 +11,7 @@ import {
   Pentagon,
   Square,
   Star,
+  StickyNote,
 } from "lucide-react";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
@@ -111,6 +112,17 @@ export const useShapesTools = () => {
         ),
         onClick: () => triggerTool("starTool"),
         active: () => actualAction === "starTool",
+      },
+      stickyNoteTool: {
+        icon: <StickyNote className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="text-xs flex gap-3 justify-start items-center">
+            <p>Sticky note tool</p>
+            {formatForDisplay("N")}
+          </div>
+        ),
+        onClick: () => triggerTool("stickyNoteTool"),
+        active: () => actualAction === "stickyNoteTool",
       },
       strokeTool: {
         icon: <PenLine className="px-2" size={40} strokeWidth={1} />,

@@ -479,6 +479,54 @@ export const useToolsEvents = () => {
     };
   }, [instance, isTouchDevice]);
 
+  // Sticky note tool events
+  React.useEffect(() => {
+    if (!instance) return;
+
+    let toastId: string | number = 0;
+
+    const handleStickyNoteAdding = () => {
+      toastId = toast("Add a sticky note", {
+        toasterId: "info",
+        description: `${isTouchDevice ? "Tap" : "Click"} to add a fixed size sticky note or ${isTouchDevice ? "tap" : "click"} and drag to add a sticky note with a defined size.`,
+        duration: Infinity,
+      });
+    };
+
+    const handleStickyNoteAdded = () => {
+      toast.dismiss(toastId);
+    };
+
+    const handleStickyNoteCancelled = (activeAction: string) => {
+      if (activeAction !== "stickyNoteTool") {
+        toast.dismiss(toastId);
+      }
+    };
+
+    instance.addEventListener("onAddingStickyNote", handleStickyNoteAdding);
+    instance.addEventListener("onAddedStickyNote", handleStickyNoteAdded);
+    instance.addEventListener(
+      "onActiveActionChange",
+      handleStickyNoteCancelled,
+    );
+
+    return () => {
+      if (!instance) {
+        return;
+      }
+
+      instance.removeEventListener(
+        "onAddingStickyNote",
+        handleStickyNoteAdding,
+      );
+      instance.removeEventListener("onAddedStickyNote", handleStickyNoteAdded);
+      instance.removeEventListener(
+        "onActiveActionChange",
+        handleStickyNoteCancelled,
+      );
+    };
+  }, [instance, isTouchDevice]);
+
   // Ellipse tool events
   React.useEffect(() => {
     if (!instance) return;

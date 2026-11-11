@@ -12,6 +12,7 @@ import {
   WeaveImageToolAction,
   WeaveStrokeToolAction,
   WeaveRectangleToolAction,
+  WeaveStickyNoteToolAction,
   WeaveEllipseToolAction,
   WeaveTextToolAction,
   WeaveZoomOutToolAction,
@@ -32,6 +33,7 @@ import {
   WeaveStarNode,
   WeaveArrowNode,
   WeaveRegularPolygonNode,
+  WeaveStickyNoteNode,
   WeaveFrameNode,
   WeaveStrokeNode,
   WeaveCommentNode,
@@ -243,6 +245,7 @@ const NODES = () => [
   new WeaveStarNode(),
   new WeaveArrowNode(),
   new WeaveRegularPolygonNode(),
+  new WeaveStickyNoteNode({ config: { label: { engine: "native" } } }),
   new WeaveFrameNode({
     config: {
       fontFamily: "'Inter', sans-serif",
@@ -528,6 +531,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
   new WeaveRectangleToolAction(),
+  new WeaveStickyNoteToolAction(),
   new WeaveEllipseToolAction(),
   new WeaveStrokeToolAction(),
   new WeaveBrushToolAction(),
