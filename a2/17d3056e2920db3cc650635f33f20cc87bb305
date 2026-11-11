@@ -1,0 +1,29 @@
+code/package-lock.json
+  s_0962bf89fb828b::t_046b4dbba68135 68,845-942,944-946,954-956,2801-2807,3003-3005,7164-7166,7170-7171,7174,8704-8717,8720,8730,8805-8807,8810-8811,8820-8823,8841,11994-11996,12005-12007,12009,13916-13918,14139-14141,14434-14436,16467-16469,18845-18847,18851,18855-18857,18860,18863,18867-18869,19623-19625
+code/package.json
+  s_f26b41d184234c::t_2b883e5c93a9c7 47-50,109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "a217d3056e2920db3cc650635f33f20cc87bb305",
+  "prompts": {},
+  "sessions": {
+    "s_0962bf89fb828b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e35455320ffeXV2s9DWxZ2z0DB",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_f26b41d184234c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e3544f6c9ffetIdm60vPvFIxmv",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
