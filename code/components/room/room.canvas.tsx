@@ -11,6 +11,11 @@ import {
 } from "@inditextech/weave-types";
 import { cn } from "@/lib/utils";
 import { ConnectionTestsOverlay } from "../room-components/overlay/connection-tests-overlay";
+import {
+  BrushLabBoot,
+  BrushLabOverlay,
+} from "../room-components/overlay/brush-lab-overlay";
+import { isBrushLabEnabled } from "@/lib/brush-lab/flag";
 
 export const WEAVE_INSTANCE_STATUS_MAP = {
   ["idle"]: "Idle",
@@ -141,6 +146,12 @@ export const RoomCanvas = React.memo(() => {
       {roomFullyLoaded && (
         <>
           <ConnectionTestsOverlay />
+          {isBrushLabEnabled() && (
+            <>
+              <BrushLabBoot />
+              <BrushLabOverlay />
+            </>
+          )}
           <div
             id="minimap"
             className={cn(

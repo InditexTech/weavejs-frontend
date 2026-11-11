@@ -39,6 +39,7 @@ import { COLOR_TOKEN_ACTION_NAME } from "../../actions/color-token-tool/constant
 import { OPERATIONS_MAP } from "./constants";
 import { ExportAreaReferencePlugin } from "@/components/plugins/export-area-reference/export-area-reference";
 import { EXPORT_AREA_SIZES } from "@/components/room-components/reference-area-size-selector";
+import { WeaveBrushLabPlugin } from "@inditextech/weave-sdk/lab";
 import { EXPORT_AREA_REFERENCE_PLUGIN_KEY } from "@/components/plugins/export-area-reference/constants";
 
 export const PLUGINS = (getUser: () => WeaveUser) => [
@@ -358,4 +359,9 @@ export const PLUGINS = (getUser: () => WeaveUser) => [
       initialSize: "4K",
     },
   }),
+  // Testers' tool, only in builds made with VITE_BRUSH_LAB=true. Written
+  // inline so a build without the flag drops the plugin entirely.
+  ...(import.meta.env.VITE_BRUSH_LAB === "true"
+    ? [new WeaveBrushLabPlugin()]
+    : []),
 ];

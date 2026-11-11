@@ -740,18 +740,21 @@ export const TextToolbar = () => {
                     actions.handler?.toggleList(state.nodeInstance!, "ol")
                   }
                 />
+                <Divider />
                 <IconToggle
                   label="Outdent"
                   icon={<Outdent size={16} strokeWidth={1.5} />}
                   pressed={false}
-                  disabled={format.list.kind === "none"}
+                  disabled={
+                    format.list.kind === "none" &&
+                    (format.indent?.state ?? "none") === "none"
+                  }
                   onClick={() => actions.handler?.outdent(state.nodeInstance!)}
                 />
                 <IconToggle
                   label="Indent"
                   icon={<Indent size={16} strokeWidth={1.5} />}
                   pressed={false}
-                  disabled={format.list.kind === "none"}
                   onClick={() => actions.handler?.indent(state.nodeInstance!)}
                 />
                 <Divider />

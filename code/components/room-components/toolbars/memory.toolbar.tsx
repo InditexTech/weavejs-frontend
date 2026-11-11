@@ -9,6 +9,28 @@ import { MemoryStick } from "lucide-react";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
 import { useWeave } from "@inditextech/weave-react";
 
+/** `performance.memory` only exists in Chromium; elsewhere it is absent. */
+export function readHeapMemory(
+  perf: Performance = performance,
+): { used: number; total: number } | null {
+  const memory = (
+    perf as Performance & {
+      memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+    }
+  ).memory;
+  if (
+    !memory ||
+    typeof memory.usedJSHeapSize !== "number" ||
+    typeof memory.totalJSHeapSize !== "number"
+  ) {
+    return null;
+  }
+  return {
+    used: Math.round(memory.usedJSHeapSize / 1024 / 1024),
+    total: Math.round(memory.totalJSHeapSize / 1024 / 1024),
+  };
+}
+
 export const MemoryToolbar = () => {
   const [usedJSHeapMemory, setUsedJSHeapMemory] = React.useState<number>(0);
   const [totalJSHeapMemory, setTotalJSHeapMemory] = React.useState<number>(0);
@@ -17,26 +39,12 @@ export const MemoryToolbar = () => {
 
   React.useEffect(() => {
     const intervalId = setInterval(() => {
-      const usedJSHeap = Math.round(
-        (
-          performance as Performance & {
-            memory: { usedJSHeapSize: number; totalJSHeapSize: number };
-          }
-        ).memory.usedJSHeapSize /
-          1024 /
-          1024,
-      );
-      setUsedJSHeapMemory(usedJSHeap);
-      const totalJSHeap = Math.round(
-        (
-          performance as Performance & {
-            memory: { usedJSHeapSize: number; totalJSHeapSize: number };
-          }
-        ).memory.totalJSHeapSize /
-          1024 /
-          1024,
-      );
-      setTotalJSHeapMemory(totalJSHeap);
+      const memory = readHeapMemory();
+      if (!memory) {
+        return;
+      }
+      setUsedJSHeapMemory(memory.used);
+      setTotalJSHeapMemory(memory.total);
     }, 1000);
 
     return () => {

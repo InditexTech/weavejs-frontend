@@ -35,6 +35,7 @@ export type SelectionFormat = {
   lineHeight: MarkQuery;
   align: { state: "all" | "none" | "some"; value?: BlockAlign };
   list: { kind: "ul" | "ol" | "none" | "mixed"; depth?: number };
+  indent?: { state: "all" | "none" | "some"; depth?: number };
 };
 
 export interface TextHandler {
