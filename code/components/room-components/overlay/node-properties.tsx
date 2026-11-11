@@ -21,7 +21,6 @@ import { EllipseProperties } from "../node-properties/ellipse-properties";
 import { StarProperties } from "../node-properties/star-properties";
 import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
-import { StickyNoteProperties } from "../node-properties/sticky-note-properties";
 import { AlignProperties } from "../node-properties/align-properties";
 import { useNodeActionName } from "./hooks/use-node-action-name";
 import { ImageTemplateProperties } from "../node-properties/image-template-properties";
@@ -61,7 +60,6 @@ export const NodeProperties = () => {
         WEAVE_IMAGE_TOOL_ACTION_NAME,
         "videoTool",
         "starTool",
-        "stickyNoteTool",
         "strokeTool",
         "arrowTool",
         "colorTokenTool",
@@ -198,7 +196,6 @@ export const NodeProperties = () => {
           <ArrowProperties />
           <StarProperties />
           <RegularPolygonProperties />
-          <StickyNoteProperties />
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />

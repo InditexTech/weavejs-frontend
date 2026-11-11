@@ -31,7 +31,6 @@ import {
   Frame,
   EllipsisVertical,
   Pentagon,
-  StickyNote,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -364,18 +363,6 @@ export function ToolsOverlayMain() {
                 }}
               >
                 <Star size={20} strokeWidth={1} /> Star tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("stickyNoteTool");
-                  SHAPES_TOOLS["stickyNoteTool"].onClick();
-                }}
-              >
-                <StickyNote size={20} strokeWidth={1} /> Sticky note tool
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel className="font-light text-xs">

@@ -59,7 +59,6 @@ export function ToolsNodeOverlay() {
         WEAVE_IMAGE_TOOL_ACTION_NAME,
         "videoTool",
         "starTool",
-        "stickyNoteTool",
         "strokeTool",
         "arrowTool",
         "colorTokenTool",

@@ -29,7 +29,6 @@ import {
   WeaveConnectorToolAction,
   WeaveGuideToolAction,
   WeavePolygonToolAction,
-  WeaveStickyNoteToolAction,
 } from "@inditextech/weave-sdk";
 import { type WeaveUser } from "@inditextech/weave-types";
 import { ColorTokenToolAction } from "../../actions/color-token-tool/color-token-tool";
@@ -104,5 +103,4 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new FitToPageToolAction(),
   new WeaveGuideToolAction(),
   new WeavePolygonToolAction(),
-  new WeaveStickyNoteToolAction(),
 ];

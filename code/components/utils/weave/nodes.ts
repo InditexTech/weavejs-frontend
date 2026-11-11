@@ -25,7 +25,6 @@ import {
   WeaveCommentNodeCreateAction,
   WeaveCommentNodeViewAction,
   WeavePolygonNode,
-  WeaveStickyNoteNode,
   WEAVE_COMMENT_STATUS,
 } from "@inditextech/weave-sdk";
 import type { WeaveTextProperties } from "@inditextech/weave-sdk";
@@ -280,5 +279,4 @@ export const NODES = (
   new PantoneNode(),
   new ImageWithTitleNode(),
   new WeavePolygonNode({ config: { label: { engine: "native" } } }),
-  new WeaveStickyNoteNode({ config: { label: { engine: "native" } } }),
 ];

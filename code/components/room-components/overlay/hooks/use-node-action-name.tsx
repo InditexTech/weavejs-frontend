@@ -37,8 +37,6 @@ export const useNodeActionName = () => {
         return "Regular Polygon";
       case "polygon":
         return "Polygon";
-      case "sticky-note":
-        return "Sticky note";
       case "stroke":
         return "Stroke";
       case "stroke-single":
@@ -91,8 +89,6 @@ export const useNodeActionName = () => {
         return "Regular Polygon";
       case "polygonTool":
         return "Polygon";
-      case "stickyNoteTool":
-        return "Sticky note";
       case "brushTool":
         return "Stroke";
       case WEAVE_IMAGE_TOOL_ACTION_NAME:
