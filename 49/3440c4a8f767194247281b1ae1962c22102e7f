@@ -1,0 +1,45 @@
+code/components/room-components/hooks/use-keyboard-handler.tsx
+  s_607c048379b315::t_8f1cbd21f8c32a 277-286
+code/components/room-components/hooks/use-tools-events.tsx
+  s_607c048379b315::t_c949b3d8267776 482-529
+code/components/room-components/node-properties/appearance-properties.tsx
+  s_607c048379b315::t_2673d4c78b7ee7 59,65-66
+code/components/room-components/node-properties/fill-properties.tsx
+  s_607c048379b315::t_4edc0f4b015688 80
+code/components/room-components/node-properties/sticky-note-properties.tsx
+  s_607c048379b315::t_fd164a70657f61 1-132
+code/components/room-components/node-properties/stroke-properties.tsx
+  s_607c048379b315::t_4375ddb59b329b 67-73,90
+code/components/room-components/overlay/hooks/use-node-action-name.tsx
+  s_607c048379b315::t_863966e9b3c61c 40-41,94-95
+code/components/room-components/overlay/hooks/use-shapes-tools.tsx
+  s_607c048379b315::t_43064c789352e5 14,116-126
+code/components/room-components/overlay/node-properties.tsx
+  s_607c048379b315::t_eb71ea364a6cd7 24,64,201
+code/components/room-components/overlay/tools-node-overlay.tsx
+  s_607c048379b315::t_d22aead0a4863f 62
+code/components/room-components/overlay/tools-overlay.main.tsx
+  s_607c048379b315::t_2ef65c3209560e 34,368-379
+code/components/use-cases/standalone/weave.ts
+  s_607c048379b315::t_b53ea2c77a2372 15,36,248,534
+code/components/utils/weave/actions.ts
+  s_607c048379b315::t_e0b90000c3e6a9 32,107
+code/components/utils/weave/nodes.ts
+  s_607c048379b315::t_6bfb442a00e2bd 28,283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "493440c4a8f767194247281b1ae1962c22102e7f",
+  "prompts": {},
+  "sessions": {
+    "s_607c048379b315": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e363c0d75ffeJLRu39lUOvmY1g",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
