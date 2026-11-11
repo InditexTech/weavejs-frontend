@@ -49,12 +49,13 @@ const humanize = (name: string) => {
 
 /** One control for one setting. Every setting gets one. */
 export function controlFor(t: TunableLike): ControlSpec {
-  const control =
-    t.type === "boolean" ? "switch" : t.type === "enum" ? "select" : "slider";
+  let control: ControlSpec["control"] = "slider";
+  if (t.type === "boolean") control = "switch";
+  else if (t.type === "enum") control = "select";
 
   const base = {
     key: t.key,
-    label: humanize(t.path[t.path.length - 1] ?? t.key),
+    label: humanize(t.path.at(-1) ?? t.key),
     control,
     unit: t.unit,
     help: t.help,

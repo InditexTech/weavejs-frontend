@@ -29,7 +29,7 @@ export function BrushLabShell({
 
   React.useEffect(() => {
     const host = document.createElement("div");
-    host.setAttribute("data-brush-lab", "");
+    host.dataset.brushLab = "";
     host.style.cssText = `position:fixed;top:0;left:0;width:0;height:0;z-index:${MAX_Z_INDEX};`;
     const root = host.attachShadow({ mode: "open" });
     const style = document.createElement("style");
@@ -59,6 +59,7 @@ export function BrushLabShell({
     >
       <div
         className="head"
+        role="presentation"
         onPointerDown={(e) => {
           if ((e.target as HTMLElement).tagName === "BUTTON") return;
           e.currentTarget.setPointerCapture(e.pointerId);

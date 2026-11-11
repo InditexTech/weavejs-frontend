@@ -90,7 +90,9 @@ function Btn({
  * dropdowns) is not re-rendered while the user is choosing: re-rendering a
  * select closes its open list.
  */
-function DeviceInfo({ lab }: { lab: WeaveBrushLabPlugin | undefined }) {
+function DeviceInfo({
+  lab,
+}: Readonly<{ lab: WeaveBrushLabPlugin | undefined }>) {
   const [report, setReport] = React.useState<WeaveBrushLabDeviceReport | null>(
     null,
   );
@@ -125,7 +127,7 @@ export function BrushLabOverlay() {
   const show = useCollaborationRoom((s) => s.brushLab.show);
   const setBrushLabShow = useCollaborationRoom((s) => s.setBrushLabShow);
 
-  const [, setVersion] = React.useState(0);
+  const [, refresh] = React.useReducer((v: number) => v + 1, 0);
   const [errors, setErrors] = React.useState<string[]>([]);
   const [compareMessage, setCompareMessage] = React.useState("");
   const [compareId, setCompareId] = React.useState("F");
@@ -139,7 +141,6 @@ export function BrushLabOverlay() {
     null,
   );
 
-  const refresh = React.useCallback(() => setVersion((v) => v + 1), []);
 
   // Only the configuration is saved; never a stroke or a sample.
   const persist = React.useCallback(() => {
