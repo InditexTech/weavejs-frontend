@@ -277,15 +277,8 @@ export function useKeyboardHandler() {
 
   useHotkey(
     { key: "N", mod: false, shift: false },
-    () => {
-      if (!STICKY_NOTE_ENABLED) {
-        return;
-      }
-      triggerTool("stickyNoteTool");
-    },
-    {
-      enabled: keysEnabled,
-    },
+    () => triggerTool("stickyNoteTool"),
+    { enabled: keysEnabled && STICKY_NOTE_ENABLED },
   );
 
   useHotkey(

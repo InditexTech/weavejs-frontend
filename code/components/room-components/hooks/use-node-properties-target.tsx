@@ -19,31 +19,30 @@ export function useNodePropertiesTarget() {
     (state) => state.nodeProperties.createProps,
   );
 
+  const isCreating = Boolean(actualAction) && nodePropertiesAction === "create";
+  const isUpdating = nodePropertiesAction === "update";
+
   const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === "create") {
+    if (isCreating) {
       return {
         key: "creating",
         type: "undefined",
         props: { ...nodeCreateProps },
       };
     }
-    if (node && nodePropertiesAction === "update") {
-      return node;
-    }
-    return undefined;
-  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return isUpdating && node ? node : undefined;
+  }, [isCreating, isUpdating, node, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (isCreating && actualAction) {
         instance.updatePropsAction(actualAction, updatedNode.props);
-      }
-      if (nodePropertiesAction === "update") {
+      } else if (isUpdating) {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction],
+    [instance, actualAction, isCreating, isUpdating],
   );
 
   return {
