@@ -33,6 +33,8 @@ export const useNodeActionName = () => {
         return "Rectangle";
       case "ellipse":
         return "Ellipse";
+      case "sticky-note":
+        return "Sticky note";
       case "regular-polygon":
         return "Regular Polygon";
       case "polygon":
@@ -85,6 +87,8 @@ export const useNodeActionName = () => {
         return "Rectangle";
       case "ellipseTool":
         return "Ellipse";
+      case "stickyNoteTool":
+        return "Sticky note";
       case "regularPolygonTool":
         return "Regular Polygon";
       case "polygonTool":

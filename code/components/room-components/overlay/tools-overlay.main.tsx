@@ -5,41 +5,12 @@
 import React from "react";
 import { ToolbarButton } from "../toolbar/toolbar-button";
 import {
-  Brush,
-  Image,
-  Images,
-  Square,
-  Type,
-  ALargeSmall,
   MousePointer,
-  Tag,
   Undo,
   Redo,
   Eraser,
-  Circle,
-  Star,
-  // Hexagon,
-  MessageSquare,
-  Video,
-  PenLine,
-  RulerDimensionLine,
-  MoveUpRight,
-  ChevronUp,
-  ChevronDown,
-  ChevronRight,
-  ChevronLeft,
-  Frame,
   EllipsisVertical,
-  Pentagon,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useWeave } from "@inditextech/weave-react";
 import { Toolbar } from "../toolbar/toolbar";
 import { useCollaborationRoom } from "@/store/store";
@@ -53,9 +24,12 @@ import {
   WEAVE_IMAGES_TOOL_ACTION_NAME,
 } from "@inditextech/weave-sdk";
 import { useOtherTools } from "./hooks/use-other-tools";
+import { useTextTools } from "./hooks/use-text-tools";
+import { ToolGroup, type ToolGroupItem } from "./tool-group";
 import { useBreakpoint } from "./hooks/use-breakpoint";
 import { useIsRoomReady } from "../hooks/use-is-room-ready";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { STICKY_NOTE_ENABLED } from "@/lib/sticky-note";
 import { IMAGE_WITH_TITLE_ACTION_NAME } from "@/components/actions/image-with-title-tool/constants";
 
 export function ToolsOverlayMain() {
@@ -63,16 +37,7 @@ export function ToolsOverlayMain() {
     "horizontal" | "vertical"
   >("horizontal");
 
-  const [actualShapeTool, setActualShapeTool] = React.useState("rectangleTool");
-  const [actualMediaTool, setActualMediaTool] = React.useState(
-    WEAVE_IMAGE_TOOL_ACTION_NAME,
-  );
-  const [actualOtherTool, setActualOtherTool] = React.useState<
-    string | undefined
-  >(undefined);
-  const [shapesMenuOpen, setShapesMenuOpen] = React.useState(false);
-  const [mediaMenuOpen, setMediaMenuOpen] = React.useState(false);
-  const [otherToolsMenuOpen, setOtherToolsMenuOpen] = React.useState(false);
+  const [openGroup, setOpenGroup] = React.useState<string | null>(null);
 
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -104,36 +69,6 @@ export function ToolsOverlayMain() {
   // const showMinimap = useCollaborationRoom((state) => state.ui.minimap);
   // const setShowMinimap = useCollaborationRoom((state) => state.setShowMinimap);
 
-  React.useEffect(() => {
-    if (
-      actualAction &&
-      ![
-        "frameTool",
-        "commentTool",
-        "connectorTool",
-        "imageTemplateTool",
-        "measureTool",
-      ].includes(actualAction)
-    ) {
-      setActualOtherTool(undefined);
-    }
-  }, [actualAction]);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setActualOtherTool(undefined);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
       if (instance && actualAction !== toolName) {
@@ -150,6 +85,137 @@ export function ToolsOverlayMain() {
   const SHAPES_TOOLS = useShapesTools();
   const MEDIA_TOOLS = useMediaTools();
   const OTHER_TOOLS = useOtherTools();
+  const TEXT_TOOLS = useTextTools();
+
+  const shapesItems = React.useMemo<ToolGroupItem[]>(
+    () => [
+      {
+        id: "rectangleTool",
+        name: "Rectangle",
+        section: "Shapes",
+        shortcut: "R",
+        ...SHAPES_TOOLS.rectangleTool,
+      },
+      {
+        id: "ellipseTool",
+        name: "Ellipse",
+        section: "Shapes",
+        shortcut: "E",
+        ...SHAPES_TOOLS.ellipseTool,
+      },
+      {
+        id: "polygonTool",
+        name: "Polygon",
+        section: "Shapes",
+        shortcut: "P",
+        ...SHAPES_TOOLS.polygonTool,
+      },
+      {
+        id: "starTool",
+        name: "Star",
+        section: "Shapes",
+        shortcut: "J",
+        ...SHAPES_TOOLS.starTool,
+      },
+      {
+        id: "strokeTool",
+        name: "Line",
+        section: "Lines",
+        shortcut: "L",
+        ...SHAPES_TOOLS.strokeTool,
+      },
+      {
+        id: "arrowTool",
+        name: "Arrow",
+        section: "Lines",
+        ...SHAPES_TOOLS.arrowTool,
+      },
+      {
+        id: "brushTool",
+        name: "Brush",
+        section: "Lines",
+        shortcut: "B",
+        ...SHAPES_TOOLS.brushTool,
+      },
+    ],
+    [SHAPES_TOOLS],
+  );
+
+  const mediaItems = React.useMemo<ToolGroupItem[]>(
+    () => [
+      {
+        id: WEAVE_IMAGE_TOOL_ACTION_NAME,
+        name: "Image",
+        section: "Images",
+        shortcut: "I",
+        ...MEDIA_TOOLS[WEAVE_IMAGE_TOOL_ACTION_NAME],
+      },
+      {
+        id: WEAVE_IMAGES_TOOL_ACTION_NAME,
+        name: "Images",
+        section: "Images",
+        shortcut: "O",
+        ...MEDIA_TOOLS[WEAVE_IMAGES_TOOL_ACTION_NAME],
+      },
+      {
+        id: IMAGE_WITH_TITLE_ACTION_NAME,
+        name: "Image with title",
+        section: "Images",
+        ...MEDIA_TOOLS[IMAGE_WITH_TITLE_ACTION_NAME],
+      },
+      {
+        id: "videoTool",
+        name: "Video",
+        section: "Video",
+        ...MEDIA_TOOLS.videoTool,
+      },
+    ],
+    [MEDIA_TOOLS],
+  );
+
+  const textItems = React.useMemo<ToolGroupItem[]>(
+    () => [
+      {
+        id: "richTextTool",
+        name: "Rich text",
+        shortcut: "Shift+T",
+        ...TEXT_TOOLS.richTextTool,
+      },
+      { id: "textTool", name: "Text", shortcut: "T", ...TEXT_TOOLS.textTool },
+    ],
+    [TEXT_TOOLS],
+  );
+
+  const otherItems = React.useMemo<ToolGroupItem[]>(
+    () => [
+      {
+        id: "colorTokenTool",
+        name: "Color reference",
+        section: "Elements",
+        ...OTHER_TOOLS.colorTokenTool,
+      },
+      {
+        id: "frameTool",
+        name: "Frame",
+        section: "Layout",
+        ...OTHER_TOOLS.frameTool,
+      },
+      {
+        id: "commentTool",
+        name: "Comment",
+        section: "Collaboration",
+        hidden: !threadsEnabled,
+        ...OTHER_TOOLS.commentTool,
+      },
+      {
+        id: "measureTool",
+        name: "Measure",
+        section: "Other",
+        ...OTHER_TOOLS.measureTool,
+      },
+    ],
+    [OTHER_TOOLS, threadsEnabled],
+  );
 
   const breakpoint = useBreakpoint();
 
@@ -228,525 +294,59 @@ export function ToolsOverlayMain() {
               barOrientation === "horizontal" ? "vertical" : "horizontal"
             }
           />
-          <ToolbarButton
-            className="rounded-none !w-[40px]"
-            icon={SHAPES_TOOLS[actualShapeTool].icon}
+          <ToolGroup
+            id="shapes"
+            items={shapesItems}
+            defaultItemId="rectangleTool"
+            orientation={barOrientation}
             disabled={!isRoomReady}
-            active={SHAPES_TOOLS[actualShapeTool].active()}
-            onClick={SHAPES_TOOLS[actualShapeTool].onClick}
-            label={SHAPES_TOOLS[actualShapeTool].label}
-            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-            tooltipAlign="center"
-            size="medium"
+            openGroup={openGroup}
+            onOpenGroupChange={setOpenGroup}
           />
-          <DropdownMenu modal={false} open={shapesMenuOpen}>
-            <DropdownMenuTrigger
+          <ToolGroup
+            id="media"
+            items={mediaItems}
+            defaultItemId={WEAVE_IMAGE_TOOL_ACTION_NAME}
+            orientation={barOrientation}
+            disabled={!isRoomReady}
+            openGroup={openGroup}
+            onOpenGroupChange={setOpenGroup}
+          />
+          <ToolGroup
+            id="text"
+            items={textItems}
+            defaultItemId="richTextTool"
+            orientation={barOrientation}
+            disabled={!isRoomReady}
+            openGroup={openGroup}
+            onOpenGroupChange={setOpenGroup}
+          />
+          {STICKY_NOTE_ENABLED && (
+            <ToolbarButton
+              className="rounded-none !w-[40px]"
+              icon={SHAPES_TOOLS["stickyNoteTool"].icon}
               disabled={!isRoomReady}
-              className={cn(
-                "relative rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                {
-                  ["disabled:cursor-default disabled:opacity-50"]: !isRoomReady,
-                },
-              )}
-              asChild
-            >
-              <ToolbarButton
-                className={cn(
-                  "rounded bg-white w-[32px] ml-[4px] !border-[0.5px] !border-[#c9c9c9]",
-                  {
-                    ["h-[20px]"]: barOrientation === "vertical",
-                  },
-                )}
-                icon={
-                  shapesMenuOpen ? (
-                    barOrientation === "horizontal" ? (
-                      <ChevronUp className="px-0" size={20} strokeWidth={1} />
-                    ) : (
-                      <ChevronLeft className="px-0" size={20} strokeWidth={1} />
-                    )
-                  ) : barOrientation === "horizontal" ? (
-                    <ChevronDown className="px-0" size={20} strokeWidth={1} />
-                  ) : (
-                    <ChevronRight className="px-0" size={20} strokeWidth={1} />
-                  )
-                }
-                disabled={!isRoomReady}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShapesMenuOpen((prev) => !prev);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>More shapes tools</p>
-                  </div>
-                }
-                size="small"
-                tooltipSideOffset={14}
-                tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-                tooltipAlign="center"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              onCloseAutoFocus={(e) => {
-                e.preventDefault();
-              }}
-              onFocusOutside={() => {
-                setShapesMenuOpen(false);
-              }}
-              align="start"
-              side={barOrientation === "horizontal" ? "top" : "right"}
-              alignOffset={-45}
-              sideOffset={14}
-              className="font-inter rounded-none shadow-none"
-            >
-              <DropdownMenuLabel className="font-light text-xs">
-                Shapes
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("rectangleTool");
-                  SHAPES_TOOLS["rectangleTool"].onClick();
-                }}
-              >
-                <Square size={20} strokeWidth={1} /> Rectangle tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("ellipseTool");
-                  SHAPES_TOOLS["ellipseTool"].onClick();
-                }}
-              >
-                <Circle size={20} strokeWidth={1} /> Ellipse tool
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("regularPolygonTool");
-                  SHAPES_TOOLS["regularPolygonTool"].onClick();
-                }}
-              >
-                <Hexagon size={20} strokeWidth={1} /> Regular Polygon tool
-              </DropdownMenuItem> */}
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("polygonTool");
-                  SHAPES_TOOLS["polygonTool"].onClick();
-                }}
-              >
-                <Pentagon size={20} strokeWidth={1} /> Polygon tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("starTool");
-                  SHAPES_TOOLS["starTool"].onClick();
-                }}
-              >
-                <Star size={20} strokeWidth={1} /> Star tool
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="font-light text-xs">
-                Lines
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
-                  if (!instance) {
-                    return;
-                  }
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("strokeTool");
-                  SHAPES_TOOLS["strokeTool"].onClick();
-                }}
-              >
-                <PenLine size={20} strokeWidth={1} /> Line tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onClick={() => {
-                  if (!instance) {
-                    return;
-                  }
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("arrowTool");
-                  SHAPES_TOOLS["arrowTool"].onClick();
-                }}
-              >
-                <MoveUpRight size={20} strokeWidth={1} /> Arrow tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualShapeTool("brushTool");
-                  SHAPES_TOOLS["brushTool"].onClick();
-                }}
-              >
-                <Brush size={20} strokeWidth={1} /> Brush tool
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <ToolbarButton
-            className="rounded-none !w-[40px]"
-            icon={MEDIA_TOOLS[actualMediaTool].icon}
+              active={SHAPES_TOOLS["stickyNoteTool"].active()}
+              onClick={SHAPES_TOOLS["stickyNoteTool"].onClick}
+              label={SHAPES_TOOLS["stickyNoteTool"].label}
+              tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
+              tooltipAlign="center"
+              size="medium"
+            />
+          )}
+          <ToolGroup
+            id="other"
+            items={otherItems}
+            rememberLast={false}
+            orientation={barOrientation}
             disabled={!isRoomReady}
-            active={MEDIA_TOOLS[actualMediaTool].active()}
-            onClick={MEDIA_TOOLS[actualMediaTool].onClick}
-            label={MEDIA_TOOLS[actualMediaTool].label}
-            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-            tooltipAlign="center"
-            size="medium"
-          />
-          <DropdownMenu modal={false} open={mediaMenuOpen}>
-            <DropdownMenuTrigger
-              disabled={!isRoomReady}
-              className={cn(
-                "relative rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                {
-                  ["disabled:cursor-default disabled:opacity-50"]: !isRoomReady,
-                },
-              )}
-              asChild
-            >
-              <ToolbarButton
-                className={cn(
-                  "rounded bg-white w-[32px] ml-[4px] !border-[0.5px] !border-[#c9c9c9]",
-                  {
-                    ["h-[20px]"]: barOrientation === "vertical",
-                  },
-                )}
-                icon={
-                  mediaMenuOpen ? (
-                    barOrientation === "horizontal" ? (
-                      <ChevronUp className="px-0" size={20} strokeWidth={1} />
-                    ) : (
-                      <ChevronLeft className="px-0" size={20} strokeWidth={1} />
-                    )
-                  ) : barOrientation === "horizontal" ? (
-                    <ChevronDown className="px-0" size={20} strokeWidth={1} />
-                  ) : (
-                    <ChevronRight className="px-0" size={20} strokeWidth={1} />
-                  )
-                }
-                disabled={!isRoomReady}
-                onClick={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen((prev) => !prev);
-                  setOtherToolsMenuOpen(false);
-                }}
-                label={
-                  <div className="flex gap-3 justify-start items-center">
-                    <p>More media tools</p>
-                  </div>
-                }
-                size="small"
-                tooltipSideOffset={14}
-                tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-                tooltipAlign="center"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              onCloseAutoFocus={(e) => {
-                e.preventDefault();
-              }}
-              onFocusOutside={() => {
-                setMediaMenuOpen(false);
-              }}
-              align="start"
-              side={barOrientation === "horizontal" ? "top" : "right"}
-              alignOffset={-45}
-              sideOffset={14}
-              className="font-inter rounded-none shadow-none"
-            >
-              <DropdownMenuLabel className="font-light text-xs">
-                Static media
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualMediaTool(WEAVE_IMAGE_TOOL_ACTION_NAME);
-                  MEDIA_TOOLS[WEAVE_IMAGE_TOOL_ACTION_NAME].onClick();
-                }}
-              >
-                <Image size={20} strokeWidth={1} /> Image tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualMediaTool(WEAVE_IMAGES_TOOL_ACTION_NAME);
-                  MEDIA_TOOLS[WEAVE_IMAGES_TOOL_ACTION_NAME].onClick();
-                }}
-              >
-                <Images size={20} strokeWidth={1} /> Images tool
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualMediaTool(IMAGE_WITH_TITLE_ACTION_NAME);
-                  MEDIA_TOOLS[IMAGE_WITH_TITLE_ACTION_NAME].onClick();
-                }}
-              >
-                <Image size={20} strokeWidth={1} /> Image with Title tool
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="font-light text-xs">
-                Dynamic media
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                className="text-xs cursor-pointer hover:rounded-none w-full"
-                onPointerDown={() => {
-                  setShapesMenuOpen(false);
-                  setMediaMenuOpen(false);
-                  setOtherToolsMenuOpen(false);
-                  setActualMediaTool("videoTool");
-                  MEDIA_TOOLS["videoTool"].onClick();
-                }}
-              >
-                <Video size={20} strokeWidth={1} /> Video tool
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <ToolbarButton
-            className="rounded-none !w-[40px]"
-            icon={<Type className="px-2" size={40} strokeWidth={1} />}
-            disabled={!isRoomReady}
-            active={actualAction === "textTool"}
-            onClick={() => triggerTool("textTool")}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Text tool</p>
-                {formatForDisplay("T")}
-              </div>
+            openGroup={openGroup}
+            onOpenGroupChange={setOpenGroup}
+            fallbackIcon={
+              <EllipsisVertical className="px-2" size={40} strokeWidth={1} />
             }
-            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-            tooltipAlign="center"
-            size="medium"
+            fallbackLabel="Other tools"
           />
-          <ToolbarButton
-            className="rounded-none !w-[40px]"
-            icon={<ALargeSmall className="px-2" size={40} strokeWidth={1} />}
-            disabled={!isRoomReady}
-            active={actualAction === "richTextTool"}
-            onClick={() => triggerTool("richTextTool")}
-            label={
-              <div className="flex gap-3 justify-start items-center">
-                <p>Rich text tool</p>
-                {formatForDisplay("Shift+T")}
-              </div>
-            }
-            tooltipSide={barOrientation === "horizontal" ? "top" : "right"}
-            tooltipAlign="center"
-            size="medium"
-          />
-          <div className="relative flex gap-0 justify-start items-center">
-            <DropdownMenu modal={false} open={otherToolsMenuOpen}>
-              <DropdownMenuTrigger
-                disabled={!isRoomReady}
-                className={cn(
-                  "relative rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none",
-                  {
-                    ["disabled:cursor-default disabled:opacity-50"]:
-                      !isRoomReady,
-                  },
-                )}
-                asChild
-              >
-                <ToolbarButton
-                  className="rounded-none !w-[40px]"
-                  icon={
-                    actualOtherTool ? (
-                      OTHER_TOOLS[actualOtherTool].icon
-                    ) : (
-                      <EllipsisVertical
-                        className="px-2"
-                        size={40}
-                        strokeWidth={1}
-                      />
-                    )
-                  }
-                  disabled={!isRoomReady}
-                  active={
-                    actualOtherTool
-                      ? OTHER_TOOLS[actualOtherTool].active()
-                      : undefined
-                  }
-                  onClick={
-                    actualOtherTool
-                      ? OTHER_TOOLS[actualOtherTool].onClick
-                      : () => {
-                          setShapesMenuOpen(false);
-                          setMediaMenuOpen(false);
-                          setOtherToolsMenuOpen((prev) => !prev);
-                        }
-                  }
-                  label={
-                    actualOtherTool
-                      ? OTHER_TOOLS[actualOtherTool].label
-                      : "Other tools"
-                  }
-                  tooltipSide={
-                    barOrientation === "horizontal" ? "top" : "right"
-                  }
-                  tooltipAlign="center"
-                  size="medium"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                onCloseAutoFocus={(e) => {
-                  e.preventDefault();
-                }}
-                onFocusOutside={() => {
-                  setOtherToolsMenuOpen(false);
-                }}
-                align="start"
-                side={barOrientation === "horizontal" ? "top" : "right"}
-                alignOffset={0}
-                sideOffset={12}
-                className="font-inter rounded-none shadow-none"
-              >
-                <DropdownMenuLabel className="font-light text-xs">
-                  Elements
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualMediaTool("videoTool");
-                    MEDIA_TOOLS["videoTool"].onClick();
-                  }}
-                >
-                  <Video size={20} strokeWidth={1} /> Video tool
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualOtherTool("colorTokenTool");
-                    OTHER_TOOLS["colorTokenTool"].onClick();
-                  }}
-                >
-                  <Tag size={20} strokeWidth={1} /> Color Reference tool
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="font-light text-xs">
-                  Layout
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualOtherTool("frameTool");
-                    OTHER_TOOLS["frameTool"].onClick();
-                  }}
-                >
-                  <Frame size={20} strokeWidth={1} /> Frame tool
-                </DropdownMenuItem>
-                {threadsEnabled && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel className="font-light text-xs">
-                      Collaboration
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      className="text-xs cursor-pointer hover:rounded-none w-full"
-                      onPointerDown={() => {
-                        setShapesMenuOpen(false);
-                        setMediaMenuOpen(false);
-                        setOtherToolsMenuOpen(false);
-                        setActualOtherTool("commentTool");
-                        OTHER_TOOLS["commentTool"].onClick();
-                      }}
-                    >
-                      <MessageSquare size={20} strokeWidth={1} /> Comment tool
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="font-light text-xs">
-                  Other
-                </DropdownMenuLabel>
-                {/* <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualOtherTool("connectorTool");
-                    OTHER_TOOLS["connectorTool"].onClick();
-                  }}
-                >
-                  <ChevronsLeftRightEllipsis size={20} strokeWidth={1} />{" "}
-                  Connector tool
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualOtherTool("imageTemplateTool");
-                    OTHER_TOOLS["imageTemplateTool"].onClick();
-                  }}
-                >
-                  <LayoutPanelTop size={20} strokeWidth={1} /> Image Template
-                  tool
-                </DropdownMenuItem> */}
-                <DropdownMenuItem
-                  className="text-xs cursor-pointer hover:rounded-none w-full"
-                  onPointerDown={() => {
-                    setShapesMenuOpen(false);
-                    setMediaMenuOpen(false);
-                    setOtherToolsMenuOpen(false);
-                    setActualOtherTool("measureTool");
-                    OTHER_TOOLS["measureTool"].onClick();
-                  }}
-                >
-                  <RulerDimensionLine size={20} strokeWidth={1} /> Measure tool
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
           {/* <ToolbarButton
           className="rounded-none !w-[40px]"
           icon={<MapPinned className="px-2" size={40} strokeWidth={1} />}

@@ -77,6 +77,7 @@ export function FillProperties() {
       "fuzzy-mask",
       "text",
       "frame",
+      "sticky-note",
     ].includes(actualNode.type)
   ) {
     return null;

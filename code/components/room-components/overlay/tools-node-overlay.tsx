@@ -54,6 +54,7 @@ export function ToolsNodeOverlay() {
       [
         "rectangleTool",
         "ellipseTool",
+        "stickyNoteTool",
         "regularPolygonTool",
         "brushTool",
         WEAVE_IMAGE_TOOL_ACTION_NAME,

@@ -10,16 +10,19 @@ import {
   PenLine,
   Pentagon,
   Square,
+  StickyNote,
   Star,
 } from "lucide-react";
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 import { WeavePolygonToolAction } from "@inditextech/weave-sdk";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { useGetSession } from "../../hooks/use-get-session";
 
 export const useShapesTools = () => {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
+  const { session } = useGetSession();
 
   const triggerTool = React.useCallback(
     (toolName: string, params?: unknown) => {
@@ -77,6 +80,25 @@ export const useShapesTools = () => {
       //   onClick: () => triggerTool("regularPolygonTool"),
       //   active: () => actualAction === "regularPolygonTool",
       // },
+      stickyNoteTool: {
+        icon: <StickyNote className="px-2" size={40} strokeWidth={1} />,
+        label: (
+          <div className="text-xs flex gap-3 justify-start items-center">
+            <p>Sticky note tool</p>
+            {formatForDisplay("N")}
+          </div>
+        ),
+        onClick: () => {
+          if (!instance) return;
+
+          triggerTool("stickyNoteTool");
+
+          instance.updatePropsAction("stickyNoteTool", {
+            author: session?.user?.name ?? undefined,
+          });
+        },
+        active: () => actualAction === "stickyNoteTool",
+      },
       polygonTool: {
         icon: <Pentagon className="px-2" size={40} strokeWidth={1} />,
         label: (
@@ -162,7 +184,7 @@ export const useShapesTools = () => {
         active: () => actualAction === "brushTool",
       },
     }),
-    [instance, actualAction, triggerTool],
+    [instance, actualAction, triggerTool, session],
   );
 
   return SHAPES_TOOLS;

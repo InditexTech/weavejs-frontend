@@ -13,6 +13,7 @@ import {
   // WeavePenToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
+  WeaveStickyNoteToolAction,
   WeaveTextToolAction,
   WeaveStarToolAction,
   WeaveStrokeToolAction,
@@ -39,6 +40,7 @@ import { FuzzyMaskToolAction } from "../../actions/fuzzy-mask-tool/fuzzy-mask-to
 import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { ThreadEntity } from "../../room-components/hooks/types";
+import { STICKY_NOTE_ENABLED } from "@/lib/sticky-note";
 import { FitToPageToolAction } from "@/components/actions/fit-to-page-tool/fit-to-page-tool";
 
 export const ACTIONS = (getUser: () => WeaveUser) => [
@@ -47,6 +49,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveEraserToolAction(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
+  ...(STICKY_NOTE_ENABLED ? [new WeaveStickyNoteToolAction()] : []),
   // new WeavePenToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),

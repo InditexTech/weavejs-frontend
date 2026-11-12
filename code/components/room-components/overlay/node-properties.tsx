@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeaveSelection } from "@inditextech/weave-types";
 import { MetaProperties } from "../node-properties/meta-properties";
 import { EllipseProperties } from "../node-properties/ellipse-properties";
+import { StickyNoteProperties } from "../node-properties/sticky-note-properties";
 import { StarProperties } from "../node-properties/star-properties";
 import { ArrowProperties } from "../node-properties/arrow-properties";
 import { RegularPolygonProperties } from "../node-properties/regular-polygon-properties";
@@ -55,6 +56,7 @@ export const NodeProperties = () => {
       [
         "rectangleTool",
         "ellipseTool",
+        "stickyNoteTool",
         "regularPolygonTool",
         "brushTool",
         WEAVE_IMAGE_TOOL_ACTION_NAME,
@@ -195,6 +197,7 @@ export const NodeProperties = () => {
           <EllipseProperties />
           <ArrowProperties />
           <StarProperties />
+          <StickyNoteProperties />
           <RegularPolygonProperties />
           <AppearanceProperties />
           <FillProperties />
