@@ -1,0 +1,21 @@
+code/components/room-components/hooks/use-node-properties-target.tsx
+  s_b4e235c5a1308f::t_4307f47ee9f94d 1-56
+code/components/room-components/node-properties/sticky-note-properties.tsx
+  s_b4e235c5a1308f::t_f5a5e597fedb1b 14,17-23,25-31,73,87,97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "0c56bb06a6b69ef2112d5b25ddf57b90c5de5d04",
+  "prompts": {},
+  "sessions": {
+    "s_b4e235c5a1308f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e308106f7ffeoDVnnKXPSN6sU3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
