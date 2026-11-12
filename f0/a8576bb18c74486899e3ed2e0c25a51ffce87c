@@ -1,0 +1,21 @@
+code/components/room-components/hooks/use-node-properties-target.tsx
+  s_b4e235c5a1308f::t_a04a6012cc4f7a 22-24,26,33-34,39,41,45
+code/components/room-components/hooks/use-keyboard-handler.tsx
+  s_b4e235c5a1308f::t_196a0907cadd99 280-281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "f0a8576bb18c74486899e3ed2e0c25a51ffce87c",
+  "prompts": {},
+  "sessions": {
+    "s_b4e235c5a1308f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e308106f7ffeoDVnnKXPSN6sU3",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
