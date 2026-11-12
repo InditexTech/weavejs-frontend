@@ -9,52 +9,26 @@ import {
   STICKY_NOTE_LABEL_DEFAULTS,
   STICKY_NOTE_PASTEL_COLORS,
 } from "@inditextech/weave-sdk";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
 import { cn } from "@/lib/utils";
 import { InputNumber } from "../inputs/input-number";
+import { useNodePropertiesTarget } from "../hooks/use-node-properties-target";
 
 export function StickyNoteProperties() {
-  const instance = useWeave((state) => state.instance);
-  const node = useWeave((state) => state.selection.node);
-  const actualAction = useWeave((state) => state.actions.actual);
+  const {
+    instance,
+    actualAction,
+    nodePropertiesAction,
+    actualNode,
+    updateElement,
+  } = useNodePropertiesTarget();
 
-  const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action,
-  );
-
-  const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps,
-  );
-
-  const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === "create") {
-      return {
-        key: "creating",
-        type: "undefined",
-        props: {
-          ...nodeCreateProps,
-        },
-      };
-    }
-    if (node && nodePropertiesAction === "update") {
-      return node;
-    }
-    return undefined;
-  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
-
-  const updateElement = React.useCallback(
-    (updatedNode: WeaveStateElement) => {
-      if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
-        instance.updatePropsAction(actualAction, updatedNode.props);
-      }
-      if (nodePropertiesAction === "update") {
-        instance.updateNode(updatedNode);
-      }
-    },
-    [instance, actualAction, nodePropertiesAction],
-  );
+  const updateProp = (props: Record<string, unknown>) => {
+    if (!actualNode) return;
+    updateElement({
+      ...actualNode,
+      props: { ...actualNode.props, ...props },
+    } as WeaveStateElement);
+  };
 
   if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
@@ -96,15 +70,7 @@ export function StickyNoteProperties() {
                 },
               )}
               style={{ backgroundColor: color }}
-              onClick={() => {
-                updateElement({
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    color,
-                  },
-                } as WeaveStateElement);
-              }}
+              onClick={() => updateProp({ color })}
             />
           ))}
         </div>
@@ -118,15 +84,7 @@ export function StickyNoteProperties() {
             actualNode.props.labelPaddingX ??
             STICKY_NOTE_LABEL_DEFAULTS.labelPaddingX
           }
-          onChange={(value) => {
-            updateElement({
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                labelPaddingX: value,
-              },
-            } as WeaveStateElement);
-          }}
+          onChange={(value) => updateProp({ labelPaddingX: value })}
         />
         <InputNumber
           label="Padding Y (px)"
@@ -136,15 +94,7 @@ export function StickyNoteProperties() {
             actualNode.props.labelPaddingY ??
             STICKY_NOTE_LABEL_DEFAULTS.labelPaddingY
           }
-          onChange={(value) => {
-            updateElement({
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                labelPaddingY: value,
-              },
-            } as WeaveStateElement);
-          }}
+          onChange={(value) => updateProp({ labelPaddingY: value })}
         />
       </div>
     </div>
