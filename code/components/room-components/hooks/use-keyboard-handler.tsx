@@ -20,6 +20,7 @@ import {
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useHandleGuides } from "./use-handle-guides";
 import Konva from "konva";
+import { STICKY_NOTE_ENABLED } from "@/lib/sticky-note";
 
 export function useKeyboardHandler() {
   const instance = useWeave((state) => state.instance);
@@ -272,6 +273,12 @@ export function useKeyboardHandler() {
     {
       enabled: keysEnabled,
     },
+  );
+
+  useHotkey(
+    { key: "N", mod: false, shift: false },
+    () => triggerTool("stickyNoteTool"),
+    { enabled: keysEnabled && STICKY_NOTE_ENABLED },
   );
 
   useHotkey(

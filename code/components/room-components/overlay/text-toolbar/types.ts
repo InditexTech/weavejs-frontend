@@ -129,6 +129,7 @@ export const SHAPE_LABEL_TYPES = [
   "ellipse",
   "polygon",
   "regular-polygon",
+  "sticky-note",
 ];
 
 export function labelPropsToTextProps(

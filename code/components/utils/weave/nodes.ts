@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from "konva";
+import { STICKY_NOTE_ENABLED } from "@/lib/sticky-note";
 import { formatDistanceToNow } from "date-fns";
 import {
   WeaveStageNode,
@@ -10,6 +11,7 @@ import {
   WeaveGroupNode,
   WeaveRectangleNode,
   WeaveEllipseNode,
+  WeaveStickyNoteNode,
   WeaveTextV2Node,
   WeaveImageNode,
   WeaveStarNode,
@@ -57,6 +59,9 @@ export const NODES = (
   new WeaveGroupNode(),
   new WeaveRectangleNode({ config: { label: { engine: "native" } } }),
   new WeaveEllipseNode({ config: { label: { engine: "native" } } }),
+  ...(STICKY_NOTE_ENABLED
+    ? [new WeaveStickyNoteNode({ config: { label: { engine: "native" } } })]
+    : []),
   new WeaveLineNode(),
   new WeaveStrokeNode(),
   new WeaveStrokeSingleNode(),
