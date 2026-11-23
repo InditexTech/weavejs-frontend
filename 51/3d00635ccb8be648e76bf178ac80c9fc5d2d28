@@ -1,0 +1,29 @@
+openspec/changes/archive/2026-11-23-use-server-generated-page-ids/.openspec.yaml
+  s_11d4064529cfc9::t_b7ceea12a2a540 1-2
+openspec/changes/archive/2026-11-23-use-server-generated-page-ids/design.md
+  s_11d4064529cfc9::t_67ef6a70a9470b 1-32
+openspec/changes/archive/2026-11-23-use-server-generated-page-ids/proposal.md
+  s_11d4064529cfc9::t_e412fc392d2a99 1-30
+openspec/changes/archive/2026-11-23-use-server-generated-page-ids/specs/page-creation/spec.md
+  s_11d4064529cfc9::t_a9f85b00507d9b 1-37
+openspec/changes/archive/2026-11-23-use-server-generated-page-ids/tasks.md
+  s_11d4064529cfc9::t_ed6088a74eb7fc 1-18
+openspec/specs/page-creation/spec.md
+  s_11d4064529cfc9::t_48b94fe1cdc295 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "513d00635ccb8be648e76bf178ac80c9fc5d2d28",
+  "prompts": {},
+  "sessions": {
+    "s_11d4064529cfc9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df7a97f1affebHRDRtF2x1lz0W",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
