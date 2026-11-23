@@ -1,0 +1,27 @@
+code/api/pages/post-page.ts
+  s_11d4064529cfc9::t_e166066c00d8f2 5-13,35
+code/components/room-components/hooks/use-create-page-from-template.tsx
+  s_11d4064529cfc9::t_deb6d044b1c42a 123-124
+code/components/room-components/hooks/use-manage-room-pages.tsx
+  s_11d4064529cfc9::t_b3943866a4d464 48,51
+code/components/room-components/pages-library/pages.grid.tsx
+  s_11d4064529cfc9::t_5e5baa24ccb0ac 190-191
+code/components/room-components/pages-library/pages.list.tsx
+  s_11d4064529cfc9::t_9932f7b6c50085 208-209
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "0c0ba16dfa9e3f49afd531cbf36569bafd1da77d",
+  "prompts": {},
+  "sessions": {
+    "s_11d4064529cfc9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df7a97f1affebHRDRtF2x1lz0W",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
