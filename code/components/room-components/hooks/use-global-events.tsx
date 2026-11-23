@@ -10,6 +10,10 @@ import { useCollaborationRoom } from "@/store/store";
 import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
 import { postCommBusJoin } from "@/api/post-comm-bus-join";
 import { useGetSession } from "./use-get-session";
+import {
+  parseBusFrame,
+  validateGlobalEvent,
+} from "./use-tasks-events.validate";
 
 const GLOBAL_BUS_ROOM = "weavejsGlobal";
 const emitter = new Emittery();
@@ -58,27 +62,16 @@ export const useGlobalEvents = () => {
       };
 
       ws.onmessage = async (event) => {
-        const message = JSON.parse(event.data);
-        const type = message.type;
+        const message = parseBusFrame(event.data, false);
 
-        if (["pageCreated"].includes(type)) {
-          emitter.emit("pageCreated", message.payload);
+        if (!message) {
+          return;
         }
 
-        if (["pageDeleted"].includes(type)) {
-          emitter.emit("pageDeleted", message.payload);
-        }
+        const eventPayload = validateGlobalEvent(message);
 
-        if (["roomUpdated"].includes(type)) {
-          emitter.emit("roomUpdated", message.payload);
-        }
-
-        if (["roomThumbnailUpdated"].includes(type)) {
-          emitter.emit("roomThumbnailUpdated", message.payload);
-        }
-
-        if (["roomDeleted"].includes(type)) {
-          emitter.emit("roomDeleted", message.payload);
+        if (eventPayload) {
+          emitter.emit(message.type, eventPayload);
         }
       };
 

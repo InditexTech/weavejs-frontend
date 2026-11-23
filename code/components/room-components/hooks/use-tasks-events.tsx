@@ -13,6 +13,13 @@ import { eventBus } from "@/components/utils/events-bus";
 import { getCommBusNegotiate } from "@/api/get-comm-bus-negotiate";
 import { postCommBusJoin } from "@/api/post-comm-bus-join";
 import { useGetSession } from "./use-get-session";
+import {
+  isStateEventType,
+  parseBusFrame,
+  pruneForeignPageMembers,
+  validateHeartbeat,
+  validateStateEvent,
+} from "./use-tasks-events.validate";
 
 type Member = {
   clientId: string;
@@ -142,26 +149,31 @@ export const useTasksEvents = () => {
       };
 
       ws.onmessage = async (event) => {
-        const payload = JSON.parse(event.data);
-        const message = payload.data;
-        const type = message?.type ?? "";
-        const messageClientId = message?.clientId ?? "";
-        const messageUserId = message?.userId ?? "";
+        const message = parseBusFrame(event.data);
+
+        if (!message) {
+          return;
+        }
+
+        const type = message.type;
+        const messageClientId = message.clientId ?? "";
+        const messageUserId = message.userId ?? "";
 
         if (type.startsWith("client.heartbeat")) {
-          let pageMembers =
-            pageMembersRef.current?.[`${message.roomId}.${message.pageId}`];
-          if (
-            !pageMembersRef.current?.[`${message.roomId}.${message.pageId}`]
-          ) {
-            pageMembersRef.current[`${message.roomId}.${message.pageId}`] =
-              new Map();
-            pageMembers =
-              pageMembersRef.current?.[`${message.roomId}.${message.pageId}`];
+          const heartbeat = validateHeartbeat(message, room);
+
+          if (!heartbeat) {
+            return;
           }
 
-          pageMembers.set(messageClientId, {
-            clientId: messageClientId,
+          const key = `${heartbeat.roomId}.${heartbeat.pageId}`;
+
+          if (!pageMembersRef.current[key]) {
+            pageMembersRef.current[key] = new Map();
+          }
+
+          pageMembersRef.current[key].set(heartbeat.clientId, {
+            clientId: heartbeat.clientId,
             lastSeen: Date.now(),
           });
         }
@@ -206,28 +218,11 @@ export const useTasksEvents = () => {
           queryClient.invalidateQueries({ queryKey });
         }
 
-        if (["roomUpdated"].includes(type)) {
-          emitter.emit("roomUpdated", message.payload);
-        }
-
-        if (["roomDeleted"].includes(type)) {
-          emitter.emit("roomDeleted", message.payload);
-        }
-
-        if (["pageCreated"].includes(type)) {
-          emitter.emit("pageCreated", message.payload);
-        }
-
-        if (["pageUpdated"].includes(type)) {
-          emitter.emit("pageUpdated", message.payload);
-        }
-
-        if (["pageThumbnailUpdated"].includes(type)) {
-          emitter.emit("pageThumbnailUpdated", message.payload);
-        }
-
-        if (["pageDeleted"].includes(type)) {
-          emitter.emit("pageDeleted", message.payload);
+        if (isStateEventType(type)) {
+          const eventPayload = validateStateEvent(message, room);
+          if (eventPayload) {
+            emitter.emit(type, eventPayload);
+          }
         }
 
         if (
@@ -724,7 +719,14 @@ export const useTasksEvents = () => {
         pageMembers = pageMembersRef.current?.[`${room}.${pageId}`];
       }
 
-      cleanupMembers(pageMembers);
+      pruneForeignPageMembers(pageMembersRef.current, room);
+
+      for (const [key, members] of Object.entries(pageMembersRef.current)) {
+        cleanupMembers(members);
+        if (members.size === 0 && key !== `${room}.${pageId}`) {
+          delete pageMembersRef.current[key];
+        }
+      }
 
       const newLeader = electLeader(pageMembers);
 
