@@ -1,0 +1,40 @@
+.opencode/commands/opsx-apply.md
+  h_c93d154c7c7074 1-195
+.opencode/commands/opsx-archive.md
+  h_c93d154c7c7074 1-250
+.opencode/commands/opsx-explore.md
+  h_c93d154c7c7074 1-236
+.opencode/commands/opsx-propose.md
+  h_c93d154c7c7074 1-167
+.opencode/commands/opsx-sync.md
+  h_c93d154c7c7074 1-283
+.opencode/commands/opsx-update.md
+  h_c93d154c7c7074 1-102
+.opencode/commands/opsx-verify.md
+  h_c93d154c7c7074 1-212
+.opencode/skills/openspec-apply-change/SKILL.md
+  h_c93d154c7c7074 1-202
+.opencode/skills/openspec-archive-change/SKILL.md
+  h_c93d154c7c7074 1-210
+.opencode/skills/openspec-explore/SKILL.md
+  h_c93d154c7c7074 1-354
+.opencode/skills/openspec-propose/SKILL.md
+  h_c93d154c7c7074 1-174
+.opencode/skills/openspec-sync-specs/SKILL.md
+  h_c93d154c7c7074 1-290
+.opencode/skills/openspec-update-change/SKILL.md
+  h_c93d154c7c7074 1-109
+.opencode/skills/openspec-verify-change/SKILL.md
+  h_c93d154c7c7074 1-220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "77b4e169b24174704a2bdf50f5aba800cd4af7a5",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
