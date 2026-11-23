@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
 import { WeaveStateManipulation } from "@inditextech/weave-sdk";
 import { useWeave } from "@inditextech/weave-react";
 import { toast } from "sonner";
@@ -91,7 +90,6 @@ export const useCreatePageFromTemplate = (
 
   const createPage = useMutation({
     mutationFn: async (params: {
-      pageId: string;
       name: string;
       thumbnail: string;
       templateId: string;
@@ -104,7 +102,6 @@ export const useCreatePageFromTemplate = (
       );
 
       const payloadParams = {
-        pageId: params.pageId,
         name: params.name,
         thumbnail: params.thumbnail,
         templateId: params.templateId,
@@ -123,8 +120,8 @@ export const useCreatePageFromTemplate = (
         toast.dismiss(createToastRef.current);
       }
     },
-    onSuccess: async (_, { pageId }) => {
-      await handleSwitchPage(pagesAmount + 1, pageId);
+    onSuccess: async (page) => {
+      await handleSwitchPage(pagesAmount + 1, page.pageId);
       toast.success("Template materialized on the page successfully");
     },
     onError: () => {
@@ -139,7 +136,6 @@ export const useCreatePageFromTemplate = (
         duration: Infinity,
       });
       createPage.mutate({
-        pageId: `${hookParams.roomId}-${uuidv4()}`,
         name: "New page",
         thumbnail: "",
         templateId,

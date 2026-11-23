@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from "uuid";
 import { getPages } from "@/api/pages/get-pages";
 import { postPage } from "@/api/pages/post-page";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -37,7 +36,6 @@ export const useManageRoomPages = (roomId: string | undefined) => {
 
   const createPage = useMutation({
     mutationFn: async (params: {
-      pageId: string;
       name: string;
       thumbnail: string;
     }) => {
@@ -47,10 +45,10 @@ export const useManageRoomPages = (roomId: string | undefined) => {
 
       return await postPage(roomId, params);
     },
-    onSuccess: (_, { pageId }) => {
+    onSuccess: (page) => {
       setStatus("managed");
       setActualPage(1);
-      setActualPageId(pageId);
+      setActualPageId(page.pageId);
     },
     onError: (error) => {
       console.error("Error creating page", error);
@@ -115,7 +113,6 @@ export const useManageRoomPages = (roomId: string | undefined) => {
       }
       pageCreationAttemptedRef.current = true;
       createPageMutate({
-        pageId: uuidv4(),
         name: "New page",
         thumbnail: "",
       });

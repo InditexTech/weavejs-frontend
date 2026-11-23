@@ -2,19 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { getPages } from "@/api/pages/get-pages";
 import { useCollaborationRoom } from "@/store/store";
 import { toast } from "sonner";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { PageGrid } from "./page.grid";
 import { Plus } from "lucide-react";
-import { postPage } from "@/api/pages/post-page";
+import { useCreatePage } from "../hooks/use-create-page";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
@@ -170,30 +165,11 @@ export const PagesGrid = () => {
     setPagesActualPages(allPages);
   }, [allPages, setPagesActualPages]);
 
-  const createPage = useMutation({
-    mutationFn: async (params: {
-      pageId: string;
-      name: string;
-      thumbnail: string;
-    }) => {
-      if (!roomId) {
-        throw new Error("Room ID is required to create a page");
-      }
-
-      setRoomPageAdding(true);
-
-      return await postPage(roomId, params);
-    },
-    onSettled: () => {
-      if (createToastRef.current) {
-        toast.dismiss(createToastRef.current);
-      }
-    },
-    onSuccess: (_, { pageId }) => {
-      handleSwitchPage(allPages.length + 1, pageId);
-    },
-    onError: (error) => {
-      console.error("Error creating page", error);
+  const createPage = useCreatePage({
+    roomId,
+    toastRef: createToastRef,
+    onCreated: (page) => {
+      handleSwitchPage(allPages.length + 1, page.pageId);
     },
   });
 
@@ -237,7 +213,6 @@ export const PagesGrid = () => {
                   });
                   setPagesGridVisible(false);
                   createPage.mutate({
-                    pageId: `${roomId}-${uuidv4()}`,
                     name: `New page`,
                     thumbnail: "",
                   });
