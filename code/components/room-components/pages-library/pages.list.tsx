@@ -6,14 +6,10 @@ import React from "react";
 import { getPages } from "@/api/pages/get-pages";
 import { useCollaborationRoom } from "@/store/store";
 import { toast } from "sonner";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Page } from "./page";
 import { Plus } from "lucide-react";
-import { postPage } from "@/api/pages/post-page";
+import { useCreatePage } from "../hooks/use-create-page";
 import { useWeave } from "@inditextech/weave-react";
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
@@ -187,29 +183,11 @@ export const PagesList = () => {
     }
   }, [query.data, setPagesAmount]);
 
-  const createPage = useMutation({
-    mutationFn: async (params: {
-      name: string;
-      thumbnail: string;
-    }) => {
-      if (!roomId) {
-        throw new Error("Room ID is required to create a page");
-      }
-
-      setRoomPageAdding(true);
-
-      return await postPage(roomId, params);
-    },
-    onSettled: () => {
-      if (createToastRef.current) {
-        toast.dismiss(createToastRef.current);
-      }
-    },
-    onSuccess: (page) => {
+  const createPage = useCreatePage({
+    roomId,
+    toastRef: createToastRef,
+    onCreated: (page) => {
       handleSwitchPage(allPages.length + 1, page.pageId);
-    },
-    onError: (error) => {
-      console.error("Error creating page", error);
     },
   });
 
