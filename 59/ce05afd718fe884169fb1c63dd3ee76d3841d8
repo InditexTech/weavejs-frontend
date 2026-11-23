@@ -1,0 +1,19 @@
+REUSE.toml
+  s_11d4064529cfc9::t_22e1b5191fabeb 12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "59ce05afd718fe884169fb1c63dd3ee76d3841d8",
+  "prompts": {},
+  "sessions": {
+    "s_11d4064529cfc9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df7a97f1affebHRDRtF2x1lz0W",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
