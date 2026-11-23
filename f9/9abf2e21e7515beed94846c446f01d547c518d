@@ -1,0 +1,45 @@
+code/components/room-components/hooks/use-global-events.tsx
+  s_3df7a2ca5a3c22::t_6a239d2a7bec62 13-16,65,67-68,71,73-74
+code/components/room-components/hooks/use-tasks-events.tsx
+  s_3df7a2ca5a3c22::t_cdc2c1f07b2014 16-22,152-160,163-166,169-176,221-225,722-729
+code/components/room-components/hooks/use-tasks-events.validate.test.ts
+  s_3df7a2ca5a3c22::t_93dacebafdf6ee 1-234
+code/components/room-components/hooks/use-tasks-events.validate.ts
+  s_3df7a2ca5a3c22::t_21323ac5cb518d 1-181
+openspec/changes/archive/2026-11-23-validate-comm-bus-events/.openspec.yaml
+  s_3df7a2ca5a3c22::t_a6c44db25e047b 1-2
+openspec/changes/archive/2026-11-23-validate-comm-bus-events/design.md
+  s_be5584c32d6bf3::t_96dd6b700afe41 1-33
+openspec/changes/archive/2026-11-23-validate-comm-bus-events/proposal.md
+  s_3df7a2ca5a3c22::t_38febb7fc05471 1-29
+openspec/changes/archive/2026-11-23-validate-comm-bus-events/specs/comm-bus-event-validation/spec.md
+  s_be5584c32d6bf3::t_5e30eed94a7e52 1-63
+openspec/changes/archive/2026-11-23-validate-comm-bus-events/tasks.md
+  s_3df7a2ca5a3c22::t_f9f47ba5bea365 1-21
+openspec/specs/comm-bus-event-validation/spec.md
+  s_3df7a2ca5a3c22::t_3f17cb98daeede 1-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "f99abf2e21e7515beed94846c446f01d547c518d",
+  "prompts": {},
+  "sessions": {
+    "s_3df7a2ca5a3c22": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df76fe1ecffeWusmbZgsxb1BOZ",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_be5584c32d6bf3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_df782a096ffeljIobzy0k2hdWr",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
