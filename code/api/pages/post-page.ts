@@ -2,17 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export type CreatedPage = {
+  roomId: string;
+  pageId: string;
+  name: string;
+  status: string;
+  position: number;
+  index: number;
+};
+
 export const postPage = async (
   roomId: string,
   {
-    pageId,
     name,
     thumbnail,
     position,
     templateId,
     target,
   }: {
-    pageId: string;
     name: string;
     thumbnail: string;
     position?: number;
@@ -25,7 +32,7 @@ export const postPage = async (
       };
     };
   },
-) => {
+): Promise<CreatedPage> => {
   const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
   const hubName = import.meta.env.VITE_API_ENDPOINT_HUB_NAME;
 
@@ -37,7 +44,6 @@ export const postPage = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      pageId,
       name,
       thumbnail,
       position,

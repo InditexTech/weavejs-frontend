@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { getPages } from "@/api/pages/get-pages";
 import { useCollaborationRoom } from "@/store/store";
@@ -190,7 +189,6 @@ export const PagesList = () => {
 
   const createPage = useMutation({
     mutationFn: async (params: {
-      pageId: string;
       name: string;
       thumbnail: string;
     }) => {
@@ -207,8 +205,8 @@ export const PagesList = () => {
         toast.dismiss(createToastRef.current);
       }
     },
-    onSuccess: (_, { pageId }) => {
-      handleSwitchPage(allPages.length + 1, pageId);
+    onSuccess: (page) => {
+      handleSwitchPage(allPages.length + 1, page.pageId);
     },
     onError: (error) => {
       console.error("Error creating page", error);
@@ -265,7 +263,6 @@ export const PagesList = () => {
                   });
                   setPagesListVisible(false);
                   createPage.mutate({
-                    pageId: `${roomId}-${uuidv4()}`,
                     name: `New page`,
                     thumbnail: "",
                   });
