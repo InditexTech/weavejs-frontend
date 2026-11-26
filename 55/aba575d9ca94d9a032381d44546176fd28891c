@@ -1,0 +1,19 @@
+openspec/specs/consent-management/spec.md
+  s_483d62c6242f9c::t_08a2ed0405bd06 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "55aba575d9ca94d9a032381d44546176fd28891c",
+  "prompts": {},
+  "sessions": {
+    "s_483d62c6242f9c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7bdd257ffeKtKn6CqBjz79MN",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
