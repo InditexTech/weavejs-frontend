@@ -119,9 +119,9 @@ export const ShowcaseLeftSidebar = ({
               <div className="flex flex-col gap-0 justify-start items-start font-light text-base">
                 <span>{session.user.name}</span>
                 <b className="text-sm">{session.user.email}</b>
+                {showUserId && <ShowcaseUserId userId={session.user.id} />}
               </div>
             </div>
-            {showUserId && <ShowcaseUserId userId={session.user.id} />}
             <Divider className="h-[0.5px] w-full" />
             <Button
               variant="link"

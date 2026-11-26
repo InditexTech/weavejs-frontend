@@ -21,8 +21,7 @@ export const ShowcaseUserId = ({ userId }: ShowcaseUserIdProps) => {
   }, [userId]);
 
   return (
-    <div className="w-full flex items-center gap-2 text-xs font-light text-muted-foreground">
-      <span className="shrink-0">User ID</span>
+    <div className="w-full mt-1 flex items-center gap-2 text-xs font-light text-muted-foreground">
       <code className="font-mono truncate" title={userId}>
         {userId}
       </code>
