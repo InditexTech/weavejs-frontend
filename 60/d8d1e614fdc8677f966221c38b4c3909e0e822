@@ -1,0 +1,39 @@
+.github/workflows/code-deploy.yml
+  s_37f704a6628bd3::t_a75ea4b734d6af 52,89
+code/components/consent/onetrust-scripts.test.tsx
+  s_37f704a6628bd3::t_72f8308cae3a00 1-39
+code/components/consent/onetrust-scripts.tsx
+  s_37f704a6628bd3::t_9397324476d0ae 1-32
+code/lib/onetrust.test.ts
+  s_37f704a6628bd3::t_0329bc2e559b14 1-32
+code/lib/onetrust.ts
+  s_37f704a6628bd3::t_70ce52ac75a27f 1-31
+code/src/routes/__root.tsx
+  s_37f704a6628bd3::t_da98b791fa4294 20-21,86
+openspec/changes/add-onetrust-consent-scripts/.openspec.yaml
+  s_37f704a6628bd3::t_2afdbeb0fa5f35 1-2
+openspec/changes/add-onetrust-consent-scripts/design.md
+  s_37f704a6628bd3::t_09b7ec3e032277 1-39
+openspec/changes/add-onetrust-consent-scripts/proposal.md
+  s_37f704a6628bd3::t_111ffdae6a0a8d 1-31
+openspec/changes/add-onetrust-consent-scripts/specs/consent-management/spec.md
+  s_37f704a6628bd3::t_a5fc4f92e51017 1-47
+openspec/changes/add-onetrust-consent-scripts/tasks.md
+  s_37f704a6628bd3::t_a285b58a2c7d5d 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "60d8d1e614fdc8677f966221c38b4c3909e0e822",
+  "prompts": {},
+  "sessions": {
+    "s_37f704a6628bd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_dec62cf3effetsvpG1ggFybQYS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
