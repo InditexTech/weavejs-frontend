@@ -37,7 +37,7 @@ const HomeInternal = () => {
   return (
     <>
       <main className="w-full h-full grid grid-cols-[400px_1fr] 2xl:grid-cols-[400px_1fr] flex justify-center items-center relative">
-        <ShowcaseLeftSidebar />
+        <ShowcaseLeftSidebar showUserId />
         <div className="w-full h-dvh flex flex-col items-center justify-center">
           {!session && <SessionLogin />}
           {session && <Rooms kind="showcase" />}
