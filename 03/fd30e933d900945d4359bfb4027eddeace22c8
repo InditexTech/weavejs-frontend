@@ -1,0 +1,25 @@
+code/components/home/home.tsx
+  s_1b5def980610fe::t_c5703f0a45e832 40
+code/components/showcase/showcase.left-sidebar.tsx
+  s_1b5def980610fe::t_aea2a8a6608bbf 29,31-37,124
+code/components/showcase/showcase.user-id.test.tsx
+  s_1b5def980610fe::t_ac618d80e9d620 1-49
+code/components/showcase/showcase.user-id.tsx
+  s_1b5def980610fe::t_cf9625f225eccb 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "03fd30e933d900945d4359bfb4027eddeace22c8",
+  "prompts": {},
+  "sessions": {
+    "s_1b5def980610fe": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de8b614d0ffesUrCjfyCf1iIMS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
