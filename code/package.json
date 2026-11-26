@@ -23,6 +23,7 @@
     "release": "nx run-many -t release",
     "start": "node --env-file=.env.production .output/server/index.mjs",
     "storage:cleanup": "tsx ./actions/storage-cleanup/index.ts",
+    "test:e2e": "playwright test",
     "tailwind:build": "npx tailwindcss -i ./app/globals.css -o ./public/tailwind-shadow.css --minify",
     "verify": "npm ci --force && npm run lint && npm run build",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && lerna version $BUMP_DEVELOP_VERSION --no-git-tag-version --no-push --force-publish --exact --yes && npm version $(npm version minor)-SNAPSHOT",

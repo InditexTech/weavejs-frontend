@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { PenBar } from "./pen-bar";
+import { penBarInsets, ROOM_FOOTER_HEIGHT } from "@/lib/pens-eraser/placement";
 import React from "react";
 import Konva from "konva";
 import { useWeave } from "@inditextech/weave-react";
@@ -14,6 +16,12 @@ import { useOnPasteExternalText } from "../hooks/use-on-paste-external-text";
 
 export function ToolsOverlay() {
   const instance = useWeave((state) => state.instance);
+
+  const viewType = useCollaborationRoom((state) => state.viewType);
+  const showRightSidebarFloating = useCollaborationRoom(
+    (state) => state.showRightSidebarFloating,
+  );
+  const insets = penBarInsets(viewType, showRightSidebarFloating);
 
   const setCroppingImage = useCollaborationRoom(
     (state) => state.setCroppingImage,
@@ -56,6 +64,7 @@ export function ToolsOverlay() {
   return (
     <>
       <ToolsOverlayMain />
+      <PenBar footerHeight={ROOM_FOOTER_HEIGHT} {...insets} />
       <ToolsNodeOverlay />
       <ToolsNodeOverlayV2 />
     </>

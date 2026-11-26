@@ -9,6 +9,10 @@ import { useCollaborationRoom } from "@/store/store";
 import { MEASURE_NODE_TYPE } from "@/components/use-cases/standalone/nodes/measure/constants";
 import { isRichTextNode } from "../text-toolbar/types";
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
+import {
+  STROKE_ERASER_LABEL,
+  STROKE_ERASER_TOOL,
+} from "@/lib/pens-eraser/tool";
 
 export const useNodeActionName = () => {
   const instance = useWeave((state) => state.instance);
@@ -119,6 +123,8 @@ export const useNodeActionName = () => {
         return "Move";
       case "maskEraserTool":
         return "Eraser";
+      case STROKE_ERASER_TOOL:
+        return STROKE_ERASER_LABEL;
       default:
         return "Unknown";
     }

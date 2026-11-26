@@ -58,6 +58,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 3000,
+      // A local weavejs checkout lives outside this project, so Vite must be
+      // allowed to serve its sources (dev only, when DEV_WEAVEJS_REPO_PATH is set).
+      ...(WEAVEJS_REPO_PATH
+        ? { fs: { allow: [process.cwd(), WEAVEJS_REPO_PATH] } }
+        : {}),
       // Nitro's dev-mode route-rules proxy (nitro.config.ts) skips any
       // request whose `Sec-Fetch-Dest` isn't document/iframe/frame/empty
       // (see nitro/dist/_build/vite.dev.mjs's nitroDevMiddlewarePre), so

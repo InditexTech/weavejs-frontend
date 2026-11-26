@@ -24,6 +24,7 @@ import { ToolbarDivider } from "@/components/room-components/toolbar/toolbar-div
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 import { MoveToolTrigger } from "@/components/room-components/overlay/tools-triggers/move-tool";
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
+import { useStrokeEraserHotkey } from "@/lib/pens-eraser/use-stroke-eraser-hotkey";
 
 export function Tools() {
   const instance = useWeave((state) => state.instance);
@@ -44,6 +45,11 @@ export function Tools() {
     },
     [instance, actualAction],
   );
+
+  // The standalone use case has no keyboard handler of its own.
+  useStrokeEraserHotkey(triggerTool, {
+    enabled: weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
+  });
 
   return (
     <div className="pointer-events-none absolute left-[8px] top-[8px] bottom-[8px] flex flex-col gap-2 justify-center items-center ">

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { PenBar } from "@/components/room-components/overlay/pen-bar";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
@@ -174,6 +175,7 @@ export const ImageCanvasLayout = () => {
       {weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
         <>
           <Tools />
+          <PenBar />
           {exporting && (
             <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-black/20 flex flex-col justify-center items-center">
               <div className="flex flex-col gap-1 justify-center items-center bg-white p-5">
