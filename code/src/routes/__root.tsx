@@ -17,6 +17,8 @@ import {
 } from "../../lib/coming-soon-preview-browser";
 import { isAllowedPath, isComingSoonEnabled } from "../../lib/coming-soon";
 import { VIEWPORT_CONTENT } from "../../lib/viewport";
+import { getAppEnv } from "../../lib/onetrust";
+import { OneTrustScripts } from "@/components/consent/onetrust-scripts";
 import { ComingSoonPage } from "@/components/coming-soon/coming-soon-page";
 import { NotFound } from "@/components/not-found/not-found";
 
@@ -81,6 +83,7 @@ function RootLayout() {
   return (
     <html lang="en">
       <head>
+        <OneTrustScripts env={getAppEnv()} />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <HeadContent />
       </head>
