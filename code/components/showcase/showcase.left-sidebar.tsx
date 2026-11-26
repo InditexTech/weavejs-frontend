@@ -26,8 +26,15 @@ import packageJson from "@/package.json";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
+import { ShowcaseUserId } from "./showcase.user-id";
 
-export const ShowcaseLeftSidebar = () => {
+type ShowcaseLeftSidebarProps = {
+  showUserId?: boolean;
+};
+
+export const ShowcaseLeftSidebar = ({
+  showUserId = false,
+}: ShowcaseLeftSidebarProps) => {
   const navigate = useNavigate();
   const location = useRouterState({ select: (s) => s.location });
 
@@ -114,6 +121,7 @@ export const ShowcaseLeftSidebar = () => {
                 <b className="text-sm">{session.user.email}</b>
               </div>
             </div>
+            {showUserId && <ShowcaseUserId userId={session.user.id} />}
             <Divider className="h-[0.5px] w-full" />
             <Button
               variant="link"
