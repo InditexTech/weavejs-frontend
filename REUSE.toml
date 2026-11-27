@@ -9,6 +9,8 @@ path = [
     ".github/**",
     "REUSE.toml",
     "PRODUCT.md",
+    "skills-lock.json",
+    "sonar-project.properties",
     "repolinter.json",
     ".opencode/**",
     "openspec/**",
@@ -41,5 +43,11 @@ SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
 path = "code/components/stageshow/**"
+SPDX-FileCopyrightText = "2026 Benji Taylor"
+SPDX-License-Identifier = "MIT"
+
+# The stageshow agent skill, as published upstream (see its LICENSE and NOTICE.md)
+[[annotations]]
+path = ".agents/skills/stageshow/**"
 SPDX-FileCopyrightText = "2026 Benji Taylor"
 SPDX-License-Identifier = "MIT"
