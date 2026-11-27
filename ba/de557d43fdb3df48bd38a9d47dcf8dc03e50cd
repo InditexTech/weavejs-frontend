@@ -1,0 +1,29 @@
+.agents/skills/stageshow/examples/weave-hero/index.tsx
+  s_a991fe62202971::t_a30db9115e25e8 1-222
+.agents/skills/stageshow/examples/weave-hero/weave-hero.css
+  s_a991fe62202971::t_4914cd4809d612 1-315
+.agents/skills/stageshow/package-lock.json
+  s_a991fe62202971::t_785676608c52ba 1-1938
+.gitignore
+  s_a991fe62202971::t_6d42068d48b88a 2-5
+REUSE.toml
+  s_a991fe62202971::t_1ea98887e2efdf 12-13,48-53
+sonar-project.properties
+  s_a991fe62202971::t_4e24db656a8ee2 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "bade557d43fdb3df48bd38a9d47dcf8dc03e50cd",
+  "prompts": {},
+  "sessions": {
+    "s_a991fe62202971": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de3aadef0ffehkrO589WZC29JG",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
