@@ -66,6 +66,7 @@ import {
   viewCommentDOM,
 } from "./components/comment/comment-dom";
 import { MeasureNode } from "./nodes/measure/measure";
+import { strokeEraserActions } from "@/lib/pens-eraser/actions";
 import { MeasureToolAction } from "./actions/measure-tool/measure-tool";
 
 const FONTS = async (): Promise<WeaveFont[]> => {
@@ -527,6 +528,7 @@ const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
+  ...strokeEraserActions(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
   new WeaveStrokeToolAction(),

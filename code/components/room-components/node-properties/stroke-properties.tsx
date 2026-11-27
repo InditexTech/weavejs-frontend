@@ -11,6 +11,8 @@ import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { InputNumber } from "../inputs/input-number";
 import InputSelect from "../inputs/input-select";
+import { PenSection } from "./pen-section";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
 
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -89,6 +91,9 @@ export function StrokeProperties() {
     return null;
   }
 
+  // The pen section carries the size, colour and opacity of the brush.
+  const penSection = PENS_AND_ERASER_AVAILABLE && actualAction === "brushTool";
+
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">
       {/* <div className="w-full flex justify-between items-center gap-3">
@@ -116,20 +121,22 @@ export function StrokeProperties() {
         />
       </div> */}
       <div className="grid grid-cols-2 gap-3 w-full">
-        <InputColor
-          label="Stroke color (#RGBA)"
-          value={actualNode.props.stroke}
-          onChange={(value) => {
-            const updatedNode: WeaveStateElement = {
-              ...actualNode,
-              props: {
-                ...actualNode.props,
-                stroke: value,
-              },
-            };
-            updateElement(updatedNode);
-          }}
-        />
+        {!penSection && (
+          <InputColor
+            label="Stroke color (#RGBA)"
+            value={actualNode.props.stroke}
+            onChange={(value) => {
+              const updatedNode: WeaveStateElement = {
+                ...actualNode,
+                props: {
+                  ...actualNode.props,
+                  stroke: value,
+                },
+              };
+              updateElement(updatedNode);
+            }}
+          />
+        )}
         {(["stroke-single", "connector"].includes(actualNode.type) ||
           ["strokeTool", "arrowTool"].includes(actualAction)) && (
           <>
@@ -181,24 +188,26 @@ export function StrokeProperties() {
             </div>
           </>
         )}
-        {(actualNode.type === "stroke" || actualAction === "brushTool") && (
-          <InputNumber
-            label="Brush size"
-            value={actualNode.props.strokeWidth ?? 1}
-            min={1}
-            max={50}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  strokeWidth: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-        )}
+        {actualAction === "brushTool" && <PenSection />}
+        {(actualNode.type === "stroke" || actualAction === "brushTool") &&
+          !penSection && (
+            <InputNumber
+              label="Brush size"
+              value={actualNode.props.strokeWidth ?? 1}
+              min={1}
+              max={50}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    strokeWidth: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+          )}
         {(["stroke-single"].includes(actualNode.type) ||
           ["strokeTool", "arrowTool"].includes(actualAction)) && (
           <>

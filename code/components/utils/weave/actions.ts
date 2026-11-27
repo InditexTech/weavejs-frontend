@@ -37,6 +37,7 @@ import { ImageTemplateToolAction } from "../../actions/image-template-tool/image
 import { ImageWithTitleToolAction } from "../../actions/image-with-title-tool/image-with-title-tool";
 import { MaskToolAction } from "../../actions/mask-tool/mask-tool";
 import { FuzzyMaskToolAction } from "../../actions/fuzzy-mask-tool/fuzzy-mask-tool";
+import { strokeEraserActions } from "@/lib/pens-eraser/actions";
 import { MaskEraserToolAction } from "../../actions/mask-eraser-tool/mask-eraser-tool";
 import { getContrastTextColor, stringToColor } from "@/lib/utils";
 import { ThreadEntity } from "../../room-components/hooks/types";
@@ -47,6 +48,7 @@ export const ACTIONS = (getUser: () => WeaveUser) => [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
+  ...strokeEraserActions(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
   ...(STICKY_NOTE_ENABLED ? [new WeaveStickyNoteToolAction()] : []),

@@ -21,6 +21,8 @@ import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { useHandleGuides } from "./use-handle-guides";
 import Konva from "konva";
 import { STICKY_NOTE_ENABLED } from "@/lib/sticky-note";
+import { isZoomingAllowed as isZoomingAllowedFor } from "@/lib/pens-eraser/tool";
+import { useStrokeEraserHotkey } from "@/lib/pens-eraser/use-stroke-eraser-hotkey";
 
 export function useKeyboardHandler() {
   const instance = useWeave((state) => state.instance);
@@ -92,14 +94,7 @@ export function useKeyboardHandler() {
   }, [instance]);
 
   const isZoomingAllowed = React.useMemo(() => {
-    const allowedZoomActions = ["selectionTool", "moveTool", "eraserTool"];
-    if (typeof actualAction === "undefined") {
-      return true;
-    }
-    if (allowedZoomActions.includes(actualAction)) {
-      return true;
-    }
-    return false;
+    return isZoomingAllowedFor(actualAction);
   }, [actualAction]);
 
   const { copyGuides, pasteGuides, toggleContainerGuides } = useHandleGuides();
@@ -240,6 +235,16 @@ export function useKeyboardHandler() {
   );
 
   // SHAPES TOOLS
+
+  useStrokeEraserHotkey(
+    (toolName) => {
+      if (guidesSequence) {
+        return;
+      }
+      triggerTool(toolName);
+    },
+    { enabled: keysEnabled },
+  );
 
   useHotkey(
     { key: "R", mod: false, shift: false },
