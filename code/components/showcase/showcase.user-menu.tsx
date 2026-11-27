@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from "react";
-import { ChevronsUpDown, Copy, LogOut } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -134,7 +134,6 @@ export const ShowcaseUserMenu = ({
                 void copyUserId(user.id);
               }}
             >
-              <Copy strokeWidth={1} />
               COPY USER ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -147,7 +146,6 @@ export const ShowcaseUserMenu = ({
             void handleSignOut();
           }}
         >
-          <LogOut strokeWidth={1} />
           {signingOut ? "SIGNING OUT…" : "SIGN OUT"}
         </DropdownMenuItem>
       </DropdownMenuContent>
