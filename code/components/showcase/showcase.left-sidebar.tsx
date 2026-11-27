@@ -15,10 +15,9 @@ import { BuildInfo } from "../utils/build-info";
 import { cn } from "@/lib/utils";
 import { ShowcaseUserMenu } from "./showcase.user-menu";
 
-const rowClass = (active: boolean, size: "nav" | "utility" = "nav") =>
+const rowClass = (active: boolean) =>
   cn(
-    "w-[calc(100%+1.5rem)] -mx-3 px-3 py-2 inline-flex items-center gap-2 text-left cursor-pointer font-inter tracking-wide transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-black",
-    size === "nav" ? "text-base" : "text-sm",
+    "w-[calc(100%+1.5rem)] -mx-3 px-3 py-2 inline-flex items-center gap-2 text-left text-base cursor-pointer font-inter tracking-wide transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-black",
     active
       ? "bg-neutral-100 text-black font-normal"
       : "text-neutral-600 font-light hover:bg-neutral-50 hover:text-black",
@@ -27,18 +26,16 @@ const rowClass = (active: boolean, size: "nav" | "utility" = "nav") =>
 const SidebarNavLink = ({
   to,
   active,
-  size = "nav",
   children,
 }: Readonly<{
   to: string;
   active: boolean;
-  size?: "nav" | "utility";
   children: React.ReactNode;
 }>) => (
   <Link
     to={to}
     aria-current={active ? "page" : undefined}
-    className={cn(rowClass(active, size), active && "pointer-events-none")}
+    className={cn(rowClass(active), active && "pointer-events-none")}
   >
     {children}
   </Link>
@@ -65,7 +62,6 @@ export const ShowcaseLeftSidebar = () => {
       key={page.to}
       to={page.to}
       active={location.pathname === page.to}
-      size="utility"
     >
       {page.label}
     </SidebarNavLink>
@@ -101,7 +97,7 @@ export const ShowcaseLeftSidebar = () => {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={rowClass(false, "utility")}
+            className={rowClass(false)}
           >
             GITHUB <ExternalLink strokeWidth={1} className="size-3.5" />
           </a>
@@ -109,7 +105,7 @@ export const ShowcaseLeftSidebar = () => {
             href={DOCUMENTATION_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={rowClass(false, "utility")}
+            className={rowClass(false)}
           >
             DOCUMENTATION <ExternalLink strokeWidth={1} className="size-3.5" />
           </a>
@@ -119,7 +115,7 @@ export const ShowcaseLeftSidebar = () => {
             onClick={() => {
               setDependenciesVisible(!dependenciesVisible);
             }}
-            className={rowClass(dependenciesVisible, "utility")}
+            className={rowClass(dependenciesVisible)}
           >
             DEPENDENCIES
           </button>
