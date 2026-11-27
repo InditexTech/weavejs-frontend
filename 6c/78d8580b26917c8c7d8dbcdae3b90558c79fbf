@@ -1,0 +1,19 @@
+code/components/stageshow/stage.tsx
+  s_a991fe62202971::t_e133e63444a3f8 277,514
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "6c78d8580b26917c8c7d8dbcdae3b90558c79fbf",
+  "prompts": {},
+  "sessions": {
+    "s_a991fe62202971": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de3aadef0ffehkrO589WZC29JG",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
