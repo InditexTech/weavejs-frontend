@@ -274,7 +274,7 @@ export function Stage<S extends object>({
       })
     }
     if (!document.fonts || document.fonts.status === 'loaded') release()
-    else document.fonts.ready.then(() => live && release())
+    else document.fonts.ready.then(() => live && release()).catch(() => live && release())
     return () => {
       live = false
       clock.cancelLayoutRaf(frame)
@@ -511,7 +511,7 @@ export function Stage<S extends object>({
           done = true
           finishIdle()
         }
-      })()
+      })().catch((e) => console.error('[stageshow] loop error', e))
     }
     const stop = (glide = false) => {
       unwatchIdle()
