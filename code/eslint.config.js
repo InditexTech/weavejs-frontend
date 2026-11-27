@@ -14,6 +14,10 @@ export default [
       ".nitro/**",
       "dist/**",
       "node_modules/**",
+      // Agent skill tooling installed next to the project
+      ".agents/**",
+      // Vendored third-party code (MIT), kept as upstream
+      "components/stageshow/**",
     ],
   },
 

@@ -3,18 +3,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 type LegalConsentCheckboxProps = {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  className?: string;
 };
 
 export function LegalConsentCheckbox({
   checked,
   onCheckedChange,
+  className,
 }: Readonly<LegalConsentCheckboxProps>) {
   return (
-    <div className="flex items-start gap-2 max-w-[360px] text-xs leading-relaxed text-[#757575]">
+    <div
+      className={cn(
+        "flex items-start gap-2 max-w-[420px] text-sm leading-relaxed text-[#757575]",
+        className,
+      )}
+    >
       <Checkbox
         id="accept-legal-terms"
         className="mt-0.5 cursor-pointer"
