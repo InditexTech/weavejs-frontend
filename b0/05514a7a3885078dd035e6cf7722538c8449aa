@@ -1,0 +1,81 @@
+code/components/room-components/node-properties/appearance-properties.tsx
+  s_483d62c6242f9c::t_2a0425fba5fef1 5,69
+code/components/room-components/node-properties/pen-section.test.tsx
+  s_483d62c6242f9c::t_1dd9ba6805914a 110-125
+code/components/room-components/node-properties/pen-section.tsx
+  s_483d62c6242f9c::t_ed1c8721ca9bd3 7,11,31,43,51,53,55,64-65,75-76,79,101-112
+code/components/room-components/node-properties/stroke-properties.pens.test.tsx
+  s_483d62c6242f9c::t_09b3d00354f74a 28-29
+code/components/room-components/node-properties/stroke-properties.tsx
+  s_483d62c6242f9c::t_c83d25a8fe7a72 15,95
+code/components/room-components/overlay/pen-bar.test.tsx
+  s_483d62c6242f9c::t_b9465edc7b7631 77,151-160,466-571
+code/components/room-components/overlay/pen-bar.tsx
+  s_483d62c6242f9c::t_f971f94acf4e0b 11,15,52,72-81,119,129,142-148,157-162,266
+code/components/room-components/pens/eraser-shape-toggle.tsx
+  s_483d62c6242f9c::t_9fc2e9c02d78e0 1-65
+code/components/room-components/pens/morph-bar.test.tsx
+  s_483d62c6242f9c::t_47105f879f1572 27,40
+code/components/room-components/pens/pen-art.tsx
+  s_483d62c6242f9c::t_84704b64674594 16,25,63,68-69,78,90,92,106,108,120,130,132,137-140,150,157,159,163,169,172,174,181,183-184,192
+code/components/room-components/pens/pen-button.test.tsx
+  s_483d62c6242f9c::t_5d9de6993d717e 1-78
+code/components/room-components/pens/pen-button.tsx
+  s_483d62c6242f9c::t_6506eab6829c51 15-18,23-30,37-38,48,50,55-88
+code/components/room-components/pens/pen-sdk.ts
+  s_483d62c6242f9c::t_c58eea847337c7 8,14,32
+code/components/room-components/pens/use-pen-controls.ts
+  s_483d62c6242f9c::t_fdd0e98a920929 7-8,24-28,47,54,67,84-85,88,104-105,165,175-183,223,228
+code/docs/brush-lab-testers-guide.md
+  s_483d62c6242f9c::t_b837f50682d803 83,97-99
+code/e2e/fixtures.ts
+  s_483d62c6242f9c::t_8634db1c60b78b 25
+code/e2e/stroke-eraser.e2e.ts
+  s_483d62c6242f9c::t_833b0a1647c95d 261-292
+code/lib/pens-eraser/actions.test.ts
+  s_483d62c6242f9c::t_cb73ba985457d2 5,7-12,15-18,23-30,33-34,39-43,48
+code/lib/pens-eraser/actions.ts
+  s_483d62c6242f9c::t_065c7a5c056123 5-7,9-13
+code/lib/pens-eraser/availability.test.ts
+  s_483d62c6242f9c::t_3c560fe5960bb0 1-27
+code/lib/pens-eraser/availability.ts
+  s_483d62c6242f9c::t_1287fe692cc022 1-10
+code/lib/pens-eraser/sdk.test.ts
+  s_483d62c6242f9c::t_c39b717e1da868 1-50
+code/lib/pens-eraser/sdk.ts
+  s_483d62c6242f9c::t_cf52f4c50f9b46 1-49
+code/lib/pens-eraser/shape.test.ts
+  s_483d62c6242f9c::t_4e98c12eaaa1c7 1-21
+code/lib/pens-eraser/shape.ts
+  s_483d62c6242f9c::t_62ec7fbceaa53a 1-19
+code/lib/pens-eraser/tool.ts
+  s_483d62c6242f9c::t_ea871d597881c7 5,19
+code/lib/pens-eraser/use-stroke-eraser-hotkey.ts
+  s_483d62c6242f9c::t_e8a31f631bbaa7 6,15
+openspec/changes/add-brush-pens-and-stroke-eraser/design.md
+  s_483d62c6242f9c::t_a06382f03bbd0e 28,39-40,48-49
+openspec/changes/add-brush-pens-and-stroke-eraser/proposal.md
+  s_483d62c6242f9c::t_bda6afe3f9376c 30
+openspec/changes/add-brush-pens-and-stroke-eraser/specs/brush-pens/spec.md
+  s_483d62c6242f9c::t_23f2d599985600 68-78
+openspec/changes/add-brush-pens-and-stroke-eraser/specs/stroke-eraser/spec.md
+  s_483d62c6242f9c::t_87023832f49ef3 75-97
+openspec/changes/add-brush-pens-and-stroke-eraser/tasks.md
+  s_483d62c6242f9c::t_15e1d8fae23e51 7-8,37-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "b005514a7a3885078dd035e6cf7722538c8449aa",
+  "prompts": {},
+  "sessions": {
+    "s_483d62c6242f9c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de7bdd257ffeKtKn6CqBjz79MN",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
