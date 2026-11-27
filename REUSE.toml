@@ -8,6 +8,9 @@ path = [
     # root level licensing
     ".github/**",
     "REUSE.toml",
+    "PRODUCT.md",
+    "skills-lock.json",
+    "sonar-project.properties",
     "repolinter.json",
     ".opencode/**",
     "openspec/**",
@@ -31,8 +34,20 @@ path = [
     "code/justfile",
     "code/package*.json",
     "code/tsconfig.json",
+    "code/content/legal/**",
     "code/components/ui/**",
     "code/components/ai-elements/**"
 ]
 SPDX-FileCopyrightText = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "code/components/stageshow/**"
+SPDX-FileCopyrightText = "2026 Benji Taylor"
+SPDX-License-Identifier = "MIT"
+
+# The stageshow agent skill, as published upstream (see its LICENSE and NOTICE.md)
+[[annotations]]
+path = ".agents/skills/stageshow/**"
+SPDX-FileCopyrightText = "2026 Benji Taylor"
+SPDX-License-Identifier = "MIT"

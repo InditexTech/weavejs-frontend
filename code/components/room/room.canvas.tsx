@@ -74,11 +74,11 @@ export const RoomCanvas = React.memo(() => {
   return (
     <section
       className={cn(
-        "fixed top-0 bottom-0 h-[calc(100%-40px)] flex z-0 overflow-hidden relative",
+        "fixed top-0 bottom-0 h-[calc(100%-var(--room-footer-h))] flex z-0 overflow-hidden relative",
         {
-          ["left-[500px] right-[500px] w-[calc(100%-500px-500px)] max-w-[calc(100%-500px-500px)]"]:
+          ["left-[var(--room-left-w)] right-[var(--room-right-w)] w-[calc(100%-var(--room-left-w)-var(--room-right-w))] max-w-[calc(100%-var(--room-left-w)-var(--room-right-w))]"]:
             !viewType || viewType === "fixed",
-          ["!left-[0px] !top-[54px] right-0 w-[calc(100%)] h-[calc(100%-54px-40px)]"]:
+          ["!left-[0px] !top-[var(--room-toolbar-h)] right-0 w-[calc(100%)] h-[calc(100%-var(--room-toolbar-h)-var(--room-footer-h))]"]:
             viewType === "floating",
         },
       )}

@@ -88,7 +88,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
     >
       <DropdownMenuTrigger
         className={cn(
-          "group flex gap-2 rounded-none h-[32px] font-inter font-light text-lg hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
+          "group flex gap-2 rounded-none h-[32px] font-inter font-light text-lg tracking-[0.04em] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
@@ -99,7 +99,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         {sidebarActive === SIDEBAR_ELEMENTS.images && imagesTotal !== null && (
           <Badge
             variant="secondary"
-            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
+            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[11px] font-medium tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
           >
             {formatBadgeCount(imagesTotal)}
           </Badge>
@@ -107,7 +107,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         {sidebarActive === SIDEBAR_ELEMENTS.videos && videosTotal !== null && (
           <Badge
             variant="secondary"
-            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
+            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[11px] font-medium tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
           >
             {formatBadgeCount(videosTotal)}
           </Badge>
@@ -115,7 +115,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         {sidebarActive === SIDEBAR_ELEMENTS.frames && framesCount !== null && (
           <Badge
             variant="secondary"
-            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
+            className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[11px] font-medium tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
           >
             {formatBadgeCount(framesCount)}
           </Badge>
@@ -124,7 +124,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           templatesTotal !== null && (
             <Badge
               variant="secondary"
-              className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[10px] font-normal tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
+              className="h-[18px] min-w-[18px] px-1 rounded-sm font-inter text-[11px] font-medium tabular-nums transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-500"
             >
               {formatBadgeCount(templatesTotal)}
             </Badge>
@@ -140,13 +140,13 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
         side="bottom"
         alignOffset={0}
         sideOffset={9}
-        className="font-inter rounded-none"
+        className="font-inter rounded-none min-w-[200px]"
       >
         <DropdownMenuGroup>
           {selectedNodes.length > 0 && (
             <>
               <DropdownMenuItem
-                className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+                className="font-normal text-sm cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
@@ -160,7 +160,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </>
           )}
           <DropdownMenuItem
-            className="group font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="group font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -173,7 +173,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="group font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="group font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -186,7 +186,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="group font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="group font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -199,7 +199,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -212,7 +212,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="group font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="group font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -225,7 +225,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+            className="font-normal text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -239,7 +239,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           </DropdownMenuItem>
           {threadsEnabled && (
             <DropdownMenuItem
-              className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+              className="font-normal text-sm cursor-pointer hover:rounded-none w-full"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setMenuOpen(false);
@@ -256,7 +256,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="font-light text-xs cursor-pointer hover:rounded-none w-full"
+                className="font-normal text-sm cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);

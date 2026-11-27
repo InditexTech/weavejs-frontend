@@ -41,11 +41,15 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## Legal pages
+
+`/cookies-policy`, `/legal-notice` and `/privacy-policy` render the Markdown files in `content/legal/` (`cookies-policy.md`, `legal-notice.md`, `privacy-policy.md`). To publish the real texts, replace those three files and rebuild. GitHub-flavoured Markdown is supported; raw HTML is not rendered. The pages stay reachable in coming soon mode, and login requires accepting them via a checkbox.
+
 ## Coming soon mode
 
 Set `VITE_COMING_SOON=true` (build-time) to show the "Coming soon" page on every route. The requested URL is kept (no redirect), so deep links like `/rooms/abc` render the page in place.
 
-- Allowlisted (served normally): `/v1/*` (health probes), `/weavebff/*`, `/coming-soon`, and static assets (`/fonts`, `/assets`, `/favicon.ico`).
+- Allowlisted (served normally): `/v1/*` (health probes), `/weavebff/*`, `/coming-soon`, the legal pages, and static assets (`/fonts`, `/assets`, `/favicon.ico`).
 - Blocked routes respond `200` with `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store` and a `robots` meta tag.
 - No third-party requests (fonts and background image are self-hosted).
 - Set to `false` (default) to restore normal routing.

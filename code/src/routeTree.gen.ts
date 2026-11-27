@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComingSoonRouteImport } from './routes/coming-soon'
+import { Route as CookiesPolicyRouteImport } from './routes/cookies-policy'
+import { Route as LegalNoticeRouteImport } from './routes/legal-notice'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ErrorIndexRouteImport } from './routes/error/index'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as RoomsAccessLinkRouteImport } from './routes/rooms/access-link'
@@ -30,6 +33,21 @@ const IndexRoute = IndexRouteImport.update({
 const ComingSoonRoute = ComingSoonRouteImport.update({
   id: '/coming-soon',
   path: '/coming-soon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesPolicyRoute = CookiesPolicyRouteImport.update({
+  id: '/cookies-policy',
+  path: '/cookies-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalNoticeRoute = LegalNoticeRouteImport.update({
+  id: '/legal-notice',
+  path: '/legal-notice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorIndexRoute = ErrorIndexRouteImport.update({
@@ -87,6 +105,9 @@ const ApiAiChatsChatIdRoute = ApiAiChatsChatIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coming-soon': typeof ComingSoonRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error/': typeof ErrorIndexRoute
@@ -101,6 +122,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coming-soon': typeof ComingSoonRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error': typeof ErrorIndexRoute
@@ -116,6 +140,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/coming-soon': typeof ComingSoonRoute
+  '/cookies-policy': typeof CookiesPolicyRoute
+  '/legal-notice': typeof LegalNoticeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/rooms/access-link': typeof RoomsAccessLinkRoute
   '/error/': typeof ErrorIndexRoute
@@ -132,6 +159,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/coming-soon'
+    | '/cookies-policy'
+    | '/legal-notice'
+    | '/privacy-policy'
     | '/rooms/$roomId'
     | '/rooms/access-link'
     | '/error/'
@@ -146,6 +176,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/coming-soon'
+    | '/cookies-policy'
+    | '/legal-notice'
+    | '/privacy-policy'
     | '/rooms/$roomId'
     | '/rooms/access-link'
     | '/error'
@@ -160,6 +193,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/coming-soon'
+    | '/cookies-policy'
+    | '/legal-notice'
+    | '/privacy-policy'
     | '/rooms/$roomId'
     | '/rooms/access-link'
     | '/error/'
@@ -175,6 +211,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComingSoonRoute: typeof ComingSoonRoute
+  CookiesPolicyRoute: typeof CookiesPolicyRoute
+  LegalNoticeRoute: typeof LegalNoticeRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   RoomsAccessLinkRoute: typeof RoomsAccessLinkRoute
   ErrorIndexRoute: typeof ErrorIndexRoute
@@ -201,6 +240,27 @@ declare module '@tanstack/react-router' {
       path: '/coming-soon'
       fullPath: '/coming-soon'
       preLoaderRoute: typeof ComingSoonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies-policy': {
+      id: '/cookies-policy'
+      path: '/cookies-policy'
+      fullPath: '/cookies-policy'
+      preLoaderRoute: typeof CookiesPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal-notice': {
+      id: '/legal-notice'
+      path: '/legal-notice'
+      fullPath: '/legal-notice'
+      preLoaderRoute: typeof LegalNoticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error/': {
@@ -279,6 +339,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComingSoonRoute: ComingSoonRoute,
+  CookiesPolicyRoute: CookiesPolicyRoute,
+  LegalNoticeRoute: LegalNoticeRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   RoomsAccessLinkRoute: RoomsAccessLinkRoute,
   ErrorIndexRoute: ErrorIndexRoute,

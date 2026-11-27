@@ -24,7 +24,7 @@ export const SidebarHeader = ({
 
   return (
     <div className="w-full px-[24px] py-[12px] bg-white flex justify-between items-center border-b-[0.5px] border-[#c9c9c9]">
-      <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
+      <div className="flex justify-between font-inter font-light items-center text-lg tracking-[0.04em] uppercase">
         {children}
       </div>
       {actions && (

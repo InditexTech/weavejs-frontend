@@ -16,9 +16,11 @@ import { Ban, Shield } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { putRoomAccessLink } from "@/api/rooms/put-room-access-link";
 import { Badge } from "../ui/badge";
+import { LegalConsentCheckbox } from "../legal/legal-consent-checkbox";
 
 export const RoomAccessLink = () => {
   const navigate = useNavigate();
+  const [accepted, setAccepted] = React.useState(false);
 
   const { session, isPending, error: sessionError } = useGetSession();
 
@@ -182,11 +184,17 @@ export const RoomAccessLink = () => {
             {!session && (
               <>
                 <Divider className="h-[0.5px] w-full" />
+                <LegalConsentCheckbox
+                  checked={accepted}
+                  onCheckedChange={setAccepted}
+                />
                 <div className="flex flex-col gap-1">
                   <Button
                     variant="outline"
+                    disabled={!accepted}
                     className="cursor-pointer font-inter font-light rounded-none"
                     onClick={async () => {
+                      if (!accepted) return;
                       if (accessPayload) {
                         sessionStorage.setItem(
                           "weave_access_link_payload",
@@ -205,12 +213,14 @@ export const RoomAccessLink = () => {
                       strokeWidth={1}
                       className="!w-[32px] !h-[32px]"
                     />
-                    CONTINUE WITH GOOGLE
+                    SIGN IN WITH GOOGLE
                   </Button>
                   <Button
                     variant="outline"
+                    disabled={!accepted}
                     className="cursor-pointer font-inter font-light rounded-none"
                     onClick={async () => {
+                      if (!accepted) return;
                       if (accessPayload) {
                         sessionStorage.setItem(
                           "weave_access_link_payload",
@@ -229,7 +239,7 @@ export const RoomAccessLink = () => {
                       strokeWidth={1}
                       className="!w-[32px] !h-[32px]"
                     />
-                    CONTINUE WITH GITHUB
+                    SIGN IN WITH GITHUB
                   </Button>
                 </div>
               </>

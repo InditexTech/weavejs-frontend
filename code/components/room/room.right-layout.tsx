@@ -57,14 +57,14 @@ export const RoomRightSidebar = () => {
   return (
     <section
       className={cn(
-        "z-0 top-0 right-0 w-[500px] flex flex-col justify-between",
+        "z-0 top-0 right-0 w-[var(--room-right-w)] flex flex-col justify-between",
         {
-          ["fixed top-0 right-0 bottom-0 h-[calc(100%-40px)] w-[500px] border-l-[0.5px] border-l-[#c9c9c9]"]:
+          ["fixed top-0 right-0 bottom-[var(--room-footer-h)] border-l-[0.5px] border-l-[#c9c9c9]"]:
             viewType === "fixed",
-          ["absolute top-[62px] right-[8px] w-[500px] h-[calc(100%-54px-16px-40px)]"]:
+          ["absolute top-[var(--room-float-top)] right-[var(--room-float-gap)]"]:
             viewType === "floating",
           ["h-[65px]"]: imageCroppingEnabled,
-          ["bottom-[8px] h-[calc(100%-54px-16px-40px)]"]:
+          ["bottom-[calc(var(--room-footer-h)+var(--room-float-gap))]"]:
             !imageCroppingEnabled && viewType === "floating",
           ["visible pointer-events-auto"]:
             !imageCroppingEnabled &&
@@ -77,7 +77,7 @@ export const RoomRightSidebar = () => {
       )}
     >
       <div
-        className={cn("w-full h-full", {
+        className={cn("w-full h-full flex flex-col", {
           ["drop-shadow"]: viewType === "floating",
         })}
       >
@@ -90,17 +90,9 @@ export const RoomRightSidebar = () => {
           showContent &&
           !isRoomSwitching && (
             <div
-              className={cn("w-full h-[calc(100%-65px)] bg-white", {
+              className={cn("w-full flex-1 min-h-0 bg-white", {
                 // ["border-t-[0.5px] border-[#c9c9c9]"]: viewType === "fixed",
-                ["h-full border-[0.5px] border-[#c9c9c9]"]:
-                  viewType === "floating",
-                ["visible pointer-events-auto"]:
-                  !imageCroppingEnabled &&
-                  ((viewType === "floating" && showRightSidebarFloating) ||
-                    viewType === "fixed"),
-                ["invisible pointer-events-none"]:
-                  imageCroppingEnabled ||
-                  (viewType === "floating" && !showRightSidebarFloating),
+                ["border-[0.5px] border-[#c9c9c9]"]: viewType === "floating",
               })}
             >
               <AnimatePresence>
