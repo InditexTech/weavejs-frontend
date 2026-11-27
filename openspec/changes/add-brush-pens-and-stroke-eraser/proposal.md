@@ -27,6 +27,6 @@ The Weave SDK is adding drawing pens (`brushTool.setInstrument`, weavejs#1312) a
 ## Impact
 
 - Code: `components/utils/weave/actions.ts`, `components/use-cases/standalone/weave.ts`, `hooks/use-keyboard-handler.tsx`, `overlay/hooks/use-node-action-name.tsx`, `node-properties/stroke-properties.tsx`, a new pen bar component, `lib/brush-lab/*`.
-- Dependencies: requires the SDK release containing weavejs#1312 and #1313. Until then the change builds only with `DEV_WEAVEJS_REPO_PATH` set, and CI cannot pass it. The flag-off production build must also compile against the SDK it is pinned to.
+- Dependencies: requires the SDK release containing weavejs#1312 and #1313. Until then the feature works only with `DEV_WEAVEJS_REPO_PATH` set; the build, `tsc` and CI run against the pinned SDK with the feature absent, through a compatibility module.
 - Tooling: introduces Playwright configuration and a mocked-backend fixture (the dependency is already declared; no config or tests exist). The standalone page is not backend-free: it needs a session, room info, an images list and image data, so the suite mocks them.
 - Docs: `docs/brush-lab-testers-guide.md`, `.env.example` for the flag.

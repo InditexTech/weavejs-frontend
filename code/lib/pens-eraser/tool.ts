@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { STROKE_ERASER_TOOL_ACTION_NAME } from "@inditextech/weave-sdk";
+import { STROKE_ERASER_TOOL_ACTION_NAME } from "./sdk";
 
 export const STROKE_ERASER_TOOL = STROKE_ERASER_TOOL_ACTION_NAME;
 export const STROKE_ERASER_LABEL = "Stroke eraser";
@@ -16,7 +16,7 @@ export const ZOOM_ALLOWED_ACTIONS: string[] = [
 ];
 
 export function isZoomingAllowed(action: string | undefined): boolean {
-  if (typeof action === "undefined") {
+  if (action === undefined) {
     return true;
   }
   return ZOOM_ALLOWED_ACTIONS.includes(action);

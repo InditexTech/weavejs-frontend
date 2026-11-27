@@ -12,7 +12,7 @@ import { useCollaborationRoom } from "@/store/store";
 import { InputNumber } from "../inputs/input-number";
 import InputSelect from "../inputs/input-select";
 import { PenSection } from "./pen-section";
-import { PENS_AND_ERASER_ENABLED } from "@/lib/pens-eraser/flag";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
 
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -92,7 +92,7 @@ export function StrokeProperties() {
   }
 
   // The pen section carries the size, colour and opacity of the brush.
-  const penSection = PENS_AND_ERASER_ENABLED && actualAction === "brushTool";
+  const penSection = PENS_AND_ERASER_AVAILABLE && actualAction === "brushTool";
 
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">

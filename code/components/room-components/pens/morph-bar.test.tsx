@@ -24,7 +24,7 @@ describe("MorphBar", () => {
         onExpand={vi.fn()}
       />,
     );
-    expect(screen.queryByRole("button", { name: "in a" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "in a" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "in b" })).toBeNull();
 
     rerender(
@@ -37,7 +37,7 @@ describe("MorphBar", () => {
       />,
     );
     expect(screen.queryByRole("button", { name: "in a" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "in b" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "in b" })).toBeDefined();
   });
 
   it("keeps every panel mounted", () => {

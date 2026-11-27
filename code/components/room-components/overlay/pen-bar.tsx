@@ -8,10 +8,11 @@ import { MorphBar } from "../pens/morph-bar";
 import { BarSlider } from "../pens/bar-slider";
 import { ColourChips } from "../pens/colour-chips";
 import { PenArt } from "../pens/pen-art";
+import { EraserShapeToggle } from "../pens/eraser-shape-toggle";
 import { PenButton } from "../pens/pen-button";
 import { usePenControls, usePenMemorySync } from "../pens/use-pen-controls";
 import { cn } from "@/lib/utils";
-import { PENS_AND_ERASER_ENABLED } from "@/lib/pens-eraser/flag";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
 import {
   BRUSH_MAX_SIZE,
   BRUSH_MIN_SIZE,
@@ -48,7 +49,7 @@ function Divider() {
 
 export function PenBar({
   className,
-  enabled = PENS_AND_ERASER_ENABLED,
+  enabled = PENS_AND_ERASER_AVAILABLE,
   footerHeight = 0,
   insetLeft = 0,
   insetRight = 0,
@@ -67,6 +68,16 @@ export function PenBar({
   React.useEffect(() => {
     if (open) setPanel("tools");
   }, [open, setPanel]);
+
+  // Escape goes back from the colour or size panel to the tools.
+  React.useEffect(() => {
+    if (!open || storedPanel === "tools") return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPanel("tools");
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, storedPanel, setPanel]);
 
   if (!controls.active) {
     return null;
@@ -105,6 +116,7 @@ export function PenBar({
             label={pen.label}
             ink={controls.inkOf(pen.id)}
             active={!eraserActive && controls.pen === pen.id}
+            dimIdle={eraserActive || controls.pen !== null}
             onClick={() => controls.selectPen(pen.id)}
           />
         ))}
@@ -114,6 +126,7 @@ export function PenBar({
           title={`${STROKE_ERASER_LABEL} (${STROKE_ERASER_SHORTCUT_LABEL})`}
           ink={eraserInk}
           active={eraserActive}
+          dimIdle={eraserActive || controls.pen !== null}
           onClick={controls.selectEraser}
         />
       </div>
@@ -126,7 +139,13 @@ export function PenBar({
         onClick={() => setPanel("size")}
       >
         <span
-          className="rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.22)] transition-[width,height,background-color,opacity] duration-200"
+          data-shape={eraserActive ? controls.eraserShape : "circle"}
+          className={cn(
+            "shadow-[inset_0_0_0_1px_rgba(0,0,0,0.22)] transition-[width,height,background-color,opacity] duration-200",
+            eraserActive && controls.eraserShape === "square"
+              ? "rounded-none"
+              : "rounded-full",
+          )}
           style={{
             width: dot,
             height: dot,
@@ -135,6 +154,12 @@ export function PenBar({
           }}
         />
       </button>
+      {eraserActive && (
+        <EraserShapeToggle
+          shape={controls.eraserShape}
+          onChange={controls.changeShape}
+        />
+      )}
       {!eraserActive && (
         <button
           type="button"
@@ -223,12 +248,6 @@ export function PenBar({
         right: insetRight,
         bottom: footerHeight + PEN_BAR_MARGIN,
       }}
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && panel !== "tools") {
-          e.stopPropagation();
-          setPanel("tools");
-        }
-      }}
     >
       <div role="toolbar" aria-label="Pen bar">
         <MorphBar
@@ -244,7 +263,7 @@ export function PenBar({
             <PenArt
               id={eraserActive ? "eraser" : (controls.pen ?? "pen")}
               ink={eraserActive ? eraserInk : ink}
-              className="mt-[10px] h-[84px] w-[28px]"
+              className="mt-[4px] h-[96px] w-[32px]"
             />
           }
         />

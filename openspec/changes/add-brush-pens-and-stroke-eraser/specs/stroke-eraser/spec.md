@@ -72,6 +72,29 @@ The system SHALL let the user set the eraser size in screen pixels from the pen 
 - **WHEN** the stage is at 25% zoom and then at 400% zoom
 - **THEN** the eraser ring has the same on-screen size in both
 
+### Requirement: Eraser shape is a circle or a square
+The system SHALL let the user choose, from the pen bar and from the brush sidebar while the stroke eraser is active, whether the eraser is a circle or a square. The circle SHALL be the default, the size SHALL be the diameter of the circle or the side of the square, and the choice SHALL be kept while the user switches tools and applied to the ring and to the erase.
+
+#### Scenario: Default
+- **WHEN** the stroke eraser is activated for the first time
+- **THEN** the eraser is a circle and the circle option is shown as chosen
+
+#### Scenario: Choosing a square
+- **WHEN** the stroke eraser is active and the user chooses the square
+- **THEN** the ring becomes a square and dragging erases a square area with the chosen size as its side
+
+#### Scenario: Kept between tools
+- **WHEN** the user chooses the square, switches to a pen and then back to the stroke eraser
+- **THEN** the eraser is still a square
+
+#### Scenario: Bar and sidebar agree
+- **WHEN** the user chooses a shape in the sidebar
+- **THEN** the pen bar shows the same shape as chosen, and the other way round
+
+#### Scenario: Not shown for pens
+- **WHEN** the brush tool is active
+- **THEN** no shape choice is shown
+
 ### Requirement: Stroke eraser is usable while zooming
 The system SHALL allow the user to zoom while the stroke eraser is active, as it does for the existing eraser, and SHALL label the active tool with a display name.
 

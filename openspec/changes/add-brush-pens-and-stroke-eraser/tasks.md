@@ -4,7 +4,8 @@
 
 - [x] 1.1 Set `DEV_WEAVEJS_REPO_PATH` in `code/.env` to the weavejs `code/packages` checkout and verify `npm run dev` logs `REPO LOCAL: true` and `WeaveStrokeEraserToolAction` and the brush `setInstrument` resolve (type-check or import in a scratch check).
 - [x] 1.2 Add the `VITE_PENS_AND_ERASER` flag helper (default off) in `lib/`, document it in `.env.example`, and add a vitest unit test for on, off and unset.
-- [x] 1.3 Verify a flag-off `vite build` still compiles against the pinned 5.9.0 SDK (no `DEV_WEAVEJS_REPO_PATH`); if static imports of unreleased exports break it, record that the merge waits for the bump. (Result: it fails with MISSING_EXPORT once the new symbols are imported, so the merge waits for 5.11.0; flag-off checks run against the local SDK until then.)
+- [x] 1.3 Verify a flag-off `vite build` still compiles against the pinned 5.9.0 SDK (no `DEV_WEAVEJS_REPO_PATH`). (Result: it failed with MISSING_EXPORT once the new symbols were imported statically; fixed by task 1.4.)
+- [x] 1.4 Isolate the new SDK exports in one compatibility module with a safe fallback and an `available` check (flag and SDK support), so `vite build` and `tsc` pass against the pinned SDK; vitest tests for the module and the availability, and a build and `tsc` run with no local SDK path.
 
 ## 2. Stroke eraser registration
 
@@ -33,6 +34,10 @@
 - [x] 4.4 Add a `*.sdk.test.ts` in `lib/brush-lab/` checking the new Brush Lab descriptors render one control each; verify it runs with `DEV_WEAVEJS_REPO_PATH` set and is skipped without.
 
 - [x] 4.13 Reduce the gap to the footer to 8px, and update the unit tests, the Playwright checks for the gap and the tile, and the tester guide. (The tile sliding to the bottom right was tried and reverted: it stays centred.)
+- [x] 4.14 Add the eraser shape choice (circle or square): read it from the tool, write it with `updatePropsAction`, show a Circle/Square toggle in the pen bar's tools panel and in the sidebar section while the eraser is active, give the size dot the chosen shape, and cover it with vitest tests, a Playwright check, and the tester guide.
+- [x] 4.15 Rework the pen drawings so the tray is lighter: shorter tips and shoulders, a much smaller eraser block, and a smaller drawing (26px wide) in the bar, the sidebar and the minimised tile; check with screenshots.
+- [x] 4.16 Make the chosen pen easy to see: bigger drawings (32×96 in a 36px slot), barrels that fade out, the chosen pen lifted higher with a slot and a dark underline, the others lower and slightly dimmed once one is chosen; vitest tests for the button and the bar, and screenshots of the bar, the eraser state and the tile.
+- [x] 4.17 Fix the SonarCloud findings of the PR: a nested ternary, `fieldset` instead of the group role, a document-level Escape handler instead of a key handler on a div, `replaceAll`, no async handler without await, no boolean mode parameter, direct `undefined` comparison and getBy queries for presence assertions.
 
 ## 5. Playwright smoke tests
 

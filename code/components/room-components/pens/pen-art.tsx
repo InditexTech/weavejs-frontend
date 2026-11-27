@@ -13,7 +13,7 @@ type PenArtProps = {
 
 const EDGE = "rgba(0,0,0,0.3)";
 const DARK = "#3a3a3d";
-const BARREL = "#f7f6f3";
+const BARREL = "#ecebe7";
 const FADE = { transition: "fill 240ms ease" } as const;
 
 /**
@@ -22,7 +22,7 @@ const FADE = { transition: "fill 240ms ease" } as const;
  * is what stands out: the tip and a band below the cap carry it.
  */
 function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
-  const uid = React.useId().replace(/:/g, "");
+  const uid = React.useId().replaceAll(":", "");
   const sheen = `${uid}-sheen`;
   const metal = `${uid}-metal`;
 
@@ -60,13 +60,13 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             {band(30)}
             <rect x="6" y="26" width="12" height="4" fill={DARK} />
             <path
-              d="M6 26 L12 8 L18 26 Z"
+              d="M6 26 L12 13 L18 26 Z"
               fill="#ecd2a6"
               stroke="#cdb184"
               strokeWidth="0.3"
             />
-            <path d="M12 8 L18 26 L14.2 26 Z" fill="#000" opacity="0.08" />
-            <path d="M10.2 14 L12 8 L13.8 14 Z" {...inkShape} />
+            <path d="M12 13 L18 26 L14.2 26 Z" fill="#000" opacity="0.08" />
+            <path d="M10.4 17.5 L12 13 L13.6 17.5 Z" {...inkShape} />
           </>
         );
       case "pen":
@@ -75,7 +75,7 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             {barrel(36)}
             {band(33)}
             <path d="M6 33 L8.5 22 L15.5 22 L18 33 Z" fill={DARK} />
-            <path d="M10 22 L12 3 L14 22 Z" {...inkShape} />
+            <path d="M10 22 L12 11 L14 22 Z" {...inkShape} />
           </>
         );
       case "fineliner":
@@ -87,9 +87,9 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             <rect x="9.3" y="22" width="5.4" height="3.2" fill="#2b2b2d" />
             <rect
               x="11.2"
-              y="4"
+              y="12"
               width="1.6"
-              height="18.5"
+              height="10.5"
               rx="0.8"
               {...inkShape}
             />
@@ -103,9 +103,9 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             <path d="M6 33 L8.5 24 L15.5 24 L18 33 Z" fill={DARK} />
             <rect
               x="8.8"
-              y="5"
+              y="13"
               width="6.4"
-              height="19.5"
+              height="11.5"
               rx="2.4"
               {...inkShape}
             />
@@ -117,7 +117,7 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             {barrel(36)}
             {band(33)}
             <path d="M6 33 L8 22 L16 22 L18 33 Z" fill={DARK} />
-            <path d="M8 22 L8.4 11 L16 6 L16 22 Z" {...inkShape} />
+            <path d="M8 22 L8.4 14 L16 10 L16 22 Z" {...inkShape} />
           </>
         );
       case "brush":
@@ -127,14 +127,17 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             {band(35)}
             <rect
               x="7.5"
-              y="24"
+              y="26"
               width="9"
-              height="11"
+              height="9"
               fill={`url(#${metal})`}
               stroke="#9a9da3"
               strokeWidth="0.3"
             />
-            <path d="M8 24 C8 15 10 9 12 3 C14 9 16 15 16 24 Z" {...inkShape} />
+            <path
+              d="M8 26 C8 20 10 14 12 9 C14 14 16 20 16 26 Z"
+              {...inkShape}
+            />
           </>
         );
       case "fountainPen":
@@ -144,41 +147,41 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
             {band(33)}
             <path d="M6 33 L9.5 22 L14.5 22 L18 33 Z" fill={DARK} />
             <path
-              d="M9.5 22 L12 4 L14.5 22 Q12 24.5 9.5 22 Z"
+              d="M9.5 22 L12 9 L14.5 22 Q12 24.5 9.5 22 Z"
               fill="#d9b44a"
               stroke="#a8862b"
               strokeWidth="0.3"
             />
             <line
               x1="12"
-              y1="9.5"
+              y1="13"
               x2="12"
-              y2="20"
+              y2="20.5"
               stroke="#7a5f17"
               strokeWidth="0.5"
             />
-            <circle cx="12" cy="12.5" r="1" fill="#7a5f17" />
+            <circle cx="12" cy="15" r="0.9" fill="#7a5f17" />
           </>
         );
       case "eraser":
         return (
           <>
-            {barrel(40)}
+            {barrel(41)}
             <rect
               x="6"
-              y="36"
+              y="37"
               width="12"
-              height="5"
+              height="4"
               fill={`url(#${metal})`}
               stroke="#9a9da3"
               strokeWidth="0.3"
             />
             <rect
               x="6"
-              y="10"
+              y="23"
               width="12"
-              height="27"
-              rx="3"
+              height="15"
+              rx="2.5"
               fill="#f0b8ae"
               stroke="#d99a8f"
               strokeWidth="0.4"
@@ -186,7 +189,7 @@ function PenArtBase({ id, ink, className }: Readonly<PenArtProps>) {
           </>
         );
       default:
-        return <rect x="9" y="8" width="6" height="56" rx="3" fill="#888" />;
+        return <rect x="9" y="12" width="6" height="52" rx="3" fill="#888" />;
     }
   })();
 

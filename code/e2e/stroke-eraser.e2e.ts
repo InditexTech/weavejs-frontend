@@ -258,6 +258,38 @@ test("the eraser in the bar shows only its size, and a pen brings the brush back
   ).toBeVisible();
 });
 
+test("the eraser can be a circle or a square, and keeps the choice", async ({
+  canvas,
+}) => {
+  await brushButton(canvas).click();
+  await expect(
+    penBar(canvas).getByRole("group", { name: "Eraser shape" }),
+  ).toHaveCount(0);
+
+  await tool(canvas, "Stroke eraser").click();
+  const circle = penBar(canvas).getByRole("button", { name: "Circle eraser" });
+  const square = penBar(canvas).getByRole("button", { name: "Square eraser" });
+  await expect(circle).toHaveAttribute("aria-pressed", "true");
+  await expect(square).toHaveAttribute("aria-pressed", "false");
+
+  await square.click();
+  await expect(square).toHaveAttribute("aria-pressed", "true");
+  await expect(circle).toHaveAttribute("aria-pressed", "false");
+  await expect(
+    penBar(canvas).locator('[data-shape="square"]').first(),
+  ).toBeVisible();
+
+  // the tool keeps the shape while a pen is used
+  await tool(canvas, "Pen").click();
+  await expect(
+    penBar(canvas).getByRole("group", { name: "Eraser shape" }),
+  ).toHaveCount(0);
+  await tool(canvas, "Stroke eraser").click();
+  await expect(
+    penBar(canvas).getByRole("button", { name: "Square eraser" }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
 test("the eraser tooltip shows its shortcut", async ({ canvas }) => {
   await brushButton(canvas).click();
   await expect(tool(canvas, "Stroke eraser")).toHaveAttribute(

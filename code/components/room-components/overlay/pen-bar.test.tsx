@@ -74,7 +74,7 @@ describe("PenBar", () => {
     brush.getProps
       .mockReset()
       .mockReturnValue({ strokeWidth: 4, stroke: "#000000ff", opacity: 1 });
-    eraser.getProps.mockReset().mockReturnValue({ size: 30 });
+    eraser.getProps.mockReset().mockReturnValue({ size: 30, shape: "circle" });
     instance.triggerAction.mockReset();
     instance.updatePropsAction.mockReset();
     instance.getActionHandler
@@ -146,6 +146,16 @@ describe("PenBar", () => {
           .getByRole("button", { name: "Stroke eraser" })
           .getAttribute("title"),
       ).toBe("Stroke eraser (Shift+D)");
+    });
+
+    it("dims the pens only once one is chosen", () => {
+      const art = (name: string) =>
+        screen.getByRole("button", { name }).querySelector("svg")!;
+      render(<PenBar enabled />);
+      expect(art("Pen").getAttribute("class")).not.toContain("opacity-80");
+      fireEvent.click(screen.getByRole("button", { name: "Marker" }));
+      expect(art("Pen").getAttribute("class")).toContain("opacity-80");
+      expect(art("Marker").getAttribute("class")).not.toContain("opacity-80");
     });
 
     it("does not choose a pen on its own", () => {
@@ -450,6 +460,112 @@ describe("PenBar", () => {
       actualAction = "strokeEraserTool";
       view.rerender(<PenBar enabled />);
       expect(screen.getByRole("slider", { name: "Size" })).toBeTruthy();
+    });
+  });
+
+  describe("eraser shape", () => {
+    const sizeDot = () =>
+      screen
+        .getByRole("button", { name: "Size and opacity" })
+        .querySelector("[data-shape]") as HTMLElement;
+
+    it("offers a circle and a square only while erasing", () => {
+      const view = render(<PenBar enabled />);
+      expect(screen.queryByRole("group", { name: "Eraser shape" })).toBeNull();
+      actualAction = "strokeEraserTool";
+      view.rerender(<PenBar enabled />);
+      expect(screen.getByRole("group", { name: "Eraser shape" })).toBeTruthy();
+      expect(
+        screen.getByRole("button", { name: "Circle eraser" }),
+      ).toBeTruthy();
+      expect(
+        screen.getByRole("button", { name: "Square eraser" }),
+      ).toBeTruthy();
+    });
+
+    it("starts with the shape the tool has", () => {
+      actualAction = "strokeEraserTool";
+      render(<PenBar enabled />);
+      expect(
+        screen
+          .getByRole("button", { name: "Circle eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("true");
+      expect(
+        screen
+          .getByRole("button", { name: "Square eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("false");
+
+      cleanup();
+      eraser.getProps.mockReturnValue({ size: 30, shape: "square" });
+      render(<PenBar enabled />);
+      expect(
+        screen
+          .getByRole("button", { name: "Square eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("true");
+    });
+
+    it("writes the shape to the tool", () => {
+      actualAction = "strokeEraserTool";
+      render(<PenBar enabled />);
+      fireEvent.click(screen.getByRole("button", { name: "Square eraser" }));
+      expect(instance.updatePropsAction).toHaveBeenCalledWith(
+        "strokeEraserTool",
+        { shape: "square" },
+      );
+      expect(
+        screen
+          .getByRole("button", { name: "Square eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("true");
+    });
+
+    it("follows the tool when something else changes the shape", () => {
+      actualAction = "strokeEraserTool";
+      render(<PenBar enabled />);
+      act(() => {
+        listeners.onPropsChange({
+          instance: { getName: () => "strokeEraserTool" },
+          props: { size: 30, shape: "square" },
+        });
+      });
+      expect(
+        screen
+          .getByRole("button", { name: "Square eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("true");
+    });
+
+    it("ignores a shape it does not know", () => {
+      actualAction = "strokeEraserTool";
+      render(<PenBar enabled />);
+      act(() => {
+        listeners.onPropsChange({
+          instance: { getName: () => "strokeEraserTool" },
+          props: { size: 30, shape: "triangle" },
+        });
+      });
+      expect(
+        screen
+          .getByRole("button", { name: "Circle eraser" })
+          .getAttribute("aria-pressed"),
+      ).toBe("true");
+    });
+
+    it("gives the size dot the shape of the eraser", () => {
+      actualAction = "strokeEraserTool";
+      eraser.getProps.mockReturnValue({ size: 30, shape: "square" });
+      render(<PenBar enabled />);
+      expect(sizeDot().getAttribute("data-shape")).toBe("square");
+      expect(sizeDot().className).toContain("rounded-none");
+    });
+
+    it("keeps a round dot for the pens", () => {
+      render(<PenBar enabled />);
+      expect(sizeDot().getAttribute("data-shape")).toBe("circle");
+      expect(sizeDot().className).toContain("rounded-full");
     });
   });
 

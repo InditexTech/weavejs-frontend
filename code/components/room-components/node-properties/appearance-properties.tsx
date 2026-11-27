@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { PENS_AND_ERASER_ENABLED } from "@/lib/pens-eraser/flag";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { WeaveStateElement } from "@inditextech/weave-types";
@@ -66,7 +66,7 @@ export function AppearanceProperties() {
   if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
 
   // The pen section carries the brush's opacity.
-  if (PENS_AND_ERASER_ENABLED && actualAction === "brushTool") return null;
+  if (PENS_AND_ERASER_AVAILABLE && actualAction === "brushTool") return null;
 
   return (
     <div className="p-[24px] pt-[16px] pb-0 flex flex-col gap-[16px]">

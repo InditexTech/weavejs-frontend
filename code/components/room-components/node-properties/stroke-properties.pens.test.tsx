@@ -25,8 +25,8 @@ vi.mock("@/store/store", () => ({
       },
     }),
 }));
-vi.mock("@/lib/pens-eraser/flag", () => ({
-  get PENS_AND_ERASER_ENABLED() {
+vi.mock("@/lib/pens-eraser/availability", () => ({
+  get PENS_AND_ERASER_AVAILABLE() {
     return flag;
   },
 }));

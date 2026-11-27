@@ -22,7 +22,7 @@ const IMAGE = readFileSync(
 async function mockBackend(page: Page) {
   const now = new Date().toISOString();
 
-  await page.route("**/weavebff/**", async (route) => {
+  await page.route("**/weavebff/**", (route) => {
     const url = new URL(route.request().url());
     const pathname = url.pathname;
 

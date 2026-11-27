@@ -65,6 +65,17 @@ The system SHALL draw each pen in the tray upright, with a neutral barrel and it
 - **WHEN** the user picks a colour while the highlighter is selected
 - **THEN** only the highlighter's tip and band change colour
 
+### Requirement: The chosen pen is easy to see
+The system SHALL show which pen, or the stroke eraser, is chosen, with more than the pen's drawing: the chosen one SHALL be lifted above the others, have a highlighted slot and an underline, and the others SHALL be shown slightly dimmed once one has been chosen.
+
+#### Scenario: A pen is chosen
+- **WHEN** the user chooses the marker
+- **THEN** the marker is lifted, has a slot and an underline, and the other pens and the eraser are slightly dimmed
+
+#### Scenario: Nothing chosen yet
+- **WHEN** the brush tool is active and no pen has been chosen
+- **THEN** no pen has a slot or an underline, and no pen is dimmed
+
 ### Requirement: Colour panel
 The system SHALL open a colour panel in place of the tools when the user presses the colour button, with a row of colour chips marking the current colour and a control for any other colour, and SHALL return to the tools with a back button. Choosing a colour SHALL apply it to new strokes.
 

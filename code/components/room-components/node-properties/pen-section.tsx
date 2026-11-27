@@ -4,10 +4,11 @@
 
 import React from "react";
 import { BarSlider } from "../pens/bar-slider";
+import { EraserShapeToggle } from "../pens/eraser-shape-toggle";
 import { ColourChips } from "../pens/colour-chips";
 import { PenButton } from "../pens/pen-button";
 import { usePenControls } from "../pens/use-pen-controls";
-import { PENS_AND_ERASER_ENABLED } from "@/lib/pens-eraser/flag";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
 import {
   BRUSH_MAX_SIZE,
   BRUSH_MIN_SIZE,
@@ -27,7 +28,7 @@ type PenSectionProps = {
 
 /** The pen bar's pens, colours and sliders, for the brush tool's properties panel. */
 export function PenSection({
-  enabled = PENS_AND_ERASER_ENABLED,
+  enabled = PENS_AND_ERASER_AVAILABLE,
 }: Readonly<PenSectionProps>) {
   const controls = usePenControls(enabled);
 
@@ -39,6 +40,7 @@ export function PenSection({
   const ink = toInk(controls.color);
   const eraserInk = "#c9c7c2";
   const current = controls.pens.find((p) => p.id === controls.pen);
+  const penName = eraserActive ? STROKE_ERASER_LABEL : current?.label;
   const size = eraserActive ? controls.eraserSize : controls.size;
 
   return (
@@ -46,16 +48,11 @@ export function PenSection({
       <div className="flex flex-col gap-1">
         <div className="font-inter text-[12px] font-light text-[#757575]">
           Pen
-          {eraserActive
-            ? ` · ${STROKE_ERASER_LABEL}`
-            : current
-              ? ` · ${current.label}`
-              : ""}
+          {penName ? ` · ${penName}` : ""}
         </div>
-        <div
-          role="group"
+        <fieldset
           aria-label="Pens"
-          className="flex h-[72px] items-end justify-center gap-[2px] overflow-hidden border border-[#c9c9c9] bg-[#f5f5f5] px-2"
+          className="m-0 flex h-[72px] min-w-0 items-end justify-center gap-[2px] overflow-hidden border border-[#c9c9c9] bg-[#f5f5f5] px-2 py-0"
         >
           {controls.pens.map((pen) => (
             <PenButton
@@ -64,6 +61,8 @@ export function PenSection({
               label={pen.label}
               ink={controls.inkOf(pen.id)}
               active={!eraserActive && controls.pen === pen.id}
+              dimIdle={eraserActive || controls.pen !== null}
+              slotClassName="bg-white"
               onClick={() => controls.selectPen(pen.id)}
             />
           ))}
@@ -73,9 +72,11 @@ export function PenSection({
             title={`${STROKE_ERASER_LABEL} (${STROKE_ERASER_SHORTCUT_LABEL})`}
             ink={eraserInk}
             active={eraserActive}
+            dimIdle={eraserActive || controls.pen !== null}
+            slotClassName="bg-white"
             onClick={controls.selectEraser}
           />
-        </div>
+        </fieldset>
       </div>
       {!eraserActive && (
         <div className="flex flex-col gap-1">
@@ -97,6 +98,18 @@ export function PenSection({
           color={eraserActive ? eraserInk : ink}
           onChange={controls.changeSize}
         />
+        {eraserActive && (
+          <div className="flex flex-col gap-1.5">
+            <div className="font-inter text-[12px] font-light text-[#757575]">
+              Shape
+            </div>
+            <EraserShapeToggle
+              variant="labelled"
+              shape={controls.eraserShape}
+              onChange={controls.changeShape}
+            />
+          </div>
+        )}
         {!eraserActive && (
           <BarSlider
             className="w-full"

@@ -107,6 +107,22 @@ describe("PenSection", () => {
     ).toBe("24");
   });
 
+  it("offers the eraser shape only while erasing, and writes it to the tool", () => {
+    const view = render(<PenSection enabled />);
+    expect(screen.queryByRole("group", { name: "Eraser shape" })).toBeNull();
+
+    actualAction = "strokeEraserTool";
+    view.rerender(<PenSection enabled />);
+    expect(screen.getByText("Shape")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Square eraser" }));
+    expect(instance.updatePropsAction).toHaveBeenCalledWith(
+      "strokeEraserTool",
+      {
+        shape: "square",
+      },
+    );
+  });
+
   it("shares the chosen pen with the pen bar through the store", () => {
     render(<PenSection enabled />);
     fireEvent.click(screen.getByRole("button", { name: "Pen" }));

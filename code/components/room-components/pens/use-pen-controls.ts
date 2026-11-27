@@ -4,11 +4,8 @@
 
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
-import {
-  BRUSH_INSTRUMENTS,
-  type WeaveBrushToolAction,
-} from "@inditextech/weave-sdk";
-import { PENS_AND_ERASER_ENABLED } from "@/lib/pens-eraser/flag";
+import { PENS_AND_ERASER_AVAILABLE } from "@/lib/pens-eraser/availability";
+import { BRUSH_INSTRUMENTS, type BrushToolLike } from "@/lib/pens-eraser/sdk";
 import {
   BRUSH_MIN_SIZE,
   BRUSH_TOOL,
@@ -24,6 +21,11 @@ import {
   STROKE_ERASER_DEFAULT_SIZE,
   clampEraserSize,
 } from "@/lib/pens-eraser/size";
+import {
+  DEFAULT_ERASER_SHAPE,
+  toEraserShape,
+  type EraserShape,
+} from "@/lib/pens-eraser/shape";
 import { inkFor, usePens } from "@/store/pens";
 import { applyPenMemory } from "./pen-sdk";
 
@@ -42,14 +44,14 @@ type PropsPayload = {
  * Applies what the bar remembers whenever the brush becomes the active tool,
  * wherever that was started from. Mounted once per layout.
  */
-export function usePenMemorySync(enabled = PENS_AND_ERASER_ENABLED) {
+export function usePenMemorySync(enabled = PENS_AND_ERASER_AVAILABLE) {
   const instance = useWeave((state) => state.instance);
 
   React.useEffect(() => {
     if (!enabled || !instance) return;
     const handle = (action: string | undefined) => {
       if (action !== BRUSH_TOOL) return;
-      const brush = instance.getActionHandler<WeaveBrushToolAction>(BRUSH_TOOL);
+      const brush = instance.getActionHandler<BrushToolLike>(BRUSH_TOOL);
       if (brush) applyPenMemory(instance, brush);
     };
     instance.addEventListener("onActiveActionChange", handle);
@@ -62,7 +64,7 @@ export function usePenMemorySync(enabled = PENS_AND_ERASER_ENABLED) {
  * the opacity and the colour are held by the tools (read back from their
  * `onPropsChange` events); the bar only adds what the SDK does not remember.
  */
-export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
+export function usePenControls(enabled = PENS_AND_ERASER_AVAILABLE) {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
 
@@ -79,9 +81,11 @@ export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
   const [eraserSize, setEraserSize] = React.useState(
     STROKE_ERASER_DEFAULT_SIZE,
   );
+  const [eraserShape, setEraserShape] =
+    React.useState<EraserShape>(DEFAULT_ERASER_SHAPE);
 
   const getBrush = React.useCallback(
-    () => instance?.getActionHandler<WeaveBrushToolAction>(BRUSH_TOOL),
+    () => instance?.getActionHandler<BrushToolLike>(BRUSH_TOOL),
     [instance],
   );
 
@@ -97,6 +101,8 @@ export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
     };
     const readEraser = (props: Record<string, unknown> | undefined) => {
       if (typeof props?.size === "number") setEraserSize(props.size);
+      const shape = toEraserShape(props?.shape);
+      if (shape) setEraserShape(shape);
     };
 
     const brush = getBrush();
@@ -156,7 +162,7 @@ export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
       if (brush && current) {
         // The pen's tapers are scaled from the width, and applying it again
         // resets the opacity: write the opacity back.
-        brush.setInstrument(current as never);
+        brush.setInstrument(current);
         const tunedOpacity = usePens.getState().tuned[current]?.opacity;
         if (tunedOpacity !== undefined) {
           instance.updatePropsAction(BRUSH_TOOL, { opacity: tunedOpacity });
@@ -164,6 +170,15 @@ export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
       }
     },
     [instance, actualAction, getBrush],
+  );
+
+  const changeShape = React.useCallback(
+    (shape: EraserShape) => {
+      if (!instance || actualAction !== STROKE_ERASER_TOOL) return;
+      setEraserShape(shape);
+      instance.updatePropsAction(STROKE_ERASER_TOOL, { shape });
+    },
+    [instance, actualAction],
   );
 
   const changeOpacity = React.useCallback(
@@ -205,10 +220,12 @@ export function usePenControls(enabled = PENS_AND_ERASER_ENABLED) {
     opacity,
     color,
     eraserSize,
+    eraserShape,
     inkOf,
     selectPen,
     selectEraser,
     changeSize,
+    changeShape,
     changeOpacity,
     changeColor,
   };

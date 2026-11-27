@@ -5,14 +5,13 @@
 import { inkFor, usePens } from "@/store/pens";
 import { penDefaultSize } from "@/lib/pens-eraser/pen-defaults";
 import { BRUSH_TOOL, toStrokeColor } from "@/lib/pens-eraser/pen-bar";
+import type { BrushToolLike } from "@/lib/pens-eraser/sdk";
 
 type Writer = {
   updatePropsAction: (name: string, props: Record<string, unknown>) => void;
 };
 
-type Brush = {
-  setInstrument: (id: never) => { applied: boolean };
-};
+type Brush = Pick<BrushToolLike, "setInstrument">;
 
 /**
  * Writes what the bar remembers for the chosen pen to the brush tool, in the
@@ -30,7 +29,7 @@ export function applyPenMemory(instance: Writer, brush: Brush): void {
     strokeWidth: tuned?.size ?? penDefaultSize(pen),
     stroke: toStrokeColor(inkFor(state, pen)),
   });
-  brush.setInstrument(pen as never);
+  brush.setInstrument(pen);
   if (tuned?.opacity !== undefined) {
     instance.updatePropsAction(BRUSH_TOOL, { opacity: tuned.opacity });
   }

@@ -80,7 +80,7 @@ The brush panel in the right sidebar has the same pens, colours and sliders, and
 
 Press the eraser in the pen bar, or **Shift+D**. Drag over a stroke: the part under the ring disappears and the rest stays as strokes.
 **Erase** (the toolbar button, **D**) still removes whole nodes and must behave as before. The ring keeps its size on screen at any
-zoom; set it with **Size** while the stroke eraser is active.
+zoom; set it with **Size** while the stroke eraser is active. Choose its shape with the **Circle** and **Square** buttons next to it (also in the right sidebar while the eraser is active): the size is the diameter of the circle or the side of the square, and the choice is kept when you switch to a pen and back.
 
 Check these:
 
@@ -94,6 +94,9 @@ Check these:
 | Drag over a locked stroke | It does not change |
 | Strokes inside a frame or a group | They are erased like any other |
 | Zoom to 25 % and 400 % | The ring has the same size on screen |
+| Square eraser: drag across a stroke | A square area is erased, to the edge of the square; the ring is a square of the same size |
+| Square eraser inside a rotated or scaled frame or group | The erased area is still a square on screen |
+| Switch Circle and Square while the eraser is active | The ring changes at once and the next drag uses the new shape |
 | Erase, then reload the page | The erased state is still there |
 | Two browsers erase the same stroke at once | Both end up with the same strokes and no error; a short overlap of pieces is a known limit |
 | A viewer on an older SDK opens the room | Pen strokes and cut pieces draw as plain round strokes |

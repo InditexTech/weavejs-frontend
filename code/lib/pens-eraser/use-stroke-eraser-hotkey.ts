@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { PENS_AND_ERASER_ENABLED } from "./flag";
+import { PENS_AND_ERASER_AVAILABLE } from "./availability";
 import { STROKE_ERASER_SHORTCUT } from "./shortcut";
 import { STROKE_ERASER_TOOL } from "./tool";
 
@@ -12,7 +12,7 @@ export function useStrokeEraserHotkey(
   triggerTool: (toolName: string) => void,
   {
     enabled,
-    flagEnabled = PENS_AND_ERASER_ENABLED,
+    flagEnabled = PENS_AND_ERASER_AVAILABLE,
   }: { enabled: boolean; flagEnabled?: boolean },
 ) {
   useHotkey(

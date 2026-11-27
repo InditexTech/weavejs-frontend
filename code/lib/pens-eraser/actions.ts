@@ -2,12 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveStrokeEraserToolAction } from "@inditextech/weave-sdk";
-import { PENS_AND_ERASER_ENABLED } from "./flag";
+import type { WeaveAction } from "@inditextech/weave-sdk";
+import { PENS_AND_ERASER_AVAILABLE } from "./availability";
+import { createStrokeEraser } from "./sdk";
 
-/** The stroke eraser action, registered only when the feature flag is on. */
-export function strokeEraserActions(enabled = PENS_AND_ERASER_ENABLED) {
-  return enabled ? [new WeaveStrokeEraserToolAction()] : [];
+/** The stroke eraser action, registered only when the feature is available. */
+export function strokeEraserActions(): WeaveAction[] {
+  if (!PENS_AND_ERASER_AVAILABLE) return [];
+  const action = createStrokeEraser();
+  return action ? [action] : [];
 }
 
 /** Action names registered more than once. */
