@@ -1,0 +1,283 @@
+.github/agents/impeccable-asset-producer.agent.md
+  s_e3a8646d7d36b1::t_c110bec49f049b 1-43
+.github/agents/impeccable-documenter.agent.md
+  s_e3a8646d7d36b1::t_ac0cd22ba4bf84 1-25
+.github/agents/impeccable-finish-reviewer.agent.md
+  s_e3a8646d7d36b1::t_d54e326a12f14d 1-39
+.github/agents/impeccable-manual-edit-applier.agent.md
+  s_e3a8646d7d36b1::t_e531c6785c5595 1-94
+.github/agents/impeccable-motion-reviewer.agent.md
+  s_e3a8646d7d36b1::t_2bb95e287dcd47 1-30
+.github/hooks/impeccable.json
+  s_e3a8646d7d36b1::t_039692c28619d9 1-13
+.github/skills/impeccable/SKILL.md
+  s_e3a8646d7d36b1::t_630122eb4ffee5 1-90
+.github/skills/impeccable/reference/adapt.md
+  s_e3a8646d7d36b1::t_b94e6736d56a41 1-318
+.github/skills/impeccable/reference/adapt.native.md
+  s_e3a8646d7d36b1::t_089d88bb3fcd7c 1-58
+.github/skills/impeccable/reference/android.md
+  s_e3a8646d7d36b1::t_b3c5e7acc7a3e9 1-46
+.github/skills/impeccable/reference/animate.md
+  s_e3a8646d7d36b1::t_04bff4d884f9de 1-106
+.github/skills/impeccable/reference/audit.md
+  s_e3a8646d7d36b1::t_8acb6fd532c0ee 1-157
+.github/skills/impeccable/reference/audit.native.md
+  s_e3a8646d7d36b1::t_eb71bb4985bf95 1-150
+.github/skills/impeccable/reference/bolder.md
+  s_e3a8646d7d36b1::t_5cdf31b7e3521f 1-33
+.github/skills/impeccable/reference/clarify.md
+  s_e3a8646d7d36b1::t_d27158a6ed342c 1-94
+.github/skills/impeccable/reference/colorize.md
+  s_e3a8646d7d36b1::t_9ae836dfd29bf0 1-86
+.github/skills/impeccable/reference/component-review.md
+  s_e3a8646d7d36b1::t_04c9d0e52ad88c 1-63
+.github/skills/impeccable/reference/craft-floor.md
+  s_e3a8646d7d36b1::t_259e0998eff02a 1-44
+.github/skills/impeccable/reference/craft.md
+  s_e3a8646d7d36b1::t_2d4cab83855573 1-5
+.github/skills/impeccable/reference/critique-rubric.md
+  s_e3a8646d7d36b1::t_74a21cb4aae8a2 1-496
+.github/skills/impeccable/reference/critique.md
+  s_e3a8646d7d36b1::t_c51db1dcfdabf9 1-329
+.github/skills/impeccable/reference/degraded/asset-producer.md
+  s_e3a8646d7d36b1::t_a21bf7a2e8cc48 1-42
+.github/skills/impeccable/reference/degraded/documenter.md
+  s_e3a8646d7d36b1::t_f517201fd67580 1-24
+.github/skills/impeccable/reference/degraded/finish-reviewer.md
+  s_e3a8646d7d36b1::t_bd854ef3a03e9e 1-38
+.github/skills/impeccable/reference/degraded/manual-edit-applier.md
+  s_e3a8646d7d36b1::t_1fa7821225e484 1-93
+.github/skills/impeccable/reference/degraded/motion-reviewer.md
+  s_e3a8646d7d36b1::t_a4aaff71104e9d 1-29
+.github/skills/impeccable/reference/delight.md
+  s_e3a8646d7d36b1::t_439c39e8b871bd 1-70
+.github/skills/impeccable/reference/distill.md
+  s_e3a8646d7d36b1::t_9368b16cffe975 1-111
+.github/skills/impeccable/reference/doctor.md
+  s_e3a8646d7d36b1::t_6ecd2c45c18018 1-58
+.github/skills/impeccable/reference/document.md
+  s_e3a8646d7d36b1::t_1a82cb18fd4c60 1-418
+.github/skills/impeccable/reference/extract.md
+  s_e3a8646d7d36b1::t_6014160c86115f 1-69
+.github/skills/impeccable/reference/foundations.md
+  s_e3a8646d7d36b1::t_bc75fc69a50903 1-44
+.github/skills/impeccable/reference/generate.md
+  s_e3a8646d7d36b1::t_49a08b2117a038 1-101
+.github/skills/impeccable/reference/harden.md
+  s_e3a8646d7d36b1::t_74de73f8f57e1f 1-362
+.github/skills/impeccable/reference/hooks.md
+  s_e3a8646d7d36b1::t_1e6941ee62c987 1-120
+.github/skills/impeccable/reference/init.md
+  s_e3a8646d7d36b1::t_029911ecd2278b 1-133
+.github/skills/impeccable/reference/ios.md
+  s_e3a8646d7d36b1::t_4e26885318411b 1-51
+.github/skills/impeccable/reference/layout.md
+  s_e3a8646d7d36b1::t_7a0ebba64e8ae8 1-84
+.github/skills/impeccable/reference/live-setup.md
+  s_e3a8646d7d36b1::t_58594da7adf970 1-104
+.github/skills/impeccable/reference/live.md
+  s_e3a8646d7d36b1::t_256a04f5eb00e8 1-343
+.github/skills/impeccable/reference/mode-operate.md
+  s_e3a8646d7d36b1::t_6651068be3004a 1-21
+.github/skills/impeccable/reference/mode-persuade.md
+  s_e3a8646d7d36b1::t_65be40bbfe4cd7 1-19
+.github/skills/impeccable/reference/mode-read.md
+  s_e3a8646d7d36b1::t_29a1a0e982e46c 1-21
+.github/skills/impeccable/reference/new-work-comp.md
+  s_e3a8646d7d36b1::t_20aef29cfc4807 1-24
+.github/skills/impeccable/reference/new-work-world.md
+  s_e3a8646d7d36b1::t_bd29b22e8f660c 1-20
+.github/skills/impeccable/reference/new-work.md
+  s_e3a8646d7d36b1::t_a3f7e2f052d0f0 1-123
+.github/skills/impeccable/reference/onboard.md
+  s_e3a8646d7d36b1::t_102acdc1305552 1-235
+.github/skills/impeccable/reference/operate.md
+  s_e3a8646d7d36b1::t_be131f81a04bff 1-61
+.github/skills/impeccable/reference/optimize.md
+  s_e3a8646d7d36b1::t_3e001547d02e16 1-257
+.github/skills/impeccable/reference/overdrive.md
+  s_e3a8646d7d36b1::t_de884a19070534 1-127
+.github/skills/impeccable/reference/polish.md
+  s_e3a8646d7d36b1::t_199fe6330cb0ca 1-105
+.github/skills/impeccable/reference/quieter.md
+  s_e3a8646d7d36b1::t_67854e6446ac5e 1-99
+.github/skills/impeccable/reference/region-map.md
+  s_e3a8646d7d36b1::t_faa3a4067c0564 1-26
+.github/skills/impeccable/reference/routing.md
+  s_e3a8646d7d36b1::t_121a0f28a37955 1-24
+.github/skills/impeccable/reference/shape.md
+  s_e3a8646d7d36b1::t_b78a4572b5250f 1-59
+.github/skills/impeccable/reference/typeset.md
+  s_e3a8646d7d36b1::t_9020ef78b96de3 1-96
+.github/skills/impeccable/reference/visualize.md
+  s_e3a8646d7d36b1::t_f19fd12bb26f45 1-47
+.github/skills/impeccable/scripts/VERSION
+  s_e3a8646d7d36b1::t_770c53c76237ef 1
+.github/skills/impeccable/scripts/command-metadata.json
+  s_e3a8646d7d36b1::t_3b29dd98ea2ad9 1-98
+.github/skills/impeccable/scripts/data/font-index-failures.json
+  s_e3a8646d7d36b1::t_be463404b1a1f3 1-121
+.github/skills/impeccable/scripts/data/font-index.json
+  s_e3a8646d7d36b1::t_f5c1ae3b3961c1 1
+.github/skills/impeccable/scripts/engine-checksums.txt
+  s_e3a8646d7d36b1::t_4d9d7bc39f5fbe 1-9
+.github/skills/impeccable/scripts/impeccable
+  s_e3a8646d7d36b1::t_b4fa75915f29ce 1-342
+.github/skills/impeccable/scripts/impeccable.cmd
+  s_e3a8646d7d36b1::t_74205a787964aa 1-363
+.github/skills/impeccable/scripts/live-browser-dom.js
+  s_e3a8646d7d36b1::t_5bb95f0709040c 1-320
+.github/skills/impeccable/scripts/live-browser-ignores.js
+  s_e3a8646d7d36b1::t_760231ffe6af5c 1-246
+.github/skills/impeccable/scripts/live-browser-session.js
+  s_e3a8646d7d36b1::t_d20747ab4ea84f 1-183
+.github/skills/impeccable/scripts/live-browser.js
+  s_e3a8646d7d36b1::t_e6246a8ee06d5c 1-13925
+.github/skills/impeccable/scripts/modern-screenshot.umd.js
+  s_e3a8646d7d36b1::t_3507f68693f4dc 1-14
+.opencode/commands/impeccable.md
+  s_e3a8646d7d36b1::t_2098f6069adadf 1-6
+.opencode/skills/impeccable/SKILL.md
+  s_e3a8646d7d36b1::t_c4b93d9b4a13ce 1-93
+.opencode/skills/impeccable/reference/adapt.md
+  s_e3a8646d7d36b1::t_4066bae41347b7 1-318
+.opencode/skills/impeccable/reference/adapt.native.md
+  s_e3a8646d7d36b1::t_b33095814fa8d1 1-58
+.opencode/skills/impeccable/reference/android.md
+  s_e3a8646d7d36b1::t_069c8fe56bf58c 1-46
+.opencode/skills/impeccable/reference/animate.md
+  s_e3a8646d7d36b1::t_c5ba8ae693bff6 1-106
+.opencode/skills/impeccable/reference/audit.md
+  s_e3a8646d7d36b1::t_5d8496615ebdfd 1-157
+.opencode/skills/impeccable/reference/audit.native.md
+  s_e3a8646d7d36b1::t_efc35a3f6fe1b4 1-150
+.opencode/skills/impeccable/reference/bolder.md
+  s_e3a8646d7d36b1::t_5f9a8103b658a5 1-33
+.opencode/skills/impeccable/reference/clarify.md
+  s_e3a8646d7d36b1::t_5f091212e3d8e6 1-94
+.opencode/skills/impeccable/reference/colorize.md
+  s_e3a8646d7d36b1::t_831c005c1a0da9 1-86
+.opencode/skills/impeccable/reference/component-review.md
+  s_e3a8646d7d36b1::t_8737f040fdb44f 1-63
+.opencode/skills/impeccable/reference/craft-floor.md
+  s_e3a8646d7d36b1::t_d8a044a10a361e 1-44
+.opencode/skills/impeccable/reference/craft.md
+  s_e3a8646d7d36b1::t_66cad4956b0b7b 1-5
+.opencode/skills/impeccable/reference/critique-rubric.md
+  s_e3a8646d7d36b1::t_6cf885a7ca54da 1-496
+.opencode/skills/impeccable/reference/critique.md
+  s_e3a8646d7d36b1::t_8a96c359c2fc17 1-329
+.opencode/skills/impeccable/reference/degraded/asset-producer.md
+  s_e3a8646d7d36b1::t_a1c9958ec6ac97 1-42
+.opencode/skills/impeccable/reference/degraded/documenter.md
+  s_e3a8646d7d36b1::t_7b63157647e896 1-24
+.opencode/skills/impeccable/reference/degraded/finish-reviewer.md
+  s_e3a8646d7d36b1::t_18de781cc722a1 1-38
+.opencode/skills/impeccable/reference/degraded/manual-edit-applier.md
+  s_e3a8646d7d36b1::t_0232b82a0ffb64 1-93
+.opencode/skills/impeccable/reference/degraded/motion-reviewer.md
+  s_e3a8646d7d36b1::t_cb5b188519bb15 1-29
+.opencode/skills/impeccable/reference/delight.md
+  s_e3a8646d7d36b1::t_278df0fa329f60 1-70
+.opencode/skills/impeccable/reference/distill.md
+  s_e3a8646d7d36b1::t_5eef646de6f6c9 1-111
+.opencode/skills/impeccable/reference/doctor.md
+  s_e3a8646d7d36b1::t_4592636dc0077e 1-58
+.opencode/skills/impeccable/reference/document.md
+  s_e3a8646d7d36b1::t_45720dedd94814 1-418
+.opencode/skills/impeccable/reference/extract.md
+  s_e3a8646d7d36b1::t_0fef9b19ea4654 1-69
+.opencode/skills/impeccable/reference/foundations.md
+  s_e3a8646d7d36b1::t_93b030a11451cd 1-44
+.opencode/skills/impeccable/reference/generate.md
+  s_e3a8646d7d36b1::t_ce0b8e1687fec9 1-101
+.opencode/skills/impeccable/reference/harden.md
+  s_e3a8646d7d36b1::t_e1847c67629d2f 1-362
+.opencode/skills/impeccable/reference/hooks.md
+  s_e3a8646d7d36b1::t_981f32abef149f 1-120
+.opencode/skills/impeccable/reference/init.md
+  s_e3a8646d7d36b1::t_d0cf0ec84af508 1-133
+.opencode/skills/impeccable/reference/ios.md
+  s_e3a8646d7d36b1::t_a78907d2997a01 1-51
+.opencode/skills/impeccable/reference/layout.md
+  s_e3a8646d7d36b1::t_35fef4626d02b9 1-84
+.opencode/skills/impeccable/reference/live-setup.md
+  s_e3a8646d7d36b1::t_299a92fb4f8c13 1-104
+.opencode/skills/impeccable/reference/live.md
+  s_e3a8646d7d36b1::t_f7045bf084dc04 1-343
+.opencode/skills/impeccable/reference/mode-operate.md
+  s_e3a8646d7d36b1::t_b17ff268b44c54 1-21
+.opencode/skills/impeccable/reference/mode-persuade.md
+  s_e3a8646d7d36b1::t_88f5753ad5a466 1-19
+.opencode/skills/impeccable/reference/mode-read.md
+  s_e3a8646d7d36b1::t_2171a444358b88 1-21
+.opencode/skills/impeccable/reference/new-work-comp.md
+  s_e3a8646d7d36b1::t_61d560e83d3b75 1-24
+.opencode/skills/impeccable/reference/new-work-world.md
+  s_e3a8646d7d36b1::t_b7c63dad8369f7 1-20
+.opencode/skills/impeccable/reference/new-work.md
+  s_e3a8646d7d36b1::t_d9665af1a78ece 1-123
+.opencode/skills/impeccable/reference/onboard.md
+  s_e3a8646d7d36b1::t_9cf45ecd933ec3 1-235
+.opencode/skills/impeccable/reference/operate.md
+  s_e3a8646d7d36b1::t_22789a9fe87859 1-61
+.opencode/skills/impeccable/reference/optimize.md
+  s_e3a8646d7d36b1::t_6918cc0d867c08 1-257
+.opencode/skills/impeccable/reference/overdrive.md
+  s_e3a8646d7d36b1::t_dbd9ec34ccafb0 1-127
+.opencode/skills/impeccable/reference/polish.md
+  s_e3a8646d7d36b1::t_0abd1100bbd8d4 1-105
+.opencode/skills/impeccable/reference/quieter.md
+  s_e3a8646d7d36b1::t_219de3c2c12d7f 1-99
+.opencode/skills/impeccable/reference/region-map.md
+  s_e3a8646d7d36b1::t_d120f77900bebb 1-26
+.opencode/skills/impeccable/reference/routing.md
+  s_e3a8646d7d36b1::t_5a27649cf410b8 1-24
+.opencode/skills/impeccable/reference/shape.md
+  s_e3a8646d7d36b1::t_4e98d601d7703c 1-59
+.opencode/skills/impeccable/reference/typeset.md
+  s_e3a8646d7d36b1::t_e2b9f7b8cfb25f 1-96
+.opencode/skills/impeccable/reference/visualize.md
+  s_e3a8646d7d36b1::t_9ef44e89de5b4a 1-47
+.opencode/skills/impeccable/scripts/VERSION
+  s_e3a8646d7d36b1::t_be3a28d9c62d02 1
+.opencode/skills/impeccable/scripts/command-metadata.json
+  s_e3a8646d7d36b1::t_1e696296d274dd 1-98
+.opencode/skills/impeccable/scripts/data/font-index-failures.json
+  s_e3a8646d7d36b1::t_4b7f677456d31b 1-121
+.opencode/skills/impeccable/scripts/data/font-index.json
+  s_e3a8646d7d36b1::t_ab9619f3795979 1
+.opencode/skills/impeccable/scripts/engine-checksums.txt
+  s_e3a8646d7d36b1::t_b7f976ab9a0d6d 1-9
+.opencode/skills/impeccable/scripts/impeccable
+  s_e3a8646d7d36b1::t_129a752a211866 1-342
+.opencode/skills/impeccable/scripts/impeccable.cmd
+  s_e3a8646d7d36b1::t_076d2f04cb07b9 1-363
+.opencode/skills/impeccable/scripts/live-browser-dom.js
+  s_e3a8646d7d36b1::t_802eca94669e0d 1-320
+.opencode/skills/impeccable/scripts/live-browser-ignores.js
+  s_e3a8646d7d36b1::t_02de0ccc2ef3f7 1-246
+.opencode/skills/impeccable/scripts/live-browser-session.js
+  s_e3a8646d7d36b1::t_fe76bc4cb96a8b 1-183
+.opencode/skills/impeccable/scripts/live-browser.js
+  s_e3a8646d7d36b1::t_5c5255e71ce029 1-13925
+.opencode/skills/impeccable/scripts/modern-screenshot.umd.js
+  s_e3a8646d7d36b1::t_50486f2fbc0ffd 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "5c8fbe75881a7bf1e21f7172cff86e07d5c81b2c",
+  "prompts": {},
+  "sessions": {
+    "s_e3a8646d7d36b1": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ded4939ceffen4rE1s0LGi3Bwz",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
