@@ -4,48 +4,53 @@
 
 import React from "react";
 import { Logo } from "@/components/utils/logo";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Avatar as AvatarUI,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
-import { Button } from "../ui/button";
-import { Eye, EyeOff, ExternalLink, LogOut } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
-import { Divider } from "../room-components/overlay/divider";
 import { useGetSession } from "../room-components/hooks/use-get-session";
-import { authClient } from "@/lib/auth.client";
 import { useCollaborationRoom } from "@/store/store";
-import packageJson from "@/package.json";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { Badge } from "../ui/badge";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { LEGAL_PAGES, LEGAL_PATHS } from "@/lib/legal-pages";
+import { SectionTitle } from "../utils/section-title";
+import { BuildInfo } from "../utils/build-info";
 import { cn } from "@/lib/utils";
-import { ShowcaseUserId } from "./showcase.user-id";
+import { ShowcaseUserMenu } from "./showcase.user-menu";
 
-type ShowcaseLeftSidebarProps = {
-  showUserId?: boolean;
-};
+const rowClass = (active: boolean, size: "nav" | "utility" = "nav") =>
+  cn(
+    "w-[calc(100%+1.5rem)] -mx-3 px-3 py-2 inline-flex items-center gap-2 text-left cursor-pointer font-inter tracking-wide transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-black",
+    size === "nav" ? "text-base" : "text-sm",
+    active
+      ? "bg-neutral-100 text-black font-normal"
+      : "text-neutral-600 font-light hover:bg-neutral-50 hover:text-black",
+  );
 
-export const ShowcaseLeftSidebar = ({
-  showUserId = false,
-}: ShowcaseLeftSidebarProps) => {
-  const navigate = useNavigate();
+const SidebarNavLink = ({
+  to,
+  active,
+  size = "nav",
+  children,
+}: Readonly<{
+  to: string;
+  active: boolean;
+  size?: "nav" | "utility";
+  children: React.ReactNode;
+}>) => (
+  <Link
+    to={to}
+    aria-current={active ? "page" : undefined}
+    className={cn(rowClass(active, size), active && "pointer-events-none")}
+  >
+    {children}
+  </Link>
+);
+
+export const ShowcaseLeftSidebar = () => {
   const location = useRouterState({ select: (s) => s.location });
 
   const isStandalone = location.pathname.startsWith("/use-cases/standalone");
   const isTemplates = location.pathname.startsWith("/use-cases/templates");
-  const isShowcase = React.useMemo(() => {
-    if (isStandalone || isTemplates) {
-      return false;
-    }
-    return true;
-  }, [isStandalone, isTemplates]);
+  const isLegal = LEGAL_PATHS.includes(location.pathname);
+  const isShowcase = !isStandalone && !isTemplates && !isLegal;
 
   const dependenciesVisible = useCollaborationRoom(
     (state) => state.dependencies.visible,
@@ -55,148 +60,74 @@ export const ShowcaseLeftSidebar = ({
   );
 
   const { session } = useGetSession();
+  const legalLinks = LEGAL_PAGES.map((page) => (
+    <SidebarNavLink
+      key={page.to}
+      to={page.to}
+      active={location.pathname === page.to}
+      size="utility"
+    >
+      {page.label}
+    </SidebarNavLink>
+  ));
 
   return (
-    <div className="w-full h-full flex flex-col border-r border-r-[0.5px] border-[#c9c9c9] p-8 justify-between items-start">
-      <div className="w-full flex flex-col gap-2 justify-start items-between">
+    <div className="w-full h-full flex flex-col gap-8 overflow-y-auto border-r border-r-[0.5px] border-[#c9c9c9] p-8 justify-between items-start">
+      <div className="w-full flex flex-col gap-2 justify-start items-start">
         <Logo kind="landscape" variant="no-text" />
-        <h1 className="text-4xl font-inter font-light text-muted-foreground uppercase">
-          {isShowcase && <span>SHOWCASE</span>}
-          {isStandalone && <span>STANDALONE</span>}
-          {isTemplates && <span>TEMPLATES</span>}
-        </h1>
-        <div className="w-full mt-5 flex flex-col justify-start items-start">
-          <Divider className="h-[0.5px] w-full mb-6" />
-          <Button
-            variant="link"
-            disabled={isShowcase}
-            className={cn(
-              "cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto",
-              {
-                ["!text-red-300"]: isShowcase,
-              },
-            )}
-            onClick={async () => {
-              navigate({ to: `/` });
-            }}
-          >
+        <nav
+          aria-label="Showcase sections"
+          className="w-full mt-8 flex flex-col gap-8 justify-start items-start"
+        >
+          <SidebarNavLink to="/" active={isShowcase}>
             SHOWCASE
-          </Button>
-          <div className="font-light text-sm !px-0 !py-0 !h-auto mt-5 text-muted-foreground">
-            USE CASES
+          </SidebarNavLink>
+          <div className="w-full flex flex-col gap-1 justify-start items-start">
+            <SectionTitle>Use cases</SectionTitle>
+            <SidebarNavLink to="/use-cases/standalone" active={isStandalone}>
+              STANDALONE
+            </SidebarNavLink>
           </div>
-          <Button
-            variant="link"
-            disabled={isStandalone}
-            className={cn(
-              "cursor-pointer font-light text-2xl !px-0 !py-0 !h-auto",
-              {
-                ["!text-red-300"]: isStandalone,
-              },
-            )}
-            onClick={async () => {
-              navigate({ to: `/use-cases/standalone` });
-            }}
-          >
-            STANDALONE
-          </Button>
-        </div>
+        </nav>
       </div>
-      <div className="w-full flex flex-col gap-3 justify-start items-start">
-        {session && session.user && (
-          <>
-            <div className="text-sm font-light flex gap-2 justify-start items-center">
-              <AvatarUI className="cursor-pointer w-[40px] h-[40px] bg-muted font-light !text-xs leading-[18px] border-[0.5px] border-[#c9c9c9]">
-                <AvatarImage
-                  src={session.user.image ?? ""}
-                  alt={session.user.name}
-                  referrerPolicy="no-referrer"
-                />
-                <AvatarFallback className="bg-transparent uppercase">
-                  {session.user.name}
-                </AvatarFallback>
-              </AvatarUI>
-              <div className="flex flex-col gap-0 justify-start items-start font-light text-base">
-                <span>{session.user.name}</span>
-                <b className="text-sm">{session.user.email}</b>
-                {showUserId && <ShowcaseUserId userId={session.user.id} />}
-              </div>
-            </div>
-            <Divider className="h-[0.5px] w-full" />
-            <Button
-              variant="link"
-              className="cursor-pointer font-inter font-light !px-0 !py-0 !h-auto"
-              onClick={async () => {
-                await authClient.signOut();
-              }}
-            >
-              <LogOut strokeWidth={1} /> SIGN OUT
-            </Button>
-            <Divider className="h-[0.5px] w-full" />
-          </>
-        )}
-        <Button
-          variant="link"
-          onClick={() => {
-            window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
-          }}
-          className="cursor-pointer font-inter font-light !px-0 !py-0 !h-auto"
-        >
-          <ExternalLink strokeWidth={1} /> GITHUB
-        </Button>
-        <Button
-          variant="link"
-          onClick={() => {
-            window.open(DOCUMENTATION_URL, "_blank", "noopener,noreferrer");
-          }}
-          className="cursor-pointer font-inter font-light !px-0 !py-0 !h-auto"
-        >
-          <ExternalLink strokeWidth={1} /> DOCUMENTATION
-        </Button>
-        <Button
-          variant="link"
-          onClick={() => {
-            setDependenciesVisible(!dependenciesVisible);
-          }}
-          className="cursor-pointer font-inter font-light !px-0 !py-0 !h-auto"
-        >
-          {!dependenciesVisible ? (
-            <Eye strokeWidth={1} />
-          ) : (
-            <EyeOff strokeWidth={1} />
-          )}{" "}
-          DEPENDENCIES
-        </Button>
-        <Divider className="h-[0.5px] w-full my-2" />
-        <div className="w-full flex flex-col justify-start items-start gap-1 text-muted-foreground">
-          <Badge variant="outline" className="text-xs font-mono cursor-default">
-            version:{packageJson.version}
-          </Badge>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="secondary"
-                  className="text-xs font-mono cursor-default"
-                >
-                  build:{(__GIT_SHA__ ?? "").slice(0, 7)}.{__GIT_RUN_ID__}.
-                  {__GIT_RUN_ATTEMPT__}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent
-                align="start"
-                side="top"
-                sideOffset={4}
-                className="rounded-none"
-              >
-                <p>
-                  <b>Github full SHA</b>
-                </p>
-                <p>{__GIT_SHA__}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+      <div className="w-full flex flex-col gap-8 justify-start items-start">
+        <div className="w-full flex flex-col gap-1 justify-start items-start">
+          <SectionTitle>Legal</SectionTitle>
+          {legalLinks}
         </div>
+        <div className="w-full flex flex-col gap-1 justify-start items-start">
+          <SectionTitle>Resources</SectionTitle>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={rowClass(false, "utility")}
+          >
+            GITHUB <ExternalLink strokeWidth={1} className="size-3.5" />
+          </a>
+          <a
+            href={DOCUMENTATION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={rowClass(false, "utility")}
+          >
+            DOCUMENTATION <ExternalLink strokeWidth={1} className="size-3.5" />
+          </a>
+          <button
+            type="button"
+            aria-pressed={dependenciesVisible}
+            onClick={() => {
+              setDependenciesVisible(!dependenciesVisible);
+            }}
+            className={rowClass(dependenciesVisible, "utility")}
+          >
+            DEPENDENCIES
+          </button>
+        </div>
+        <BuildInfo />
+        {session && session.user && (
+          <ShowcaseUserMenu user={session.user} showCopyUserId />
+        )}
       </div>
     </div>
   );

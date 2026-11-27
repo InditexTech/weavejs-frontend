@@ -21,11 +21,47 @@ import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth.client";
 import { useWeave } from "@inditextech/weave-react";
 import { useNavigate } from "@tanstack/react-router";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import { LogOut } from "lucide-react";
+
+const getInitials = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const PRESENCE: Record<string, { label: string; dot: string }> = {
+  [WEAVE_STORE_CONNECTION_STATUS.CONNECTED]: {
+    label: "Connected to the room",
+    dot: "bg-emerald-500",
+  },
+  [WEAVE_STORE_CONNECTION_STATUS.CONNECTING]: {
+    label: "Connecting to the room…",
+    dot: "bg-amber-400 motion-safe:animate-pulse",
+  },
+  [WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM]: {
+    label: "Switching room…",
+    dot: "bg-amber-400 motion-safe:animate-pulse",
+  },
+  [WEAVE_STORE_CONNECTION_STATUS.ERROR]: {
+    label: "Connection problem",
+    dot: "bg-red-500",
+  },
+  [WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED]: {
+    label: "Disconnected",
+    dot: "bg-[#757575]",
+  },
+};
 
 export function RoomUser() {
   const navigate = useNavigate();
 
   const instance = useWeave((state) => state.instance);
+  const connectionStatus = useWeave((state) => state.connection.status);
+  const presence =
+    PRESENCE[connectionStatus] ??
+    PRESENCE[WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED];
 
   const room = useCollaborationRoom((state) => state.room);
   const roomInfo = useCollaborationRoom((state) => state.roomInfo.data);
@@ -53,27 +89,40 @@ export function RoomUser() {
             }}
           >
             <DropdownMenuTrigger
-              className={cn("rounded-none cursor-pointer focus:outline-none", {
-                ["font-normal"]: menuOpen,
-                ["font-extralight"]: !menuOpen,
-              })}
+              className={cn(
+                "rounded-none cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#757575] focus-visible:ring-offset-2 max-w-[240px]",
+                {
+                  ["font-normal"]: menuOpen,
+                  ["font-extralight"]: !menuOpen,
+                },
+              )}
             >
-              <div className="text-sm font-light flex gap-1 justify-start items-center">
-                <AvatarUI className="w-[40px] h-[40px] bg-muted font-light !text-xs leading-[18px] border-[0.5px] border-[#c9c9c9]">
-                  <AvatarImage
-                    src={session.user.image ?? ""}
-                    alt={session.user.name}
-                    referrerPolicy="no-referrer"
+              <div className="text-sm font-light flex gap-2 justify-start items-center min-w-0">
+                <div className="relative shrink-0" title={presence.label}>
+                  <AvatarUI className="w-[40px] h-[40px] bg-muted font-light !text-xs leading-[18px] border-[0.5px] border-[#c9c9c9]">
+                    <AvatarImage
+                      src={session.user.image ?? ""}
+                      alt={session.user.name}
+                      referrerPolicy="no-referrer"
+                    />
+                    <AvatarFallback className="bg-transparent">
+                      {getInitials(session.user.name)}
+                    </AvatarFallback>
+                  </AvatarUI>
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute -bottom-0.5 -right-0.5 block size-3 rounded-full border-2 border-white transition-colors duration-300",
+                      presence.dot,
+                    )}
                   />
-                  <AvatarFallback className="bg-transparent uppercase">
-                    {session.user.name}
-                  </AvatarFallback>
-                </AvatarUI>
-                <div className="flex flex-col gap-0 leading-tight justify-start items-start font-light text-sm whitespace-nowrap">
-                  <div className="flex gap-2 justify-start items-center">
-                    <div>{session.user.name}</div>
-                  </div>
-                  <b className="text-xs text-[#757575]">{session.user.email}</b>
+                  <span className="sr-only">{presence.label}</span>
+                </div>
+                <div className="flex flex-col gap-0 leading-tight justify-start items-start font-light text-sm whitespace-nowrap min-w-0">
+                  <div className="max-w-full truncate">{session.user.name}</div>
+                  <b className="max-w-full truncate text-xs text-[#757575]">
+                    {session.user.email}
+                  </b>
                 </div>
               </div>
             </DropdownMenuTrigger>
@@ -96,7 +145,7 @@ export function RoomUser() {
                   navigate({ to: "/" });
                 }}
               >
-                Sign out
+                <LogOut strokeWidth={1} /> Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
