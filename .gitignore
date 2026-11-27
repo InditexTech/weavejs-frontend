@@ -1,2 +1,5 @@
 .vscode
 mastra.db*
+
+# Installed dependencies of agent skills
+.agents/**/node_modules/

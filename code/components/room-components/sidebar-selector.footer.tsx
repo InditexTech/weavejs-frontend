@@ -75,7 +75,7 @@ export const SidebarSelectorFooter = () => {
     >
       <DropdownMenuTrigger
         className={cn(
-          "flex gap-2 rounded-none h-[32px] font-inter font-light text-lg hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
+          "flex gap-2 rounded-none h-[32px] font-inter font-light text-lg tracking-[0.04em] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
             ["font-light text-[#c9c9c9]"]: menuOpen,
             ["font-light"]: !menuOpen,
@@ -96,13 +96,13 @@ export const SidebarSelectorFooter = () => {
         side="bottom"
         alignOffset={0}
         sideOffset={9}
-        className="font-inter rounded-none"
+        className="font-inter rounded-none min-w-[200px]"
       >
         <DropdownMenuGroup>
           {selectedNodes.length > 0 && (
             <>
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);
@@ -116,7 +116,7 @@ export const SidebarSelectorFooter = () => {
             </>
           )}
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -129,7 +129,7 @@ export const SidebarSelectorFooter = () => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -142,7 +142,7 @@ export const SidebarSelectorFooter = () => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -155,7 +155,7 @@ export const SidebarSelectorFooter = () => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           {/* <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -168,7 +168,7 @@ export const SidebarSelectorFooter = () => {
             </DropdownMenuShortcut>
           </DropdownMenuItem> */}
           <DropdownMenuItem
-            className="text-foreground cursor-pointer hover:rounded-none w-full"
+            className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
             onPointerDown={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
@@ -182,7 +182,7 @@ export const SidebarSelectorFooter = () => {
           </DropdownMenuItem>
           {threadsEnabled && (
             <DropdownMenuItem
-              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setMenuOpen(false);
@@ -199,7 +199,7 @@ export const SidebarSelectorFooter = () => {
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none w-full"
+                className="text-foreground text-sm cursor-pointer hover:rounded-none w-full"
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   setMenuOpen(false);

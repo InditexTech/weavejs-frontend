@@ -13,6 +13,9 @@ describe("isAllowedPath", () => {
     "/coming-soon",
     "/fonts/inter-regular.ttf",
     "/favicon.ico",
+    "/cookies-policy",
+    "/legal-notice",
+    "/privacy-policy/",
   ])("allows %s", (p) => expect(isAllowedPath(p)).toBe(true));
 
   it.each(["/", "/rooms/abc", "/use-cases/x", "/v1x", "/coming-soonx"])(

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { LEGAL_PATHS } from "./legal-pages";
+
 export const COMING_SOON_PATH = "/coming-soon";
 
 const ALLOWED_PREFIXES = [
@@ -21,6 +23,7 @@ const ALLOWED_EXACT = new Set([
   "/weavebff",
   COMING_SOON_PATH,
   "/favicon.ico",
+  ...LEGAL_PATHS,
 ]);
 
 export function isComingSoonEnabled(): boolean {

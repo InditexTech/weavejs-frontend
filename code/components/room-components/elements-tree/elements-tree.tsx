@@ -116,7 +116,7 @@ function mapElementsToTree(
       disabledActions: [
         <HoverCard key="locked-info">
           <HoverCardTrigger asChild>
-            <div className="px-1 text-[10px] flex gap-1 justify-end items-center">
+            <div className="px-1 text-[11px] flex gap-1 justify-end items-center">
               <div
                 className="w-[16px] h-[16px] border border-[#c9c9c9]"
                 style={{
@@ -455,7 +455,7 @@ export const ElementsTree = () => {
           )}
         </div>
       </ScrollArea>
-      <div className="px-[24px] py-[8px] text-xs border-t-[0.5px] border-[#c9c9c9]">
+      <div className="px-[24px] py-[8px] text-[13px] border-t-[0.5px] border-[#c9c9c9]">
         Nodes: {amountOfNodes}
       </div>
     </div>

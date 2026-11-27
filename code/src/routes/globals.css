@@ -109,6 +109,12 @@
 }
 
 :root {
+  --room-left-w: 360px;
+  --room-right-w: 420px;
+  --room-footer-h: 40px;
+  --room-toolbar-h: 54px;
+  --room-float-top: 62px;
+  --room-float-gap: 8px;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);

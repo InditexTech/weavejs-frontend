@@ -53,16 +53,12 @@ export const RoomLeftSidebar = ({
   //   return null;
   // }
 
-  if (viewType === "floating" && !showLeftSidebarFloating) {
-    return null;
-  }
-
   return (
     <section
       className={cn("", {
-        ["top-0 left-0 bottom-0 h-[calc(100%-40px)] w-[500px]"]:
+        ["top-0 left-0 bottom-[var(--room-footer-h)] w-[var(--room-left-w)]"]:
           viewType === "fixed",
-        ["top-[62px] left-[62px] w-[500px] h-[calc(100%-54px-16px-40px)] drop-shadow"]:
+        ["top-[var(--room-float-top)] left-[var(--room-float-top)] bottom-[calc(var(--room-footer-h)+var(--room-float-gap))] w-[var(--room-left-w)] drop-shadow"]:
           viewType === "floating" && showLeftSidebarFloating,
         ["fixed pointer-events-auto bg-white border-r-[0.5px] border-r-[#c9c9c9]"]:
           !imageCroppingEnabled &&
