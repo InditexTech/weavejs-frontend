@@ -1,0 +1,81 @@
+LICENSES/MIT.txt
+  s_a991fe62202971::t_716f24719a8cc7 1-9
+REUSE.toml
+  s_a991fe62202971::t_d98cf59656653f 41-45
+code/.prettierignore
+  s_a991fe62202971::t_f6e81353f6f15a 1-2
+code/components/legal/legal-consent-checkbox.tsx
+  s_a991fe62202971::t_b320581b446160 6,11,17,20-25
+code/components/session/session.hero-demo.css
+  s_a991fe62202971::t_d7e2ad3b0ac7e0 1-350
+code/components/session/session.hero-demo.tsx
+  s_a991fe62202971::t_f2039fad905a30 1-328
+code/components/session/session.hero-frame.css
+  s_a991fe62202971::t_462c3a8d22ac46 1-79
+code/components/session/session.hero-frame.tsx
+  s_a991fe62202971::t_ac4630ab0c4b33 5-6,8-18
+code/components/session/session.login.tsx
+  s_a991fe62202971::t_d42a7597d3d790 13-14,30,33,37-52,55-56,62,65,68-85,88-134
+code/components/stageshow/LICENSE
+  s_a991fe62202971::t_0aad3ca6b3b207 1-21
+code/components/stageshow/README.md
+  s_a991fe62202971::t_33273e0d8e0599 1-10
+code/components/stageshow/act.ts
+  s_a991fe62202971::t_efd43012bcb799 1-669
+code/components/stageshow/clock.ts
+  s_a991fe62202971::t_bb5ff71b36eb11 1-265
+code/components/stageshow/cursor.css
+  s_a991fe62202971::t_ca69aee5092480 1-256
+code/components/stageshow/cursor.tsx
+  s_a991fe62202971::t_3d0038d28ebe46 1-103
+code/components/stageshow/cursors.tsx
+  s_a991fe62202971::t_af661e7cd2c626 1-106
+code/components/stageshow/ease.ts
+  s_a991fe62202971::t_03caa2837c3d62 1-65
+code/components/stageshow/keys.css
+  s_a991fe62202971::t_c62282c256fa5f 1-60
+code/components/stageshow/keys.tsx
+  s_a991fe62202971::t_d4dc82cb536e79 1-36
+code/components/stageshow/looks.ts
+  s_a991fe62202971::t_13f4c29b11b9dd 1-23
+code/components/stageshow/measure.ts
+  s_a991fe62202971::t_89835aa5c1b96d 1-122
+code/components/stageshow/parts/Avatar.css
+  s_a991fe62202971::t_c9fea1177421e8 1-102
+code/components/stageshow/parts/Avatar.tsx
+  s_a991fe62202971::t_809217df5cdf39 1-46
+code/components/stageshow/parts/Facepile.css
+  s_a991fe62202971::t_c43ae1b0128dbc 1-17
+code/components/stageshow/parts/Facepile.tsx
+  s_a991fe62202971::t_cd96bd114bc10d 1-26
+code/components/stageshow/reduced-motion.ts
+  s_a991fe62202971::t_f9aeeb88095610 1-18
+code/components/stageshow/stage.css
+  s_a991fe62202971::t_79262f5be880dd 1-448
+code/components/stageshow/stage.tsx
+  s_a991fe62202971::t_848a75eca60d5a 1-612
+code/components/stageshow/util.ts
+  s_a991fe62202971::t_06fa3ab327286c 1-25
+code/components/stageshow/window.css
+  s_a991fe62202971::t_8a48350fa2033b 1-612
+code/components/stageshow/window.tsx
+  s_a991fe62202971::t_b77761d2effcb4 1-276
+code/eslint.config.js
+  s_a991fe62202971::t_596fc72b79909e 17-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "8550f407270332448bdbf231a3321eec734e386f",
+  "prompts": {},
+  "sessions": {
+    "s_a991fe62202971": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de3aadef0ffehkrO589WZC29JG",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
