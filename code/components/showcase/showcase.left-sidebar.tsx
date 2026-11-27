@@ -88,10 +88,6 @@ export const ShowcaseLeftSidebar = () => {
       </div>
       <div className="w-full flex flex-col gap-8 justify-start items-start">
         <div className="w-full flex flex-col gap-1 justify-start items-start">
-          <SectionTitle>Legal</SectionTitle>
-          {legalLinks}
-        </div>
-        <div className="w-full flex flex-col gap-1 justify-start items-start">
           <SectionTitle>Resources</SectionTitle>
           <a
             href={GITHUB_URL}
@@ -119,6 +115,10 @@ export const ShowcaseLeftSidebar = () => {
           >
             DEPENDENCIES
           </button>
+        </div>
+        <div className="w-full flex flex-col gap-1 justify-start items-start">
+          <SectionTitle>Legal</SectionTitle>
+          {legalLinks}
         </div>
         <BuildInfo />
         {session && session.user && (
