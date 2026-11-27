@@ -1,0 +1,21 @@
+openspec/specs/legal-pages/spec.md
+  s_a991fe62202971::t_2e7309b07457d7 1-78
+openspec/specs/room-sidebar-layout/spec.md
+  s_a991fe62202971::t_bc6cbbf511df96 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "89671c2c5b82c2549638d1ca687aeb9725ca3c6c",
+  "prompts": {},
+  "sessions": {
+    "s_a991fe62202971": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_de3aadef0ffehkrO589WZC29JG",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
